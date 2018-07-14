@@ -1,0 +1,29 @@
+background = OpenImage("background.tif")
+background = GrayScale(background)
+mask = OpenImage("mask.tif")
+mask = GrayScale(mask)
+
+OpenVideo("00001.MTS")
+{
+	Grayscale()
+	DifferenceAbs(background)
+	Threshold(0.05)
+	Mask(mask)
+	
+	CreateClusters(minArea=10, maxArea=30)
+	CreateTracks(maxMove=2, minActive=3, maxInactive=3)
+	CreatePaths(distance=5)
+	
+	100:Color()
+	100:StoreImage(bin)
+	100:DrawPaths(pathdrawmode=age, power=4, palette=heat)
+	100:DrawLegend()
+	100:ShowImage()
+
+	100-50:GetImage(bin)
+	100-50:DrawPaths(pathdrawmode=links, power=4, palette=heat)
+	100-50:DrawLegend()
+	100-50:ShowImage(display=2)
+	
+	100:ShowTrackInfo()
+}

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="D3B0C179-1F76-406A-B938-7E33C6BF461F" Name="Bio Image Operation" Language="1033" Version="!(bind.FileVersion.BioImageOperationExe)" Manufacturer="Joost de Folter" UpgradeCode="EDE41139-C8E6-4D98-AE85-E669F8CA6D48">
+		<Package InstallerVersion="200" Platform="x64" Compressed="yes" InstallScope="perMachine" Manufacturer="Joost de Folter" Description="http://joostdefolter.info" Comments="http://joostdefolter.info" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate CompressionLevel="high" EmbedCab="yes" />
+
+		<Feature Id="ProductFeature" Title="BioImageOperation" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFiles64Folder">
+				<Directory Id="INSTALLFOLDER" Name="BioImageOperation" />
+			</Directory>
+
+			<Directory Id="ProgramMenuFolder">
+				<Directory Id="ApplicationProgramsFolder" Name="BioImageOperation" />
+			</Directory>
+			<Directory Id="DesktopFolder" Name="Desktop" />
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<Component Id="MainExecutable" Win64="yes">
+				<File Id="BioImageOperationExe" Name="$(var.BioImageOperation.TargetFileName)" Source="$(var.BioImageOperation.TargetPath)" KeyPath="yes" >
+					<Shortcut Id="StartmenuShortcut" Directory="ApplicationProgramsFolder" Name="BioImageOperation" WorkingDirectory="INSTALLDIR" Advertise="yes" Icon="BioIcon.exe" IconIndex="0">
+						<Icon Id="BioIcon.exe" SourceFile="$(var.BioImageOperation.TargetPath)" />
+					</Shortcut>
+					<Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="BioImageOperation" WorkingDirectory="INSTALLDIR" Advertise="yes" Icon="BioIcon.exe" IconIndex="0" />
+				</File>
+			</Component>
+			<Component Id="OpencvDllComp" Win64="yes">
+				<File Id="OpencvDll" Name="opencv_world341.dll" Source="D:\opencv\build\x64\vc15\bin\opencv_world341.dll" />
+			</Component>
+			<Component Id="FfmpegDllComp" Win64="yes">
+				<File Id="FfmpegDll" Name="opencv_ffmpeg341_64.dll" Source="D:\opencv\build\x64\vc15\bin\opencv_ffmpeg341_64.dll" />
+			</Component>
+			<Component Id="H264DllComp" Win64="yes">
+				<File Id="H264Dll" Name="openh264-1.7.0-win64.dll" Source="D:\openh264\openh264-1.7.0-win64.dll" />
+			</Component>
+		</ComponentGroup>
+		<Property Id="ARPPRODUCTICON" Value="BioIcon.exe" />
+	</Fragment>
+</Wix>
+
+<!-- http://wixtoolset.org/documentation/manual/v3/votive/votive_project_references.html -->

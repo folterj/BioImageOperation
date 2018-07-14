@@ -1,0 +1,296 @@
+/*****************************************************************************
+ * Bio Image Operation
+ * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *****************************************************************************/
+
+#include "VideoSource.h"
+#include "Constants.h"
+#include "Util.h"
+
+#ifdef _DEBUG
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#define new DEBUG_NEW
+#endif
+
+
+VideoSource::VideoSource()
+{
+}
+
+VideoSource::~VideoSource()
+{
+	close();
+}
+
+void VideoSource::reset()
+{
+	sourcePath->reset();
+	label = "";
+	nsources = 0;
+	sourcei = 0;
+	nframes = 0;
+	videoNframes = 0;
+	framei = 0;
+	videoFramei = 0;
+	width = 0;
+	height = 0;
+	fps = 1;
+	start = 0;
+	end = 0;
+	interval = 1;
+	seekMode = false;
+	close();
+}
+
+bool VideoSource::init(System::String^ basePath, System::String^ filePath, System::String^ start, System::String^ length, double fps0, int interval)
+{
+	System::String^ fileName = ".";	// dummy value to pass initial while-loop condition
+	bool ok = false;
+	int lengthi = 0;
+
+	reset();
+
+	sourcePath->setInputPath(basePath, filePath);
+
+	nsources = sourcePath->getFileCount();
+	if (nsources == 0)
+	{
+		throw gcnew System::Exception("File(s) not found: " + sourcePath->templatePath);
+	}
+
+	nframes = 0;
+	while (fileName != "")
+	{
+		fileName = sourcePath->createFilePath();
+		if (fileName != "")
+		{
+			if (videoCapture.open(Util::stdString(fileName)))
+			{
+				nframes += (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_COUNT);
+				width = (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_WIDTH);
+				height = (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_HEIGHT);
+				fps = videoCapture.get(VideoCaptureProperties::CAP_PROP_FPS);
+			}
+			else
+			{
+				throw gcnew System::Exception("Unable to open video: " + fileName);
+			}
+			videoCapture.release();
+		}
+	}
+	sourcePath->resetFilePath();
+
+	if (fps == 0)
+	{
+		fps = fps0;
+	}
+
+	this->start = Util::parseFrameTime(start, fps);
+	lengthi = Util::parseFrameTime(length, fps);
+
+	if (lengthi > 0)
+	{
+		this->end = this->start + lengthi;
+		if (this->end > nframes)
+		{
+			this->end = 0;
+		}
+	}
+
+	this->interval = interval;
+	if (this->interval == 0)
+	{
+		this->interval = 1;
+	}
+	seekMode = (interval >= Constants::seekModeInterval);	// auto select seek mode: if interval >= x frames
+
+	ok = open();
+	if (ok)
+	{
+		framei = this->start;
+		videoFramei = this->start;
+		seekFrame();
+	}
+
+	return ok;
+}
+
+bool VideoSource::open()
+{
+	bool ok = videoIsOpen;
+	System::String^ fileName;
+
+	if (!videoIsOpen)
+	{
+		// open (next) video
+		fileName = sourcePath->createFilePath();
+		if (fileName != "")
+		{
+			if (videoCapture.open(Util::stdString(fileName)))
+			{
+				videoNframes = (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_COUNT);
+				label = Util::extractFileName(fileName);
+				sourcei++;
+				videoIsOpen = videoCapture.isOpened();
+				ok = videoIsOpen;
+			}
+
+			if (!videoIsOpen)
+			{
+				close();
+				throw gcnew System::Exception("Unable to open video: " + fileName);
+			}
+		}
+		else
+		{
+			ok = false;
+		}
+	}
+	return ok;
+}
+
+void VideoSource::release()
+{
+	videoCapture.release();
+	videoIsOpen = false;
+}
+
+void VideoSource::close()
+{
+	release();
+}
+
+bool VideoSource::getNextImage(Mat* image)
+{
+	bool frameOk = false;
+
+	if (seekMode)
+	{
+		if (seekFrame())
+		{
+			frameOk = nextFrame();
+		}
+		videoFramei += interval;
+		framei += interval;
+	}
+	else
+	{
+		// skip frames
+		do
+		{
+			frameOk = nextFrame();
+			if (!frameOk)
+			{
+				break;
+			}
+			framei++;
+		} while ((framei % interval) != 0);
+	}
+
+	if (frameOk)
+	{
+		if (end != 0 && framei >= end)
+		{
+			// reached desired length
+			videoIsOpen = false;
+		}
+		else if (!videoCapture.retrieve(*image))
+		{
+			// unexpected error
+			videoIsOpen = false;
+		}
+	}
+
+	return (frameOk && videoIsOpen);
+}
+
+bool VideoSource::seekFrame()
+{
+	bool openOk = true;
+
+	while (videoFramei >= videoNframes && openOk)
+	{
+		videoFramei -= videoNframes;
+		videoCapture.release();
+		videoIsOpen = false;
+		openOk = open();
+	}
+	return videoCapture.set(VideoCaptureProperties::CAP_PROP_POS_FRAMES, videoFramei);
+}
+
+bool VideoSource::nextFrame()
+{
+	bool frameOk = false;
+
+	do
+	{
+		if (!videoIsOpen)
+		{
+			// try open (next) video
+			if (!open())
+			{
+				break;
+			}
+		}
+		if (videoIsOpen)
+		{
+			frameOk = videoCapture.grab();
+			if (!frameOk)
+			{
+				release();
+			}
+		}
+	} while (!videoIsOpen);
+
+	return (frameOk && videoIsOpen);
+}
+
+int VideoSource::getWidth()
+{
+	return width;
+}
+
+int VideoSource::getHeight()
+{
+	return height;
+}
+
+double VideoSource::getFps()
+{
+	return fps;
+}
+
+System::String^ VideoSource::getLabel()
+{
+	return label;
+}
+
+int VideoSource::getCurrentFrame()
+{
+	return framei - start;
+}
+
+int VideoSource::getTotalFrames()
+{
+	if (end > 0)
+	{
+		return end - start;
+	}
+	return nframes - start;
+}

@@ -1,0 +1,105 @@
+/*****************************************************************************
+ * Bio Image Operation
+ * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *****************************************************************************/
+
+#pragma once
+#include "Cluster.h"
+#include "ClusterTrack.h"
+#include "DistanceCluster.h"
+#include "PathNode.h"
+#include "PathLink.h"
+#include "TrackingParams.h"
+#include "StatData.h"
+#include "TrackingStats.h"
+#include "Cluster.h"
+#include "OutputStream.h"
+#include <vcclr.h>
+#pragma unmanaged
+#include "opencv2/opencv.hpp"
+#pragma managed
+
+using namespace System;
+using namespace cv;
+
+
+/*
+ * Image tracking - clustering, tracking, common paths
+ */
+
+class ImageTracker
+{
+public:
+	gcroot<System::String^> trackerId = "";
+	std::vector<std::vector<cv::Point>> contours;
+	std::vector<Cluster*> clusters;
+	std::vector<ClusterTrack*> clusterTracks;
+	std::vector<PathNode*> pathNodes;
+	std::vector<PathLink*> pathLinks;
+	std::deque<int> recycledLabels;
+	int nextTrackLabel = 0;
+	int nextPathLabel = 0;
+
+	bool clusterParamsFinalised = false;
+	bool trackParamsFinalised = false;
+	bool countPositionSet = false;
+	double pathDistance = Constants::minPathDistance;
+	int pathAge = 0;
+	cv::Point countPosition;
+	OutputStream clusterStream, trackStream, pathStream, trackInfoStream;
+	Mat clusterLabelImage, clusterStats, clusterCentroids, clusterRoiImage, clusterRoiImage2;
+	Moments clusterMoments;
+
+	TrackingParams trackingParams;
+	StatData areaStats;
+	StatData distanceStats;
+	TrackingStats trackingStats;
+
+	ImageTracker();
+	ImageTracker(System::String^ trackerId);
+	~ImageTracker();
+	void deleteClusters();
+	void deleteTracks();
+	void deletePaths();
+	void reset();
+
+	bool createClusters(Mat* image, double areaMin, double areaMax);
+	void createTracks(double maxMove, int minActive, int maxInactive);
+	void createPaths(double pathDistance);
+	bool findClusters(Mat* image);
+	void matchClusterTracks();
+	DistanceCluster* findNearestClusterDistance(ClusterTrack* track, double maxMoveDistance);
+	bool matchTrackCluster(DistanceCluster* distCluster, double maxMoveDistance, double& distance);
+	void pruneTracks();
+	void matchPaths();
+	bool matchPathElement(ClusterTrack* track);
+	void updatePaths();
+	void updateClusterParams();
+	void addPathLink(PathNode* node1, PathNode* node2);
+	void updateTrackParams();
+
+	void drawClusters(Mat* source, Mat* dest, ClusterDrawMode drawMode);
+	void drawTracks(Mat* source, Mat* dest, ClusterDrawMode drawMode, double fps);
+	void drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, float power, Palette palette);
+	void drawTrackInfo(Mat* source, Mat* dest);
+	System::String^ getInfo();
+
+	void saveClusters(System::String^ fileName, int i);
+	void saveTracks(System::String^ fileName, int i);
+	void savePaths(System::String^ fileName, int i);
+	void saveTrackInfo(System::String^ fileName, int i);
+	void closeStreams();
+};

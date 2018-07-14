@@ -1,0 +1,6 @@
+OpenVideo("00001.MTS", interval=1000)
+{
+	background = UpdateBackground(weight=0.05)
+	ShowImage(background)
+}
+ShowImage(background)

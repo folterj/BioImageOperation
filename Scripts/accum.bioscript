@@ -1,0 +1,17 @@
+background = OpenImage("background.tif")
+background = Grayscale(background)
+mask = OpenImage("mask.tif")
+mask = Grayscale(mask)
+
+OpenVideo("test.mts")
+{
+	Grayscale()
+	DifferenceAbs(background)
+	Mask(mask)
+	Threshold(0.1)
+	
+	AddAccum(accummode=age)
+	
+	20:GetAccum(power=4,palette=heat)
+	20:ShowImage()
+}

@@ -1,0 +1,24 @@
+background = OpenImage("background.tif")
+background = GrayScale(background)
+mask = OpenImage("mask.tif")
+mask = GrayScale(mask)
+blank = CreateImage()
+
+OpenVideo("test.MTS")
+{
+	StoreImage(original)
+	Grayscale()
+	DifferenceAbs(background)
+	Threshold(0.05)
+	Mask(mask)
+	
+	CreateClusters(minArea=10, maxArea=30)
+	CreateTracks(maxMove=2, minActive=3, maxInactive=3)
+
+	GetImage(blank)
+	DrawClusters(DrawMode=fill)
+	overlay = UpdateAverage(0.05)
+	GetImage(original)
+	Add(overlay)
+	ShowImage()
+}
