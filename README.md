@@ -7,3 +7,6 @@ This tool has been developed in collaboration with biologists, using extensive c
 The solution balancing both the need for research purposes and flexibility required for this, and desired ease of use is realised in a script based user interface.
 
 The tool uses the widely used OpenCV for many of it's image operations, with an efficient tracking algorithm allowing real time processing.
+
+See joostdefolter.info for more info
+http://joostdefolter.info/ant-research
