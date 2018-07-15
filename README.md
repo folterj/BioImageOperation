@@ -11,6 +11,8 @@ The tool uses the widely used OpenCV for many of it's image operations, with an 
 See joostdefolter.info for more info
 http://joostdefolter.info/ant-research
 
+This is a Visual Studio 2017 C++ Windows Forms project
+
 Project Requirements
 - OpenCV
 - Openh264 1.7 library
