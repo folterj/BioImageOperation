@@ -11,10 +11,10 @@ The tool uses the widely used OpenCV for many of it's image operations, with an 
 See joostdefolter.info for more info
 http://joostdefolter.info/ant-research
 
-This is a Visual Studio 2017 C++ Windows Forms project
+This is a Microsoft Visual Studio 2017 C++ Windows Forms project
 
 Project Requirements
-- OpenCV
-- Openh264 1.7 library
-- WiX 3
+- OpenCV 3.4.1 (https://opencv.org/)
+- Openh264 1.7 library (https://github.com/cisco/openh264)
+- WiX 3 (http://wixtoolset.org)
 - Windows 64-bit
