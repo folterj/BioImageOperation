@@ -10,3 +10,9 @@ The tool uses the widely used OpenCV for many of it's image operations, with an 
 
 See joostdefolter.info for more info
 http://joostdefolter.info/ant-research
+
+Project Requirements
+- OpenCV
+- Openh264 1.7 library
+- WiX 3
+- Windows 64-bit
