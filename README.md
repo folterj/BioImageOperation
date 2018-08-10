@@ -1,6 +1,6 @@
 # BioImageOperation
 
-Bio Image Operation or 'BIO', is a next generation Image processing tool focussing on biological applications, balancing ease of use with desired flexibility required for research.
+Bio Image Operation or 'BIO', is a next generation Image processing tool focusing on biological applications, balancing ease of use with desired flexibility required for research.
 
 This tool has been developed in collaboration with biologists, using extensive captured images.
 
