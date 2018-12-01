@@ -176,21 +176,21 @@ void ClusterTrack::drawPoint(Mat* image, Scalar color)
 {
 	cv::Point point((int)x, (int)y);
 
-	drawMarker(*image, point, color, MARKER_CROSS, 2, 1, CV_AA);
+	drawMarker(*image, point, color, MARKER_CROSS, 2, 1, LINE_AA);
 }
 
 void ClusterTrack::drawCircle(Mat* image, Scalar color)
 {
 	cv::Point point((int)x, (int)y);
 
-	circle(*image, point, (int)rad, color, 1, CV_AA);
+	circle(*image, point, (int)rad, color, 1, LINE_AA);
 }
 
 void ClusterTrack::drawBox(Mat* image, Scalar color)
 {
 	Rect rect((int)(x - rad), (int)(y - rad), (int)(rad * 2), (int)(rad * 2));
 
-	rectangle(*image, rect, color, 1, CV_AA);
+	rectangle(*image, rect, color, 1, LINE_AA);
 }
 
 void ClusterTrack::drawAngle(Mat* image, Scalar color)
@@ -200,14 +200,14 @@ void ClusterTrack::drawAngle(Mat* image, Scalar color)
 	int x1 = (int)(x + 2 * rad * cos(orientation));
 	int y1 = (int)(y + 2 * rad * sin(orientation));
 
-	arrowedLine(*image, cv::Point(x0, y0), cv::Point(x1, y1), color, 1, CV_AA);
+	arrowedLine(*image, cv::Point(x0, y0), cv::Point(x1, y1), color, 1, LINE_AA);
 }
 
 void ClusterTrack::drawLabel(Mat* image, Scalar color)
 {
 	cv::Point point((int)x, (int)y);
 
-	putText(*image, Util::stdString(label.ToString()), point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA);
+	putText(*image, Util::stdString(label.ToString()), point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, LINE_AA);
 }
 
 void ClusterTrack::drawTracks(Mat* image, Scalar color, int ntracks)
@@ -222,7 +222,7 @@ void ClusterTrack::drawTracks(Mat* image, Scalar color, int ntracks)
 		point1.y = (int)points[i].y;
 		if (init)
 		{
-			line(*image, point0, point1, color, 1, CV_AA);
+			line(*image, point0, point1, color, 1, LINE_AA);
 		}
 		point0 = point1;
 		init = true;

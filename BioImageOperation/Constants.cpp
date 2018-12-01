@@ -39,6 +39,7 @@ const int Constants::minPathDistance = 2;
 
 const int Constants::clusterTrainingCycles = 10;
 const int Constants::trackTrainingCycles = 10;
+const int Constants::trainingDataPoints = 1000;
 const int Constants::defMinActive = 3;
 const int Constants::defMaxInactive = 3;
 const int Constants::defMaxMove = 1000;

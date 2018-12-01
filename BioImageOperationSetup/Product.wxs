@@ -35,10 +35,10 @@
 				</File>
 			</Component>
 			<Component Id="OpencvDllComp" Win64="yes">
-				<File Id="OpencvDll" Name="opencv_world341.dll" Source="D:\opencv\build\x64\vc15\bin\opencv_world341.dll" />
+				<File Id="OpencvDll" Name="opencv_world400.dll" Source="D:\opencv\build\x64\vc15\bin\opencv_world400.dll" />
 			</Component>
 			<Component Id="FfmpegDllComp" Win64="yes">
-				<File Id="FfmpegDll" Name="opencv_ffmpeg341_64.dll" Source="D:\opencv\build\x64\vc15\bin\opencv_ffmpeg341_64.dll" />
+				<File Id="FfmpegDll" Name="opencv_ffmpeg400_64.dll" Source="D:\opencv\build\x64\vc15\bin\opencv_ffmpeg400_64.dll" />
 			</Component>
 			<Component Id="H264DllComp" Win64="yes">
 				<File Id="H264Dll" Name="openh264-1.7.0-win64.dll" Source="D:\openh264\openh264-1.7.0-win64.dll" />

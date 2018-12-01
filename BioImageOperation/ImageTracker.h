@@ -44,6 +44,7 @@ class ImageTracker
 {
 public:
 	gcroot<System::String^> trackerId = "";
+	gcroot<System::String^> basePath = "";
 	std::vector<std::vector<cv::Point>> contours;
 	std::vector<Cluster*> clusters;
 	std::vector<ClusterTrack*> clusterTracks;
@@ -68,38 +69,102 @@ public:
 	StatData distanceStats;
 	TrackingStats trackingStats;
 
+	/*
+	 * Constructor for testing
+	 */
 	ImageTracker();
+
+	/*
+	 * Main constructor
+	 */
 	ImageTracker(System::String^ trackerId);
+
+	/*
+	 * Destructor
+	 */
 	~ImageTracker();
+
+	/*
+	 * Deep delete routines
+	 */
 	void deleteClusters();
 	void deleteTracks();
 	void deletePaths();
+
+	/*
+	 * Reset class properties
+	 */
 	void reset();
 
-	bool createClusters(Mat* image, double areaMin, double areaMax);
-	void createTracks(double maxMove, int minActive, int maxInactive);
+	/*
+	 * Create clusters from image entry point
+	 */
+	bool createClusters(Mat* image, double areaMin, double areaMax, System::String^ basePath);
+
+	/*
+	 * Create tracks entry point
+	 */
+	void createTracks(double maxMove, int minActive, int maxInactive, System::String^ basePath);
+
+	/*
+	 * Create paths entry point
+	 */
 	void createPaths(double pathDistance);
+
+	/*
+	 * Create clusters from image
+	 */
 	bool findClusters(Mat* image);
+
+	/*
+	 * Create tracks
+	 */
 	void matchClusterTracks();
 	DistanceCluster* findNearestClusterDistance(ClusterTrack* track, double maxMoveDistance);
 	bool matchTrackCluster(DistanceCluster* distCluster, double maxMoveDistance, double& distance);
 	void pruneTracks();
+
+	/*
+	 * Create paths
+	 */
 	void matchPaths();
 	bool matchPathElement(ClusterTrack* track);
 	void updatePaths();
-	void updateClusterParams();
 	void addPathLink(PathNode* node1, PathNode* node2);
+
+	/*
+	 * Update automatic clustering parameters
+	 */
+	void updateClusterParams();
+
+	/*
+	 * Update automatic tracking parameters
+	 */
 	void updateTrackParams();
 
+	/*
+	 * Drawing routines
+	 */
 	void drawClusters(Mat* source, Mat* dest, ClusterDrawMode drawMode);
 	void drawTracks(Mat* source, Mat* dest, ClusterDrawMode drawMode, double fps);
 	void drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, float power, Palette palette);
 	void drawTrackInfo(Mat* source, Mat* dest);
+
+	/*
+	 * Return tracking information to show in text Form
+	 */
 	System::String^ getInfo();
 
+	/*
+	 * Save routines
+	 */
 	void saveClusters(System::String^ fileName, int i);
 	void saveTracks(System::String^ fileName, int i);
 	void savePaths(System::String^ fileName, int i);
 	void saveTrackInfo(System::String^ fileName, int i);
+
+	/*
+	 * Ensure closing & flushing any open streams
+	 */
 	void closeStreams();
 };

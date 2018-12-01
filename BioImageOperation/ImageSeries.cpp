@@ -32,10 +32,10 @@ void ImageSeries::reset()
 	images.clear();
 }
 
-void ImageSeries::addImage(Mat image, int bufferSize)
+void ImageSeries::addImage(Mat* image, int bufferSize)
 {
-	width = image.cols;
-	height = image.rows;
+	width = image->cols;
+	height = image->rows;
 
 	if (bufferSize != 0)
 	{
@@ -45,7 +45,7 @@ void ImageSeries::addImage(Mat image, int bufferSize)
 			images.pop_front();
 		}
 	}
-	images.push_back(image);
+	images.push_back(image->clone());
 }
 
 void ImageSeries::getMedian(OutputArray dest, Observer^ observer)

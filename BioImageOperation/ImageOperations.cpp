@@ -251,7 +251,7 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Pale
 	xbar = xstart + (int)(0.25 * width);
 	xline = xstart + (int)(0.4 * width);
 
-	rectangle(*dest, rect.tl(), rect.br(), background, LineTypes::FILLED, CV_AA);
+	rectangle(*dest, rect.tl(), rect.br(), background, LineTypes::FILLED, LINE_AA);
 
 	for (int y = ystart; y < yend; y++)
 	{
@@ -263,7 +263,7 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Pale
 		case Palette::Rainbow: color = ColorScale::getRainbowScale(val); break;
 		}
 
-		line(*dest, Point(xstart, y), Point(xbar, y), Util::bgrtoScalar(color), 1, CV_AA);
+		line(*dest, Point(xstart, y), Point(xbar, y), Util::bgrtoScalar(color), 1, LINE_AA);
 	}
 
 	for (int i = 0; i <= logPower; i++)
@@ -274,10 +274,10 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Pale
 		{
 			label += "   (1)";
 		}
-		putText(*dest, Util::stdString(label), Point(xline, (int)(y + textSize.height / 2)), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, infoColor, thickness, CV_AA);
+		putText(*dest, Util::stdString(label), Point(xline, (int)(y + textSize.height / 2)), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, infoColor, thickness, LINE_AA);
 		label = System::String::Format("{0}", -i);
-		putText(*dest, Util::stdString(label), Point((int)(xline + textSize.width), y), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, infoColor, thickness, CV_AA);
-		line(*dest, Point(xstart, y), Point(xline, y), infoColor, 1, CV_AA);
+		putText(*dest, Util::stdString(label), Point((int)(xline + textSize.width), y), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, infoColor, thickness, LINE_AA);
+		line(*dest, Point(xstart, y), Point(xline, y), infoColor, 1, LINE_AA);
 	}
 }
 
@@ -299,13 +299,13 @@ void ImageOperations::drawColorSwatches(Mat* dest, Rect rect)
 	double fontScale = width * 0.004;
 	int ntotal = 27;
 
-	rectangle(*dest, rect.tl(), rect.br(), background, LineTypes::FILLED, CV_AA);
+	rectangle(*dest, rect.tl(), rect.br(), background, LineTypes::FILLED, LINE_AA);
 
 	for (int i = 0; i < ntotal; i++)
 	{
 		y1 = (int)(ystart + i * yrange / ntotal) + 1;
 		y2 = (int)(ystart + (i + 1) * yrange / ntotal) - 1;
 		color = Util::getLabelColor(i);
-		rectangle(*dest, Point(xstart, y1), Point(xbar, y2), color, LineTypes::FILLED, CV_AA);
+		rectangle(*dest, Point(xstart, y1), Point(xbar, y2), color, LineTypes::FILLED, LINE_AA);
 	}
 }

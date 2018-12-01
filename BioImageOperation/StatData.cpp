@@ -41,6 +41,11 @@ void StatData::add(double x)
 	data.push_back(x);
 }
 
+int StatData::dataSize()
+{
+	return (int)data.size();
+}
+
 bool StatData::calcStats()
 {
 	if (data.size() > 0)
@@ -148,7 +153,6 @@ void StatData::calcSSStdDev()
 
 void StatData::calcHistogram()
 {
-	double q1, q3, iqr, binsize;
 	int n = (int)data.size();
 	int i;
 
@@ -159,30 +163,18 @@ void StatData::calcHistogram()
 
 	if (maxRange != 0)
 	{
-		q1 = calcPartition(0.25);
-		q3 = calcPartition(0.75);
-		iqr = q3 - q1;
-		binsize = 2 * iqr / Math::Pow(n, (double)1 / 3);
-		nbins = (int)Math::Ceiling(maxRange / binsize);
-
-		if (nbins > Constants::statBins)
-		{
-			nbins = Constants::statBins;
-		}
-
 		for (double x : data)
 		{
-			i = (int)(x / maxRange * nbins);
-			if (i >= nbins)
+			i = (int)(x / maxRange * Constants::statBins);
+			if (i >= Constants::statBins)
 			{
-				i = nbins - 1;
+				i = Constants::statBins - 1;
 			}
 			bins[i]++;
 		}
 	}
 	else
 	{
-		nbins = 0;
 		maxRange = 1;
 	}
 }
@@ -198,13 +190,13 @@ void StatData::calcOtsu()
 
 	otsu = 0;
 
-	for (int i = 0; i < nbins - 1; i++)
+	for (int i = 0; i < Constants::statBins - 1; i++)
 	{
 		total += bins[i];
 		sum1 += i * bins[i];
 	}
 
-	for (int i = 0; i < nbins - 1; i++)
+	for (int i = 0; i < Constants::statBins - 1; i++)
 	{
 		wB += bins[i];
 		wF = total - wB;
@@ -216,7 +208,7 @@ void StatData::calcOtsu()
 			between = wB * wF * ((sumB / wB) - mF) * ((sumB / wB) - mF);
 			if (between >= maximum)
 			{
-				otsu = (double)i / nbins * maxRange;
+				otsu = (double)i / Constants::statBins * maxRange;
 				maximum = between;
 			}
 		}
@@ -226,9 +218,9 @@ void StatData::calcOtsu()
 void StatData::calcPeak()
 {
 	double binval;
-	int mini = (int)(otsu / maxRange * nbins);
-	int medi = nbins / 2;
-	int maxi = nbins - 1;
+	int mini = (int)(otsu / maxRange * Constants::statBins);
+	int medi = Constants::statBins / 2;
+	int maxi = Constants::statBins - 1;
 	double maxval;
 
 	if (maxi < 1)
@@ -238,18 +230,18 @@ void StatData::calcPeak()
 
 	// starting value
 	maxval = bins[medi];
-	peak = (double)medi / nbins * maxRange;
+	peak = (double)medi / Constants::statBins * maxRange;
 
 	// skip last bin
 	for (int i = maxi - 1; i > mini; i--)
 	{
-		if (i >= 0 && i < nbins)
+		if (i >= 0 && i < Constants::statBins)
 		{
 			binval = bins[i];
 			if (binval > maxval)
 			{
 				maxval = binval;
-				peak = (double)i / nbins * maxRange;
+				peak = (double)i / Constants::statBins * maxRange;
 			}
 		}
 	}
@@ -291,5 +283,5 @@ void StatData::saveData(System::String^ filename)
 		s += System::String::Format("{0}\n", x);
 	}
 
-	System::IO::File::AppendAllText(filename, s);
+	System::IO::File::WriteAllText(filename, s);
 }

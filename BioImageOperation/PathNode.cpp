@@ -67,5 +67,5 @@ void PathNode::draw(Mat* image, Scalar color)
 {
 	cv::Point point((int)x, (int)y);
 
-	drawMarker(*image, point, color, MARKER_CROSS, 2, 1, CV_AA);
+	drawMarker(*image, point, color, MARKER_CROSS, 2, 1, LINE_AA);
 }

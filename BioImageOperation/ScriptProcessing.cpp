@@ -427,7 +427,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::AddSeries:
-			imageSeries->addImage(*getLabelOrCurrentImage(operation, image, true), (int)operation->getArgumentNumeric());
+			imageSeries->addImage(getLabelOrCurrentImage(operation, image, true), (int)operation->getArgumentNumeric());
 			break;
 
 		case ScriptOperationType::GetSeriesMedian:
@@ -447,11 +447,11 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::CreateClusters:
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker), true)->createClusters(image, operation->getArgumentNumeric(ArgumentLabel::MinArea), operation->getArgumentNumeric(ArgumentLabel::MaxArea));
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker), true)->createClusters(image, operation->getArgumentNumeric(ArgumentLabel::MinArea), operation->getArgumentNumeric(ArgumentLabel::MaxArea), basePath);
 			break;
 
 		case ScriptOperationType::CreateTracks:
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->createTracks(operation->getArgumentNumeric(ArgumentLabel::MaxMove), (int)operation->getArgumentNumeric(ArgumentLabel::MinActive), (int)operation->getArgumentNumeric(ArgumentLabel::MaxInactive));
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->createTracks(operation->getArgumentNumeric(ArgumentLabel::MaxMove), (int)operation->getArgumentNumeric(ArgumentLabel::MinActive), (int)operation->getArgumentNumeric(ArgumentLabel::MaxInactive), basePath);
 			break;
 
 		case ScriptOperationType::CreatePaths:
@@ -576,6 +576,16 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		else
 		{
 			errorMsg = Util::netString(e.msg);
+		}
+		if (errorMsg->Contains("=="))
+		{
+			// adding more user friendly messages:
+			if (errorMsg->Contains("CV_MAT_TYPE")) {
+				errorMsg += " (Image types don't match)";
+			}
+			if (errorMsg->Contains("CV_MAT_CN")) {
+				errorMsg += " (Image color channels don't match)";
+			}
 		}
 		errorMsg += " in\n" + Util::netString(operation->line);
 		observer->showErrorMessage(errorMsg);

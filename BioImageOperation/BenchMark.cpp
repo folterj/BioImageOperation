@@ -136,13 +136,13 @@ void BenchMark::benchmarkTest()
 				time5 = stopwatch->ElapsedMilliseconds;
 				t5.addValue((double)(time5 - time4));
 
-				clusterOk = tracker->createClusters(&binImage2, 10, 30);
+				clusterOk = tracker->createClusters(&binImage2, 10, 30, "");
 				time6 = stopwatch->ElapsedMilliseconds;
 				t6.addValue((double)(time6 - time5));
 
 				if (clusterOk)
 				{
-					tracker->createTracks(2, 3, 3);
+					tracker->createTracks(2, 3, 3, "");
 					//tracker->createPaths(PathMode::Simple, 10);
 				}
 				time7 = stopwatch->ElapsedMilliseconds;

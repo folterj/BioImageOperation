@@ -151,7 +151,7 @@ public enum class DrawPosition
 class Constants
 {
 public:
-	static const int statBins = 1000;
+	static const int statBins = 20;
 	static const int nDisplays;
 	static const int nInfoWindows;
 	static const int nTrackers;
@@ -172,6 +172,7 @@ public:
 
 	static const int clusterTrainingCycles;
 	static const int trackTrainingCycles;
+	static const int trainingDataPoints;
 	static const int defMinActive;
 	static const int defMaxInactive;
 	static const int defMaxMove;

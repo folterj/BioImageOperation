@@ -33,7 +33,6 @@ public:
 	std::vector<double> data;
 
 	int bins[Constants::statBins] = {};
-	int nbins = 0;
 	double maxRange = 0;
 	double mean = 0;
 	double median = 0;
@@ -48,6 +47,7 @@ public:
 	StatData();
 	void reset();
 	void add(double x);
+	int dataSize();
 	bool calcStats();
 	void calcMean();
 	void removeMaxRange(double range);

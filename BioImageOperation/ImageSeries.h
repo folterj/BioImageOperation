@@ -40,6 +40,6 @@ public:
 	~ImageSeries();
 
 	void reset();
-	void addImage(Mat image, int bufferSize = 0);
+	void addImage(Mat* image, int bufferSize = 0);
 	void getMedian(OutputArray dest, Observer^ observer = nullptr);
 };

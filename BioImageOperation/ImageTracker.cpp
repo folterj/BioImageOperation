@@ -124,9 +124,11 @@ void ImageTracker::reset()
  * Create clusters from image entry point
  */
 
-bool ImageTracker::createClusters(Mat* image, double minArea, double maxArea)
+bool ImageTracker::createClusters(Mat* image, double minArea, double maxArea, System::String^ basePath)
 {
 	bool clustersOk;
+
+	this->basePath = basePath;
 
 	if (minArea != 0 || maxArea != 0)
 	{
@@ -147,9 +149,11 @@ bool ImageTracker::createClusters(Mat* image, double minArea, double maxArea)
  * Create tracks entry point
  */
 
-void ImageTracker::createTracks(double maxMove, int minActive, int maxInactive)
+void ImageTracker::createTracks(double maxMove, int minActive, int maxInactive, System::String^ basePath)
 {
 	bool clustersOk = (clusters.size() > 0);
+
+	this->basePath = basePath;
 
 	if (maxMove != 0 || minActive || maxInactive != 0)
 	{
@@ -587,10 +591,11 @@ void ImageTracker::updateClusterParams()
 		trackingParams.area.n++;
 	}
 
-	if (trackingParams.area.n >= Constants::clusterTrainingCycles)
+	if (trackingParams.area.n >= Constants::clusterTrainingCycles &&
+		areaStats.dataSize() >= Constants::trainingDataPoints)
 	{
 		areaStats.calcStats();
-		//areaStats.saveData("D:\\ants_area.csv");
+		areaStats.saveData(Util::combinePath(basePath, "area_cluster_data.csv"));
 		trackingParams.area = areaStats.getParamRange();
 		clusterParamsFinalised = true;
 
@@ -626,11 +631,12 @@ void ImageTracker::updateTrackParams()
 		trackingParams.maxMove.n++;
 	}
 
-	if (trackingParams.maxMove.n >= Constants::trackTrainingCycles)
+	if (trackingParams.maxMove.n >= Constants::trackTrainingCycles &&
+		distanceStats.dataSize() >= Constants::trainingDataPoints)
 	{
 		//distanceStats.removeMaxRange(0.1);	// remove top 10%
 		distanceStats.calcStats();
-		//distanceStats.saveData("D:\\ants_distance.csv");
+		distanceStats.saveData(Util::combinePath(basePath, "move_tracking_data.csv"));
 		trackingParams.maxMove.set(0, distanceStats.median * 4, 0);
 		trackParamsFinalised = true;
 
@@ -789,7 +795,7 @@ void ImageTracker::drawTrackInfo(Mat* source, Mat* dest)
 	if (position.x < 0) position.x = 0;
 	if (position.y < 0) position.y = 0;
 
-	putText(*dest, label, position, HersheyFonts::FONT_HERSHEY_SIMPLEX, 1, color, 1, CV_AA);
+	putText(*dest, label, position, HersheyFonts::FONT_HERSHEY_SIMPLEX, 1, color, 1, LINE_AA);
 }
 
 /*

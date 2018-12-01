@@ -143,21 +143,21 @@ void Cluster::drawPoint(Mat* image, Scalar color)
 {
 	cv::Point point((int)x, (int)y);
 
-	drawMarker(*image, point, color, MARKER_CROSS, 2, 1, CV_AA);
+	drawMarker(*image, point, color, MARKER_CROSS, 2, 1, LINE_AA);
 }
 
 void Cluster::drawCircle(Mat* image, Scalar color)
 {
 	cv::Point point((int)x, (int)y);
 
-	circle(*image, point, (int)rad, color, 1, CV_AA);
+	circle(*image, point, (int)rad, color, 1, LINE_AA);
 }
 
 void Cluster::drawBox(Mat* image, Scalar color)
 {
 	Rect rect((int)(x - rad), (int)(y - rad), (int)(rad * 2), (int)(rad * 2));
 
-	rectangle(*image, rect, color, 1, CV_AA);
+	rectangle(*image, rect, color, 1, LINE_AA);
 }
 
 void Cluster::drawAngle(Mat* image, Scalar color)
@@ -167,22 +167,25 @@ void Cluster::drawAngle(Mat* image, Scalar color)
 	int x1 = (int)(x + rad * cos(angle));
 	int y1 = (int)(y + rad * sin(angle));
 
-	line(*image, cv::Point(x0, y0), cv::Point(x1, y1), color, 1, CV_AA);
+	line(*image, cv::Point(x0, y0), cv::Point(x1, y1), color, 1, LINE_AA);
 }
 
 void Cluster::drawLabel(Mat* image, Scalar color)
 {
 	cv::Point point((int)x, (int)y);
 
-	putText(*image, Util::stdString(getLabels()), point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA);
-	//putText(*image, Util::stdString(area.ToString()), point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA));
+	putText(*image, Util::stdString(getLabels()), point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, LINE_AA);
+	//putText(*image, Util::stdString(area.ToString()), point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, LINE_AA));
 }
 
 void Cluster::drawFill(Mat* image, Scalar color)
 {
-	Mat clusterImage2(clusterImage.size(), CV_8UC3);
-	clusterImage2.setTo(0);
-	clusterImage2.setTo(color, clusterImage);			// use image as mask to convert to color
+	if (Util::isValidImage(&clusterImage))
+	{
+		Mat clusterImage2(clusterImage.size(), image->type());
+		clusterImage2.setTo(0);
+		clusterImage2.setTo(color, clusterImage);			// use image as mask to convert to color
 
-	clusterImage2.copyTo((*image)(box), clusterImage);	// use mask again; don't copy black pixels
+		clusterImage2.copyTo((*image)(box), clusterImage);	// use mask again; don't copy black pixels
+	}
 }

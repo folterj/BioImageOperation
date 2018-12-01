@@ -63,13 +63,44 @@ public:
 	Palette logPalette;
 	bool abort = false;
 
+	/*
+	 * Initialisation
+	 */
 	ScriptProcessing(Observer^ observer);
+
+	/*
+	 * Destructor
+	 */
 	~ScriptProcessing();
+
+	/*
+	 * Reset class properties when (re)starting script processing
+	 */
 	void reset();
+
+	/*
+	 * Start processing in separate thread
+	 */
 	void startProcess(System::String^ filePath, System::String^ script);
 	void processThreadMethod();
+
+	/*
+	 * Main script loop - called recursively for { internal } loops
+	 */
 	void processOperations(ScriptOperations* operations, ScriptOperation* prevOperation0);
+
+	/*
+	 * Process single script operation
+	 */
 	bool processOperation(ScriptOperation* operation, ScriptOperation* prevOperation);
+
+	/*
+	 * Helper function to get reference image, or else current image
+	 */
 	Mat* getLabelOrCurrentImage(ScriptOperation* operation, Mat* currentImage, bool explicitArgument);
+
+	/*
+	 * Abort thread, attempt closing output streams to prevent data loss
+	 */
 	void doAbort(bool tryKill);
 };
