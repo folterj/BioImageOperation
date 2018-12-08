@@ -101,7 +101,7 @@ void BenchMark::benchmarkTest()
 		Mat backImage = imread("D:\\Video\\Ants\\Copied 17 April\\background.tif", IMREAD_GRAYSCALE);
 		Mat maskImage = imread("D:\\Video\\Ants\\Copied 17 April\\mask.tif", IMREAD_GRAYSCALE);
 
-		if (!video.init("D:\\Video\\Ants\\Copied 17 April\\", "test.MTS"))
+		if (!video.init(0, "D:\\Video\\Ants\\Copied 17 April\\", "test.MTS"))
 			return;
 
 		int nframes = video.nframes;

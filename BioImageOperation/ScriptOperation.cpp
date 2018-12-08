@@ -432,16 +432,16 @@ OperationInfo^ ScriptOperation::getOperationInfo(ScriptOperationType type)
 	case ScriptOperationType::OpenVideo:
 	{
 		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Start, ArgumentLabel::Length, ArgumentLabel::Interval };
-		description = "Open video file(s) and process frames, accepts file name pattern, start/length frames or time (ffmpeg formats supported)";
+		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::API, ArgumentLabel::Start, ArgumentLabel::Length, ArgumentLabel::Interval };
+		description = "Open video file(s) and process frames, accepts file name pattern, start/length frames or time (ffmpeg formats supported) (API: See OpenCV API codes)";
 		break;
 	}
 
 	case ScriptOperationType::OpenCapture:
 	{
 		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path, ArgumentLabel::Source, ArgumentLabel::Width, ArgumentLabel::Height, ArgumentLabel::Interval };
-		description = "Open capturing from video (IP) path or camera source (#)";
+		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::API, ArgumentLabel::Path, ArgumentLabel::Source, ArgumentLabel::Width, ArgumentLabel::Height, ArgumentLabel::Interval };
+		description = "Open capturing from video (IP) path or camera source (#) (API: See OpenCV API codes)";
 		break;
 	}
 
@@ -848,7 +848,7 @@ void ScriptOperation::writeOperationList(System::String^ filename)
 	File::WriteAllText(filename, s);
 }
 
-bool ScriptOperation::initFrameSource(FrameType frameType, System::String^ basePath, System::String^ templatePath, System::String^ start, System::String^ length, double fps0, int interval)
+bool ScriptOperation::initFrameSource(FrameType frameType, int apiCode, System::String^ basePath, System::String^ templatePath, System::String^ start, System::String^ length, double fps0, int interval)
 {
 	bool ok = true;
 
@@ -862,7 +862,7 @@ bool ScriptOperation::initFrameSource(FrameType frameType, System::String^ baseP
 		}
 		if (frameSource)
 		{
-			ok = frameSource->init(basePath, templatePath, start, length, fps0, interval);
+			ok = frameSource->init(apiCode, basePath, templatePath, start, length, fps0, interval);
 		}
 	}
 	return ok;

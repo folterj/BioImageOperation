@@ -41,7 +41,7 @@ void ImageSource::reset()
 	height = 0;
 }
 
-bool ImageSource::init(System::String^ basePath, System::String^ filePath, System::String^ start, System::String^ length, double fps0, int interval)
+bool ImageSource::init(int apiCode, System::String^ basePath, System::String^ filePath, System::String^ start, System::String^ length, double fps0, int interval)
 {
 	int lengthi = 0;
 

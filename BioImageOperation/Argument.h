@@ -38,6 +38,7 @@ public enum class ArgumentLabel
 	Red,
 	Green,
 	Blue,
+	API,
 	Path,
 	Codec,
 	Fps,

@@ -30,6 +30,7 @@ class CaptureSource : public FrameSource
 public:
 	VideoCapture videoCapture;
 	gcroot<System::String^> source;
+	int apiCode;
 	bool videoIsOpen = false;
 	int framei = 0;
 	int width = 0;
@@ -40,7 +41,7 @@ public:
 	CaptureSource();
 	~CaptureSource();
 	void reset();
-	bool init(System::String^ basePath, System::String^ filePath, System::String^ start = "", System::String^ length = "", double fps0 = 1, int interval = 1);
+	bool init(int apiCode, System::String^ basePath, System::String^ filePath, System::String^ start = "", System::String^ length = "", double fps0 = 1, int interval = 1);
 	bool open();
 	bool getNextImage(Mat* image);
 	void close();

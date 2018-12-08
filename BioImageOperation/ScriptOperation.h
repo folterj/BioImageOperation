@@ -74,7 +74,7 @@ public:
 	static System::String^ getOperationList();
 	static void writeOperationList(System::String^ filename);
 
-	bool initFrameSource(FrameType frameType, System::String^ basePath, System::String^ templatePath, System::String^ start = "", System::String^ length = "", double fps0 = 1, int interval = 1);
+	bool initFrameSource(FrameType frameType, int apiCode, System::String^ basePath, System::String^ templatePath, System::String^ start = "", System::String^ length = "", double fps0 = 1, int interval = 1);
 	void initFrameOutput(FrameType frameType, System::String^ basePath, System::String^ templatePath, System::String^ defaultExtension = "", System::String^ start = "", System::String^ length = "", double fps = 0, System::String^ codecs = "");
 	void close();
 };

@@ -252,7 +252,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::OpenImage:
-			operation->initFrameSource(FrameType::Image, basePath, operation->getArgument(ArgumentLabel::Path), operation->getArgument(ArgumentLabel::Start), operation->getArgument(ArgumentLabel::Length), sourceFps, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
+			operation->initFrameSource(FrameType::Image, 0, basePath, operation->getArgument(ArgumentLabel::Path), operation->getArgument(ArgumentLabel::Start), operation->getArgument(ArgumentLabel::Length), sourceFps, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
 			if (operation->frameSource->getNextImage(newImage))
 			{
 				observer->showStatus("", operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames(), true);
@@ -264,7 +264,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::OpenVideo:
-			operation->initFrameSource(FrameType::Video, basePath, operation->getArgument(ArgumentLabel::Path), operation->getArgument(ArgumentLabel::Start), operation->getArgument(ArgumentLabel::Length), 0, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
+			operation->initFrameSource(FrameType::Video, (int)operation->getArgumentNumeric(ArgumentLabel::API), basePath, operation->getArgument(ArgumentLabel::Path), operation->getArgument(ArgumentLabel::Start), operation->getArgument(ArgumentLabel::Length), 0, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
 			if (operation->frameSource->getNextImage(newImage))
 			{
 				observer->showStatus(operation->frameSource->getLabel(), operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames(), true);
@@ -287,7 +287,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			{
 				source = operation->getArgumentNumeric().ToString();
 			}
-			operation->initFrameSource(FrameType::Capture, basePath, source, "", "", 0, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
+			operation->initFrameSource(FrameType::Capture, (int)operation->getArgumentNumeric(ArgumentLabel::API), basePath, source, "", "", 0, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
 
 			if (operation->frameSource->getNextImage(newImage))
 			{

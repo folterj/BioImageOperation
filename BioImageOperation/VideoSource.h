@@ -35,6 +35,7 @@ class VideoSource : public FrameSource
 public:
 	VideoCapture videoCapture;
 	bool videoIsOpen = false;
+	int apiCode = 0;
 	gcroot<NumericPath^> sourcePath = gcnew NumericPath();
 	gcroot<System::String^> label = "";
 	int nsources = 0;
@@ -54,7 +55,7 @@ public:
 	VideoSource();
 	~VideoSource();
 	void reset();
-	bool init(System::String^ basePath, System::String^ filePath, System::String^ start = "", System::String^ length = "", double fps0 = 1, int interval = 1);
+	bool init(int apiCode, System::String^ basePath, System::String^ filePath, System::String^ start = "", System::String^ length = "", double fps0 = 1, int interval = 1);
 	bool open();
 	void release();
 	void close();

@@ -32,6 +32,7 @@ CaptureSource::~CaptureSource()
 void CaptureSource::reset()
 {
 	source = "";
+	apiCode = VideoCaptureAPIs::CAP_ANY;
 	framei = 0;
 	width = 0;
 	height = 0;
@@ -39,10 +40,11 @@ void CaptureSource::reset()
 	close();
 }
 
-bool CaptureSource::init(System::String^ basePath, System::String^ filePath, System::String^ start, System::String^ length, double fps0, int interval)
+bool CaptureSource::init(int apiCode, System::String^ basePath, System::String^ filePath, System::String^ start, System::String^ length, double fps0, int interval)
 {
 	reset();
 
+	this->apiCode = apiCode;
 	this->source = filePath;
 
 	return open();
@@ -52,6 +54,7 @@ bool CaptureSource::open()
 {
 	bool isSourceIndex = false;
 	int index;
+	System::String^ message;
 
 	if (!videoIsOpen)
 	{
@@ -63,14 +66,14 @@ bool CaptureSource::open()
 
 		if (isSourceIndex)
 		{
-			if (videoCapture.open(index))
+			if (videoCapture.open(index, apiCode))
 			{
 				videoIsOpen = videoCapture.isOpened();
 			}
 		}
 		else
 		{
-			if (videoCapture.open(Util::stdString(source)))
+			if (videoCapture.open(Util::stdString(source), apiCode))
 			{
 				videoIsOpen = videoCapture.isOpened();
 			}
@@ -79,7 +82,12 @@ bool CaptureSource::open()
 		if (!videoIsOpen)
 		{
 			close();
-			throw gcnew System::Exception("Unable to open capture source: " + source);
+			message = "Unable to open capture";
+			if (apiCode != 0) {
+				message += " API code: " + apiCode;
+			}
+			message += " source: " + source;
+			throw gcnew System::Exception(message);
 		}
 		else
 		{

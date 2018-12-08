@@ -46,7 +46,7 @@ public:
 	ImageSource();
 	~ImageSource();
 	void reset();
-	bool init(System::String^ basePath, System::String^ filePath, System::String^ start = "", System::String^ length = "", double fps0 = 1, int interval = 1);
+	bool init(int apiCode, System::String^ basePath, System::String^ filePath, System::String^ start = "", System::String^ length = "", double fps0 = 1, int interval = 1);
 	bool open();
 	bool getNextImage(Mat* image);
 	void close();

@@ -33,7 +33,7 @@ class FrameSource abstract
 {
 public:
 	virtual void reset() = 0;
-	virtual bool init(System::String^ basePath, System::String^ filePath, System::String^ start = "", System::String^ length = "", double fps0 = 1, int interval = 1) = 0;
+	virtual bool init(int apiCode, System::String^ basePath, System::String^ filePath, System::String^ start = "", System::String^ length = "", double fps0 = 1, int interval = 1) = 0;
 	virtual bool getNextImage(Mat* image) = 0;
 	virtual void close() = 0;
 

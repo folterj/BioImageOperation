@@ -41,6 +41,7 @@ VideoSource::~VideoSource()
 void VideoSource::reset()
 {
 	sourcePath->reset();
+	apiCode = VideoCaptureAPIs::CAP_ANY;
 	label = "";
 	nsources = 0;
 	sourcei = 0;
@@ -58,14 +59,15 @@ void VideoSource::reset()
 	close();
 }
 
-bool VideoSource::init(System::String^ basePath, System::String^ filePath, System::String^ start, System::String^ length, double fps0, int interval)
+bool VideoSource::init(int apiCode, System::String^ basePath, System::String^ filePath, System::String^ start, System::String^ length, double fps0, int interval)
 {
 	System::String^ fileName = ".";	// dummy value to pass initial while-loop condition
 	bool ok = false;
 	int lengthi = 0;
+	System::String^ message;
 
 	reset();
-
+	this->apiCode = apiCode;
 	sourcePath->setInputPath(basePath, filePath);
 
 	nsources = sourcePath->getFileCount();
@@ -89,7 +91,13 @@ bool VideoSource::init(System::String^ basePath, System::String^ filePath, Syste
 			}
 			else
 			{
-				throw gcnew System::Exception("Unable to open video: " + fileName);
+				message = "Unable to open capture";
+				if (apiCode != 0) {
+					message += " API code: " + apiCode;
+				}
+				message += " filename: " + fileName;
+				throw gcnew System::Exception(message);
+
 			}
 			videoCapture.release();
 		}
@@ -135,6 +143,7 @@ bool VideoSource::open()
 {
 	bool ok = videoIsOpen;
 	System::String^ fileName;
+	System::String^ message;
 
 	if (!videoIsOpen)
 	{
@@ -142,7 +151,7 @@ bool VideoSource::open()
 		fileName = sourcePath->createFilePath();
 		if (fileName != "")
 		{
-			if (videoCapture.open(Util::stdString(fileName)))
+			if (videoCapture.open(Util::stdString(fileName), apiCode))
 			{
 				videoNframes = (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_COUNT);
 				label = Util::extractFileName(fileName);
@@ -154,7 +163,12 @@ bool VideoSource::open()
 			if (!videoIsOpen)
 			{
 				close();
-				throw gcnew System::Exception("Unable to open video: " + fileName);
+				message = "Unable to open capture";
+				if (apiCode != 0) {
+					message += " API code: " + apiCode;
+				}
+				message += " filename: " + fileName;
+				throw gcnew System::Exception(message);
 			}
 		}
 		else
