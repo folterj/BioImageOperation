@@ -60,7 +60,7 @@ public:
 	double pathDistance = Constants::minPathDistance;
 	int pathAge = 0;
 	cv::Point countPosition;
-	OutputStream clusterStream, trackStream, pathStream, trackInfoStream;
+	OutputStream clusterStream, trackStream, pathStream, trackInfoStream, trackLogStream;
 	Mat clusterLabelImage, clusterStats, clusterCentroids, clusterRoiImage, clusterRoiImage2;
 	Moments clusterMoments;
 
@@ -162,6 +162,8 @@ public:
 	void saveTracks(System::String^ fileName, int i);
 	void savePaths(System::String^ fileName, int i);
 	void saveTrackInfo(System::String^ fileName, int i);
+	void initLogClusterTrack(System::String^ fileName);
+	void logClusterTrack(ClusterTrack* clusterTrack);
 
 	/*
 	 * Ensure closing & flushing any open streams

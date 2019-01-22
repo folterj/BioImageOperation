@@ -749,6 +749,14 @@ OperationInfo^ ScriptOperation::getOperationInfo(ScriptOperationType type)
 		break;
 	}
 
+	case ScriptOperationType::SaveTrackLog:
+	{
+		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
+		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker };
+		description = "Save tracking log to file (CSV format)";
+		break;
+	}
+
 	case ScriptOperationType::DrawLegend:
 	{
 		requiredArguments = gcnew array<ArgumentLabel> { };

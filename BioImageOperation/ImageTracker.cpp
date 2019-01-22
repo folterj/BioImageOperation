@@ -155,8 +155,16 @@ void ImageTracker::createTracks(double maxMove, int minActive, int maxInactive, 
 
 	this->basePath = basePath;
 
-	if (maxMove != 0 || minActive || maxInactive != 0)
+	if (maxMove != 0 || minActive != 0 || maxInactive != 0)
 	{
+		if (minActive <= 0)
+		{
+			minActive = Constants::defMinActive;
+		}
+		if (maxInactive <= 0)
+		{
+			maxInactive = Constants::defMaxInactive;
+		}
 		trackingParams.maxMove.set(0, maxMove);
 		trackingParams.minActive = minActive;
 		trackingParams.maxInactive = maxInactive;
@@ -283,9 +291,9 @@ void ImageTracker::matchClusterTracks()
 
 	clusterMinDistances.reserve(clusterTracks.size());
 	// for each track find nearest cluster
-	for (ClusterTrack* track0 : clusterTracks)
+	for (ClusterTrack* clusterTrack : clusterTracks)
 	{
-		distanceCluster = findNearestClusterDistance(track0, maxMove);
+		distanceCluster = findNearestClusterDistance(clusterTrack, maxMove);
 		if (distanceCluster)
 		{
 			clusterMinDistances.push_back(distanceCluster);
@@ -447,6 +455,7 @@ void ImageTracker::pruneTracks()
 		}
 		if (clusterTrack->inactiveCount > maxInactive)
 		{
+			logClusterTrack(clusterTrack);
 			recycledLabels.push_back(clusterTrack->label);
 			clusterTracks.erase(clusterTracks.begin() + i);
 			delete clusterTrack;
@@ -454,6 +463,10 @@ void ImageTracker::pruneTracks()
 
 		else if (clusterTrack->isActive(trackingParams.minActive))
 		{
+			if (clusterTrack->activeCount == trackingParams.minActive) {
+				// track has just become active
+				logClusterTrack(clusterTrack);
+			}
 			trackingStats.nActiveTracks++;
 			trackingStats.trackLifetime.addValue(clusterTrack->activeCount);
 		}
@@ -903,6 +916,17 @@ void ImageTracker::saveTrackInfo(System::String^ filename, int i)
 	}
 }
 
+void ImageTracker::initLogClusterTrack(System::String^ filename)
+{
+	trackLogStream.init(filename, "Label,Area,Rad, Pos X,Pos Y,Active count,Inactive count\n");
+}
+
+void ImageTracker::logClusterTrack(ClusterTrack* clusterTrack) {
+	System::String^ s = "";
+	s += System::String::Format("{0},{1},{2},{3},{4},{5},{6}\n", clusterTrack->label, clusterTrack->area, clusterTrack->rad, clusterTrack->x, clusterTrack->y, clusterTrack->activeCount, clusterTrack->inactiveCount);
+	trackLogStream.write(s);
+}
+
 /*
  * Ensure closing & flushing any open streams
  */
@@ -913,4 +937,5 @@ void ImageTracker::closeStreams()
 	trackStream.closeStream();
 	pathStream.closeStream();
 	trackInfoStream.closeStream();
+	trackLogStream.closeStream();
 }

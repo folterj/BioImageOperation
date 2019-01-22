@@ -78,6 +78,7 @@ public enum class ScriptOperationType
 	ShowTrackInfo,
 	DrawTrackInfo,
 	SaveTrackInfo,
+	SaveTrackLog,
 	DrawLegend,
 
 	Wait,

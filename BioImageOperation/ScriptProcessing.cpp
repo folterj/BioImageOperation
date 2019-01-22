@@ -505,6 +505,11 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveTrackInfo(outputPath.createFilePath(count), count);
 			break;
 
+		case ScriptOperationType::SaveTrackLog:
+			outputPath.setOutputPath(basePath, operation->getArgument(ArgumentLabel::Path), Util::netString(Constants::defaultDataExtension));
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->initLogClusterTrack(outputPath.createFilePath(count));
+			break;
+
 		case ScriptOperationType::DrawLegend:
 			displayi = (int)operation->getArgumentNumeric(ArgumentLabel::Display);
 			if (displayi > 0)
