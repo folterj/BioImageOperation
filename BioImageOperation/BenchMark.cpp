@@ -136,7 +136,7 @@ void BenchMark::benchmarkTest()
 				time5 = stopwatch->ElapsedMilliseconds;
 				t5.addValue((double)(time5 - time4));
 
-				clusterOk = tracker->createClusters(&binImage2, 10, 30, "");
+				clusterOk = tracker->createClusters(&binImage2, 10, 30, "", false);
 				time6 = stopwatch->ElapsedMilliseconds;
 				t6.addValue((double)(time6 - time5));
 

@@ -134,9 +134,10 @@ bool ClusterTrack::isActive(int minActive)
 	return (assigned && activeCount >= minActive && inactiveCount == 0);
 }
 
-void ClusterTrack::draw(Mat* image, ClusterDrawMode drawMode, double fps)
+void ClusterTrack::draw(Mat* image, ClusterDrawMode drawMode, int ntracks)
 {
 	Scalar color = Util::getLabelColor(label);
+	Scalar labelColor = Scalar(0x80, 0x80, 0x80);
 
 	if ((drawMode & ClusterDrawMode::Point) != ClusterDrawMode::None)
 	{
@@ -156,15 +157,19 @@ void ClusterTrack::draw(Mat* image, ClusterDrawMode drawMode, double fps)
 	}
 	if ((drawMode & ClusterDrawMode::Label) != ClusterDrawMode::None)
 	{
-		drawLabel(image, color);
+		drawLabel(image, labelColor, false);
+	}
+	if ((drawMode & ClusterDrawMode::Labeln) != ClusterDrawMode::None)
+	{
+		drawLabel(image, labelColor, true);
 	}
 	if ((drawMode & ClusterDrawMode::Tracks) != ClusterDrawMode::None)
 	{
-		if (fps == 0)
+		if (ntracks == 0)
 		{
-			fps = 10;
+			ntracks = 10;
 		}
-		drawTracks(image, color, (int)fps);
+		drawTracks(image, color, ntracks);
 	}
 	if ((drawMode & ClusterDrawMode::Track) != ClusterDrawMode::None)
 	{
@@ -203,11 +208,22 @@ void ClusterTrack::drawAngle(Mat* image, Scalar color)
 	arrowedLine(*image, cv::Point(x0, y0), cv::Point(x1, y1), color, 1, LINE_AA);
 }
 
-void ClusterTrack::drawLabel(Mat* image, Scalar color)
+void ClusterTrack::drawLabel(Mat* image, Scalar color, bool showCount)
 {
 	cv::Point point((int)x, (int)y);
+	System::String^ labelx;
 
-	putText(*image, Util::stdString(label.ToString()), point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, LINE_AA);
+	if (showCount)
+	{
+		labelx = area.ToString();
+		point.y = (int)(y + rad);
+	}
+	else
+	{
+		labelx = label.ToString();
+	}
+
+	putText(*image, Util::stdString(labelx), point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, LINE_AA);
 }
 
 void ClusterTrack::drawTracks(Mat* image, Scalar color, int ntracks)
@@ -228,4 +244,9 @@ void ClusterTrack::drawTracks(Mat* image, Scalar color, int ntracks)
 		init = true;
 		n++;
 	}
+}
+
+System::String^ ClusterTrack::ToString()
+{
+	return System::String::Format("Label:{0} Area:{1:F1} Radius:{2:F1} Angle:{3:F1} X:{4:F1} Y:{5:F1}", label, area, rad, orientation, x, y);
 }

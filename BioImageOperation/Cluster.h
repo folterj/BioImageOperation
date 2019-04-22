@@ -70,5 +70,7 @@ public:
 	void drawBox(Mat* image, Scalar color);
 	void drawAngle(Mat* image, Scalar color);
 	void drawFill(Mat* image, Scalar color);
-	void drawLabel(Mat* image, Scalar color);
+	void drawLabel(Mat* image, Scalar color, bool showCount);
+
+	virtual System::String^ ToString();
 };

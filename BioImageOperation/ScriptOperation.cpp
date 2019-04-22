@@ -681,7 +681,7 @@ OperationInfo^ ScriptOperation::getOperationInfo(ScriptOperationType type)
 	{
 		requiredArguments = gcnew array<ArgumentLabel> { };
 		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::DrawMode };
-		description = "Draw clusters (DrawMode: Point|Circle|Box|Angle|Label|Fill)";
+		description = "Draw clusters (DrawMode: Point|Circle|Box|Angle|Label|Labeln|Fill)";
 		break;
 	}
 
@@ -689,7 +689,7 @@ OperationInfo^ ScriptOperation::getOperationInfo(ScriptOperationType type)
 	{
 		requiredArguments = gcnew array<ArgumentLabel> { };
 		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::DrawMode };
-		description = "Draw tracked clusters (DrawMode: Point|Circle|Box|Angle|Label|Track|Tracks)";
+		description = "Draw tracked clusters (DrawMode: Point|Circle|Box|Angle|Label|Labeln|Track|Tracks)";
 		break;
 	}
 
@@ -770,6 +770,14 @@ OperationInfo^ ScriptOperation::getOperationInfo(ScriptOperationType type)
 		requiredArguments = gcnew array<ArgumentLabel> { };
 		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::MS };
 		description = "Pause execution for a period (1000 ms default)";
+		break;
+	}
+
+	case ScriptOperationType::Debug:
+	{
+		requiredArguments = gcnew array<ArgumentLabel> { };
+		optionalArguments = gcnew array<ArgumentLabel> { };
+		description = "Debug mode";
 		break;
 	}
 

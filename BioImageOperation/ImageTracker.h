@@ -33,6 +33,7 @@
 #pragma managed
 
 using namespace System;
+using namespace System::Windows::Forms;
 using namespace cv;
 
 
@@ -69,6 +70,8 @@ public:
 	StatData distanceStats;
 	TrackingStats trackingStats;
 
+	bool debugMode = false;
+
 	/*
 	 * Constructor for testing
 	 */
@@ -99,7 +102,7 @@ public:
 	/*
 	 * Create clusters from image entry point
 	 */
-	bool createClusters(Mat* image, double areaMin, double areaMax, System::String^ basePath);
+	bool createClusters(Mat* image, double areaMin, double areaMax, System::String^ basePath, bool debugMode);
 
 	/*
 	 * Create tracks entry point
@@ -146,7 +149,7 @@ public:
 	 * Drawing routines
 	 */
 	void drawClusters(Mat* source, Mat* dest, ClusterDrawMode drawMode);
-	void drawTracks(Mat* source, Mat* dest, ClusterDrawMode drawMode, double fps);
+	void drawTracks(Mat* source, Mat* dest, ClusterDrawMode drawMode, int ntracks);
 	void drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, float power, Palette palette);
 	void drawTrackInfo(Mat* source, Mat* dest);
 

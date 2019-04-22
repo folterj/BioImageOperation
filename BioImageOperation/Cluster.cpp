@@ -112,6 +112,7 @@ System::String^ Cluster::getLabels()
 void Cluster::draw(Mat* image, ClusterDrawMode drawMode)
 {
 	Scalar color = Util::getLabelColor(getLabel());
+	Scalar labelColor = Scalar(0x80, 0x80, 0x80);
 
 	if ((drawMode & ClusterDrawMode::Point) != ClusterDrawMode::None)
 	{
@@ -131,7 +132,11 @@ void Cluster::draw(Mat* image, ClusterDrawMode drawMode)
 	}
 	if ((drawMode & ClusterDrawMode::Label) != ClusterDrawMode::None)
 	{
-		drawLabel(image, color);
+		drawLabel(image, labelColor, false);
+	}
+	if ((drawMode & ClusterDrawMode::Labeln) != ClusterDrawMode::None)
+	{
+		drawLabel(image, labelColor, true);
 	}
 	if ((drawMode & ClusterDrawMode::Fill) != ClusterDrawMode::None)
 	{
@@ -170,12 +175,22 @@ void Cluster::drawAngle(Mat* image, Scalar color)
 	line(*image, cv::Point(x0, y0), cv::Point(x1, y1), color, 1, LINE_AA);
 }
 
-void Cluster::drawLabel(Mat* image, Scalar color)
+void Cluster::drawLabel(Mat* image, Scalar color, bool showCount)
 {
 	cv::Point point((int)x, (int)y);
+	System::String^ labelx;
 
-	putText(*image, Util::stdString(getLabels()), point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, LINE_AA);
-	//putText(*image, Util::stdString(area.ToString()), point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, LINE_AA));
+	if (showCount)
+	{
+		labelx = area.ToString();
+		point.y = (int)(y + rad);
+	}
+	else
+	{
+		labelx = getLabels();
+	}
+	
+	putText(*image, Util::stdString(labelx), point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, LINE_AA);
 }
 
 void Cluster::drawFill(Mat* image, Scalar color)
@@ -188,4 +203,9 @@ void Cluster::drawFill(Mat* image, Scalar color)
 
 		clusterImage2.copyTo((*image)(box), clusterImage);	// use mask again; don't copy black pixels
 	}
+}
+
+System::String^ Cluster::ToString()
+{
+	return System::String::Format("Label:{0} Area:{1:F1} Radius:{2:F1} Angle:{3:F1} X:{4:F1} Y:{5:F1}", getLabels(), area, rad, angle, x, y);
 }

@@ -77,11 +77,13 @@ public:
 	void assign();
 	bool isActive(int minActive);
 
-	void draw(Mat* image, ClusterDrawMode drawMode, double fps);
+	void draw(Mat* image, ClusterDrawMode drawMode, int ntracks);
 	void drawPoint(Mat* image, Scalar color);
 	void drawCircle(Mat* image, Scalar color);
 	void drawBox(Mat* image, Scalar color);
 	void drawAngle(Mat* image, Scalar color);
-	void drawLabel(Mat* image, Scalar color);
+	void drawLabel(Mat* image, Scalar color, bool showCount);
 	void drawTracks(Mat* image, Scalar color, int ntracks = 1);
+
+	virtual System::String^ ToString();
 };

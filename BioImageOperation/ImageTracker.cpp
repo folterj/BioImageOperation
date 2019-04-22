@@ -124,11 +124,12 @@ void ImageTracker::reset()
  * Create clusters from image entry point
  */
 
-bool ImageTracker::createClusters(Mat* image, double minArea, double maxArea, System::String^ basePath)
+bool ImageTracker::createClusters(Mat* image, double minArea, double maxArea, System::String^ basePath, bool debugMode)
 {
 	bool clustersOk;
 
 	this->basePath = basePath;
+	this->debugMode = debugMode;
 
 	if (minArea != 0 || maxArea != 0)
 	{
@@ -428,6 +429,11 @@ bool ImageTracker::matchTrackCluster(DistanceCluster* distCluster, double maxMov
 				}
 			}
 		}
+
+		if (debugMode && trackParamsFinalised && !found)
+		{
+			MessageBox::Show("Failed match:\nTrack " + distCluster->track->ToString() + "\nPreferred:\nCluster " + distCluster->cluster->ToString());
+		}
 	}
 
 	if (found)
@@ -673,13 +679,13 @@ void ImageTracker::drawClusters(Mat* source, Mat* dest, ClusterDrawMode drawMode
 	}
 }
 
-void ImageTracker::drawTracks(Mat* source, Mat* dest, ClusterDrawMode drawMode, double fps)
+void ImageTracker::drawTracks(Mat* source, Mat* dest, ClusterDrawMode drawMode, int ntracks)
 {
 	source->copyTo(*dest);
 
 	for (ClusterTrack* clusterTrack : clusterTracks)
 	{
-		clusterTrack->draw(dest, drawMode, fps);
+		clusterTrack->draw(dest, drawMode, ntracks);
 	}
 }
 
@@ -923,8 +929,12 @@ void ImageTracker::initLogClusterTrack(System::String^ filename)
 
 void ImageTracker::logClusterTrack(ClusterTrack* clusterTrack) {
 	System::String^ s = "";
-	s += System::String::Format("{0},{1},{2},{3},{4},{5},{6}\n", clusterTrack->label, clusterTrack->area, clusterTrack->rad, clusterTrack->x, clusterTrack->y, clusterTrack->activeCount, clusterTrack->inactiveCount);
-	trackLogStream.write(s);
+
+	if (trackLogStream.isOpen)
+	{
+		s += System::String::Format("{0},{1},{2},{3},{4},{5},{6}\n", clusterTrack->label, clusterTrack->area, clusterTrack->rad, clusterTrack->x, clusterTrack->y, clusterTrack->activeCount, clusterTrack->inactiveCount);
+		trackLogStream.write(s);
+	}
 }
 
 /*

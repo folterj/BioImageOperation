@@ -82,6 +82,7 @@ public enum class ScriptOperationType
 	DrawLegend,
 
 	Wait,
+	Debug,
 };
 
 
@@ -108,9 +109,10 @@ public enum class ClusterDrawMode : int
 	Box = 0x04,
 	Angle = 0x08,
 	Label = 0x10,
-	Track = 0x20,
-	Tracks = 0x40,
-	Fill = 0x80,
+	Labeln = 0x20,
+	Track = 0x40,
+	Tracks = 0x80,
+	Fill = 0x100,
 	ClusterDefault = Fill,
 	TracksDefault = Tracks,
 };

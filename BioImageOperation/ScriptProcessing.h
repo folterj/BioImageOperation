@@ -62,6 +62,7 @@ public:
 	double logPower = 0;
 	Palette logPalette;
 	bool abort = false;
+	bool debugMode = false;
 
 	/*
 	 * Initialisation

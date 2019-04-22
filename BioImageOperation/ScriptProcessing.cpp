@@ -227,6 +227,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 	int width, height;
 	int displayi;
 	double fps;
+	int time;
 	bool done = true;
 
 	try
@@ -447,7 +448,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::CreateClusters:
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker), true)->createClusters(image, operation->getArgumentNumeric(ArgumentLabel::MinArea), operation->getArgumentNumeric(ArgumentLabel::MaxArea), basePath);
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker), true)->createClusters(image, operation->getArgumentNumeric(ArgumentLabel::MinArea), operation->getArgumentNumeric(ArgumentLabel::MaxArea), basePath, debugMode);
 			break;
 
 		case ScriptOperationType::CreateTracks:
@@ -464,7 +465,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::DrawTracks:
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->drawTracks(getLabelOrCurrentImage(operation, image, true), newImage, operation->getClusterDrawMode(ClusterDrawMode::TracksDefault), sourceFps);
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->drawTracks(getLabelOrCurrentImage(operation, image, true), newImage, operation->getClusterDrawMode(ClusterDrawMode::TracksDefault), (int)sourceFps);
 			newImageSet = true;
 			break;
 
@@ -528,12 +529,16 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::Wait:
-			int time = (int)operation->getArgumentNumeric();
+			time = (int)operation->getArgumentNumeric();
 			if (time == 0)
 			{
 				time = 1000;
 			}
 			Thread::Sleep(time);
+			break;
+
+		case ScriptOperationType::Debug:
+			debugMode = true;
 			break;
 
 		}	// end of switch
