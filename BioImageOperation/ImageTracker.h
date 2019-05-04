@@ -51,7 +51,6 @@ public:
 	std::vector<ClusterTrack*> clusterTracks;
 	std::vector<PathNode*> pathNodes;
 	std::vector<PathLink*> pathLinks;
-	std::deque<int> recycledLabels;
 	int nextTrackLabel = 0;
 	int nextPathLabel = 0;
 
@@ -161,8 +160,8 @@ public:
 	/*
 	 * Save routines
 	 */
-	void saveClusters(System::String^ fileName, int i);
-	void saveTracks(System::String^ fileName, int i);
+	void saveClusters(System::String^ fileName, int i, bool byId);
+	void saveTracks(System::String^ fileName, int i, bool byId);
 	void savePaths(System::String^ fileName, int i);
 	void saveTrackInfo(System::String^ fileName, int i);
 	void initLogClusterTrack(System::String^ fileName);

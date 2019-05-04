@@ -35,6 +35,7 @@ class Util
 public:
 	static double toDouble(System::String^ s);
 	static bool isNumeric(System::String^ s);
+	static bool isBoolean(System::String^ s);
 	static int parseFrameTime(System::String^ s, double fps);
 	static double calcDistance(double x0, double y0, double x1, double y1);
 	static double calcDistance(double x, double y);

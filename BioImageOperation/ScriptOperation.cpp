@@ -262,8 +262,8 @@ System::String^ ScriptOperation::getArgument(ArgumentLabel label)
 
 double ScriptOperation::getArgumentNumeric(ArgumentLabel label, bool oneBase)
 {
-	System::String^ arg;
 	double x = 0;
+	System::String^ arg;
 
 	if (label != ArgumentLabel::None)
 	{
@@ -294,6 +294,44 @@ double ScriptOperation::getArgumentNumeric(ArgumentLabel label, bool oneBase)
 	}
 
 	return x;
+}
+
+bool ScriptOperation::getArgumentBoolean(ArgumentLabel label)
+{
+	bool b = false;
+	System::String^ arg;
+
+	if (label != ArgumentLabel::None)
+	{
+		// search for label
+		for each(Argument* argument in arguments)
+		{
+			if (argument->argumentLabel == label)
+			{
+				arg = Util::netString(argument->value);
+				b = true;
+				if (Util::isBoolean(arg))
+				{
+					b = bool::Parse(arg);
+				}
+				break;
+			}
+		}
+	}
+	else
+	{
+		// find boolean argument
+		for (int argumenti = 0; argumenti < arguments.size(); argumenti++)
+		{
+			arg = Util::netString(arguments.at(argumenti)->value);
+			if (Util::isBoolean(arg))
+			{
+				b = bool::Parse(arg);
+				break;
+			}
+		}
+	}
+	return b;
 }
 
 generic<class type> type ScriptOperation::getArgument(ArgumentLabel label, type defaultArgument)
@@ -712,7 +750,7 @@ OperationInfo^ ScriptOperation::getOperationInfo(ScriptOperationType type)
 	case ScriptOperationType::SaveClusters:
 	{
 		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker };
+		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::ByLabel };
 		description = "Save clusters to file (CSV format)";
 		break;
 	}
@@ -720,7 +758,7 @@ OperationInfo^ ScriptOperation::getOperationInfo(ScriptOperationType type)
 	case ScriptOperationType::SaveTracks:
 	{
 		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker };
+		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::ByLabel };
 		description = "Save cluster tracking to file (CSV format)";
 		break;
 	}

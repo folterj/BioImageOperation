@@ -68,6 +68,7 @@ public:
 	ScriptOperation* getNextInnerOperation();
 	System::String^ getArgument(ArgumentLabel label = ArgumentLabel::None);
 	double getArgumentNumeric(ArgumentLabel label = ArgumentLabel::None, bool oneBase = false);
+	bool getArgumentBoolean(ArgumentLabel label = ArgumentLabel::None);
 	generic<class type> type getArgument(ArgumentLabel label, type defaultArgument);
 	ClusterDrawMode getClusterDrawMode(ClusterDrawMode defaultArgument);
 	static OperationInfo^ getOperationInfo(ScriptOperationType type);

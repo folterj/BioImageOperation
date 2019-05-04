@@ -488,12 +488,12 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::SaveClusters:
 			outputPath.setOutputPath(basePath, operation->getArgument(ArgumentLabel::Path), Util::netString(Constants::defaultDataExtension));
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveClusters(outputPath.createFilePath(count), count);
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveClusters(outputPath.createFilePath(count), count, operation->getArgumentBoolean(ArgumentLabel::ByLabel));
 			break;
 
 		case ScriptOperationType::SaveTracks:
 			outputPath.setOutputPath(basePath, operation->getArgument(ArgumentLabel::Path), Util::netString(Constants::defaultDataExtension));
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveTracks(outputPath.createFilePath(count), count);
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveTracks(outputPath.createFilePath(count), count, operation->getArgumentBoolean(ArgumentLabel::ByLabel));
 			break;
 
 		case ScriptOperationType::SavePaths:

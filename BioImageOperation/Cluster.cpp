@@ -94,6 +94,17 @@ int Cluster::getLabel()
 	return label0;
 }
 
+int Cluster::getFirstLabel()
+{
+	int label0 = -1;
+
+	if (!assignedTracks.empty())
+	{
+		label0 = assignedTracks[0]->label;
+	}
+	return label0;
+}
+
 System::String^ Cluster::getLabels()
 {
 	System::String^ labels = "";

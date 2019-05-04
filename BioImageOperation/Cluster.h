@@ -63,6 +63,7 @@ public:
 	bool inRange(ClusterTrack* track, double dist, double maxMoveDistance);
 
 	int getLabel();
+	int getFirstLabel();
 	System::String^ getLabels();
 	void draw(Mat* image, ClusterDrawMode drawMode);
 	void drawPoint(Mat* image, Scalar color);

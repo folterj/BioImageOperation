@@ -101,7 +101,6 @@ void ImageTracker::reset()
 	deleteClusters();
 	deleteTracks();
 
-	recycledLabels.clear();
 	nextTrackLabel = 0;
 	nextPathLabel = 0;
 	pathAge = 0;
@@ -331,15 +330,7 @@ void ImageTracker::matchClusterTracks()
 		// assign tracks to unassigned clusters
 		if (!cluster->isAssigned())
 		{
-			if (!recycledLabels.empty())
-			{
-				label = recycledLabels.front();
-				recycledLabels.pop_front();
-			}
-			else
-			{
-				label = nextTrackLabel++;
-			}
+			label = nextTrackLabel++;
 			track = new ClusterTrack(label);
 			clusterTracks.push_back(track);
 			cluster->assign(track);
@@ -462,7 +453,6 @@ void ImageTracker::pruneTracks()
 		if (clusterTrack->inactiveCount > maxInactive)
 		{
 			logClusterTrack(clusterTrack);
-			recycledLabels.push_back(clusterTrack->label);
 			clusterTracks.erase(clusterTracks.begin() + i);
 			delete clusterTrack;
 		}
@@ -846,40 +836,97 @@ System::String^ ImageTracker::getInfo()
  * Save routines
  */
 
-void ImageTracker::saveClusters(System::String^ filename, int i)
+void ImageTracker::saveClusters(System::String^ filename, int i, bool byId)
 {
 	System::String^ s = "";
-	Cluster* cluster;
-	int n = (int)clusters.size();
+	int dcol;
+	int col = 0;
+	int maxi = 0;
 
 	clusterStream.init(filename, "Frame,Cluster,Area,Rad,Angle,Pos X,Pos Y\n");
 
 	if (clusterParamsFinalised)
 	{
-		for (int c = 0; c < n; c++)
+		if (byId)
 		{
-			cluster = clusters[c];
-			s += System::String::Format("{0},{1},{2},{3},{4},{5},{6}\n", i, c, cluster->area, cluster->rad, cluster->angle, cluster->x, cluster->y);
-			//s += System::String::Format("{0}\n", cluster->area);
+			for (Cluster* cluster : clusters)
+			{
+				maxi = Math::Max(cluster->getFirstLabel(), maxi);
+			}
+			s += i + ",";
+			for (int i = 0; i <= maxi; i++)
+			{
+				for (Cluster* cluster : clusters)
+				{
+					if (cluster->getFirstLabel() == i)
+					{
+						dcol = i - col;
+						if (dcol > 0)
+						{
+							s += gcnew System::String(',', dcol * 6);
+							col = i;
+						}
+						s += System::String::Format("{0},{1},{2},{3},{4},{5},", cluster->getFirstLabel(), cluster->area, cluster->rad, cluster->angle, cluster->x, cluster->y);
+						col++;
+					}
+				}
+			}
+			s += "\n";
+		}
+		else
+		{
+			for (Cluster* cluster : clusters)
+			{
+				s += System::String::Format("{0},{1},{2},{3},{4},{5},{6}\n", i, cluster->getFirstLabel(), cluster->area, cluster->rad, cluster->angle, cluster->x, cluster->y);
+			}
 		}
 		clusterStream.write(s);
 	}
 }
 
-void ImageTracker::saveTracks(System::String^ filename, int i)
+void ImageTracker::saveTracks(System::String^ filename, int i, bool byId)
 {
 	System::String^ s = "";
-	ClusterTrack* track;
-	int n = (int)clusterTracks.size();
+	int dcol;
+	int col = 0;
+	int maxi = 0;
 
 	trackStream.init(filename, "Frame,Track,Area,Rad,Orientation,Pos X,Pos Y\n");
 
 	if (trackParamsFinalised)
 	{
-		for (int t = 0; t < n; t++)
+		if (byId)
 		{
-			track = clusterTracks[t];
-			s += System::String::Format("{0},{1},{2},{3},{4},{5},{6}\n", i, track->label, track->area, track->rad, track->orientation, track->x, track->y);
+			for (ClusterTrack* track : clusterTracks)
+			{
+				maxi = Math::Max(track->label, maxi);
+			}
+			s += i + ",";
+			for (int i = 0; i <= maxi; i++)
+			{
+				for (ClusterTrack* track : clusterTracks)
+				{
+					if (track->label == i)
+					{
+						dcol = i - col;
+						if (dcol > 0)
+						{
+							s += gcnew System::String(',', dcol * 6);
+							col = i;
+						}
+						s += System::String::Format("{0},{1},{2},{3},{4},{5},", track->label, track->area, track->rad, track->orientation, track->x, track->y);
+						col++;
+					}
+				}
+			}
+			s += "\n";
+		}
+		else
+		{
+			for (ClusterTrack* track : clusterTracks)
+			{
+				s += System::String::Format("{0},{1},{2},{3},{4},{5},{6}\n", i, track->label, track->area, track->rad, track->orientation, track->x, track->y);
+			}
 		}
 		trackStream.write(s);
 	}
@@ -888,16 +935,13 @@ void ImageTracker::saveTracks(System::String^ filename, int i)
 void ImageTracker::savePaths(System::String^ filename, int i)
 {
 	System::String^ s = "";
-	PathNode* node;
-	int n = (int)pathNodes.size();
 
 	pathStream.init(filename, "Frame,Path,Age,Usage,Last use,Pos X,Pos Y\n");
 
 	if (trackParamsFinalised)
 	{
-		for (int p = 0; p < n; p++)
+		for (PathNode* node : pathNodes)
 		{
-			node = pathNodes[p];
 			s += System::String::Format("{0},{1},{2},{3},{4},{5},{6}\n", i, node->label, node->age, node->accumUsage, node->lastUse, node->x, node->y);
 		}
 		pathStream.write(s);
@@ -924,7 +968,7 @@ void ImageTracker::saveTrackInfo(System::String^ filename, int i)
 
 void ImageTracker::initLogClusterTrack(System::String^ filename)
 {
-	trackLogStream.init(filename, "Label,Area,Rad, Pos X,Pos Y,Active count,Inactive count\n");
+	trackLogStream.init(filename, "Label,Area,Rad,Pos X,Pos Y,Active count,Inactive count\n");
 }
 
 void ImageTracker::logClusterTrack(ClusterTrack* clusterTrack) {

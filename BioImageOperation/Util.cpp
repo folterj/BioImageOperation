@@ -39,9 +39,16 @@ double Util::toDouble(System::String^ s)
 
 bool Util::isNumeric(System::String^ s)
 {
-	double x = 0;
+	double x;
 
 	return double::TryParse(s, x);
+}
+
+bool Util::isBoolean(System::String^ s)
+{
+	bool b;
+
+	return bool::TryParse(s, b);
 }
 
 int Util::parseFrameTime(System::String^ s, double fps)
