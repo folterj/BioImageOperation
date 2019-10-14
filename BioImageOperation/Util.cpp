@@ -306,10 +306,16 @@ void Util::saveImage(System::String^ fileName, Mat* image)
 Bitmap^ Util::matToBitmap(Mat *image)
 {
 	Bitmap^ bitmap;
+	uchar* data;
 	PixelFormat pixelFormat;
+	int width = image->cols;
+	int height = image->rows;
+	int stride1 = (int)image->step;
+	int stride2 = (int)Math::Ceiling(stride1 / 4.0) * 4;
 	bool isGrayscale = (image->channels() == 1);
 	bool hasAlpha = (image->channels() == 4);
 	int bpp = (int)image->elemSize() * 8;
+	int offset = 0;
 
 	if (isGrayscale)
 	{
@@ -344,7 +350,21 @@ Bitmap^ Util::matToBitmap(Mat *image)
 		}
 	}
 
-	bitmap = gcnew Bitmap(image->cols, image->rows, (int)image->step, pixelFormat, (IntPtr)image->data);
+	if (stride2 == stride1)
+	{
+		bitmap = gcnew Bitmap(width, height, stride1, pixelFormat, (IntPtr)image->data);
+	}
+	else
+	{
+		// stride is not multiple of 4; convert to image with padding
+		data = new uchar[height * stride2]();		// declare and zet to zeros
+		for (int y = 0; y < image->rows; y++)
+		{
+			memcpy(&data[offset], image->row(y).data, stride1);
+			offset += stride2;
+		}
+		bitmap = gcnew Bitmap(width, height, stride2, pixelFormat, (IntPtr)data);
+	}
 
 	if (isGrayscale && bpp <= 8)
 	{

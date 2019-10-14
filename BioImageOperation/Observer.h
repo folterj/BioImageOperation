@@ -33,6 +33,7 @@ using namespace System;
 public interface class Observer
 {
 	void resetUI();
+	void resetImages();
 	void resetProgressTimer();
 	void clearStatus();
 	void showStatus(int i);

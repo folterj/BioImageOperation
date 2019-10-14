@@ -103,6 +103,7 @@ namespace BioImageOperation {
 		virtual void resetProgressTimer();
 
 		virtual void resetUI();
+		virtual void resetImages();
 		delegate void ResetUIDelegate();
 		ResetUIDelegate^ resetUIDelegate = gcnew ResetUIDelegate(this, &MainForm::resetUIDelegateMethod);
 		void resetUIDelegateMethod();

@@ -178,6 +178,14 @@ void MainForm::resetUIDelegateMethod()
 	updateUI(false);
 }
 
+void MainForm::resetImages()
+{
+	for (int i = 0; i < imageForms->Length; i++)
+	{
+		imageForms[i]->reset();
+	}
+}
+
 void MainForm::resetProgressTimer()
 {
 	stopwatch.Restart();

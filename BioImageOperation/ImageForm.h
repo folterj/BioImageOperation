@@ -57,6 +57,7 @@ namespace BioImageOperation {
 
 	public:
 		ImageForm(void);
+		void reset();
 		void setTitle(int title);
 		void updateTitle();
 		bool setImage(Mat* image);

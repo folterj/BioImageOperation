@@ -124,6 +124,7 @@ void ScriptProcessing::reset()
 	accumBuffer->reset();
 
 	imageTrackers->reset();
+	observer->resetImages();
 }
 
 /*
@@ -604,6 +605,9 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 	catch (System::Exception^ e)
 	{
 		System::String^ errorMsg = Util::getExceptionDetail(e) + " in\n" + Util::netString(operation->line);
+#ifdef _DEBUG
+		errorMsg += e->StackTrace;
+#endif
 		observer->showErrorMessage(errorMsg);
 		doAbort(false);
 	}

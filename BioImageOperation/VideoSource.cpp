@@ -154,6 +154,10 @@ bool VideoSource::open()
 			if (videoCapture.open(Util::stdString(fileName), apiCode))
 			{
 				videoNframes = (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_COUNT);
+				if (videoNframes < 0)
+				{
+					videoNframes = 0;
+				}
 				label = Util::extractFileName(fileName);
 				sourcei++;
 				videoIsOpen = videoCapture.isOpened();
@@ -238,7 +242,7 @@ bool VideoSource::seekFrame()
 {
 	bool openOk = true;
 
-	while (videoFramei >= videoNframes && openOk)
+	while (videoNframes != 0 &&videoFramei >= videoNframes && openOk)
 	{
 		videoFramei -= videoNframes;
 		videoCapture.release();

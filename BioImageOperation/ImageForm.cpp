@@ -41,6 +41,11 @@ ImageForm::~ImageForm()
 	}
 }
 
+void ImageForm::reset()
+{
+	displayReady = true;
+}
+
 void ImageForm::updateTitle()
 {
 	System::String^ s = System::String::Format("BIO Image {0}", title);
