@@ -58,6 +58,7 @@ public enum class ScriptOperationType
 	Add,
 	Multiply,
 	Invert,
+	RollingBall,
 
 	UpdateBackground,
 	UpdateAverage,

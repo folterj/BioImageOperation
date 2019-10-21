@@ -48,7 +48,7 @@ void ImageSeries::addImage(Mat* image, int bufferSize)
 	images.push_back(image->clone());
 }
 
-void ImageSeries::getMedian(OutputArray dest, Observer^ observer)
+bool ImageSeries::getMedian(OutputArray dest, Observer^ observer)
 {
 	Mat image;
 	unsigned char* outData;
@@ -58,6 +58,10 @@ void ImageSeries::getMedian(OutputArray dest, Observer^ observer)
 	unsigned char median;
 	int n = (int)images.size();
 	std::vector<unsigned char> pixelBuffer(n);
+
+	if (n == 0) {
+		return false;
+	}
 
 	dest.create(height, width, CV_8U);
 	image = dest.getMat();
@@ -92,4 +96,5 @@ void ImageSeries::getMedian(OutputArray dest, Observer^ observer)
 			observer->showStatus(y, height);
 		}
 	}
+	return true;
 }

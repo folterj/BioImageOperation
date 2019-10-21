@@ -205,6 +205,7 @@ void ImageTracker::createPaths(double pathDistance)
 
 bool ImageTracker::findClusters(Mat* image)
 {
+	int totArea = image->rows * image->cols;
 	int area, minArea, maxArea;
 	double x, y, angle;
 	Rect box;
@@ -232,6 +233,11 @@ bool ImageTracker::findClusters(Mat* image)
 	{
 		// skip initial 'full-image label' returned by connectedComponents
 		area = clusterStats.at<int>(label, ConnectedComponentsTypes::CC_STAT_AREA);
+
+		if ((double)area / totArea > Constants::maxBinaryPixelsFactor) {
+			clusters.clear();
+			break;
+		}
 
 		if (clusterParamsFinalised)
 		{

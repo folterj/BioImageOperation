@@ -64,6 +64,7 @@ bool VideoSource::init(int apiCode, System::String^ basePath, System::String^ fi
 	System::String^ fileName = ".";	// dummy value to pass initial while-loop condition
 	bool ok = false;
 	int lengthi = 0;
+	int nframes0;
 	System::String^ message;
 
 	reset();
@@ -84,10 +85,16 @@ bool VideoSource::init(int apiCode, System::String^ basePath, System::String^ fi
 		{
 			if (videoCapture.open(Util::stdString(fileName)))
 			{
-				nframes += (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_COUNT);
+				nframes0 = (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_COUNT);
+				if (nframes0 > 0) {
+					nframes += nframes0;
+				}
 				width = (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_WIDTH);
 				height = (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_HEIGHT);
 				fps = videoCapture.get(VideoCaptureProperties::CAP_PROP_FPS);
+				if (fps < 0) {
+					fps = 0;
+				}
 			}
 			else
 			{
@@ -126,7 +133,7 @@ bool VideoSource::init(int apiCode, System::String^ basePath, System::String^ fi
 	{
 		this->interval = 1;
 	}
-	seekMode = (interval >= Constants::seekModeInterval);	// auto select seek mode: if interval >= x frames
+	seekMode = (interval >= Constants::seekModeInterval && nframes != 0);		// auto select seek mode: if interval >= x frames
 
 	ok = open();
 	if (ok)
@@ -242,7 +249,7 @@ bool VideoSource::seekFrame()
 {
 	bool openOk = true;
 
-	while (videoNframes != 0 &&videoFramei >= videoNframes && openOk)
+	while (videoNframes != 0 && videoFramei >= videoNframes && openOk)
 	{
 		videoFramei -= videoNframes;
 		videoCapture.release();

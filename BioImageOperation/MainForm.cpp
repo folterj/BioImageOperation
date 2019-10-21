@@ -222,13 +222,17 @@ void MainForm::showStatus(System::String^ label, int i, int tot, bool showFrameP
 {
 	System::String^ s;
 
-	double progress = (double)i / tot;
+	double progress = 0;
 	TimeSpan totalElapsed = stopwatch.Elapsed;
 	double totalTimeElapsed = totalElapsed.TotalSeconds;
 	double avgFrametime = totalTimeElapsed / (i + 1);
 	double estimate = 0;
 	TimeSpan estimateTimespan;
 
+	if (tot > 0) {
+		progress = (double)i / tot;
+		s += System::String::Format("{0:P1}", progress);
+	}
 	if (progress > 0)
 	{
 		estimate = totalTimeElapsed * (1 / progress - 1);
@@ -237,11 +241,15 @@ void MainForm::showStatus(System::String^ label, int i, int tot, bool showFrameP
 
 	if (showFrameProgress)
 	{
-		s = System::String::Format("{0:P1} {1} (#{2}) {3:F3}s @{4}fps Elapsed: {5:hh\\:mm\\:ss} Left: {6:hh\\:mm\\:ss}", progress, label, i, avgFrametime, processFps, totalElapsed, estimateTimespan);
+		s += System::String::Format(" {0} (#{1}) {2:F3}s @{3}fps", label, i, avgFrametime, processFps);
 	}
 	else
 	{
-		s = System::String::Format("{0:P1} {1} Elapsed: {2:hh\\:mm\\:ss} Left: {3:hh\\:mm\\:ss}", progress, label, totalElapsed, estimateTimespan);
+		s += label;
+	}
+	s += System::String::Format(" Elapsed: {0:hh\\:mm\\:ss}", totalElapsed);
+	if (estimate != 0) {
+		s += System::String::Format(" Left: {0:hh\\:mm\\:ss}", estimateTimespan);
 	}
 
 	showStatus(s, progress);

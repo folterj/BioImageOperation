@@ -18,6 +18,7 @@
 
 #include "ScriptProcessing.h"
 #include "ImageOperations.h"
+//#include "BackgroundRollingBall.h"
 #include "NumericPath.h"
 #include "Constants.h"
 #include "Util.h"
@@ -415,7 +416,12 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			ImageOperations::invert(*getLabelOrCurrentImage(operation, image, false), *newImage);
 			newImageSet = true;
 			break;
-
+		/*
+		case ScriptOperationType::RollingBall:
+			newImage = BackgroundSubtract::subtract_background_rolling_ball(getLabelOrCurrentImage(operation, image, false), 50, false);
+			newImageSet = true;
+			break;
+		*/
 		case ScriptOperationType::UpdateBackground:
 			backgroundBuffer->addImage(getLabelOrCurrentImage(operation, image, true), operation->getArgumentNumeric());
 			backgroundBuffer->getImage(newImage);
@@ -433,8 +439,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::GetSeriesMedian:
-			imageSeries->getMedian(*newImage, observer);
-			newImageSet = true;
+			newImageSet = imageSeries->getMedian(*newImage, observer);
 			break;
 
 		case ScriptOperationType::AddAccum:
@@ -580,6 +585,9 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 	{
 		// opencv exception
 		System::String^ errorMsg;
+#ifdef _DEBUG
+		errorMsg = Util::netString(e.msg);
+#else
 		if (e.err != "")
 		{
 			errorMsg = Util::netString(e.err);
@@ -588,6 +596,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		{
 			errorMsg = Util::netString(e.msg);
 		}
+#endif
 		if (errorMsg->Contains("=="))
 		{
 			// adding more user friendly messages:
