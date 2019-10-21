@@ -178,6 +178,7 @@ xcopy /y /d C:\openh264\*.dll "$(OutDir)"</Command>
   <ItemGroup>
     <ClCompile Include="AboutForm.cpp" />
     <ClCompile Include="Argument.cpp" />
+    <ClCompile Include="BackgroundRollingBall.cpp" />
     <ClCompile Include="CaptureSource.cpp" />
     <ClCompile Include="FrameOutput.cpp" />
     <ClCompile Include="ImageOutput.cpp" />
@@ -227,6 +228,7 @@ xcopy /y /d C:\openh264\*.dll "$(OutDir)"</Command>
     </ClInclude>
     <ClInclude Include="Argument.h" />
     <ClInclude Include="AssemblyInfo.h" />
+    <ClInclude Include="BackgroundRollingBall.h" />
     <ClInclude Include="CaptureSource.h" />
     <ClInclude Include="FrameOutput.h" />
     <ClInclude Include="ImageOutput.h" />

@@ -147,6 +147,9 @@
     <ClCompile Include="PathLink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BackgroundRollingBall.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainForm.h">
@@ -282,6 +285,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PathLink.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BackgroundRollingBall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
