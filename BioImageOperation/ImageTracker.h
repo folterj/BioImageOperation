@@ -160,10 +160,10 @@ public:
 	/*
 	 * Save routines
 	 */
-	void saveClusters(System::String^ fileName, int i, bool byId);
-	void saveTracks(System::String^ fileName, int i, bool byId);
-	void savePaths(System::String^ fileName, int i);
-	void saveTrackInfo(System::String^ fileName, int i);
+	void saveClusters(System::String^ fileName, double time, bool byLabel);
+	void saveTracks(System::String^ fileName, double time, bool byLabel);
+	void savePaths(System::String^ fileName, double time);
+	void saveTrackInfo(System::String^ fileName, double time);
 	void initLogClusterTrack(System::String^ fileName);
 	void logClusterTrack(ClusterTrack* clusterTrack);
 

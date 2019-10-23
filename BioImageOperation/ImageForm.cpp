@@ -20,6 +20,7 @@
 #include "Constants.h"
 #include "Util.h"
 
+using namespace System::Drawing::Imaging;
 using namespace BioImageOperation;
 
 
@@ -33,6 +34,10 @@ ImageForm::~ImageForm()
 	if (imageBuffer)
 	{
 		delete imageBuffer;
+	}
+	if (bitmapData)
+	{
+		delete bitmapData;
 	}
 
 	if (components)
@@ -77,14 +82,95 @@ bool ImageForm::setImage(Mat* image)
 			imageBuffer = new Mat();
 		}
 		image->copyTo(*imageBuffer);
-		bitmap = Util::matToBitmap(imageBuffer);
-
+		if (bitmapData)
+		{
+			delete bitmapData;
+			bitmapData = NULL;
+		}
+		bitmap = matToBitmap(imageBuffer);
 		return true;
 	}
 	else
 	{
 		return false;
 	}
+}
+
+Bitmap^ ImageForm::matToBitmap(Mat* image)
+{
+	Bitmap^ bitmap;
+	PixelFormat pixelFormat;
+	int width = image->cols;
+	int height = image->rows;
+	int stride1 = (int)image->step;
+	int stride2 = (int)Math::Ceiling(stride1 / 4.0) * 4;
+	bool isGrayscale = (image->channels() == 1);
+	bool hasAlpha = (image->channels() == 4);
+	int bpp = (int)image->elemSize() * 8;
+	int offset = 0;
+
+	if (isGrayscale)
+	{
+		switch (bpp)
+		{
+		case 1: pixelFormat = PixelFormat::Format1bppIndexed; break;		// bpp < 8 not possible with current implementation of Mat
+		case 4: pixelFormat = PixelFormat::Format4bppIndexed; break;		// bpp < 8 not possible with current implementation of Mat
+		case 8: pixelFormat = PixelFormat::Format8bppIndexed; break;
+		case 16: pixelFormat = PixelFormat::Format16bppGrayScale; break;	// not supported by draw graphics (https://msdn.microsoft.com/en-us/library/system.drawing.graphics.fromimage(v=vs.110).aspx)
+		}
+	}
+	else
+	{
+		if (hasAlpha)
+		{
+			switch (bpp)
+			{
+			case 16: pixelFormat = PixelFormat::Format16bppArgb1555; break;
+			case 32: pixelFormat = PixelFormat::Format32bppArgb; break;
+			case 64: pixelFormat = PixelFormat::Format64bppArgb; break;
+			}
+		}
+		else
+		{
+			switch (bpp)
+			{
+			case 16: pixelFormat = PixelFormat::Format16bppRgb565; break;
+			case 24: pixelFormat = PixelFormat::Format24bppRgb; break;
+			case 32: pixelFormat = PixelFormat::Format32bppRgb; break;
+			case 48: pixelFormat = PixelFormat::Format48bppRgb; break;
+			}
+		}
+	}
+
+	if (stride2 == stride1)
+	{
+		bitmap = gcnew Bitmap(width, height, stride1, pixelFormat, (IntPtr)image->data);
+	}
+	else
+	{
+		// stride is not multiple of 4; convert to image with padding
+		bitmapData = new uchar[height * stride2]();		// declare and zet to zeros
+		for (int y = 0; y < image->rows; y++)
+		{
+			memcpy(&bitmapData[offset], image->row(y).data, stride1);
+			offset += stride2;
+		}
+		bitmap = gcnew Bitmap(width, height, stride2, pixelFormat, (IntPtr)bitmapData);
+	}
+
+	if (isGrayscale && bpp <= 8)
+	{
+		// indexed needs (grayscale) palette
+		ColorPalette^ palette = bitmap->Palette;
+		array<Color>^ entries = palette->Entries;
+		int n = entries->Length;
+		for (int i = 0; i < n; i++)
+		{
+			entries[i] = Drawing::Color::FromArgb(i * 0xFF / (n - 1), i * 0xFF / (n - 1), i * 0xFF / (n - 1));
+		}
+		bitmap->Palette = palette;
+	}
+	return bitmap;
 }
 
 void ImageForm::show()

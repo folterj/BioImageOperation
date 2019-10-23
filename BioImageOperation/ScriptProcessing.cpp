@@ -132,7 +132,7 @@ void ScriptProcessing::reset()
  * Start processing in separate thread
  */
 
-void ScriptProcessing::startProcess(System::String^ filePath, System::String^ script)
+bool ScriptProcessing::startProcess(System::String^ filePath, System::String^ script)
 {
 	reset();
 	basePath = Util::extractFilePath(filePath);
@@ -149,7 +149,9 @@ void ScriptProcessing::startProcess(System::String^ filePath, System::String^ sc
 	{
 		observer->showErrorMessage(Util::getExceptionDetail(e));
 		doAbort(true);
+		return false;
 	}
+	return true;
 }
 
 void ScriptProcessing::processThreadMethod()
@@ -195,6 +197,7 @@ void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOpe
 bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperation* prevOperation)
 {
 	int count = operation->count;
+	double time;
 
 	operation->count++;
 
@@ -204,6 +207,15 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		{
 			return true;
 		}
+	}
+
+	if (sourceFps > 0)
+	{
+		time = count / sourceFps;
+	}
+	else
+	{
+		time = count;
 	}
 
 	Mat* image = NULL;			// pointer to source image
@@ -229,7 +241,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 	int width, height;
 	int displayi;
 	double fps;
-	int time;
+	int delay;
 	bool done = true;
 
 	try
@@ -494,22 +506,22 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::SaveClusters:
 			outputPath.setOutputPath(basePath, operation->getArgument(ArgumentLabel::Path), Util::netString(Constants::defaultDataExtension));
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveClusters(outputPath.createFilePath(count), count, operation->getArgumentBoolean(ArgumentLabel::ByLabel));
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveClusters(outputPath.createFilePath(count), time, operation->getArgumentBoolean(ArgumentLabel::ByLabel));
 			break;
 
 		case ScriptOperationType::SaveTracks:
 			outputPath.setOutputPath(basePath, operation->getArgument(ArgumentLabel::Path), Util::netString(Constants::defaultDataExtension));
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveTracks(outputPath.createFilePath(count), count, operation->getArgumentBoolean(ArgumentLabel::ByLabel));
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveTracks(outputPath.createFilePath(count), time, operation->getArgumentBoolean(ArgumentLabel::ByLabel));
 			break;
 
 		case ScriptOperationType::SavePaths:
 			outputPath.setOutputPath(basePath, operation->getArgument(ArgumentLabel::Path), Util::netString(Constants::defaultDataExtension));
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->savePaths(outputPath.createFilePath(count), count);
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->savePaths(outputPath.createFilePath(count), time);
 			break;
 
 		case ScriptOperationType::SaveTrackInfo:
 			outputPath.setOutputPath(basePath, operation->getArgument(ArgumentLabel::Path), Util::netString(Constants::defaultDataExtension));
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveTrackInfo(outputPath.createFilePath(count), count);
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveTrackInfo(outputPath.createFilePath(count), time);
 			break;
 
 		case ScriptOperationType::SaveTrackLog:
@@ -535,12 +547,12 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::Wait:
-			time = (int)operation->getArgumentNumeric();
-			if (time == 0)
+			delay = (int)operation->getArgumentNumeric();
+			if (delay == 0)
 			{
-				time = 1000;
+				delay = 1000;
 			}
-			Thread::Sleep(time);
+			Thread::Sleep(delay);
 			break;
 
 		case ScriptOperationType::Debug:

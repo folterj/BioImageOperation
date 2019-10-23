@@ -48,6 +48,7 @@ namespace BioImageOperation {
 
 		int title;
 		Mat* imageBuffer;
+		uchar* bitmapData;
 		Bitmap^ bitmap;
 		int swidth = 0;
 		int sheight = 0;
@@ -61,6 +62,7 @@ namespace BioImageOperation {
 		void setTitle(int title);
 		void updateTitle();
 		bool setImage(Mat* image);
+		Bitmap^ matToBitmap(Mat* image);
 		void show();
 		void updateFps();
 

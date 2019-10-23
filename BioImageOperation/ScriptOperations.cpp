@@ -52,7 +52,7 @@ void ScriptOperations::reset()
 
 void ScriptOperations::extract(System::String^ script, int linei0)
 {
-	ScriptOperation* operation;
+	ScriptOperation* operation = NULL;
 	array<System::String^>^ lines = script->Split(gcnew array<System::String^>{ "\r\n", "\r", "\n" }, StringSplitOptions::None);
 	System::String^ line;
 	bool skipping = false;

@@ -91,12 +91,15 @@ namespace BioImageOperation {
 		Timers::Timer secondsTimer;
 		int processCount = 0;
 		int processFps = 0;
+		bool fileModified = false;
 
 		MainForm(void);
 		void setFilePath(System::String^ filePath);
+		void updateTitle();
 		void clearInput();
 		void open();
 		void save();
+		bool askSaveChanges();
 		void updateUI(bool start);
 		void checkUpdates();
 
@@ -146,6 +149,7 @@ namespace BioImageOperation {
 		System::Void scripthelpToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e);
 		System::Void aboutToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e);
 		System::Void checkUpdatesToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e);
+		System::Void scriptText_TextChanged(System::Object^ sender, System::EventArgs^ e);
 		System::Void testButton_Click(System::Object^  sender, System::EventArgs^  e);
 		System::Void processButton_Click(System::Object^  sender, System::EventArgs^  e);
 		System::Void abortButton_Click(System::Object^  sender, System::EventArgs^  e);
@@ -158,7 +162,7 @@ namespace BioImageOperation {
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			System::ComponentModel::ComponentResourceManager^  resources = (gcnew System::ComponentModel::ComponentResourceManager(MainForm::typeid));
+			System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(MainForm::typeid));
 			this->statusStrip = (gcnew System::Windows::Forms::StatusStrip());
 			this->progressBar = (gcnew System::Windows::Forms::ToolStripProgressBar());
 			this->statusLabel = (gcnew System::Windows::Forms::ToolStripStatusLabel());
@@ -217,6 +221,7 @@ namespace BioImageOperation {
 			this->scriptText->Size = System::Drawing::Size(584, 480);
 			this->scriptText->TabIndex = 1;
 			this->scriptText->Text = L"";
+			this->scriptText->TextChanged += gcnew System::EventHandler(this, &MainForm::scriptText_TextChanged);
 			// 
 			// processButton
 			// 
@@ -349,26 +354,26 @@ namespace BioImageOperation {
 			// scripthelpToolStripMenuItem
 			// 
 			this->scripthelpToolStripMenuItem->Name = L"scripthelpToolStripMenuItem";
-			this->scripthelpToolStripMenuItem->Size = System::Drawing::Size(180, 22);
+			this->scripthelpToolStripMenuItem->Size = System::Drawing::Size(170, 22);
 			this->scripthelpToolStripMenuItem->Text = L"&Help";
 			this->scripthelpToolStripMenuItem->Click += gcnew System::EventHandler(this, &MainForm::scripthelpToolStripMenuItem_Click);
 			// 
 			// checkUpdatesToolStripMenuItem
 			// 
 			this->checkUpdatesToolStripMenuItem->Name = L"checkUpdatesToolStripMenuItem";
-			this->checkUpdatesToolStripMenuItem->Size = System::Drawing::Size(180, 22);
+			this->checkUpdatesToolStripMenuItem->Size = System::Drawing::Size(170, 22);
 			this->checkUpdatesToolStripMenuItem->Text = L"Check for &updates";
 			this->checkUpdatesToolStripMenuItem->Click += gcnew System::EventHandler(this, &MainForm::checkUpdatesToolStripMenuItem_Click);
 			// 
 			// toolStripSeparator5
 			// 
 			this->toolStripSeparator5->Name = L"toolStripSeparator5";
-			this->toolStripSeparator5->Size = System::Drawing::Size(177, 6);
+			this->toolStripSeparator5->Size = System::Drawing::Size(167, 6);
 			// 
 			// aboutToolStripMenuItem
 			// 
 			this->aboutToolStripMenuItem->Name = L"aboutToolStripMenuItem";
-			this->aboutToolStripMenuItem->Size = System::Drawing::Size(180, 22);
+			this->aboutToolStripMenuItem->Size = System::Drawing::Size(170, 22);
 			this->aboutToolStripMenuItem->Text = L"&About...";
 			this->aboutToolStripMenuItem->Click += gcnew System::EventHandler(this, &MainForm::aboutToolStripMenuItem_Click);
 			// 

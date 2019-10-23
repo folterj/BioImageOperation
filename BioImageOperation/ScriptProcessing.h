@@ -82,7 +82,7 @@ public:
 	/*
 	 * Start processing in separate thread
 	 */
-	void startProcess(System::String^ filePath, System::String^ script);
+	bool startProcess(System::String^ filePath, System::String^ script);
 	void processThreadMethod();
 
 	/*

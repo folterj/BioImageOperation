@@ -113,14 +113,20 @@ System::Void MainForm::MainForm_Shown(System::Object^  sender, System::EventArgs
 
 void MainForm::setFilePath(System::String^ filePath)
 {
-	System::String^ title = "Bio Image Operation";
-	System::String^ fileTitle;
-
 	this->filePath = filePath;
-	fileTitle = Util::extractTitle(filePath);
+	updateTitle();
+}
+
+void MainForm::updateTitle()
+{
+	System::String^ title = "Bio Image Operation";
+	System::String^ fileTitle = Util::extractTitle(filePath);
 	if (fileTitle != "")
 	{
 		title += " - " + fileTitle;
+		if (fileModified) {
+			title += "*";
+		}
 	}
 	Text = title;
 }
@@ -133,22 +139,44 @@ void MainForm::clearInput()
 void MainForm::open()
 {
 	StreamReader reader(filePath);
-
 	scriptProcessing->doAbort(false);
 	clearInput();
-
 	scriptText->AppendText(reader.ReadToEnd());
-
 	reader.Close();
+
+	fileModified = false;
+	updateTitle();
 }
 
 void MainForm::save()
 {
 	StreamWriter writer(filePath);
-
 	writer.Write(scriptText->Text);
-
 	writer.Close();
+
+	if (fileModified)
+	{
+		fileModified = false;
+		updateTitle();
+	}
+}
+
+bool MainForm::askSaveChanges()
+{
+	System::Windows::Forms::DialogResult dialogResult;
+	if (fileModified)
+	{
+		dialogResult = MessageBox::Show("Save changes?", "File modified", MessageBoxButtons::YesNoCancel, MessageBoxIcon::Question);
+		if (dialogResult == System::Windows::Forms::DialogResult::Yes)
+		{
+			saveToolStripMenuItem_Click(this, EventArgs::Empty);
+		}
+		if (dialogResult == System::Windows::Forms::DialogResult::Cancel)
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 void MainForm::updateUI(bool start)
@@ -342,6 +370,13 @@ System::Void MainForm::openToolStripMenuItem_Click(System::Object^  sender, Syst
 	fileDialog.Filter = Util::netString(Constants::scriptFileDialogFilter);
 	fileDialog.FilterIndex = Constants::defaultScriptFileDialogFilter;
 
+	if (fileModified)
+	{
+		if (!askSaveChanges()) {
+			return;
+		}
+	}
+
 	if (fileDialog.ShowDialog() == ::DialogResult::OK)
 	{
 		try
@@ -446,6 +481,16 @@ void MainForm::checkUpdates()
 	MessageBox::Show("No newer version found.", "BIO Update");
 }
 
+System::Void MainForm::scriptText_TextChanged(System::Object^ sender, System::EventArgs^ e)
+{
+	if (!fileModified)
+	{
+		fileModified = true;
+		updateTitle();
+	}
+}
+
+
 System::Void MainForm::testButton_Click(System::Object^  sender, System::EventArgs^  e)
 {
 	updateUI(true);
@@ -455,7 +500,13 @@ System::Void MainForm::testButton_Click(System::Object^  sender, System::EventAr
 System::Void MainForm::processButton_Click(System::Object^  sender, System::EventArgs^  e)
 {
 	updateUI(true);
-	scriptProcessing->startProcess(filePath, scriptText->Text);
+	if (scriptProcessing->startProcess(filePath, scriptText->Text))
+	{
+		if (fileModified && filePath != "")
+		{
+			save();
+		}
+	}
 }
 
 System::Void MainForm::abortButton_Click(System::Object^  sender, System::EventArgs^  e)
@@ -469,4 +520,7 @@ System::Void MainForm::MainForm_FormClosing(System::Object^  sender, System::Win
 	secondsTimer.Stop();
 	scriptProcessing->doAbort(true);
 	benchMark->doAbort();
+	if (!askSaveChanges()) {
+		e->Cancel = true;
+	}
 }

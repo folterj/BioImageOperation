@@ -55,7 +55,6 @@ public:
 	
 	static Mat loadImage(System::String^ fileName);
 	static void saveImage(System::String^ fileName, Mat* image);
-	static System::Drawing::Bitmap^ matToBitmap(Mat *image);
 	static bool isValidImage(Mat* image);
 	static System::String^ getCodecString(int codec);
 
