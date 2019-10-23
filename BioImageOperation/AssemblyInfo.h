@@ -25,8 +25,8 @@
 #define Assembly_Description L"http://joostdefolter.info"
 
 // Version
-#define File_Version 1,4,410,20
-#define File_Version_Str "1.4.410.20"
+#define File_Version 1,4,410,21
+#define File_Version_Str "1.4.410.21"
 
 // CLR assembly version
 #define Assembly_Version File_Version_Str
