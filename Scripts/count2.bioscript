@@ -11,7 +11,7 @@ boxrt = GrayScale(boxrt)
 boxrb = OpenImage("boxrb.png")
 boxrb = GrayScale(boxrb)
 
-OpenVideo("0*.MTS")
+OpenVideo("*.mp4")
 {
 	Grayscale()
 	background = UpdateBackground(0.001)

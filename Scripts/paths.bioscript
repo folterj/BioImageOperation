@@ -3,7 +3,7 @@ background = GrayScale(background)
 mask = OpenImage("mask.tif")
 mask = GrayScale(mask)
 
-OpenVideo("00001.MTS")
+OpenVideo("test.mp4")
 {
 	Grayscale()
 	DifferenceAbs(background)

@@ -1,4 +1,4 @@
-OpenVideo("test.mts")
+OpenVideo("test.mp4")
 {
 	Grayscale()
 	background = UpdateBackground(weight=0.01)

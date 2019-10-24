@@ -1,0 +1,19 @@
+background = OpenImage("background.png")
+overlay = CreateImage()
+
+OpenVideo("test.mp4")
+{
+	StoreImage(original)
+	GrayScale()
+	DifferenceAbs(background)
+	Threshold(0.1)
+
+	CreateClusters(MinArea=200, MaxArea=500)
+	CreateTracks(MinActive=100, MaxInactive=100, MaxMove=20)
+
+	overlay = DrawTracks(Label=overlay, DrawMode=Track)
+
+	GetImage(original)
+	Add(overlay)
+	ShowImage()
+}

@@ -3,7 +3,7 @@ background = GrayScale(background)
 mask = OpenImage("mask.tif")
 mask = GrayScale(mask)
 
-OpenVideo("test.MTS")
+OpenVideo("test.mp4")
 {
 	Grayscale()
 	DifferenceAbs(background)
@@ -16,5 +16,5 @@ OpenVideo("test.MTS")
 	Color()
 	DrawTracks(drawmode=tracks)
 	ShowImage()
-	SaveVideo("testvideo.mp4")
+	SaveVideo("testoutput.mp4")
 }

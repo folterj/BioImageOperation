@@ -1,4 +1,4 @@
-OpenVideo("1.mp4", interval=10000)
+OpenVideo("test.mp4", interval=10000)
 {
 	GrayScale()
 	AddSeries()
