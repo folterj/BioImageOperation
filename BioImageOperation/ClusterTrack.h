@@ -84,6 +84,6 @@ public:
 	void drawAngle(Mat* image, Scalar color);
 	void drawLabel(Mat* image, Scalar color, bool showCount);
 	void drawTracks(Mat* image, Scalar color, int ntracks = 1);
-
+	System::String^ getCsv();
 	virtual System::String^ ToString();
 };

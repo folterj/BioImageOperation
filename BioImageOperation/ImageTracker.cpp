@@ -211,6 +211,7 @@ bool ImageTracker::findClusters(Mat* image)
 	Rect box;
 	int n;
 	bool clusterOk;
+	std::vector<std::vector<cv::Point>> contours;
 
 	n = connectedComponentsWithStats(*image, clusterLabelImage, clusterStats, clusterCentroids);
 
@@ -262,6 +263,8 @@ bool ImageTracker::findClusters(Mat* image)
 
 				// filter label pixels only
 				clusterRoiImage2 = (clusterRoiImage == label);
+				// find contour
+				findContours(clusterRoiImage2, contours, RetrievalModes::RETR_EXTERNAL, ContourApproximationModes::CHAIN_APPROX_NONE);
 				// get moments
 				clusterMoments = moments(clusterRoiImage2, true);
 				// get angle
@@ -269,7 +272,7 @@ bool ImageTracker::findClusters(Mat* image)
 			}
 			x = clusterCentroids.at<double>(label, 0);
 			y = clusterCentroids.at<double>(label, 1);
-			clusters.push_back(new Cluster(x, y, area, angle, box, &clusterRoiImage2));
+			clusters.push_back(new Cluster(x, y, area, angle, box, &clusterRoiImage2, &contours[0]));
 		}
 	}
 	return (clusters.size() > 0);
@@ -842,14 +845,22 @@ System::String^ ImageTracker::getInfo()
  * Save routines
  */
 
-void ImageTracker::saveClusters(System::String^ filename, double time, bool byLabel)
+void ImageTracker::saveClusters(System::String^ filename, double time, bool byLabel, bool writeContour)
 {
+	System::String^ header = "";
 	System::String^ s = "";
 	int dcol;
 	int col = 0;
 	int maxi = 0;
 
-	clusterStream.init(filename, "Time,Label,Area,Rad,Angle,Pos X,Pos Y\n");
+	header = "Time,Label,Area,Rad,Angle,Pos X,Pos Y";
+	if (writeContour)
+	{
+		header += ",Contour";
+	}
+	header += "\n";
+
+	clusterStream.init(filename, header);
 
 	if (clusterParamsFinalised)
 	{
@@ -872,7 +883,7 @@ void ImageTracker::saveClusters(System::String^ filename, double time, bool byLa
 							s += gcnew System::String(',', dcol * 6);
 							col = i;
 						}
-						s += System::String::Format("{0},{1},{2},{3},{4},{5},", cluster->getFirstLabel(), cluster->area, cluster->rad, cluster->angle, cluster->x, cluster->y);
+						s += cluster->getCsv(writeContour) + ",";
 						col++;
 					}
 				}
@@ -883,7 +894,7 @@ void ImageTracker::saveClusters(System::String^ filename, double time, bool byLa
 		{
 			for (Cluster* cluster : clusters)
 			{
-				s += System::String::Format("{0},{1},{2},{3},{4},{5},{6}\n", time, cluster->getFirstLabel(), cluster->area, cluster->rad, cluster->angle, cluster->x, cluster->y);
+				s += System::String::Format("{0},{1}\n", time, cluster->getCsv(writeContour));
 			}
 		}
 		clusterStream.write(s);
@@ -920,7 +931,7 @@ void ImageTracker::saveTracks(System::String^ filename, double time, bool byLabe
 							s += gcnew System::String(',', dcol * 6);
 							col = i;
 						}
-						s += System::String::Format("{0},{1},{2},{3},{4},{5},", track->label, track->area, track->rad, track->orientation, track->x, track->y);
+						s += track->getCsv() + ",";
 						col++;
 					}
 				}
@@ -931,7 +942,7 @@ void ImageTracker::saveTracks(System::String^ filename, double time, bool byLabe
 		{
 			for (ClusterTrack* track : clusterTracks)
 			{
-				s += System::String::Format("{0},{1},{2},{3},{4},{5},{6}\n", time, track->label, track->area, track->rad, track->orientation, track->x, track->y);
+				s += System::String::Format("{0},{1}\n", time, track->getCsv());
 			}
 		}
 		trackStream.write(s);

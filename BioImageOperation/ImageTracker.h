@@ -160,7 +160,7 @@ public:
 	/*
 	 * Save routines
 	 */
-	void saveClusters(System::String^ fileName, double time, bool byLabel);
+	void saveClusters(System::String^ fileName, double time, bool byLabel, bool saveContour);
 	void saveTracks(System::String^ fileName, double time, bool byLabel);
 	void savePaths(System::String^ fileName, double time);
 	void saveTrackInfo(System::String^ fileName, double time);

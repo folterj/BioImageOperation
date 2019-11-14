@@ -246,6 +246,12 @@ void ClusterTrack::drawTracks(Mat* image, Scalar color, int ntracks)
 	}
 }
 
+System::String^ ClusterTrack::getCsv()
+{
+	System::String^ s = System::String::Format("{0},{1},{2},{3},{4},{5}", label, area, rad, orientation, x, y);
+	return s;
+}
+
 System::String^ ClusterTrack::ToString()
 {
 	return System::String::Format("Label:{0} Area:{1:F1} Radius:{2:F1} Angle:{3:F1} X:{4:F1} Y:{5:F1}", label, area, rad, orientation, x, y);

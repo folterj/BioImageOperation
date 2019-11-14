@@ -21,7 +21,7 @@
 #include "Util.h"
 
 
-Cluster::Cluster(double x, double y, double area, double angle, Rect box, Mat* clusterImage)
+Cluster::Cluster(double x, double y, double area, double angle, Rect box, Mat* clusterImage, std::vector<Point>* contour)
 {
 	this->area = area;
 	this->x = x;
@@ -29,6 +29,10 @@ Cluster::Cluster(double x, double y, double area, double angle, Rect box, Mat* c
 	this->angle = angle;
 	this->box = box;
 	this->clusterImage = *clusterImage;
+	for (Point point : *contour)
+	{
+		this->contour.push_back(box.tl() + point);
+	}
 	rad = sqrt(area);
 }
 
@@ -214,6 +218,20 @@ void Cluster::drawFill(Mat* image, Scalar color)
 
 		clusterImage2.copyTo((*image)(box), clusterImage);	// use mask again; don't copy black pixels
 	}
+}
+
+System::String^ Cluster::getCsv(bool writeContour)
+{
+	System::String^ s = System::String::Format("{0},{1},{2},{3},{4},{5}", getFirstLabel(), area, rad, angle, x, y);
+	if (writeContour)
+	{
+		s += ",";
+		for (Point point : contour)
+		{
+			s += System::String::Format("{0} {1} ", point.x, point.y);
+		}
+	}
+	return s;
 }
 
 System::String^ Cluster::ToString()
