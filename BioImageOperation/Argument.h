@@ -67,7 +67,8 @@ public enum class ArgumentLabel
 	MaxInactive,
 	Display,
 	Position,
-	ByLabel,
+	Format,
+	Contour
 };
 
 

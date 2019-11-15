@@ -71,6 +71,14 @@ bool NumericPath::setInputPath(System::String^ basePath, System::String^ templat
 	return set;
 }
 
+bool NumericPath::setOutputPath(System::String^ templatePath)
+{
+	bool ok = setOutputPath("", templatePath, "");
+	offset = 0;
+	numlen = 1;
+	return ok;
+}
+
 bool NumericPath::setOutputPath(System::String^ basePath, System::String^ templatePath, System::String^ defaultExtension)
 {
 	int extPos;
@@ -130,7 +138,7 @@ bool NumericPath::setOutputPath(System::String^ basePath, System::String^ templa
 System::String^ NumericPath::createFilePath()
 {
 	currentPath = createFilePath(filei++);
-	return currentFilePath();
+	return currentPath;
 }
 
 System::String^ NumericPath::currentFilePath()

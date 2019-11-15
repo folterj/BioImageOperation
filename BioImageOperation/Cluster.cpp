@@ -216,23 +216,27 @@ void Cluster::drawFill(Mat* image, Scalar color)
 	}
 }
 
+std::vector<Point> Cluster::getContour()
+{
+	std::vector<Point> contour;
+	std::vector<std::vector<Point>> contours;
+	findContours(clusterImage, contours, RetrievalModes::RETR_EXTERNAL, ContourApproximationModes::CHAIN_APPROX_NONE);
+	for (Point point : contours[0])
+	{
+		contour.push_back(box.tl() + point);
+	}
+	return contour;
+}
+
 System::String^ Cluster::getCsv(bool writeContour)
 {
-	std::vector<std::vector<Point>> contours;
-	std::vector<Point> contour;
-	Point absPoint;
-
 	System::String^ s = System::String::Format("{0},{1},{2},{3},{4},{5}", getFirstLabel(), area, rad, angle, x, y);
 	if (writeContour)
 	{
 		s += ",";
-		// find contour
-		findContours(clusterImage, contours, RetrievalModes::RETR_EXTERNAL, ContourApproximationModes::CHAIN_APPROX_NONE);
-		contour = contours[0];
-		for (Point point : contour)
+		for (Point point : getContour())
 		{
-			absPoint = box.tl() + point;
-			s += System::String::Format("{0} {1} ", absPoint.x, absPoint.y);
+			s += System::String::Format("{0} {1} ", point.x, point.y);
 		}
 	}
 	return s;

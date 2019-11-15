@@ -44,6 +44,7 @@ public:
 	void reset();
 	void resetFilePath();
 	bool setInputPath(System::String^ basePath, System::String^ templatePath);
+	bool setOutputPath(System::String^ templatePath);
 	bool setOutputPath(System::String^ basePath, System::String^ templatePath, System::String^ defaultExtension);
 	System::String^ createFilePath();
 	System::String^ currentFilePath();

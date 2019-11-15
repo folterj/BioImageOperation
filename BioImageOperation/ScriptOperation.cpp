@@ -343,6 +343,7 @@ generic<class type> type ScriptOperation::getArgument(ArgumentLabel label, type 
 	ClusterDrawMode clusterDrawMode;
 	PathDrawMode pathDrawMode;
 	DrawPosition drawPosition;
+	SaveFormat saveFormat;
 	bool ok = false;
 
 	if (arg != "")
@@ -370,6 +371,10 @@ generic<class type> type ScriptOperation::getArgument(ArgumentLabel label, type 
 		if (type::typeid == DrawPosition::typeid)
 		{
 			ok = Enum::TryParse<DrawPosition>(arg, true, drawPosition);
+		}
+		if (type::typeid == SaveFormat::typeid)
+		{
+			ok = Enum::TryParse<SaveFormat>(arg, true, saveFormat);
 		}
 
 		if (!ok)
@@ -400,6 +405,10 @@ generic<class type> type ScriptOperation::getArgument(ArgumentLabel label, type 
 		if (type::typeid == DrawPosition::typeid)
 		{
 			return (type)drawPosition;
+		}
+		if (type::typeid == SaveFormat::typeid)
+		{
+			return (type)saveFormat;
 		}
 	}
 	return defaultArgument;
@@ -750,7 +759,7 @@ OperationInfo^ ScriptOperation::getOperationInfo(ScriptOperationType type)
 	case ScriptOperationType::SaveClusters:
 	{
 		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::ByLabel };
+		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Contour };
 		description = "Save clusters to file (CSV format)";
 		break;
 	}
@@ -758,7 +767,7 @@ OperationInfo^ ScriptOperation::getOperationInfo(ScriptOperationType type)
 	case ScriptOperationType::SaveTracks:
 	{
 		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::ByLabel };
+		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Contour };
 		description = "Save cluster tracking to file (CSV format)";
 		break;
 	}

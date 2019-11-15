@@ -246,9 +246,23 @@ void ClusterTrack::drawTracks(Mat* image, Scalar color, int ntracks)
 	}
 }
 
-System::String^ ClusterTrack::getCsv()
+System::String^ ClusterTrack::getCsv(Cluster* cluster, bool writeContour)
 {
+	std::vector<std::vector<Point>> contours;
+	Point absPoint;
+
 	System::String^ s = System::String::Format("{0},{1},{2},{3},{4},{5}", label, area, rad, orientation, x, y);
+	if (writeContour)
+	{
+		s += ",";
+		if (cluster)
+		{
+			for (Point point : cluster->getContour())
+			{
+				s += System::String::Format("{0} {1} ", point.x, point.y);
+			}
+		}
+	}
 	return s;
 }
 

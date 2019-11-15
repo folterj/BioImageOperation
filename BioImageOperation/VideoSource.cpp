@@ -140,7 +140,17 @@ bool VideoSource::init(int apiCode, System::String^ basePath, System::String^ fi
 	{
 		framei = this->start;
 		videoFramei = this->start;
-		seekFrame();
+		if (seekMode)
+		{
+			seekFrame();
+		}
+		else
+		{
+			for (int i = 0; i < this->start; i++)
+			{
+				nextFrame();
+			}
+		}
 	}
 
 	return ok;

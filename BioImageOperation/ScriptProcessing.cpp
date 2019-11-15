@@ -506,22 +506,22 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::SaveClusters:
 			outputPath.setOutputPath(basePath, operation->getArgument(ArgumentLabel::Path), Util::netString(Constants::defaultDataExtension));
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveClusters(outputPath.createFilePath(count), time, operation->getArgumentBoolean(ArgumentLabel::ByLabel),true);
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveClusters(outputPath.createFilePath(count), count, time, operation->getArgument<SaveFormat>(ArgumentLabel::Format, SaveFormat::ByTime), operation->getArgumentBoolean(ArgumentLabel::Contour));
 			break;
 
 		case ScriptOperationType::SaveTracks:
 			outputPath.setOutputPath(basePath, operation->getArgument(ArgumentLabel::Path), Util::netString(Constants::defaultDataExtension));
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveTracks(outputPath.createFilePath(count), time, operation->getArgumentBoolean(ArgumentLabel::ByLabel));
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveTracks(outputPath.createFilePath(count), count, time, operation->getArgument<SaveFormat>(ArgumentLabel::Format, SaveFormat::ByTime), operation->getArgumentBoolean(ArgumentLabel::Contour));
 			break;
 
 		case ScriptOperationType::SavePaths:
 			outputPath.setOutputPath(basePath, operation->getArgument(ArgumentLabel::Path), Util::netString(Constants::defaultDataExtension));
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->savePaths(outputPath.createFilePath(count), time);
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->savePaths(outputPath.createFilePath(count), count, time);
 			break;
 
 		case ScriptOperationType::SaveTrackInfo:
 			outputPath.setOutputPath(basePath, operation->getArgument(ArgumentLabel::Path), Util::netString(Constants::defaultDataExtension));
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveTrackInfo(outputPath.createFilePath(count), time);
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveTrackInfo(outputPath.createFilePath(count), count, time);
 			break;
 
 		case ScriptOperationType::SaveTrackLog:

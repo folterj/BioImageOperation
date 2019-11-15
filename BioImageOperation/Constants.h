@@ -88,6 +88,14 @@ public enum class ScriptOperationType
 };
 
 
+public enum class SaveFormat
+{
+	ByTime,
+	ByLabel,
+	Split
+};
+
+
 public enum class ImageColorMode
 {
 	GrayScale,
@@ -102,6 +110,7 @@ public enum class Palette
 	Heat,
 	Rainbow,
 };
+
 
 public enum class ClusterDrawMode : int
 {

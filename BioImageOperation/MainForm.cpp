@@ -134,6 +134,7 @@ void MainForm::updateTitle()
 void MainForm::clearInput()
 {
 	scriptText->Clear();
+	fileModified = false;
 }
 
 void MainForm::open()
@@ -359,6 +360,14 @@ void MainForm::OnElapsed(System::Object ^sender, System::Timers::ElapsedEventArg
 
 System::Void MainForm::clearToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
 {
+	if (fileModified)
+	{
+		if (!askSaveChanges())
+		{
+			return;
+		}
+	}
+
 	setFilePath("");
 	clearInput();
 }
@@ -372,7 +381,8 @@ System::Void MainForm::openToolStripMenuItem_Click(System::Object^  sender, Syst
 
 	if (fileModified)
 	{
-		if (!askSaveChanges()) {
+		if (!askSaveChanges())
+		{
 			return;
 		}
 	}
