@@ -211,7 +211,6 @@ bool ImageTracker::findClusters(Mat* image)
 	Rect box;
 	int n;
 	bool clusterOk;
-	std::vector<std::vector<cv::Point>> contours;
 
 	n = connectedComponentsWithStats(*image, clusterLabelImage, clusterStats, clusterCentroids);
 
@@ -263,8 +262,6 @@ bool ImageTracker::findClusters(Mat* image)
 
 				// filter label pixels only
 				clusterRoiImage2 = (clusterRoiImage == label);
-				// find contour
-				findContours(clusterRoiImage2, contours, RetrievalModes::RETR_EXTERNAL, ContourApproximationModes::CHAIN_APPROX_NONE);
 				// get moments
 				clusterMoments = moments(clusterRoiImage2, true);
 				// get angle
@@ -272,7 +269,7 @@ bool ImageTracker::findClusters(Mat* image)
 			}
 			x = clusterCentroids.at<double>(label, 0);
 			y = clusterCentroids.at<double>(label, 1);
-			clusters.push_back(new Cluster(x, y, area, angle, box, &clusterRoiImage2, &contours[0]));
+			clusters.push_back(new Cluster(x, y, area, angle, box, &clusterRoiImage2));
 		}
 	}
 	return (clusters.size() > 0);

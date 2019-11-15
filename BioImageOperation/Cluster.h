@@ -39,7 +39,6 @@ class Cluster
 public:
 	std::vector<ClusterTrack*> assignedTracks;
 	Mat clusterImage;
-	std::vector<Point> contour;
 
 	double x = 0;
 	double y = 0;
@@ -52,7 +51,7 @@ public:
 	double areaUnassigned = 0;
 	double rad = 0;
 
-	Cluster(double x, double y, double area, double angle, Rect box, Mat* clusterImage, std::vector<Point>* contour);
+	Cluster(double x, double y, double area, double angle, Rect box, Mat* clusterImage);
 	Cluster(Moments* cvmoments, double area);
 	void unAssign();
 	bool isAssignable(double trackedArea);

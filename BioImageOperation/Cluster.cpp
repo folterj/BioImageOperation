@@ -21,7 +21,7 @@
 #include "Util.h"
 
 
-Cluster::Cluster(double x, double y, double area, double angle, Rect box, Mat* clusterImage, std::vector<Point>* contour)
+Cluster::Cluster(double x, double y, double area, double angle, Rect box, Mat* clusterImage)
 {
 	this->area = area;
 	this->x = x;
@@ -29,10 +29,6 @@ Cluster::Cluster(double x, double y, double area, double angle, Rect box, Mat* c
 	this->angle = angle;
 	this->box = box;
 	this->clusterImage = *clusterImage;
-	for (Point point : *contour)
-	{
-		this->contour.push_back(box.tl() + point);
-	}
 	rad = sqrt(area);
 }
 
@@ -222,13 +218,21 @@ void Cluster::drawFill(Mat* image, Scalar color)
 
 System::String^ Cluster::getCsv(bool writeContour)
 {
+	std::vector<std::vector<Point>> contours;
+	std::vector<Point> contour;
+	Point absPoint;
+
 	System::String^ s = System::String::Format("{0},{1},{2},{3},{4},{5}", getFirstLabel(), area, rad, angle, x, y);
 	if (writeContour)
 	{
 		s += ",";
+		// find contour
+		findContours(clusterImage, contours, RetrievalModes::RETR_EXTERNAL, ContourApproximationModes::CHAIN_APPROX_NONE);
+		contour = contours[0];
 		for (Point point : contour)
 		{
-			s += System::String::Format("{0} {1} ", point.x, point.y);
+			absPoint = box.tl() + point;
+			s += System::String::Format("{0} {1} ", absPoint.x, absPoint.y);
 		}
 	}
 	return s;
