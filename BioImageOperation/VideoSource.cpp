@@ -311,6 +311,11 @@ double VideoSource::getFps()
 	return fps;
 }
 
+int VideoSource::getFrameNumber()
+{
+	return framei;
+}
+
 System::String^ VideoSource::getLabel()
 {
 	return label;

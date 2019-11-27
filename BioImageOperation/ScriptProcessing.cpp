@@ -114,6 +114,7 @@ void ScriptProcessing::reset()
 	sourceWidth = 0;
 	sourceHeight = 0;
 	sourceFps = 0;
+	sourceFrameNumber = 0;
 	logPower = 0;
 	abort = false;
 
@@ -197,7 +198,6 @@ void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOpe
 bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperation* prevOperation)
 {
 	int count = operation->count;
-	double time;
 
 	operation->count++;
 
@@ -207,15 +207,6 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		{
 			return true;
 		}
-	}
-
-	if (sourceFps > 0)
-	{
-		time = count / sourceFps;
-	}
-	else
-	{
-		time = count;
 	}
 
 	Mat* image = NULL;			// pointer to source image
@@ -241,6 +232,8 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 	int width, height;
 	int displayi;
 	double fps;
+	int frame = sourceFrameNumber;
+
 	int delay;
 	bool done = true;
 
@@ -263,11 +256,13 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			ImageOperations::create(newImage, width, height, operation->getArgument<ImageColorMode>(ArgumentLabel::ColorMode, ImageColorMode::Color), operation->getArgumentNumeric(ArgumentLabel::Red), operation->getArgumentNumeric(ArgumentLabel::Green), operation->getArgumentNumeric(ArgumentLabel::Blue));
 			sourceWidth = width;
 			sourceHeight = height;
+			sourceFrameNumber = 0;
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::OpenImage:
 			operation->initFrameSource(FrameType::Image, 0, basePath, operation->getArgument(ArgumentLabel::Path), operation->getArgument(ArgumentLabel::Start), operation->getArgument(ArgumentLabel::Length), sourceFps, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
+			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage))
 			{
 				observer->showStatus("", operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames(), true);
@@ -280,6 +275,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::OpenVideo:
 			operation->initFrameSource(FrameType::Video, (int)operation->getArgumentNumeric(ArgumentLabel::API), basePath, operation->getArgument(ArgumentLabel::Path), operation->getArgument(ArgumentLabel::Start), operation->getArgument(ArgumentLabel::Length), 0, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
+			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage))
 			{
 				observer->showStatus(operation->frameSource->getLabel(), operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames(), true);
@@ -303,7 +299,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				source = operation->getArgumentNumeric().ToString();
 			}
 			operation->initFrameSource(FrameType::Capture, (int)operation->getArgumentNumeric(ArgumentLabel::API), basePath, source, "", "", 0, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
-
+			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage))
 			{
 				observer->showStatus(operation->frameSource->getCurrentFrame());
@@ -506,22 +502,22 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::SaveClusters:
 			outputPath.setOutputPath(basePath, operation->getArgument(ArgumentLabel::Path), Util::netString(Constants::defaultDataExtension));
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveClusters(outputPath.createFilePath(count), count, time, operation->getArgument<SaveFormat>(ArgumentLabel::Format, SaveFormat::ByTime), operation->getArgumentBoolean(ArgumentLabel::Contour));
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveClusters(outputPath.createFilePath(frame), frame, getTime(frame), operation->getArgument<SaveFormat>(ArgumentLabel::Format, SaveFormat::ByTime), operation->getArgumentBoolean(ArgumentLabel::Contour));
 			break;
 
 		case ScriptOperationType::SaveTracks:
 			outputPath.setOutputPath(basePath, operation->getArgument(ArgumentLabel::Path), Util::netString(Constants::defaultDataExtension));
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveTracks(outputPath.createFilePath(count), count, time, operation->getArgument<SaveFormat>(ArgumentLabel::Format, SaveFormat::ByTime), operation->getArgumentBoolean(ArgumentLabel::Contour));
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveTracks(outputPath.createFilePath(frame), frame, getTime(frame), operation->getArgument<SaveFormat>(ArgumentLabel::Format, SaveFormat::ByTime), operation->getArgumentBoolean(ArgumentLabel::Contour));
 			break;
 
 		case ScriptOperationType::SavePaths:
 			outputPath.setOutputPath(basePath, operation->getArgument(ArgumentLabel::Path), Util::netString(Constants::defaultDataExtension));
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->savePaths(outputPath.createFilePath(count), count, time);
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->savePaths(outputPath.createFilePath(frame), frame, getTime(frame));
 			break;
 
 		case ScriptOperationType::SaveTrackInfo:
 			outputPath.setOutputPath(basePath, operation->getArgument(ArgumentLabel::Path), Util::netString(Constants::defaultDataExtension));
-			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveTrackInfo(outputPath.createFilePath(count), count, time);
+			imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker))->saveTrackInfo(outputPath.createFilePath(frame), frame, getTime(frame));
 			break;
 
 		case ScriptOperationType::SaveTrackLog:
@@ -658,6 +654,20 @@ Mat* ScriptProcessing::getLabelOrCurrentImage(ScriptOperation* operation, Mat* c
 		image = currentImage;
 	}
 	return image;
+}
+
+double ScriptProcessing::getTime(int frame)
+{
+	double time;
+	if (sourceFps > 0)
+	{
+		time = frame / sourceFps;
+	}
+	else
+	{
+		time = frame;
+	}
+	return time;
 }
 
 /*

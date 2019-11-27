@@ -49,6 +49,7 @@ public:
 	int getWidth();
 	int getHeight();
 	double getFps();
+	int getFrameNumber();
 
 	System::String^ getLabel();
 	int getCurrentFrame();

@@ -137,6 +137,11 @@ double ImageSource::getFps()
 	return 0;
 }
 
+int ImageSource::getFrameNumber()
+{
+	return filei;
+}
+
 System::String^ ImageSource::getLabel()
 {
 	return label;

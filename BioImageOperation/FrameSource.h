@@ -40,6 +40,7 @@ public:
 	virtual int getWidth() = 0;
 	virtual int getHeight() = 0;
 	virtual double getFps() = 0;
+	virtual int getFrameNumber() = 0;
 
 	virtual System::String^ getLabel() = 0;
 	virtual int getCurrentFrame() = 0;

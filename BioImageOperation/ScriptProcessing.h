@@ -59,6 +59,7 @@ public:
 	int sourceWidth = 0;
 	int sourceHeight = 0;
 	double sourceFps = 0;
+	int sourceFrameNumber = 0;
 	double logPower = 0;
 	Palette logPalette;
 	bool abort = false;
@@ -94,11 +95,11 @@ public:
 	 * Process single script operation
 	 */
 	bool processOperation(ScriptOperation* operation, ScriptOperation* prevOperation);
-
 	/*
 	 * Helper function to get reference image, or else current image
 	 */
 	Mat* getLabelOrCurrentImage(ScriptOperation* operation, Mat* currentImage, bool explicitArgument);
+	double getTime(int frame);
 
 	/*
 	 * Abort thread, attempt closing output streams to prevent data loss

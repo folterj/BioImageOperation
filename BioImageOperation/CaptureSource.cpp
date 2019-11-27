@@ -146,6 +146,11 @@ double CaptureSource::getFps()
 	return fps;
 }
 
+int CaptureSource::getFrameNumber()
+{
+	return framei;
+}
+
 System::String^ CaptureSource::getLabel()
 {
 	return "";
