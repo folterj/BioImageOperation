@@ -35,13 +35,13 @@
 				</File>
 			</Component>
 			<Component Id="OpencvDllComp" Win64="yes">
-				<File Id="OpencvDll" Name="opencv_world410.dll" Source="C:\opencv\build\x64\vc15\bin\opencv_world410.dll" />
+				<File Id="OpencvDll" Name="opencv_world420.dll" Source="C:\opencv\build\x64\vc15\bin\opencv_world420.dll" />
 			</Component>
 			<Component Id="FfmpegDllComp" Win64="yes">
-				<File Id="FfmpegDll" Name="opencv_ffmpeg410_64.dll" Source="C:\opencv\build\x64\vc15\bin\opencv_ffmpeg410_64.dll" />
+				<File Id="FfmpegDll" Name="opencv_videoio_ffmpeg420_64.dll" Source="C:\opencv\build\x64\vc15\bin\opencv_videoio_ffmpeg420_64.dll" />
 			</Component>
 			<Component Id="H264DllComp" Win64="yes">
-				<File Id="H264Dll" Name="openh264-1.7.0-win64.dll" Source="C:\openh264\openh264-1.7.0-win64.dll" />
+				<File Id="H264Dll" Name="openh264-1.8.0-win64.dll" Source="C:\openh264\openh264-1.8.0-win64.dll" />
 			</Component>
 		</ComponentGroup>
 		<Property Id="ARPPRODUCTICON" Value="BioIcon.exe" />

@@ -18,11 +18,12 @@
 		<!--Search for Microsoft Visual C++ x64 Redistributable-->
 		<util:RegistrySearch Variable="DETECTVCREDISTX64" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" Value="Installed" Result="value" Win64="yes" />
 
-		<!-- Log PathVariable="D:\BIO install.log" / -->
+		<!-- Log PathVariable="C:\BIO install.log" / -->
+    <!-- Calculate SHA1 hash from files: https://md5file.com/calculator / -->
 		
 		<Chain>
-			<ExePackage Id="VcRedist_x64" Name="VcRedist_x64" DetectCondition="DETECTVCREDISTX64" Cache="no" Compressed="no" PerMachine="yes" Permanent="yes" Vital="no" InstallCommand="/passive /norestart" DownloadUrl="https://aka.ms/vs/15/release/vc_redist.x64.exe" >
-				<RemotePayload ProductName="vcRedist_x64.exe" Description="C++ 2017 Redistributable" Version="14.12.25810.0" Size="15328616" Hash="6699383B22F2AD050245866A176C2EDE6E348443" />
+			<ExePackage Id="VcRedist_x64" Name="VcRedist_x64" DetectCondition="DETECTVCREDISTX64" Cache="no" Compressed="no" PerMachine="yes" Permanent="yes" Vital="no" InstallCommand="/passive /norestart" DownloadUrl="https://aka.ms/vs/16/release/vc_redist.x64.exe" >
+				<RemotePayload ProductName="vcRedist_x64.exe" Description="C++ 2019 Redistributable" Version="14.24.28127.4" Size="15060496" Hash="b87c38d093872d7be7e191f01107b39c87888a5a" />
 			</ExePackage>
 
 			<ExePackage Id="Netfx4Full" Name="Netfx4Full" DetectCondition="DETECTNET40 OR DETECTNET40_64" Cache="no" Compressed="no" PerMachine="yes" Permanent="yes" Vital="no" InstallCommand="/passive /norestart" DownloadUrl="http://go.microsoft.com/fwlink/?linkid=182805" >

@@ -760,7 +760,7 @@ OperationInfo^ ScriptOperation::getOperationInfo(ScriptOperationType type)
 	{
 		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
 		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Contour };
-		description = "Save clusters to file (CSV format)";
+		description = "Save clusters to CSV file (Format: ByTime, ByLabel, Split)";
 		break;
 	}
 
@@ -768,7 +768,7 @@ OperationInfo^ ScriptOperation::getOperationInfo(ScriptOperationType type)
 	{
 		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
 		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Contour };
-		description = "Save cluster tracking to file (CSV format)";
+		description = "Save cluster tracking to CSV file (Format: ByTime, ByLabel, Split)";
 		break;
 	}
 
@@ -776,7 +776,7 @@ OperationInfo^ ScriptOperation::getOperationInfo(ScriptOperationType type)
 	{
 		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
 		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker };
-		description = "Save paths to file (CSV format)";
+		description = "Save paths to CSV file";
 		break;
 	}
 
@@ -792,7 +792,7 @@ OperationInfo^ ScriptOperation::getOperationInfo(ScriptOperationType type)
 	{
 		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
 		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker };
-		description = "Save tracking information to file (CSV format)";
+		description = "Save tracking information to CSV file";
 		break;
 	}
 
@@ -800,7 +800,7 @@ OperationInfo^ ScriptOperation::getOperationInfo(ScriptOperationType type)
 	{
 		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
 		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker };
-		description = "Save tracking log to file (CSV format)";
+		description = "Save tracking log to CSV file";
 		break;
 	}
 
