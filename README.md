@@ -14,7 +14,7 @@ http://joostdefolter.info/ant-research
 This is a Microsoft Visual Studio 2019 C++ Windows Forms project
 
 Project Requirements
-- OpenCV 4.1.0 (https://opencv.org/)
+- OpenCV 4.2.0 (https://opencv.org/)
 - Openh264 1.7 library (https://github.com/cisco/openh264)
 - WiX 3 (http://wixtoolset.org)
 - Windows 64-bit
