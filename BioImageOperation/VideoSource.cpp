@@ -1,32 +1,15 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
 #include "VideoSource.h"
 #include "Constants.h"
 #include "Util.h"
-
-#ifdef _DEBUG
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#define new DEBUG_NEW
-#endif
 
 
 VideoSource::VideoSource()
@@ -40,7 +23,7 @@ VideoSource::~VideoSource()
 
 void VideoSource::reset()
 {
-	sourcePath->reset();
+	sourcePath.reset();
 	apiCode = VideoCaptureAPIs::CAP_ANY;
 	label = "";
 	nsources = 0;
@@ -59,31 +42,31 @@ void VideoSource::reset()
 	close();
 }
 
-bool VideoSource::init(int apiCode, System::String^ basePath, System::String^ filePath, System::String^ start, System::String^ length, double fps0, int interval)
+bool VideoSource::init(int apiCode, string basePath, string filePath, string start, string length, double fps0, int interval)
 {
-	System::String^ fileName = ".";	// dummy value to pass initial while-loop condition
+	string fileName = ".";	// dummy value to pass initial while-loop condition
 	bool ok = false;
 	int lengthi = 0;
 	int nframes0;
-	System::String^ message;
+	string message;
 
 	reset();
 	this->apiCode = apiCode;
-	sourcePath->setInputPath(basePath, filePath);
+	sourcePath.setInputPath(basePath, filePath);
 
-	nsources = sourcePath->getFileCount();
+	nsources = sourcePath.getFileCount();
 	if (nsources == 0)
 	{
-		throw gcnew System::Exception("File(s) not found: " + sourcePath->templatePath);
+		throw invalid_argument("File(s) not found: " + sourcePath.templatePath);
 	}
 
 	nframes = 0;
 	while (fileName != "")
 	{
-		fileName = sourcePath->createFilePath();
+		fileName = sourcePath.createFilePath();
 		if (fileName != "")
 		{
-			if (videoCapture.open(Util::stdString(fileName)))
+			if (videoCapture.open(fileName))
 			{
 				nframes0 = (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_COUNT);
 				if (nframes0 > 0) {
@@ -103,13 +86,13 @@ bool VideoSource::init(int apiCode, System::String^ basePath, System::String^ fi
 					message += " API code: " + apiCode;
 				}
 				message += " filename: " + fileName;
-				throw gcnew System::Exception(message);
+				throw invalid_argument(message);
 
 			}
 			videoCapture.release();
 		}
 	}
-	sourcePath->resetFilePath();
+	sourcePath.resetFilePath();
 
 	if (fps == 0)
 	{
@@ -159,16 +142,16 @@ bool VideoSource::init(int apiCode, System::String^ basePath, System::String^ fi
 bool VideoSource::open()
 {
 	bool ok = videoIsOpen;
-	System::String^ fileName;
-	System::String^ message;
+	string fileName;
+	string message;
 
 	if (!videoIsOpen)
 	{
 		// open (next) video
-		fileName = sourcePath->createFilePath();
+		fileName = sourcePath.createFilePath();
 		if (fileName != "")
 		{
-			if (videoCapture.open(Util::stdString(fileName), apiCode))
+			if (videoCapture.open(fileName, apiCode))
 			{
 				videoNframes = (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_COUNT);
 				if (videoNframes < 0)
@@ -189,7 +172,7 @@ bool VideoSource::open()
 					message += " API code: " + apiCode;
 				}
 				message += " filename: " + fileName;
-				throw gcnew System::Exception(message);
+				throw invalid_argument(message);
 			}
 		}
 		else
@@ -316,7 +299,7 @@ int VideoSource::getFrameNumber()
 	return framei;
 }
 
-System::String^ VideoSource::getLabel()
+string VideoSource::getLabel()
 {
 	return label;
 }

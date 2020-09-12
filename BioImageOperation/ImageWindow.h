@@ -7,4 +7,25 @@
  * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
-#include "FrameSource.h"
+#pragma once
+#include <QMainWindow>
+#include <QGraphicsPixmapItem>
+#include "ui_ImageWindow.h"
+#include <opencv2/opencv.hpp>
+
+using namespace cv;
+
+
+class ImageWindow : public QMainWindow
+{
+	Q_OBJECT
+
+public:
+	ImageWindow(QWidget *parent = Q_NULLPTR);
+	~ImageWindow();
+	void draw(Mat* videoFrame);
+
+private:
+	Ui::ImageWindow ui;
+	QGraphicsPixmapItem pixmap;
+};

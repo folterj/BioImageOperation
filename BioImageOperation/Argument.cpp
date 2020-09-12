@@ -1,60 +1,52 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
 #include "Argument.h"
 #include "Util.h"
 
-using namespace System;
 
-
-Argument::Argument(System::String^ arg)
-{
-	array<Char>^ quotes = { L'\"', L'\'' };
+Argument::Argument(string arg) {
 	int i;
+	ArgumentLabel label;
 
-	allArgument = Util::stdString(arg);
+	allArgument = arg;
 
-	i = arg->IndexOf("=");
-	if (i > 0)
-	{
-		value = Util::stdString(arg->Substring(i + 1)->Trim()->Trim(quotes));
-		arg = arg->Substring(0, i)->Trim();	// label
-		if (!Enum::TryParse<ArgumentLabel>(arg, true, argumentLabel))
-		{
-			throw gcnew ArgumentException("Unkown argument: " + arg);
+	i = arg.find("=");
+	if (i > 0) {
+		value = Util::removeQuotes(Util::trim_copy(arg.substr(i + 1)));
+		arg = Util::trim_copy(arg.substr(0, i));	// label
+		label = getArgumentLabel(arg);
+		if (label != ArgumentLabel::None) {
+			argumentLabel = getArgumentLabel(arg);
+		} else {
+			throw invalid_argument("Unkown argument: " + arg);
 		}
-	}
-	else
-	{
-		if (arg->Contains("\"") || arg->Contains("\'"))
-		{
-			arg = arg->Trim(quotes);
+	} else {
+		if (Util::contains(arg, "\"") || Util::contains(arg, "\"")) {
+			arg = Util::removeQuotes(arg);
 			argumentLabel = ArgumentLabel::Path;
-		}
-		else if (Util::isNumeric(arg))
-		{
+		} else if (Util::isNumeric(arg)) {
 			// prevent interpretation of number as enum
-		}
-		else
-		{
-			Enum::TryParse<ArgumentLabel>(arg, true, argumentLabel);
+		} else {
+			argumentLabel = getArgumentLabel(arg);
 		}
 
-		value = Util::stdString(arg);
+		value = arg;
 	}
+}
+
+ArgumentLabel Argument::getArgumentLabel(string arg)
+{
+	ArgumentLabel label = ArgumentLabel::None;
+	const string* element = find(begin(argumentLabels), end(argumentLabels), arg);
+	if (element != end(argumentLabels)) {
+		label = (ArgumentLabel)distance(argumentLabels, element);
+	}
+	return label;
 }

@@ -1,25 +1,15 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
 #include "NumericPath.h"
 #include "Util.h"
-
-using namespace System::IO;
+#include <filesystem>
 
 
 NumericPath::NumericPath()
@@ -28,7 +18,7 @@ NumericPath::NumericPath()
 
 void NumericPath::reset()
 {
-	inputFilenames = nullptr;
+	inputFilenames.clear();
 	templatePath = "";
 	initialPath = "";
 	extension = "";
@@ -46,11 +36,10 @@ void NumericPath::resetFilePath()
 	filei = 0;
 }
 
-bool NumericPath::setInputPath(System::String^ basePath, System::String^ templatePath)
+bool NumericPath::setInputPath(string basePath, string templatePath)
 {
-	if (templatePath == "")
-	{
-		throw gcnew System::Exception("No path specified");
+	if (templatePath == "") {
+		throw invalid_argument("No path specified");
 	}
 
 	templatePath = Util::combinePath(basePath, templatePath);
@@ -61,8 +50,8 @@ bool NumericPath::setInputPath(System::String^ basePath, System::String^ templat
 	initialPath = templatePath;
 
 	inputFilenames = Util::getImageFileNames(templatePath);
-	Array::Sort(inputFilenames);
-	totaln = inputFilenames->Length;
+	sort(inputFilenames.begin(), inputFilenames.end());
+	totaln = inputFilenames.size();
 
 	extension = Util::extractFileExtension(templatePath);
 	initialPath = Util::extractFilePath(templatePath);
@@ -71,7 +60,7 @@ bool NumericPath::setInputPath(System::String^ basePath, System::String^ templat
 	return set;
 }
 
-bool NumericPath::setOutputPath(System::String^ templatePath)
+bool NumericPath::setOutputPath(string templatePath)
 {
 	bool ok = setOutputPath("", templatePath, "");
 	offset = 0;
@@ -79,16 +68,15 @@ bool NumericPath::setOutputPath(System::String^ templatePath)
 	return ok;
 }
 
-bool NumericPath::setOutputPath(System::String^ basePath, System::String^ templatePath, System::String^ defaultExtension)
+bool NumericPath::setOutputPath(string basePath, string templatePath, string defaultExtension)
 {
 	int extPos;
 	int numpos;
 	int test;
 	bool ok = true;
 
-	if (templatePath == "")
-	{
-		throw gcnew System::Exception("No path specified");
+	if (templatePath == "") {
+		throw invalid_argument("No path specified");
 	}
 
 	templatePath = Util::combinePath(basePath, templatePath);
@@ -98,25 +86,26 @@ bool NumericPath::setOutputPath(System::String^ basePath, System::String^ templa
 
 	this->templatePath = templatePath;
 
-	extPos = templatePath->LastIndexOf(".");
-	if (extPos >= 0)
-	{
-		extension = templatePath->Substring(extPos);
+	extPos = templatePath.find_last_of(".");
+	if (extPos >= 0) {
+		extension = templatePath.substr(extPos);
 		numpos = extPos - 1;
-	}
-	else
-	{
-		if (!defaultExtension->StartsWith("."))
-		{
+	} else {
+		if (!defaultExtension._Starts_with(".")) {
 			defaultExtension = "." + defaultExtension;
 		}
 		extension = defaultExtension;
-		numpos = templatePath->Length - 1;
+		numpos = templatePath.length() - 1;
 	}
 
-	while (ok)
-	{
-		ok = int::TryParse(templatePath->Substring(numpos, numlen + 1), test);
+	while (ok) {
+		try {
+			test = stoi(templatePath.substr(numpos, numlen + 1));
+			ok = true;
+		}
+		catch (...) {
+			ok = false;
+		}
 		if (ok)
 		{
 			offset = test;
@@ -128,44 +117,39 @@ bool NumericPath::setOutputPath(System::String^ basePath, System::String^ templa
 			numpos++;
 		}
 	}
-	initialPath = templatePath->Substring(0, numpos);
-
-	set = Directory::Exists(Util::extractFilePath(initialPath));
+	initialPath = templatePath.substr(0, numpos);
+	
+	set = filesystem::exists(Util::extractFilePath(initialPath));
 
 	return set;
 }
 
-System::String^ NumericPath::createFilePath()
+string NumericPath::createFilePath()
 {
 	currentPath = createFilePath(filei++);
 	return currentPath;
 }
 
-System::String^ NumericPath::currentFilePath()
+string NumericPath::currentFilePath()
 {
 	return currentPath;
 }
 
-System::String^ NumericPath::createFilePath(int i)
+string NumericPath::createFilePath(int i)
 {
-	System::String^ path = "";
-	System::String^ nums;
+	string path = "";
+	string format, nums;
 
-	if (input)
-	{
-		if (i < totaln)
-		{
+	if (input) {
+		if (i < totaln) {
 			path = inputFilenames[i];
 		}
-	}
-	else
-	{
+	} else {
 		path = initialPath;
 		int num = offset + i;
-		if (numlen > 0)
-		{
-			nums = System::String::Format("{0}", num);
-			path += nums->PadLeft(numlen, '0');
+		if (numlen > 0) {
+			format = "%0" + to_string(numlen) + "d";
+			nums = Util::numPadZeros(num, format);
 		}
 		path += extension;
 	}
@@ -183,7 +167,7 @@ int NumericPath::getFileCount()
 	return totaln;
 }
 
-System::String^ NumericPath::getOriginalPath()
+string NumericPath::getOriginalPath()
 {
 	return templatePath;
 }

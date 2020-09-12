@@ -1,28 +1,19 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
 #pragma once
-#pragma unmanaged
-#include "opencv2/opencv.hpp"
-#pragma managed
+#include <string>
+#include <vector>
+#include <QImage>
 #include "ColorScale.h"
 
-using namespace System;
+using namespace std;
 using namespace cv;
 
 
@@ -33,10 +24,30 @@ using namespace cv;
 class Util
 {
 public:
-	static double toDouble(System::String^ s);
-	static bool isNumeric(System::String^ s);
-	static bool isBoolean(System::String^ s);
-	static int parseFrameTime(System::String^ s, double fps);
+	static string numPadZeros(int number, string format);
+	static bool contains(string src, string target);
+	template <typename Out>
+	static void split(const string& s, char delim, Out result);
+	static vector<string> split(const string& s, char delim);
+	static string toLower(string s);
+	static string removeQuotes(string s);
+	// trim from start (in place)
+	static void ltrim(string& s);
+	// trim from end (in place)
+	static void rtrim(string& s);
+	// trim from both ends (in place)
+	static void trim(string& s);
+	// trim from start (copying)
+	static string ltrim_copy(string s);
+	// trim from end (copying)
+	static string rtrim_copy(string s);
+	// trim from both ends (copying)
+	static string trim_copy(string s);
+
+	static double toDouble(string s);
+	static bool isNumeric(string s);
+	static bool isBoolean(string s);
+	static int parseFrameTime(string s, double fps);
 	static double calcDistance(double x0, double y0, double x1, double y1);
 	static double calcDistance(double x, double y);
 
@@ -48,24 +59,18 @@ public:
 	static Scalar getRainbowScale(double scale);
 	static Scalar bgrtoScalar(BGR bgr);
 
-	static std::string stdString(System::String^ s);
-	static System::String^ netString(std::string s);
-	static std::vector<std::string> stdStringVector(array<System::String^>^ list);
-	static System::String^ getExceptionDetail(System::Exception^ e);
-	
-	static Mat loadImage(System::String^ fileName);
-	static void saveImage(System::String^ fileName, Mat* image);
+	static Mat loadImage(string fileName);
+	static void saveImage(string fileName, Mat* image);
 	static bool isValidImage(Mat* image);
-	static System::String^ getCodecString(int codec);
+	static string getCodecString(int codec);
 
-	static array<System::String^>^ getImageFileNames(System::String^ searchPath);
-	static System::String^ extractFilePath(System::String^ path);
-	static System::String^ extractTitle(System::String^ path);
-	static System::String^ extractFileName(System::String^ path);
-	static System::String^ extractFileTitle(System::String^ fileName);
-	static System::String^ extractFileExtension(System::String^ fileName);
-	static System::String^ combinePath(System::String^ basePath, System::String^ templatePath);
-	static System::String^ getUrl(System::String^ url);
-	static bool openWebLink(System::String^ link);
-	static int compareVersions(System::String^ version1, System::String^ version2);
+	static vector<string> getImageFileNames(string searchPath);
+	static string extractFilePath(string path);
+	static string extractTitle(string path);
+	static string extractFileName(string path);
+	static string extractFileTitle(string fileName);
+	static string extractFileExtension(string fileName);
+	static string combinePath(string basePath, string templatePath);
+
+	static QImage matToQImage(cv::Mat const& src);
 };

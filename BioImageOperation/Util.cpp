@@ -1,73 +1,122 @@
-/*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *****************************************************************************/
-
 #include "Util.h"
-
-using namespace System;
-using namespace System::Diagnostics;
-using namespace System::Net;
-using namespace System::IO;
-using namespace System::Windows::Forms;
-using namespace Runtime::InteropServices;
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <filesystem>
 
 
-double Util::toDouble(System::String^ s)
+string Util::numPadZeros(int number, string format) {
+	const int buflen = 1000;
+	char buffer[buflen];
+	snprintf(buffer, buflen, format.c_str(), number);
+	return string(buffer);
+}
+
+bool Util::contains(string src, string target) {
+	return (src.find(target) != string::npos);
+}
+
+template <typename Out>
+void Util::split(const string& s, char delim, Out result) {
+	istringstream iss(s);
+	string item;
+	while (getline(iss, item, delim)) {
+		*result++ = item;
+	}
+}
+
+vector<string> Util::split(const string& s, char delim) {
+	vector<string> elems;
+	split(s, delim, back_inserter(elems));
+	return elems;
+}
+
+string Util::toLower(string s) {
+	string s2;
+	transform(s.begin(), s.end(), s2.begin(), [](unsigned char c) { return std::tolower(c); });
+	return s2;
+}
+
+string Util::removeQuotes(string s) {
+	string s2;
+	for (char c : s) {
+		if (c != '\"' && c != '\'') {
+			s2 += c;
+		}
+	}
+	return s2;
+}
+
+void Util::ltrim(string& s) {
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+		return !std::isspace(ch);
+		}));
+}
+
+void Util::rtrim(string& s) {
+	s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+		return !std::isspace(ch);
+		}).base(), s.end());
+}
+
+void Util::trim(string& s) {
+	ltrim(s);
+	rtrim(s);
+}
+
+string Util::ltrim_copy(string s) {
+	ltrim(s);
+	return s;
+}
+
+string Util::rtrim_copy(string s) {
+	rtrim(s);
+	return s;
+}
+
+string Util::trim_copy(string s) {
+	trim(s);
+	return s;
+}
+
+double Util::toDouble(string s)
 {
 	if (isNumeric(s))
 	{
-		return double::Parse(s);
+		return stod(s);
 	}
 	return 0;
 }
 
-bool Util::isNumeric(System::String^ s)
+bool Util::isNumeric(string s)
 {
-	double x;
-
-	return double::TryParse(s, x);
+	try {
+		stod(s);
+		return true;
+	} catch (...) {
+	}
+	return false;
 }
 
-bool Util::isBoolean(System::String^ s)
+bool Util::isBoolean(string s)
 {
-	bool b;
-
-	return bool::TryParse(s, b);
+	return (toLower(s) == "true" || toLower(s) == "false");
 }
 
-int Util::parseFrameTime(System::String^ s, double fps)
+int Util::parseFrameTime(string s, double fps)
 {
 	int frames = 0;
-	int count;
+	int totalSeconds = 0;
 
-	if (s->Contains(":"))
-	{
+	if (Util::contains(s, ":")) {
 		// time format
-		count = s->Split(':')->Length - 1;
-		if (count == 1)
-		{
-			s = "0:" + s;
+		for (string part : split(s, ':')) {
+			totalSeconds *= 60;
+			totalSeconds += toDouble(part);
 		}
-		frames = (int)(TimeSpan::Parse(s).TotalSeconds * fps);
-	}
-	else
-	{
+		frames = (int)(totalSeconds * fps);
+	} else {
 		// frames
-		int::TryParse(s, frames);
+		frames = stoi(s);
 	}
 	return frames;
 }
@@ -91,8 +140,8 @@ double Util::getMomentsAngle(Moments* moments)
 double Util::calcAngleDif(double angle1, double angle2)
 {
 	double dangle = angle2 - angle1;
-	while (dangle < -Math::PI) dangle += 2 * Math::PI;
-	while (dangle > Math::PI) dangle -= 2 * Math::PI;
+	while (dangle < -M_PI) dangle += 2 * M_PI;
+	while (dangle > M_PI) dangle -= 2 * M_PI;
 	return dangle;
 }
 
@@ -102,22 +151,19 @@ Scalar Util::getLabelColor(int label0)
 	int ir, ig, ib;
 	double r, g, b;
 
-	if (label0 != 0x10000)
-	{
+	if (label0 != 0x10000) {
 		label = (label0 % 27);  // 0 ... 26 (27 unique colors)
 		ir = label % 3;
 		ig = (label / 3) % 3;
 		ib = (label / 9) % 3;
 
-		r = 0.25f * (1 + ir);
-		g = 0.25f * (1 + ig);
-		b = 0.25f * (1 + ib);
-	}
-	else
-	{
-		r = 0.5f;
-		g = 0.5f;
-		b = 0.5f;
+		r = 0.25 * (1 + ir);
+		g = 0.25 * (1 + ig);
+		b = 0.25 * (1 + ib);
+	} else {
+		r = 0.5;
+		g = 0.5;
+		b = 0.5;
 	}
 	return Scalar(b * 0xFF, g * 0xFF, r * 0xFF);
 }
@@ -132,7 +178,7 @@ Scalar Util::getHeatScale(double scale)
 	int intScale;
 	double floatScale;
 
-	colScale = (float)scale * 4;
+	colScale = scale * 4;
 	intScale = (int)colScale;
 	floatScale = colScale - intScale;
 	switch (intScale)
@@ -176,7 +222,7 @@ Scalar Util::getRainbowScale(double scale)
 	int intScale;
 	double floatScale;
 
-	colScale = (float)scale * 6;
+	colScale = scale * 6;
 	intScale = (int)colScale;
 	floatScale = colScale - intScale;
 	switch (intScale)
@@ -227,42 +273,6 @@ Scalar Util::bgrtoScalar(BGR bgr)
 	return Scalar(bgr.b, bgr.g, bgr.r);
 }
 
-std::string Util::stdString(System::String^ s)
-{
-	const char* cstr = (const char*)(Marshal::StringToHGlobalAnsi(s)).ToPointer();
-	std::string s2 = cstr;
-	Marshal::FreeHGlobal(IntPtr((void*)cstr));
-	return s2;
-}
-
-System::String^ Util::netString(std::string s)
-{
-	return gcnew System::String(s.c_str());
-}
-
-std::vector<std::string> Util::stdStringVector(array<System::String^>^ list)
-{
-	std::vector<std::string> vec;
-
-	for each (System::String^ s in list)
-	{
-		vec.push_back(stdString(s));
-	}
-	return vec;
-}
-
-System::String^ Util::getExceptionDetail(System::Exception^ e)
-{
-	System::String^ s = e->Message;
-	System::Exception^ innerException = e->InnerException;
-
-	if (innerException)
-	{
-		s += " - " + getExceptionDetail(innerException);
-	}
-	return s;
-}
-
 bool Util::isValidImage(Mat* image)
 {
 	if (image)
@@ -272,15 +282,15 @@ bool Util::isValidImage(Mat* image)
 	return false;
 }
 
-System::String^ Util::getCodecString(int codec)
+string Util::getCodecString(int codec)
 {
-	System::String^ codecs = "";
+	string codecs = "";
 	
 	if (codec > 0)
 	{
 		for (int i = 0; i < 4; i++)
 		{
-			codecs += (Char)(codec & 0xFF);
+			codecs += (char)(codec & 0xFF);
 			codec /= 0x100;
 		}
 	}
@@ -291,63 +301,65 @@ System::String^ Util::getCodecString(int codec)
 	return codecs;
 }
 
-Mat Util::loadImage(System::String^ fileName)
+Mat Util::loadImage(string fileName)
 {
-	return imread(stdString(fileName), ImreadModes::IMREAD_UNCHANGED);
+	return imread(fileName, ImreadModes::IMREAD_UNCHANGED);
 }
 
-void Util::saveImage(System::String^ fileName, Mat* image)
+void Util::saveImage(string fileName, Mat* image)
 {
-	imwrite(stdString(fileName), *image);
+	imwrite(fileName, *image);
 }
 
-
-
-array<System::String^>^ Util::getImageFileNames(System::String^ searchPath)
+vector<string> Util::getImageFileNames(string searchPath)
 {
-	System::String^ path = extractFilePath(searchPath);
-	System::String^ pattern = extractFileName(searchPath);
-	array<System::String^>^ fileNames = Directory::GetFiles(path, pattern);
-	Array::Sort(fileNames);
+	vector<string> fileNames;
+	string fileName;
+	string path = extractFilePath(searchPath);
+	string pattern = extractFileName(searchPath);
+
+	for (const auto& entry : filesystem::directory_iterator(path)) {
+		fileName = entry.path().string();
+		if (fileName._Starts_with(pattern)) {
+			fileNames.push_back(fileName);
+		}
+	}
+	sort(fileNames.begin(), fileNames.end());
 	return fileNames;
 }
 
-System::String^ Util::extractFilePath(System::String^ path)
+string Util::extractFilePath(string path)
 {
-	System::String^ filePath = "";
-	array<System::String^>^ parts = path->Split('\\');
-	for (int i = 0; i < parts->Length - 1; i++)
-	{
+	string filePath = "";
+	vector<string> parts = split(path, '\\');
+	for (int i = 0; i < (int)parts.size() - 1; i++) {
 		filePath += parts[i];
 		filePath += "\\";
 	}
 	return filePath;
 }
 
-System::String^ Util::extractTitle(System::String^ path)
+string Util::extractTitle(string path)
 {
 	return extractFileTitle(extractFileName(path));
 }
 
-System::String^ Util::extractFileName(System::String^ path)
+string Util::extractFileName(string path)
 {
-	System::String^ fileName = path;
-	array<System::String^>^ parts = path->Split('\\');
-	if (parts->Length > 1)
-	{
-		fileName = parts[parts->Length - 1];
+	string fileName = path;
+	vector<string> parts = split(path, '\\');
+	if (parts.size() > 1) {
+		fileName = parts[parts.size() - 1];
 	}
 	return fileName;
 }
 
-System::String^ Util::extractFileTitle(System::String^ fileName)
+string Util::extractFileTitle(string fileName)
 {
-	System::String^ fileTitle = "";
-	array<System::String^>^ parts = fileName->Split('.');
-	for (int i = 0; i < parts->Length - 1; i++)
-	{
-		if (i > 0)
-		{
+	string fileTitle = "";
+	vector<string> parts = split(fileName, '.');
+	for (int i = 0; i < parts.size() - 1; i++) {
+		if (i > 0) {
 			fileTitle += ".";
 		}
 		fileTitle += parts[i];
@@ -355,86 +367,27 @@ System::String^ Util::extractFileTitle(System::String^ fileName)
 	return fileTitle;
 }
 
-System::String^ Util::extractFileExtension(System::String^ fileName)
+string Util::extractFileExtension(string fileName)
 {
-	System::String^ fileExtension = fileName;
-	array<System::String^>^ parts = fileExtension->Split('.');
-	if (parts->Length > 1)
-	{
-		fileExtension = parts[parts->Length - 1];
+	string fileExtension = fileName;
+	vector<string> parts = split(fileExtension, '.');
+	if (parts.size() > 1) {
+		fileExtension = parts[parts.size() - 1];
 	}
 	return fileExtension;
 }
 
-System::String^ Util::combinePath(System::String^ basePath, System::String^ templatePath)
+string Util::combinePath(string basePath, string templatePath)
 {
-	if (basePath == "" || templatePath->Contains(":"))
-	{
+	if (basePath == "" || Util::contains(templatePath, ":")) {
 		return templatePath;
-	}
-	else
-	{
-		return Path::Combine(basePath, templatePath);
+	} else {
+		return (filesystem::path(basePath) / filesystem::path(templatePath)).string();
 	}
 }
 
-System::String^ Util::getUrl(System::String^ url)
+QImage Util::matToQImage(cv::Mat const& src)
 {
-	System::String^ content = "";
-
-	WebRequest^ request = WebRequest::Create(url);
-	request->UseDefaultCredentials = true;
-	request->Timeout = 30000;	// takes max approx 2.5 seconds
-	((HttpWebRequest^)request)->Accept = "*/*";
-	((HttpWebRequest^)request)->UserAgent = "compatible";	// essential!
-	WebResponse^ response = request->GetResponse();
-	Stream^ responseStream = response->GetResponseStream();
-	StreamReader^ reader = gcnew StreamReader(responseStream);
-	content = reader->ReadToEnd();
-	reader->Close();
-	responseStream->Close();
-	response->Close();
-
-	return content;
-}
-
-bool Util::openWebLink(System::String^ link)
-{
-	try
-	{
-		Process::Start(link);
-		return true;
-	}
-	catch (System::Exception^ e)
-	{
-		Clipboard::SetText(link);
-		MessageBox::Show("Error: " + e->Message + "\nPlease use your preferred browser to navigate to this link manually\n(This link has been copied to the clipboard - Select Paste in your browser address bar)", "BIO Update");
-	}
-	return false;
-}
-
-int Util::compareVersions(System::String^ version1, System::String^ version2)
-{
-	int comp = 0;
-	array<System::String^>^ versions1 = version1->Split('.');
-	array<System::String^>^ versions2 = version2->Split('.');
-	int v1, v2;
-
-	for (int i = 0; i < version1->Length && i < versions2->Length; i++)
-	{
-		int::TryParse(versions1[i], v1);
-		int::TryParse(versions2[i], v2);
-
-		if (v2 > v1)
-		{
-			comp = 1;
-			break;
-		}
-		else if (v2 < v1)
-		{
-			comp = -1;
-			break;
-		}
-	}
-	return comp;
+	QImage qimage(src.data, src.cols, src.rows, src.step, QImage::Format_RGB888);
+	return qimage.rgbSwapped();
 }

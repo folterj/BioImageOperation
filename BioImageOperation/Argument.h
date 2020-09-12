@@ -1,32 +1,23 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
 #pragma once
 #include <string>
 
-using namespace System;
+using namespace std;
 
 
 /*
  * All labels for script operation arguments
  */
 
-public enum class ArgumentLabel
+enum class ArgumentLabel
 {
 	None,
 	Source,
@@ -71,14 +62,59 @@ public enum class ArgumentLabel
 	Contour
 };
 
+const string argumentLabels[] =
+{
+	"None",
+	"Source",
+	"X",
+	"Y",
+	"Width",
+	"Height",
+	"ColorMode",
+	"Red",
+	"Green",
+	"Blue",
+	"API",
+	"Path",
+	"Codec",
+	"Fps",
+	"IsColor",
+	"AccumMode",
+	"DrawMode",
+	"DrawLabel",
+	"MS",
+	"Label",
+	"Start",
+	"Length",
+	"Interval",
+	"Maximum",
+	"Level",
+	"Weight",
+	"Factor",
+	"Power",
+	"Palette",
+	"Tracker",
+	"MinArea",
+	"MaxArea",
+	"PathDrawMode",
+	"Distance",
+	"MaxMove",
+	"MinActive",
+	"MaxInactive",
+	"Display",
+	"Position",
+	"Format",
+	"Contour"
+};
 
 class Argument
 {
 public:
-	std::string allArgument;
+	string allArgument;
 	ArgumentLabel argumentLabel = ArgumentLabel::None;
-	std::string value = "";
+	string value = "";
 	bool required = false;
 
-	Argument(System::String^ arg);
+	Argument(string arg);
+	ArgumentLabel getArgumentLabel(string arg);
 };
