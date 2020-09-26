@@ -33,14 +33,23 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 	double orientationGuess;
 	double angle, angleInv, angleDif, angleDifInv;
 	double newx, newy;
+	int ntracks = (int)cluster->assignedTracks.size();
 
 	angle = cluster->angle;
 
-	if (!isNew && cluster->assignedTracks.size() > 1 && cluster->isOverlap(this))
+	if (!isNew && ntracks > 1 && cluster->isOverlap(this))
 	{
 		// part of multiple tracked clusters; stick with estimated position
-		newx = estimateX;
-		newy = estimateY;
+		if (preferEstimatePosition(cluster))
+		{
+			newx = estimateX;
+			newy = estimateY;
+		}
+		else
+		{
+			newx = (x + estimateX) / 2;
+			newy = (y + estimateY) / 2;
+		}
 	}
 	else
 	{
@@ -99,15 +108,13 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 		orientation = angle;
 	}
 
-	if ((cluster->assignedTracks.size() == 1 || area == 0) && cluster->area < maxArea)
+	if ((ntracks == 1 || area == 0) && cluster->area < maxArea)
 	{
 		// only assign area if single track
 		area = cluster->area;
 		rad = sqrt(area);
 	}
 
-	x0 = x;
-	y0 = y;
 	x = newx;
 	y = newy;
 
@@ -117,6 +124,31 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 	activeCount++;
 	inactiveCount = 0;
 	assign();
+}
+
+bool ClusterTrack::preferEstimatePosition(Cluster* cluster)
+{
+	int n = (int)cluster->assignedTracks.size();
+	double cx = cluster->x;
+	double cy = cluster->y;
+	double x0 = 0;
+	double y0 = 0;
+	double x1 = 0;
+	double y1 = 0;
+
+	for (ClusterTrack* track : cluster->assignedTracks)
+	{
+		x0 += track->x;
+		y0 += track->y;
+		x1 += track->estimateX;
+		y1 += track->estimateY;
+	}
+	x0 /= n;
+	y0 /= n;
+	x1 /= n;
+	y1 /= n;
+
+	return (Util::calcDistance(cx, cy, x1, y1) < Util::calcDistance(cx, cy, x0, y0));
 }
 
 void ClusterTrack::unAssign()

@@ -42,5 +42,5 @@ const int Constants::trackTrainingCycles = 10;
 const int Constants::trainingDataPoints = 1000;
 const int Constants::defMinActive = 3;
 const int Constants::defMaxInactive = 3;
-const int Constants::defMaxMove = 1000;
+const int Constants::defMaxMove = 0;
 const double Constants::maxBinaryPixelsFactor = 0.1;	// realistic value 0.01;

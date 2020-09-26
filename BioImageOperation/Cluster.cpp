@@ -44,19 +44,29 @@ Cluster::Cluster(Moments* cvmoments, double area)
 void Cluster::unAssign()
 {
 	assignedTracks.clear();
-	areaUnassigned = area;
 }
 
 bool Cluster::isAssignable(double trackedArea)
 {
 	int n = (int)assignedTracks.size();
-	return (n == 0 || (trackedArea * 0.75 < areaUnassigned && n < Constants::maxMergedBlobs));
+	double totalArea;
+
+	if (n == 0)
+	{
+		return true;
+	}
+
+	totalArea = trackedArea;
+	for (ClusterTrack* track : assignedTracks)
+	{
+		totalArea += track->area;
+	}
+	return (totalArea * 0.75 < area && n < Constants::maxMergedBlobs);
 }
 
 void Cluster::assign(ClusterTrack* track)
 {
 	assignedTracks.push_back(track);
-	areaUnassigned -= track->area;
 }
 
 bool Cluster::isAssigned()
@@ -76,7 +86,7 @@ bool Cluster::isOverlap(ClusterTrack* track)
 
 bool Cluster::inRange(ClusterTrack* track, double dist, double maxMoveDistance)
 {
-	return (dist - (2 * rad - track->rad) <= maxMoveDistance);
+	return (maxMoveDistance <= 0 || dist - (2 * rad - track->rad) <= maxMoveDistance);
 }
 
 int Cluster::getLabel()

@@ -51,8 +51,6 @@ public:
 	bool orientInvertAngle = false;
 	double area = 0;
 	double rad = 0;
-	double x0 = 0;
-	double y0 = 0;
 	double dx = 0;
 	double dy = 0;
 	double dist = 0;
@@ -72,6 +70,7 @@ public:
 
 	ClusterTrack(int label);
 	void update(Cluster* cluster, double maxArea, double maxMoveDistance, bool positionPrediction);
+	bool preferEstimatePosition(Cluster* cluster);
 
 	void unAssign();
 	void assign();

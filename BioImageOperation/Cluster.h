@@ -48,7 +48,6 @@ public:
 	double area = 0;
 	double angle = 0;
 
-	double areaUnassigned = 0;
 	double rad = 0;
 
 	Cluster(double x, double y, double area, double angle, Rect box, Mat* clusterImage);

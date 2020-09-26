@@ -390,7 +390,6 @@ bool ImageTracker::matchTrackCluster(DistanceCluster* distCluster, double maxMov
 	ClusterTrack* track = distCluster->track;
 	double mindist = 0;
 	double dist;
-	bool first = true;
 	bool found = false;
 
 	distance = 0;
@@ -414,14 +413,13 @@ bool ImageTracker::matchTrackCluster(DistanceCluster* distCluster, double maxMov
 				if (cluster->inRange(track, dist, maxMoveDistance))
 				{
 					// distance smaller than max move distance
-					if (dist < mindist || first)
+					if (dist < mindist || !found)
 					{
 						// smallest distance
 						matchCluster = cluster;
 						mindist = dist;
 						distance = mindist;
 						found = true;
-						first = false;
 					}
 				}
 			}
