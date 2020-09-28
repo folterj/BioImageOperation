@@ -70,7 +70,6 @@ public:
 
 	ClusterTrack(int label);
 	void update(Cluster* cluster, double maxArea, double maxMoveDistance, bool positionPrediction);
-	bool preferEstimatePosition(Cluster* cluster);
 
 	void unAssign();
 	void assign();

@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 #include "ImageSeries.h"
+#include "ImageOperations.h"
 
 
 ImageSeries::ImageSeries()
@@ -61,6 +62,15 @@ bool ImageSeries::getMedian(OutputArray dest, Observer^ observer)
 
 	if (n == 0) {
 		return false;
+	}
+
+	// Currently only works for GrayScale
+	for (int i = 0; i < n; i++)
+	{
+		if (images[i].channels() > 1)
+		{
+			ImageOperations::convertToGrayScale(images[i], images[i]);
+		}
 	}
 
 	dest.create(height, width, CV_8U);

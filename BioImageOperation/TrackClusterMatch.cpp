@@ -16,12 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#include "DistanceCluster.h"
+#include "TrackClusterMatch.h"
 
 
-DistanceCluster::DistanceCluster(ClusterTrack* track, Cluster* cluster, double distance)
+TrackClusterMatch::TrackClusterMatch(ClusterTrack* track)
 {
 	this->track = track;
-	this->cluster = cluster;
-	this->distance = distance;
+}
+
+void TrackClusterMatch::assign()
+{
+	cluster->assign(track);
 }

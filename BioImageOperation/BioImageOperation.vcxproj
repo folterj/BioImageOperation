@@ -195,7 +195,7 @@ xcopy /y /d C:\openh264\*.dll "$(OutDir)"</Command>
     <ClCompile Include="ColorScale.cpp" />
     <ClCompile Include="AccumBuffer.cpp" />
     <ClCompile Include="Constants.cpp" />
-    <ClCompile Include="DistanceCluster.cpp" />
+    <ClCompile Include="TrackClusterMatch.cpp" />
     <ClCompile Include="FrameSource.cpp" />
     <ClCompile Include="ImageItemList.cpp" />
     <ClCompile Include="ImageForm.cpp" />
@@ -244,7 +244,7 @@ xcopy /y /d C:\openh264\*.dll "$(OutDir)"</Command>
     <ClInclude Include="ColorScale.h" />
     <ClInclude Include="AccumBuffer.h" />
     <ClInclude Include="Constants.h" />
-    <ClInclude Include="DistanceCluster.h" />
+    <ClInclude Include="TrackClusterMatch.h" />
     <ClInclude Include="FrameSource.h" />
     <ClInclude Include="ImageItemList.h" />
     <ClInclude Include="ImageForm.h">

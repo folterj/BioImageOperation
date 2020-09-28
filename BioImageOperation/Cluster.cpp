@@ -32,15 +32,6 @@ Cluster::Cluster(double x, double y, double area, double angle, Rect box, Mat* c
 	rad = sqrt(area);
 }
 
-Cluster::Cluster(Moments* cvmoments, double area)
-{
-	this->area = area;
-	x = cvmoments->m10 / area;
-	y = cvmoments->m01 / area;
-	angle = Util::getMomentsAngle(cvmoments);
-	rad = sqrt(area);
-}
-
 void Cluster::unAssign()
 {
 	assignedTracks.clear();
@@ -79,14 +70,19 @@ double Cluster::calcDistance(ClusterTrack* track)
 	return Util::calcDistance(track->estimateX, track->estimateY, x, y);
 }
 
+double Cluster::calcAreaDif(ClusterTrack* track)
+{
+	return Math::Abs(area - track->area);
+}
+
 bool Cluster::isOverlap(ClusterTrack* track)
 {
 	return (calcDistance(track) - (2 * rad - track->rad) <= 0);
 }
 
-bool Cluster::inRange(ClusterTrack* track, double dist, double maxMoveDistance)
+bool Cluster::inRange(ClusterTrack* track, double distance, double maxMoveDistance)
 {
-	return (maxMoveDistance <= 0 || dist - (2 * rad - track->rad) <= maxMoveDistance);
+	return (maxMoveDistance <= 0 || distance - (2 * rad - track->rad) <= maxMoveDistance);
 }
 
 int Cluster::getLabel()
@@ -241,6 +237,25 @@ std::vector<Point> Cluster::getContour()
 System::String^ Cluster::getCsv(bool writeContour)
 {
 	System::String^ s = System::String::Format("{0},{1},{2},{3},{4},{5}", getFirstLabel(), area, rad, angle, x, y);
+	/*
+	if (assignedTracks.size() == 1)
+	{
+		s += System::String::Format(",{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}",
+			moments.m00, moments.m01, moments.m10,
+			moments.m11, moments.m02, moments.m20,
+			moments.m21, moments.m12, moments.m30, moments.m03);
+
+		s += System::String::Format(",{0},{1},{2},{3},{4},{5},{6}",
+			moments.mu02, moments.mu03, moments.mu11,
+			moments.mu12, moments.mu20, moments.mu21,
+			moments.mu30);
+
+		s += System::String::Format(",{0},{1},{2},{3},{4},{5},{6}",
+			moments.nu02, moments.nu03, moments.nu11,
+			moments.nu12, moments.nu20, moments.nu21,
+			moments.nu30);
+	}
+	*/
 	if (writeContour)
 	{
 		s += ",";

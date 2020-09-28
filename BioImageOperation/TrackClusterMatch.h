@@ -28,12 +28,15 @@ using namespace System;
  * For tracking: storing track, candidate cluster, and corresponding distance between these
  */
 
-class DistanceCluster
+class TrackClusterMatch
 {
 public:
-	double distance = 0;
 	ClusterTrack* track = NULL;
 	Cluster* cluster = NULL;
+	double matchFactor = 0;
+	double distance = 0;
+	double areaDif = 0;
 
-	DistanceCluster(ClusterTrack* track, Cluster* cluster, double distance);
+	TrackClusterMatch(ClusterTrack* track);
+	void assign();
 };

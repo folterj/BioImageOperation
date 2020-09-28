@@ -281,8 +281,8 @@ bool ImageTracker::findClusters(Mat* image)
 
 void ImageTracker::matchClusterTracks()
 {
-	std::vector<DistanceCluster*> clusterMinDistances;
-	DistanceCluster* distanceCluster = NULL;
+	std::vector<TrackClusterMatch*> trackClusterMatches;
+	TrackClusterMatch* trackClusterMatch = NULL;
 	ClusterTrack* track;
 	int maxArea = (int)trackingParams.area.getMax();
 	double maxMove = trackingParams.maxMove.getMax();
@@ -295,20 +295,20 @@ void ImageTracker::matchClusterTracks()
 	trackingStats.trackDistance.reset();
 	trackingStats.trackDistance.setTotal((int)clusterTracks.size());
 
-	clusterMinDistances.reserve(clusterTracks.size());
+	trackClusterMatches.reserve(clusterTracks.size());
 	// for each track find nearest cluster
 	for (ClusterTrack* clusterTrack : clusterTracks)
 	{
-		distanceCluster = findNearestClusterDistance(clusterTrack, maxMove);
-		if (distanceCluster)
+		trackClusterMatch = findTrackClusterMatch(clusterTrack, maxMove);
+		if (trackClusterMatch)
 		{
-			clusterMinDistances.push_back(distanceCluster);
+			trackClusterMatches.push_back(trackClusterMatch);
 		}
 	}
 
 	// sort surest matches first
-	std::sort(clusterMinDistances.begin(), clusterMinDistances.end(),
-		[](DistanceCluster const* a, DistanceCluster const* b) { return a->distance < b->distance; });
+	std::sort(trackClusterMatches.begin(), trackClusterMatches.end(),
+		[](TrackClusterMatch const* a, TrackClusterMatch const* b) { return a->matchFactor > b->matchFactor; });
 
 	// to not over-assign clusters
 	for (Cluster* cluster : clusters)
@@ -321,7 +321,7 @@ void ImageTracker::matchClusterTracks()
 	}
 
 	// assign tracks to best cluster
-	for (DistanceCluster* clusterMinDistance : clusterMinDistances)
+	for (TrackClusterMatch* clusterMinDistance : trackClusterMatches)
 	{
 		found = matchTrackCluster(clusterMinDistance, maxMove, distance);
 		if (found)
@@ -349,47 +349,60 @@ void ImageTracker::matchClusterTracks()
 	}
 
 	// clean up
-	for (int i = 0; i < clusterMinDistances.size(); i++)
+	for (int i = 0; i < trackClusterMatches.size(); i++)
 	{
-		delete clusterMinDistances[i];
+		delete trackClusterMatches[i];
 	}
 }
 
-DistanceCluster* ImageTracker::findNearestClusterDistance(ClusterTrack* track, double maxMoveDistance)
+TrackClusterMatch* ImageTracker::findTrackClusterMatch(ClusterTrack* track, double maxMoveDistance)
 {
-	Cluster* cluster = NULL;
-	double mindist = 0;
-	double dist;
-	bool first = true;
+	TrackClusterMatch* trackClusterMatch = new TrackClusterMatch(track);
+	Cluster* bestCluster = NULL;
+	double matchFactor;
+	double distFactor, distance;
+	double areaFactor, areaDif;
+	bool found = false;
 
-	for (Cluster* cluster0 : clusters)
+	for (Cluster* cluster : clusters)
 	{
-		dist = cluster0->calcDistance(track);
-		if (cluster0->inRange(track, dist, maxMoveDistance))
+		if (cluster->isAssignable(track->area))
 		{
-			// distance smaller than max move distance
-			if (dist < mindist || first)
+			distance = cluster->calcDistance(track);
+			if (cluster->inRange(track, distance, maxMoveDistance))
 			{
-				// smallest distance
-				cluster = cluster0;
-				mindist = dist;
-				first = false;
+				distFactor = 1 - distance / maxMoveDistance;
+				if (distFactor < 0)
+				{
+					distFactor = 0;
+				}
+				areaDif = cluster->calcAreaDif(track);
+				areaFactor = 1 - areaDif / cluster->area;
+				matchFactor = distFactor * areaFactor;
+				if (matchFactor > trackClusterMatch->matchFactor || !found)
+				{
+					// smallest distance
+					trackClusterMatch->cluster = cluster;
+					trackClusterMatch->matchFactor = matchFactor;
+					trackClusterMatch->distance = distance;
+					trackClusterMatch->areaDif = areaDif;
+					found = true;
+				}
 			}
 		}
 	}
-	if (cluster)
+	if (found)
 	{
-		return new DistanceCluster(track, cluster, mindist);
+		return trackClusterMatch;
 	}
 	return NULL;
 }
 
-bool ImageTracker::matchTrackCluster(DistanceCluster* distCluster, double maxMoveDistance, double& distance)
+bool ImageTracker::matchTrackCluster(TrackClusterMatch* trackClusterMatch, double maxMoveDistance, double& distance)
 {
-	Cluster* matchCluster = distCluster->cluster;
-	ClusterTrack* track = distCluster->track;
-	double mindist = 0;
-	double dist;
+	TrackClusterMatch* trackClusterMatch2;
+	ClusterTrack* track = trackClusterMatch->track;
+	Cluster* matchCluster = trackClusterMatch->cluster;
 	bool found = false;
 
 	distance = 0;
@@ -397,43 +410,29 @@ bool ImageTracker::matchTrackCluster(DistanceCluster* distCluster, double maxMov
 	if (matchCluster->isAssignable(track->area) || !trackParamsFinalised)
 	{
 		// try preferred cluster
-		matchCluster = distCluster->cluster;
-		distance = distCluster->distance;
+		distance = trackClusterMatch->distance;
 		found = true;
 	}
 	else
 	{
 		// find alternative best cluster
-		for (Cluster* cluster : clusters)
+		trackClusterMatch2 = findTrackClusterMatch(track, maxMoveDistance);
+		if (trackClusterMatch2 != NULL)
 		{
-			if (cluster->isAssignable(track->area))
-			{
-				// only assign if track 'fits' into unallocated area of cluster
-				dist = cluster->calcDistance(track);
-				if (cluster->inRange(track, dist, maxMoveDistance))
-				{
-					// distance smaller than max move distance
-					if (dist < mindist || !found)
-					{
-						// smallest distance
-						matchCluster = cluster;
-						mindist = dist;
-						distance = mindist;
-						found = true;
-					}
-				}
-			}
+			trackClusterMatch = trackClusterMatch2;
+			distance = trackClusterMatch->distance;
+			found = true;
 		}
 
 		if (debugMode && trackParamsFinalised && !found)
 		{
-			MessageBox::Show("Failed match:\nTrack " + distCluster->track->ToString() + "\nPreferred:\nCluster " + distCluster->cluster->ToString());
+			MessageBox::Show("Failed match:\nTrack " + trackClusterMatch->track->ToString() + "\nPreferred:\nCluster " + trackClusterMatch->cluster->ToString());
 		}
 	}
 
 	if (found)
 	{
-		matchCluster->assign(track);
+		trackClusterMatch->assign();
 	}
 	return found;
 }

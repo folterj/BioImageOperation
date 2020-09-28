@@ -51,15 +51,15 @@ public:
 	double rad = 0;
 
 	Cluster(double x, double y, double area, double angle, Rect box, Mat* clusterImage);
-	Cluster(Moments* cvmoments, double area);
 	void unAssign();
 	bool isAssignable(double trackedArea);
 	void assign(ClusterTrack* track);
 	bool isAssigned();
 
 	double calcDistance(ClusterTrack* track);
+	double calcAreaDif(ClusterTrack* track);
 	bool isOverlap(ClusterTrack* track);
-	bool inRange(ClusterTrack* track, double dist, double maxMoveDistance);
+	bool inRange(ClusterTrack* track, double distance, double maxMoveDistance);
 
 	int getLabel();
 	int getFirstLabel();

@@ -19,7 +19,7 @@
 #pragma once
 #include "Cluster.h"
 #include "ClusterTrack.h"
-#include "DistanceCluster.h"
+#include "TrackClusterMatch.h"
 #include "PathNode.h"
 #include "PathLink.h"
 #include "TrackingParams.h"
@@ -122,8 +122,8 @@ public:
 	 * Create tracks
 	 */
 	void matchClusterTracks();
-	DistanceCluster* findNearestClusterDistance(ClusterTrack* track, double maxMoveDistance);
-	bool matchTrackCluster(DistanceCluster* distCluster, double maxMoveDistance, double& distance);
+	TrackClusterMatch* findTrackClusterMatch(ClusterTrack* track, double maxMoveDistance);
+	bool matchTrackCluster(TrackClusterMatch* trackClusterMatch, double maxMoveDistance, double& distance);
 	void pruneTracks();
 
 	/*

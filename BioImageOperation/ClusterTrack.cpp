@@ -35,27 +35,9 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 	double newx, newy;
 	int ntracks = (int)cluster->assignedTracks.size();
 
+	newx = cluster->x;
+	newy = cluster->y;
 	angle = cluster->angle;
-
-	if (!isNew && ntracks > 1 && cluster->isOverlap(this))
-	{
-		// part of multiple tracked clusters; stick with estimated position
-		if (preferEstimatePosition(cluster))
-		{
-			newx = estimateX;
-			newy = estimateY;
-		}
-		else
-		{
-			newx = (x + estimateX) / 2;
-			newy = (y + estimateY) / 2;
-		}
-	}
-	else
-	{
-		newx = cluster->x;
-		newy = cluster->y;
-	}
 
 	if (!isNew)
 	{
@@ -124,31 +106,6 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 	activeCount++;
 	inactiveCount = 0;
 	assign();
-}
-
-bool ClusterTrack::preferEstimatePosition(Cluster* cluster)
-{
-	int n = (int)cluster->assignedTracks.size();
-	double cx = cluster->x;
-	double cy = cluster->y;
-	double x0 = 0;
-	double y0 = 0;
-	double x1 = 0;
-	double y1 = 0;
-
-	for (ClusterTrack* track : cluster->assignedTracks)
-	{
-		x0 += track->x;
-		y0 += track->y;
-		x1 += track->estimateX;
-		y1 += track->estimateY;
-	}
-	x0 /= n;
-	y0 /= n;
-	x1 /= n;
-	y1 /= n;
-
-	return (Util::calcDistance(cx, cy, x1, y1) < Util::calcDistance(cx, cy, x0, y0));
 }
 
 void ClusterTrack::unAssign()
