@@ -34,6 +34,8 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 	double angle, angleInv, angleDif, angleDifInv;
 	double newx, newy;
 	int ntracks = (int)cluster->assignedTracks.size();
+	
+	isMerged = (ntracks > 1);
 
 	newx = cluster->x;
 	newy = cluster->y;

@@ -63,6 +63,7 @@ bool VideoSource::init(int apiCode, System::String^ basePath, System::String^ fi
 {
 	System::String^ fileName = ".";	// dummy value to pass initial while-loop condition
 	bool ok = false;
+	bool canSeek;
 	int lengthi = 0;
 	int nframes0;
 	System::String^ message;
@@ -133,14 +134,15 @@ bool VideoSource::init(int apiCode, System::String^ basePath, System::String^ fi
 	{
 		this->interval = 1;
 	}
-	seekMode = (interval >= Constants::seekModeInterval && nframes != 0);		// auto select seek mode: if interval >= x frames
+	canSeek = (nframes != 0);
+	seekMode = (canSeek && interval >= Constants::seekModeInterval);		// auto select seek mode: if interval >= x frames
 
 	ok = open();
 	if (ok)
 	{
 		framei = this->start;
 		videoFramei = this->start;
-		if (seekMode)
+		if (canSeek)
 		{
 			seekFrame();
 		}

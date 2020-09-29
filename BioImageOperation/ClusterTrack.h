@@ -39,13 +39,10 @@ class PathNode;	// forward declaration
 class ClusterTrack
 {
 public:
-	std::vector<Point2d> points;
-
 	int label = 0;
 
 	double x = 0;
 	double y = 0;
-
 	double orientation = 0;
 
 	bool orientInvertAngle = false;
@@ -63,10 +60,14 @@ public:
 
 	bool isNew = true;
 	bool assigned = true;
+	bool isMerged = false;
 	int activeCount = 0;
 	int inactiveCount = 0;
 	
 	PathNode* lastPathNode = NULL;
+
+	std::vector<Point2d> points;
+
 
 	ClusterTrack(int label);
 	void update(Cluster* cluster, double maxArea, double maxMoveDistance, bool positionPrediction);

@@ -409,18 +409,16 @@ bool ImageTracker::matchTrackCluster(TrackClusterMatch* trackClusterMatch, doubl
 
 	if (matchCluster->isAssignable(track->area) || !trackParamsFinalised)
 	{
-		// try preferred cluster
-		distance = trackClusterMatch->distance;
+		// preferred cluster
 		found = true;
 	}
 	else
 	{
-		// find alternative best cluster
+		// alternative best cluster
 		trackClusterMatch2 = findTrackClusterMatch(track, maxMoveDistance);
 		if (trackClusterMatch2 != NULL)
 		{
 			trackClusterMatch = trackClusterMatch2;
-			distance = trackClusterMatch->distance;
 			found = true;
 		}
 
@@ -433,6 +431,7 @@ bool ImageTracker::matchTrackCluster(TrackClusterMatch* trackClusterMatch, doubl
 	if (found)
 	{
 		trackClusterMatch->assign();
+		distance = trackClusterMatch->distance;
 	}
 	return found;
 }

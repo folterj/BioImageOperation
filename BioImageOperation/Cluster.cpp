@@ -82,7 +82,20 @@ bool Cluster::isOverlap(ClusterTrack* track)
 
 bool Cluster::inRange(ClusterTrack* track, double distance, double maxMoveDistance)
 {
-	return (maxMoveDistance <= 0 || distance - (2 * rad - track->rad) <= maxMoveDistance);
+	if (maxMoveDistance <= 0)
+	{
+		return true;
+	}
+
+	if (track->isMerged)
+	{
+		// allow for greater move distance after being merged
+		return distance - 2 * rad <= 2 * maxMoveDistance;
+	}
+	else
+	{
+		return distance - (2 * rad - track->rad) <= maxMoveDistance;
+	}
 }
 
 int Cluster::getLabel()
