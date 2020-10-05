@@ -61,7 +61,9 @@ public:
 	int pathAge = 0;
 	cv::Point countPosition;
 	OutputStream clusterStream, trackStream, pathStream, trackInfoStream, trackLogStream;
-	Mat clusterLabelImage, clusterStats, clusterCentroids, clusterRoiImage, clusterRoiImage2;
+	Mat clusterLabelImage, clusterRoiImage;
+	Mat1i clusterStats;
+	Mat1d clusterCentroids;
 	Moments clusterMoments;
 
 	TrackingParams trackingParams;

@@ -233,7 +233,7 @@ bool ImageTracker::findClusters(Mat* image)
 	for (int label = 1; label < n; label++)
 	{
 		// skip initial 'full-image label' returned by connectedComponents
-		area = clusterStats.at<int>(label, ConnectedComponentsTypes::CC_STAT_AREA);
+		area = clusterStats(label, ConnectedComponentsTypes::CC_STAT_AREA);
 
 		if ((double)area / totArea > Constants::maxBinaryPixelsFactor) {
 			clusters.clear();
@@ -251,11 +251,12 @@ bool ImageTracker::findClusters(Mat* image)
 
 		if (clusterOk)
 		{
+			Mat clusterRoiImage2;
 			// get RoI using stats; copy part of image
-			box = Rect(clusterStats.at<int>(label, ConnectedComponentsTypes::CC_STAT_LEFT),
-						clusterStats.at<int>(label, ConnectedComponentsTypes::CC_STAT_TOP),
-						clusterStats.at<int>(label, ConnectedComponentsTypes::CC_STAT_WIDTH),
-						clusterStats.at<int>(label, ConnectedComponentsTypes::CC_STAT_HEIGHT));
+			box = Rect(clusterStats(label, ConnectedComponentsTypes::CC_STAT_LEFT),
+						clusterStats(label, ConnectedComponentsTypes::CC_STAT_TOP),
+						clusterStats(label, ConnectedComponentsTypes::CC_STAT_WIDTH),
+						clusterStats(label, ConnectedComponentsTypes::CC_STAT_HEIGHT));
 
 			if (clusterParamsFinalised)
 			{
@@ -267,9 +268,9 @@ bool ImageTracker::findClusters(Mat* image)
 				// get angle
 				angle = Util::getMomentsAngle(&clusterMoments);
 			}
-			x = clusterCentroids.at<double>(label, 0);
-			y = clusterCentroids.at<double>(label, 1);
-			clusters.push_back(new Cluster(x, y, area, angle, box, &clusterRoiImage2));
+			x = clusterCentroids(label, 0);
+			y = clusterCentroids(label, 1);
+			clusters.push_back(new Cluster(x, y, area, angle, box, &clusterMoments, &clusterRoiImage2));
 		}
 	}
 	return (clusters.size() > 0);
