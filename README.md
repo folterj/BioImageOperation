@@ -18,3 +18,5 @@ Project Requirements
 - Openh264 1.8.0 library (https://github.com/cisco/openh264)
 - WiX 3 (http://wixtoolset.org)
 - Windows 64-bit
+
+![BIO screenshot](bio.png)
