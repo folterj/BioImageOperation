@@ -21,13 +21,14 @@
 #include "Util.h"
 
 
-Cluster::Cluster(double x, double y, double area, double angle, Rect box, Mat* clusterImage)
+Cluster::Cluster(double x, double y, double area, double angle, Rect box, Moments* moments, Mat* clusterImage)
 {
 	this->area = area;
 	this->x = x;
 	this->y = y;
 	this->angle = angle;
 	this->box = box;
+	this->moments = *moments;
 	this->clusterImage = *clusterImage;
 	rad = sqrt(area);
 }
@@ -249,6 +250,7 @@ std::vector<Point> Cluster::getContour()
 
 System::String^ Cluster::getCsv(bool writeContour)
 {
+	// https://www.learnopencv.com/blob-detection-using-opencv-python-c/
 	System::String^ s = System::String::Format("{0},{1},{2},{3},{4},{5}", getFirstLabel(), area, rad, angle, x, y);
 	/*
 	if (assignedTracks.size() == 1)
@@ -269,6 +271,40 @@ System::String^ Cluster::getCsv(bool writeContour)
 			moments.nu30);
 	}
 	*/
+
+	/*
+	double mx = moments.m10 / moments.m00;
+	double my = moments.m01 / moments.m00;
+
+	double a = moments.m20 / moments.m00 - mx * mx;
+	double b = 2 * (moments.m11 / moments.m00 - mx * my);
+	double c = moments.m02 / moments.m00 - my * my;
+
+	double l = Math::Sqrt(8 * (a + c + Math::Sqrt(b * b + (a - c) * (a - c)))) / 2;
+	double w = Math::Sqrt(8 * (a + c - Math::Sqrt(b * b + (a - c) * (a - c)))) / 2;
+
+	double norml = l / rad;
+	double normw = w / rad;
+	double ratio = w / l;
+
+	std::vector<Point> contour = getContour();
+	double perimeter = arcLength(contour, true);
+	std::vector<Point> hull;
+	std::vector<Point2f> contour2;
+
+	convexHull(contour, hull);
+	approxPolyDP(hull, contour2, 0.001, true);
+
+	double circularity = area * 4 * Math::PI / (perimeter * perimeter);
+	double ellipsity = area / (Math::PI * l * w);
+	double convexity = area / contourArea(contour2);
+
+	if (assignedTracks.size() == 1) {
+		s += System::String::Format(",{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}",
+			area, rad, l, w, norml, normw, ratio, circularity, ellipsity, convexity);
+	}
+	*/
+
 	if (writeContour)
 	{
 		s += ",";

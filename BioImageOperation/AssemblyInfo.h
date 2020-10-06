@@ -21,12 +21,12 @@
 #define Assembly_Title "BIO"
 #define Assembly_Product "BioImageOperation"
 #define Assembly_Company "Joost de Folter"
-#define Assembly_Copyright L"2018"
+#define Assembly_Copyright L"2020"
 #define Assembly_Description L"http://joostdefolter.info"
 
 // Version
-#define File_Version 1,4,420,22
-#define File_Version_Str "1.4.420.22"
+#define File_Version 1,5,440,1
+#define File_Version_Str "1.5.440.1"
 
 // CLR assembly version
 #define Assembly_Version File_Version_Str
