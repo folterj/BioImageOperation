@@ -7,31 +7,4 @@
  * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
-#pragma once
-#include <string>
-#include <vector>
-
-using namespace std;
-
-
-class ScriptOperation;	// forward declaration
-
-
-/*
- * Specific vector helper
- */
-
-class ScriptOperations : vector<ScriptOperation*>
-{
-public:
-	int currentOperationi = 0;
-
-	ScriptOperations();
-	~ScriptOperations();
-	void reset();
-	void extract(string script, int linei = 0);
-	bool hasOperations();
-	ScriptOperation* getCurrentOperation();
-	bool moveNextOperation();
-	void close();
-};
+#include "FrameOutput.h"

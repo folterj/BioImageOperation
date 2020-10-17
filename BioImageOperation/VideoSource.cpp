@@ -44,7 +44,7 @@ void VideoSource::reset()
 
 bool VideoSource::init(int apiCode, string basePath, string filePath, string start, string length, double fps0, int interval)
 {
-	string fileName = ".";	// dummy value to pass initial while-loop condition
+	string filename = ".";	// dummy value to pass initial while-loop condition
 	bool ok = false;
 	int lengthi = 0;
 	int nframes0;
@@ -57,16 +57,16 @@ bool VideoSource::init(int apiCode, string basePath, string filePath, string sta
 	nsources = sourcePath.getFileCount();
 	if (nsources == 0)
 	{
-		throw invalid_argument("File(s) not found: " + sourcePath.templatePath);
+		throw ios_base::failure("File(s) not found: " + sourcePath.templatePath);
 	}
 
 	nframes = 0;
-	while (fileName != "")
+	while (filename != "")
 	{
-		fileName = sourcePath.createFilePath();
-		if (fileName != "")
+		filename = sourcePath.createFilePath();
+		if (filename != "")
 		{
-			if (videoCapture.open(fileName))
+			if (videoCapture.open(filename))
 			{
 				nframes0 = (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_COUNT);
 				if (nframes0 > 0) {
@@ -85,8 +85,8 @@ bool VideoSource::init(int apiCode, string basePath, string filePath, string sta
 				if (apiCode != 0) {
 					message += " API code: " + apiCode;
 				}
-				message += " filename: " + fileName;
-				throw invalid_argument(message);
+				message += " filename: " + filename;
+				throw ios_base::failure(message);
 
 			}
 			videoCapture.release();
@@ -142,23 +142,23 @@ bool VideoSource::init(int apiCode, string basePath, string filePath, string sta
 bool VideoSource::open()
 {
 	bool ok = videoIsOpen;
-	string fileName;
+	string filename;
 	string message;
 
 	if (!videoIsOpen)
 	{
 		// open (next) video
-		fileName = sourcePath.createFilePath();
-		if (fileName != "")
+		filename = sourcePath.createFilePath();
+		if (filename != "")
 		{
-			if (videoCapture.open(fileName, apiCode))
+			if (videoCapture.open(filename, apiCode))
 			{
 				videoNframes = (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_COUNT);
 				if (videoNframes < 0)
 				{
 					videoNframes = 0;
 				}
-				label = Util::extractFileName(fileName);
+				label = Util::extractFileName(filename);
 				sourcei++;
 				videoIsOpen = videoCapture.isOpened();
 				ok = videoIsOpen;
@@ -171,7 +171,7 @@ bool VideoSource::open()
 				if (apiCode != 0) {
 					message += " API code: " + apiCode;
 				}
-				message += " filename: " + fileName;
+				message += " filename: " + filename;
 				throw invalid_argument(message);
 			}
 		}

@@ -79,7 +79,7 @@ enum class ScriptOperationType
 	Debug,
 };
 
-const string scriptOperationTypes[] =
+const vector<string> scriptOperationTypes =
 {
 	"None",
 	"SetPath",

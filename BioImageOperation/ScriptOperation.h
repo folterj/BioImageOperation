@@ -14,7 +14,7 @@
 #include "Argument.h"
 #include "OperationInfo.h"
 #include "FrameSource.h"
-//#include "FrameOutput.h"
+#include "FrameOutput.h"
 
 using namespace cv;
 
@@ -37,7 +37,7 @@ public:
 	int count = 0;
 
 	FrameSource* frameSource = NULL;
-	//FrameOutput* frameOutput = NULL;
+	FrameOutput* frameOutput = NULL;
 	Mat image;
 	Mat* imageRef = NULL;
 
@@ -49,12 +49,12 @@ public:
 	void checkArguments();
 	bool hasInnerOperations();
 	ScriptOperation* getNextInnerOperation();
-	string getArgument(string label);
-	double getArgumentNumeric(string label = "", bool oneBase = false);
-	bool getArgumentBoolean(string label = "");
-	string getArgument(string label, string defaultArgument);
+	string getArgument(ArgumentLabel label);
+	double getArgumentNumeric(ArgumentLabel label = ArgumentLabel::None, bool oneBase = false);
+	bool getArgumentBoolean(ArgumentLabel label = ArgumentLabel::None);
+	string getArgument(ArgumentLabel label, string defaultArgument);
 	ClusterDrawMode getClusterDrawMode(ClusterDrawMode defaultArgument);
-	static OperationInfo getOperationInfo(ScriptOperationType type);
+	static OperationInfo* getOperationInfo(ScriptOperationType type);
 	static string getOperationList();
 	static void writeOperationList(string filename);
 

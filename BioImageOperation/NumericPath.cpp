@@ -7,9 +7,9 @@
  * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
+#include <filesystem>
 #include "NumericPath.h"
 #include "Util.h"
-#include <filesystem>
 
 
 NumericPath::NumericPath()

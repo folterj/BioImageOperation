@@ -8,30 +8,26 @@
  *****************************************************************************/
 
 #pragma once
-#include <string>
-#include <vector>
-
-using namespace std;
-
-
-class ScriptOperation;	// forward declaration
+#include "FrameOutput.h"
+#include "NumericPath.h"
 
 
 /*
- * Specific vector helper
+ * Output for image file(s)
  */
 
-class ScriptOperations : vector<ScriptOperation*>
+class ImageOutput : public FrameOutput
 {
 public:
-	int currentOperationi = 0;
+	NumericPath outputPath;
+	int start;
+	int end;
+	int filei = 0;
 
-	ScriptOperations();
-	~ScriptOperations();
+	ImageOutput();
+	~ImageOutput();
 	void reset();
-	void extract(string script, int linei = 0);
-	bool hasOperations();
-	ScriptOperation* getCurrentOperation();
-	bool moveNextOperation();
+	void init(string basePath, string filePath, string defaultExtension = "", string start = "", string length = "", double fps0 = 1, string codecs = "");
+	bool writeImage(Mat* image);
 	void close();
 };

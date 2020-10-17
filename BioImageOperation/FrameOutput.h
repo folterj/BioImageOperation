@@ -8,30 +8,21 @@
  *****************************************************************************/
 
 #pragma once
-#include <string>
-#include <vector>
+#include <opencv2/opencv.hpp>
 
 using namespace std;
-
-
-class ScriptOperation;	// forward declaration
+using namespace cv;
 
 
 /*
- * Specific vector helper
+ * Base class for image output classes
  */
 
-class ScriptOperations : vector<ScriptOperation*>
+class FrameOutput abstract
 {
 public:
-	int currentOperationi = 0;
-
-	ScriptOperations();
-	~ScriptOperations();
-	void reset();
-	void extract(string script, int linei = 0);
-	bool hasOperations();
-	ScriptOperation* getCurrentOperation();
-	bool moveNextOperation();
-	void close();
+	virtual void reset() = 0;
+	virtual void init(string basePath, string templatePath, string defaultExtension = "", string start = "", string length = "", double fps = 0, string codecs = "") = 0;
+	virtual bool writeImage(Mat* image) = 0;
+	virtual void close() = 0;
 };

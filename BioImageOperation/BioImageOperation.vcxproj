@@ -115,9 +115,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Argument.cpp" />
+    <ClCompile Include="CaptureSource.cpp" />
     <ClCompile Include="ColorScale.cpp" />
     <ClCompile Include="Constants.cpp" />
+    <ClCompile Include="FrameOutput.cpp" />
     <ClCompile Include="FrameSource.cpp" />
+    <ClCompile Include="ImageOutput.cpp" />
+    <ClCompile Include="ImageSource.cpp" />
     <ClCompile Include="ImageWindow.cpp" />
     <ClCompile Include="NumericPath.cpp" />
     <ClCompile Include="OperationInfo.cpp" />
@@ -125,6 +129,7 @@
     <ClCompile Include="ScriptOperations.cpp" />
     <ClCompile Include="ScriptProcessing.cpp" />
     <ClCompile Include="Util.cpp" />
+    <ClCompile Include="VideoOutput.cpp" />
     <ClCompile Include="VideoSource.cpp" />
     <QtRcc Include="MainWindow.qrc" />
     <QtUic Include="ImageWindow.ui" />
@@ -134,8 +139,13 @@
     <ClCompile Include="BioImageOperation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CaptureSource.h" />
+    <ClInclude Include="FrameOutput.h" />
+    <ClInclude Include="ImageOutput.h" />
+    <ClInclude Include="ImageSource.h" />
     <ClInclude Include="NumericPath.h" />
     <ClInclude Include="OperationInfo.h" />
+    <ClInclude Include="VideoOutput.h" />
     <ClInclude Include="VideoSource.h" />
     <QtMoc Include="ImageWindow.h" />
     <ClInclude Include="Argument.h" />

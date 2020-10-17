@@ -62,7 +62,7 @@ enum class ArgumentLabel
 	Contour
 };
 
-const string argumentLabels[] =
+const vector<string> argumentLabels =
 {
 	"None",
 	"Source",

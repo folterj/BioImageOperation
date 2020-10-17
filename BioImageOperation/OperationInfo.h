@@ -18,8 +18,8 @@
 class OperationInfo
 {
 public:
-	ArgumentLabel* requiredArguments;
-	ArgumentLabel* optionalArguments;
+	vector<ArgumentLabel> requiredArguments;
+	vector<ArgumentLabel> optionalArguments;
 	string description = "";
 
 	OperationInfo(ArgumentLabel* requiredArguments, ArgumentLabel* optionalArguments, string description);

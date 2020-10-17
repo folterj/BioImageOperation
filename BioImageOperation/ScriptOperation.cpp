@@ -9,6 +9,13 @@
 
 #include "ScriptOperation.h"
 #include "ScriptOperations.h"
+#include "ImageSource.h"
+#include "VideoSource.h"
+#include "CaptureSource.h"
+#include "ImageOutput.h"
+#include "VideoOutput.h"
+#include "Util.h"
+
 
 ScriptOperation::ScriptOperation() {
 }
@@ -42,69 +49,74 @@ void ScriptOperation::reset() {
 }
 
 void ScriptOperation::extract(string line) {
-	string operation;
+	string operation, part;
 	int i, i1, i2;
-	int interval0, offset0;
 
 	this->line = line;
 
-	i = line->IndexOf(":");
-	i1 = line->IndexOf("-");
-	i2 = line->IndexOf("(");
+	i = line.find(":");
+	i1 = line.find("-");
+	i2 = line.find("(");
 	if (i > 0 && (i < i2 || i2 < 0)) {
 		if (i1 > 0 && i1 < i) {
 			// interval & offset
-			if (int::TryParse(line->Substring(0, i1), interval0)) {
-				interval = interval0;
+			part = line.substr(0, i1);
+			if (Util::isNumeric(part)) {
+				interval = stoi(part);
 			}
 			i1++;
-			if (int::TryParse(line->Substring(i1, i - i1), offset0)) {
-				offset = offset0;
+			part = line.substr(i1, i - i1);
+			if (Util::isNumeric(part)) {
+				offset = stoi(part);
 			}
-		} else if (int::TryParse(line->Substring(0, i), interval0)) {
-			// interval
-			interval = interval0;
+		} else {
+			part = line.substr(0, i);
+			if (Util::isNumeric(part)) {
+				// interval
+				interval = stoi(part);
+			}
 		}
-		line = line->Substring(i + 1)->Trim();
+		line = Util::trim_copy(line.substr(i + 1));
 	}
 
-	i = line->IndexOf("=");
-	i1 = line->IndexOf("(");
+	i = line.find("=");
+	i1 = line.find("(");
 	if (i > 0 && i < i1) {
-		asignee = Util::stdString(line->Substring(0, i)->Trim());
-		line = line->Substring(i + 1)->Trim();
+		asignee = Util::trim_copy(line.substr(0, i));
+		line = Util::trim_copy(line.substr(i + 1));
 	}
 
-	i1 = line->IndexOf("(");	// get index again in shortened line
+	i1 = line.find("(");	// get index again in shortened line
 	if (i1 > 0) {
-		operation = line->Substring(0, i1)->Trim();
-		i2 = line->LastIndexOf(")");
+		operation = Util::trim_copy(line.substr(0, i1));
+		i2 = line.find_last_of(")");
 		if (i2 < 0) {
-			i2 = line->Length;
+			i2 = line.size();
 		}
-		line = line->Substring(i1 + 1, i2 - i1 - 1)->Trim();
+		line = Util::trim_copy(line.substr(i1 + 1, i2 - i1 - 1));
 
-		for each (System::String ^ arg in line->Split(',')) {
-			if (arg->Trim() != "") {
-				arguments.push_back(new Argument(arg->Trim()));
+		for each (string arg in Util::split(line, ",")) {
+			if (Util::trim_copy(arg) != "") {
+				arguments.push_back(new Argument(Util::trim_copy(arg)));
 			}
 		}
 	}
 
-	if (Enum::TryParse<ScriptOperationType>(operation, true, operationType)) {
+	if (Util::listContains(scriptOperationTypes, operation)) {
+		operationType = (ScriptOperationType)Util::getListIndex(scriptOperationTypes, operation);
 		checkArguments();
 	} else {
-		throw gcnew ArgumentException("Unkown operation: " + operation);
+		throw invalid_argument("Unkown operation: " + operation);
 	}
 }
 
 void ScriptOperation::checkArguments() {
-	OperationInfo^ info = getOperationInfo(operationType);
-	array<ArgumentLabel>^ requiredArguments = info->requiredArguments;
-	array<ArgumentLabel>^ optionalArguments = info->optionalArguments;
+	OperationInfo* info = getOperationInfo(operationType);
+	vector<ArgumentLabel> requiredArguments = info->requiredArguments;
+	vector<ArgumentLabel> optionalArguments = info->optionalArguments;
 	bool found;
 
-	if (requiredArguments && optionalArguments) {
+	if (!requiredArguments.empty() && !optionalArguments.empty()) {
 		// check required arguments
 		for each (ArgumentLabel label in requiredArguments) {
 			found = false;
@@ -113,14 +125,14 @@ void ScriptOperation::checkArguments() {
 					if (argument->argumentLabel == label) {
 						found = true;
 					}
-				} else if (requiredArguments->Length == 1 && arguments.size() == 1) {
+				} else if (requiredArguments.size() == 1 && arguments.size() == 1) {
 					if (label != ArgumentLabel::Path) {
 						// exception: if only single required argument and no label used (except for path as this should be found)
 						found = true;
 					}
 				}
 			} if (!found) {
-				throw gcnew ArgumentException("Missing required argument: " + label.ToString());
+				throw invalid_argument("Missing required argument: " + argumentLabels[(int)label]);
 			}
 		}
 
@@ -139,7 +151,7 @@ void ScriptOperation::checkArguments() {
 					}
 				}
 				if (!found) {
-					throw gcnew ArgumentException("Unexpected argument: " + Util::netString(argument->allArgument));
+					throw invalid_argument("Unexpected argument: " + argument->allArgument);
 				}
 			}
 		}
@@ -169,13 +181,13 @@ string ScriptOperation::getArgument(ArgumentLabel label) {
 		// search for label
 		for each (Argument * argument in arguments) {
 			if (argument->argumentLabel == label) {
-				arg = Util::netString(argument->value);
+				arg = argument->value;
 				break;
 			}
 		}
 	} else if (arguments.size() > 0) {
 		// else return first argument
-		arg = Util::netString(arguments.at(0)->value);
+		arg = arguments.at(0)->value;
 	}
 
 	return arg;
@@ -192,7 +204,7 @@ double ScriptOperation::getArgumentNumeric(ArgumentLabel label, bool oneBase) {
 	} else {
 		// find numeric argument
 		for (int argumenti = 0; argumenti < arguments.size(); argumenti++) {
-			arg = Util::netString(arguments.at(argumenti)->value);
+			arg = arguments.at(argumenti)->value;
 			if (Util::isNumeric(arg)) {
 				x = Util::toDouble(arg);
 				break;
@@ -217,10 +229,10 @@ bool ScriptOperation::getArgumentBoolean(ArgumentLabel label) {
 		// search for label
 		for each (Argument * argument in arguments) {
 			if (argument->argumentLabel == label) {
-				arg = Util::netString(argument->value);
+				arg = argument->value;
 				b = true;
 				if (Util::isBoolean(arg)) {
-					b = bool::Parse(arg);
+					b = Util::toBoolean(arg);
 				}
 				break;
 			}
@@ -228,9 +240,9 @@ bool ScriptOperation::getArgumentBoolean(ArgumentLabel label) {
 	} else {
 		// find boolean argument
 		for (int argumenti = 0; argumenti < arguments.size(); argumenti++) {
-			arg = Util::netString(arguments.at(argumenti)->value);
+			arg = arguments.at(argumenti)->value;
 			if (Util::isBoolean(arg)) {
-				b = bool::Parse(arg);
+				b = Util::toBoolean(arg);
 				break;
 			}
 		}
@@ -238,7 +250,7 @@ bool ScriptOperation::getArgumentBoolean(ArgumentLabel label) {
 	return b;
 }
 
-generic<class type> type ScriptOperation::getArgument(ArgumentLabel label, type defaultArgument) {
+string ScriptOperation::getArgument(ArgumentLabel label, string defaultArgument) {
 	string arg = getArgument(label);
 	ImageColorMode colorMode;
 	Palette palette;
@@ -321,17 +333,17 @@ ClusterDrawMode ScriptOperation::getClusterDrawMode(ClusterDrawMode defaultArgum
 	int cluterDrawMode = 0;
 	ClusterDrawMode clusterDrawMode0;
 	string fullArg = getArgument(ArgumentLabel::DrawMode);
-	array<string>^ args = fullArg->Split(gcnew array<string>{"|", "&", "+"}, StringSplitOptions::RemoveEmptyEntries);
+	vector<string> args = fullArg->Split(gcnew array<string>{"|", "&", "+"}, StringSplitOptions::RemoveEmptyEntries);
 	string arg;
-	bool ok = (args->Length != 0);
+	bool ok = (!args.empty());
 
-	for each (System::String ^ arg0 in args) {
-		arg = arg0->Trim();
+	for each (string arg0 in args) {
+		arg = Util::trim_copy(arg0);
 		if (Enum::TryParse<ClusterDrawMode>(arg, true, clusterDrawMode0)) {
 			cluterDrawMode |= (int)clusterDrawMode0;
 		} else {
 			ok = false;
-			throw gcnew ArgumentException(System::String::Format("Value {0} not valid for DrawMode", arg));
+			throw invalid_argument("Value " + arg + " not valid for DrawMode");
 		}
 	}
 
@@ -348,9 +360,9 @@ OperationInfo* ScriptOperation::getOperationInfo(ScriptOperationType type) {
 string ScriptOperation::getOperationList() {
 	string s;
 	ScriptOperationType type;
-	OperationInfo^ info;
-	array<ArgumentLabel>^ requiredArguments;
-	array<ArgumentLabel>^ optionalArguments;
+	OperationInfo* info;
+	vector<ArgumentLabel> requiredArguments;
+	vector<ArgumentLabel> optionalArguments;
 	string description;
 	bool firstArg;
 
@@ -370,14 +382,14 @@ string ScriptOperation::getOperationList() {
 			optionalArguments = info->optionalArguments;
 			description = info->description;
 
-			s += System::String::Format("\\b {0}\\b0 (", type);
+			s += string::Format("\\b {0}\\b0 (", type);
 
 			if (requiredArguments) {
 				for each (ArgumentLabel arg in requiredArguments) {
 					if (!firstArg) {
 						s += ", ";
 					}
-					s += System::String::Format("{0}", arg);
+					s += string::Format("{0}", arg);
 					firstArg = false;
 				}
 			}
@@ -388,7 +400,7 @@ string ScriptOperation::getOperationList() {
 						s += ", ";
 					}
 					s += "{\\cf2 ";
-					s += System::String::Format("{0}", arg);
+					s += string::Format("{0}", arg);
 					s += "}";
 					firstArg = false;
 				}

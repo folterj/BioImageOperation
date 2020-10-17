@@ -27,9 +27,10 @@ public:
 	static string numPadZeros(int number, string format);
 	static bool contains(string src, string target);
 	template <typename Out>
-	static void split(const string& s, char delim, Out result);
-	static vector<string> split(const string& s, char delim);
+	static void split(const string& s, const string& delim, Out result);
+	static vector<string> split(const string& s, const string& delim);
 	static string toLower(string s);
+	static string toUpper(string s);
 	static string removeQuotes(string s);
 	// trim from start (in place)
 	static void ltrim(string& s);
@@ -46,7 +47,10 @@ public:
 
 	static double toDouble(string s);
 	static bool isNumeric(string s);
+	static bool toBoolean(string s);
 	static bool isBoolean(string s);
+	static int getListIndex(vector<string> source, string target);
+	static bool listContains(vector<string> source, string target);
 	static int parseFrameTime(string s, double fps);
 	static double calcDistance(double x0, double y0, double x1, double y1);
 	static double calcDistance(double x, double y);

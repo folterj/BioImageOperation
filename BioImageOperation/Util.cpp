@@ -15,8 +15,12 @@ bool Util::contains(string src, string target) {
 	return (src.find(target) != string::npos);
 }
 
+bool Util::contains(string src, string target) {
+	return (src.find(target) != string::npos);
+}
+
 template <typename Out>
-void Util::split(const string& s, char delim, Out result) {
+void Util::split(const string& s, const string& delim, Out result) {
 	istringstream iss(s);
 	string item;
 	while (getline(iss, item, delim)) {
@@ -24,7 +28,7 @@ void Util::split(const string& s, char delim, Out result) {
 	}
 }
 
-vector<string> Util::split(const string& s, char delim) {
+vector<string> Util::split(const string& s, const string& delim) {
 	vector<string> elems;
 	split(s, delim, back_inserter(elems));
 	return elems;
@@ -32,7 +36,13 @@ vector<string> Util::split(const string& s, char delim) {
 
 string Util::toLower(string s) {
 	string s2;
-	transform(s.begin(), s.end(), s2.begin(), [](unsigned char c) { return std::tolower(c); });
+	transform(s.begin(), s.end(), s2.begin(), [](unsigned char c) { return tolower(c); });
+	return s2;
+}
+
+string Util::toUpper(string s) {
+	string s2;
+	transform(s.begin(), s.end(), s2.begin(), [](unsigned char c) { return toupper(c); });
 	return s2;
 }
 
@@ -49,13 +59,13 @@ string Util::removeQuotes(string s) {
 void Util::ltrim(string& s) {
 	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
 		return !std::isspace(ch);
-		}));
+	}));
 }
 
 void Util::rtrim(string& s) {
 	s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
 		return !std::isspace(ch);
-		}).base(), s.end());
+	}).base(), s.end());
 }
 
 void Util::trim(string& s) {
@@ -64,16 +74,19 @@ void Util::trim(string& s) {
 }
 
 string Util::ltrim_copy(string s) {
+	// *** in-place operation!
 	ltrim(s);
 	return s;
 }
 
 string Util::rtrim_copy(string s) {
+	// *** in-place operation!
 	rtrim(s);
 	return s;
 }
 
 string Util::trim_copy(string s) {
+	// *** in-place operation!
 	trim(s);
 	return s;
 }
@@ -97,9 +110,29 @@ bool Util::isNumeric(string s)
 	return false;
 }
 
+bool Util::toBoolean(string s)
+{
+	return (toLower(s) == "true");
+}
+
 bool Util::isBoolean(string s)
 {
 	return (toLower(s) == "true" || toLower(s) == "false");
+}
+
+int Util::getListIndex(vector<string> source, string target)
+{
+	int index = -1;
+	auto item = find(begin(source), end(source), target);
+	if (item != end(source)) {
+		index = distance(begin(source), item);
+	}
+	return index;
+}
+
+bool Util::listContains(vector<string> source, string target)
+{
+	return (getListIndex(source, target) != end(source));
 }
 
 int Util::parseFrameTime(string s, double fps)
@@ -109,7 +142,7 @@ int Util::parseFrameTime(string s, double fps)
 
 	if (Util::contains(s, ":")) {
 		// time format
-		for (string part : split(s, ':')) {
+		for (string part : split(s, ":")) {
 			totalSeconds *= 60;
 			totalSeconds += toDouble(part);
 		}
@@ -331,7 +364,7 @@ vector<string> Util::getImageFileNames(string searchPath)
 string Util::extractFilePath(string path)
 {
 	string filePath = "";
-	vector<string> parts = split(path, '\\');
+	vector<string> parts = split(path, "\\");
 	for (int i = 0; i < (int)parts.size() - 1; i++) {
 		filePath += parts[i];
 		filePath += "\\";
@@ -347,7 +380,7 @@ string Util::extractTitle(string path)
 string Util::extractFileName(string path)
 {
 	string fileName = path;
-	vector<string> parts = split(path, '\\');
+	vector<string> parts = split(path, "\\");
 	if (parts.size() > 1) {
 		fileName = parts[parts.size() - 1];
 	}
@@ -357,7 +390,7 @@ string Util::extractFileName(string path)
 string Util::extractFileTitle(string fileName)
 {
 	string fileTitle = "";
-	vector<string> parts = split(fileName, '.');
+	vector<string> parts = split(fileName, ".");
 	for (int i = 0; i < parts.size() - 1; i++) {
 		if (i > 0) {
 			fileTitle += ".";
@@ -370,7 +403,7 @@ string Util::extractFileTitle(string fileName)
 string Util::extractFileExtension(string fileName)
 {
 	string fileExtension = fileName;
-	vector<string> parts = split(fileExtension, '.');
+	vector<string> parts = split(fileExtension, ".");
 	if (parts.size() > 1) {
 		fileExtension = parts[parts.size() - 1];
 	}

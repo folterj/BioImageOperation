@@ -37,16 +37,16 @@ void ScriptOperations::extract(string script, int linei0) {
 
 	clear();
 
-	for (int linei = linei0; linei < lines->Length; linei++) {
-		line = lines[linei]->Trim();
-		if (line->StartsWith("{")) {
+	for (int linei = linei0; linei < lines.size(); linei++) {
+		line = Util::trim_copy(lines[linei]);
+		if (line._Starts_with("{")) {
 			// adds inner instructions for last operation
 			if (operation) {
 				operation->innerOperations = new ScriptOperations();
 				operation->innerOperations->extract(script, linei + 1);
 				skipping = true;
 			}
-		} else if (line->StartsWith("}")) {
+		} else if (line._Starts_with("}")) {
 			if (skipping) {
 				if (operation) {
 					operation->lineEnd = linei;
@@ -55,15 +55,15 @@ void ScriptOperations::extract(string script, int linei0) {
 			} else {
 				return;
 			}
-		} else if (!skipping && line != "" && !line->StartsWith("//") && !line->StartsWith("#")) {
+		} else if (!skipping && line != "" && !line._Starts_with("//") && !line._Starts_with("#")) {
 			try {
 				operation = new ScriptOperation();
 				operation->extract(line);
 				operation->lineStart = linei;
 				operation->lineEnd = linei;
 				push_back(operation);
-			} catch (ArgumentException^ e) {
-				throw gcnew ArgumentException(e->Message + " in line:\n" + line);
+			} catch (exception e) {
+				throw invalid_argument(e.what() + string(" in line:\n") + line);
 			}
 		}
 	}
