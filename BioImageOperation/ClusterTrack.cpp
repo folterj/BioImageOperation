@@ -248,9 +248,12 @@ System::String^ ClusterTrack::getCsv(Cluster* cluster, bool writeContour)
 		s += ",";
 		if (cluster)
 		{
-			for (Point point : cluster->getContour())
+			if (cluster->assignedTracks.size() == 1)
 			{
-				s += System::String::Format("{0} {1} ", point.x, point.y);
+				for (Point point : cluster->getContour())
+				{
+					s += System::String::Format("{0} {1} ", point.x, point.y);
+				}
 			}
 		}
 	}
