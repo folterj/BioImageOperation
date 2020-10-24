@@ -28,7 +28,7 @@ Argument::Argument(string arg) {
 			throw invalid_argument("Unkown argument: " + arg);
 		}
 	} else {
-		if (Util::contains(arg, "\"") || Util::contains(arg, "\"")) {
+		if (Util::contains(arg, "\"") || Util::contains(arg, "'")) {
 			arg = Util::removeQuotes(arg);
 			argumentLabel = ArgumentLabel::Path;
 		} else if (Util::isNumeric(arg)) {
@@ -44,9 +44,9 @@ Argument::Argument(string arg) {
 ArgumentLabel Argument::getArgumentLabel(string arg)
 {
 	ArgumentLabel label = ArgumentLabel::None;
-	const string* element = find(begin(argumentLabels), end(argumentLabels), arg);
-	if (element != end(argumentLabels)) {
-		label = (ArgumentLabel)distance(argumentLabels, element);
+	int enumIndex = Util::getListIndex(ArgumentLabels, arg);
+	if (enumIndex >= 0) {
+		label = (ArgumentLabel)enumIndex;
 	}
 	return label;
 }

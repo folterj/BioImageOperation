@@ -7,6 +7,8 @@
  * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
+#include <fstream>
+#include <iostream>
 #include "ScriptOperation.h"
 #include "ScriptOperations.h"
 #include "ImageSource.h"
@@ -95,15 +97,15 @@ void ScriptOperation::extract(string line) {
 		}
 		line = Util::trim_copy(line.substr(i1 + 1, i2 - i1 - 1));
 
-		for each (string arg in Util::split(line, ",")) {
+		for (string arg : Util::split(line, ",")) {
 			if (Util::trim_copy(arg) != "") {
 				arguments.push_back(new Argument(Util::trim_copy(arg)));
 			}
 		}
 	}
 
-	if (Util::listContains(scriptOperationTypes, operation)) {
-		operationType = (ScriptOperationType)Util::getListIndex(scriptOperationTypes, operation);
+	if (Util::contains(ScriptOperationTypes, operation)) {
+		operationType = (ScriptOperationType)Util::getListIndex(ScriptOperationTypes, operation);
 		checkArguments();
 	} else {
 		throw invalid_argument("Unkown operation: " + operation);
@@ -111,16 +113,16 @@ void ScriptOperation::extract(string line) {
 }
 
 void ScriptOperation::checkArguments() {
-	OperationInfo* info = getOperationInfo(operationType);
-	vector<ArgumentLabel> requiredArguments = info->requiredArguments;
-	vector<ArgumentLabel> optionalArguments = info->optionalArguments;
+	OperationInfo info = getOperationInfo(operationType);
+	vector<ArgumentLabel> requiredArguments = info.requiredArguments;
+	vector<ArgumentLabel> optionalArguments = info.optionalArguments;
 	bool found;
 
 	if (!requiredArguments.empty() && !optionalArguments.empty()) {
 		// check required arguments
-		for each (ArgumentLabel label in requiredArguments) {
+		for (ArgumentLabel label : requiredArguments) {
 			found = false;
-			for each (Argument * argument in arguments) {
+			for (Argument* argument : arguments) {
 				if (argument->argumentLabel != ArgumentLabel::None) {
 					if (argument->argumentLabel == label) {
 						found = true;
@@ -132,20 +134,20 @@ void ScriptOperation::checkArguments() {
 					}
 				}
 			} if (!found) {
-				throw invalid_argument("Missing required argument: " + argumentLabels[(int)label]);
+				throw invalid_argument("Missing required argument: " + ArgumentLabels[(int)label]);
 			}
 		}
 
 		// check all arguments
-		for each (Argument * argument in arguments) {
+		for (Argument* argument : arguments) {
 			// ignore non-labelled arguments
 			if (argument->argumentLabel != ArgumentLabel::None) {
 				found = false;
-				for each (ArgumentLabel label in requiredArguments) {
+				for (ArgumentLabel label : requiredArguments) {
 					if (label == argument->argumentLabel) {
 						found = true;
 					}
-				} for each (ArgumentLabel label in optionalArguments) {
+				} for (ArgumentLabel label : optionalArguments) {
 					if (label == argument->argumentLabel) {
 						found = true;
 					}
@@ -179,7 +181,7 @@ string ScriptOperation::getArgument(ArgumentLabel label) {
 
 	if (label != ArgumentLabel::None) {
 		// search for label
-		for each (Argument * argument in arguments) {
+		for (Argument* argument : arguments) {
 			if (argument->argumentLabel == label) {
 				arg = argument->value;
 				break;
@@ -190,6 +192,14 @@ string ScriptOperation::getArgument(ArgumentLabel label) {
 		arg = arguments.at(0)->value;
 	}
 
+	return arg;
+}
+
+string ScriptOperation::getArgument(ArgumentLabel label, string defaultArgument) {
+	string arg = getArgument(label);
+	if (arg != "") {
+		arg = defaultArgument;
+	}
 	return arg;
 }
 
@@ -227,7 +237,7 @@ bool ScriptOperation::getArgumentBoolean(ArgumentLabel label) {
 
 	if (label != ArgumentLabel::None) {
 		// search for label
-		for each (Argument * argument in arguments) {
+		for (Argument* argument : arguments) {
 			if (argument->argumentLabel == label) {
 				arg = argument->value;
 				b = true;
@@ -250,97 +260,19 @@ bool ScriptOperation::getArgumentBoolean(ArgumentLabel label) {
 	return b;
 }
 
-string ScriptOperation::getArgument(ArgumentLabel label, string defaultArgument) {
-	string arg = getArgument(label);
-	ImageColorMode colorMode;
-	Palette palette;
-	AccumMode accumMode;
-	ClusterDrawMode clusterDrawMode;
-	PathDrawMode pathDrawMode;
-	DrawPosition drawPosition;
-	SaveFormat saveFormat;
-	bool ok = false;
-
-	if (arg != "")
-	{
-		if (type::typeid == ImageColorMode::typeid)
-		{
-			ok = Enum::TryParse<ImageColorMode>(arg, true, colorMode);
-		}
-		if (type::typeid == Palette::typeid)
-		{
-			ok = Enum::TryParse<Palette>(arg, true, palette);
-		}
-		if (type::typeid == AccumMode::typeid)
-		{
-			ok = Enum::TryParse<AccumMode>(arg, true, accumMode);
-		}
-		if (type::typeid == ClusterDrawMode::typeid)
-		{
-			ok = Enum::TryParse<ClusterDrawMode>(arg, true, clusterDrawMode);
-		}
-		if (type::typeid == PathDrawMode::typeid)
-		{
-			ok = Enum::TryParse<PathDrawMode>(arg, true, pathDrawMode);
-		}
-		if (type::typeid == DrawPosition::typeid)
-		{
-			ok = Enum::TryParse<DrawPosition>(arg, true, drawPosition);
-		}
-		if (type::typeid == SaveFormat::typeid)
-		{
-			ok = Enum::TryParse<SaveFormat>(arg, true, saveFormat);
-		}
-
-		if (!ok)
-		{
-			throw gcnew ArgumentException(System::String::Format("Value {0} not valid for {1}", arg, type::typeid));
-		}
-
-		if (type::typeid == ImageColorMode::typeid)
-		{
-			return (type)colorMode;
-		}
-		if (type::typeid == Palette::typeid)
-		{
-			return (type)palette;
-		}
-		if (type::typeid == AccumMode::typeid)
-		{
-			return (type)accumMode;
-		}
-		if (type::typeid == ClusterDrawMode::typeid)
-		{
-			return (type)clusterDrawMode;
-		}
-		if (type::typeid == PathDrawMode::typeid)
-		{
-			return (type)pathDrawMode;
-		}
-		if (type::typeid == DrawPosition::typeid)
-		{
-			return (type)drawPosition;
-		}
-		if (type::typeid == SaveFormat::typeid)
-		{
-			return (type)saveFormat;
-		}
-	}
-	return defaultArgument;
-}
-
 ClusterDrawMode ScriptOperation::getClusterDrawMode(ClusterDrawMode defaultArgument) {
-	int cluterDrawMode = 0;
-	ClusterDrawMode clusterDrawMode0;
+	int clusterDrawMode = 0;
+	int clusterDrawMode0;
 	string fullArg = getArgument(ArgumentLabel::DrawMode);
-	vector<string> args = fullArg->Split(gcnew array<string>{"|", "&", "+"}, StringSplitOptions::RemoveEmptyEntries);
+	vector<string> args = Util::split(fullArg, vector<string>{"|", "&", "+"}, true);
 	string arg;
 	bool ok = (!args.empty());
 
-	for each (string arg0 in args) {
+	for (string arg0 : args) {
 		arg = Util::trim_copy(arg0);
-		if (Enum::TryParse<ClusterDrawMode>(arg, true, clusterDrawMode0)) {
-			cluterDrawMode |= (int)clusterDrawMode0;
+		clusterDrawMode0 = Util::getListIndex(ClusterDrawModes, arg);
+		if (clusterDrawMode0 >= 0) {
+			clusterDrawMode |= clusterDrawMode0;
 		} else {
 			ok = false;
 			throw invalid_argument("Value " + arg + " not valid for DrawMode");
@@ -348,13 +280,19 @@ ClusterDrawMode ScriptOperation::getClusterDrawMode(ClusterDrawMode defaultArgum
 	}
 
 	if (ok) {
-		return (ClusterDrawMode)cluterDrawMode;
+		return (ClusterDrawMode)clusterDrawMode;
 	}
 	return defaultArgument;
 }
 
-OperationInfo* ScriptOperation::getOperationInfo(ScriptOperationType type) {
-	return new OperationInfo(requiredArguments, optionalArguments, description);
+OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
+	vector<ArgumentLabel> requiredArguments;
+	vector<ArgumentLabel> optionalArguments;
+	string description = "";
+
+	// **************************
+
+	return OperationInfo(requiredArguments, optionalArguments, description);
 }
 
 string ScriptOperation::getOperationList() {
@@ -371,8 +309,8 @@ string ScriptOperation::getOperationList() {
 	s = "{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Consolas;}}\n{\\colortbl;\\red0\\green0\\blue0;\\red127\\green127\\blue127;\\red0\\green0\\blue255;}";
 	s += "\\margl720\\margr720\\margt720\\margb720 \\fs20\n";	// 0.5 inch margins; font size 10
 	s += "\\b BioImageOperation script operations\\b0\\line\n\\line\n";
-
-	for each (int types in Enum::GetValues(ScriptOperationType::typeid)) {
+	/*
+	for (int types : Enum::GetValues(ScriptOperationType::typeid)) {
 		firstArg = true;
 		type = (ScriptOperationType)types;
 
@@ -385,7 +323,7 @@ string ScriptOperation::getOperationList() {
 			s += string::Format("\\b {0}\\b0 (", type);
 
 			if (requiredArguments) {
-				for each (ArgumentLabel arg in requiredArguments) {
+				for (ArgumentLabel arg : requiredArguments) {
 					if (!firstArg) {
 						s += ", ";
 					}
@@ -395,7 +333,7 @@ string ScriptOperation::getOperationList() {
 			}
 
 			if (optionalArguments) {
-				for each (ArgumentLabel arg in optionalArguments) {
+				for (ArgumentLabel arg : optionalArguments) {
 					if (!firstArg) {
 						s += ", ";
 					}
@@ -415,16 +353,18 @@ string ScriptOperation::getOperationList() {
 	s += "}";
 
 	s = s->Replace("\n", "\r\n");
-
+	*/
 	return s;
 }
 
 void ScriptOperation::writeOperationList(string filename) {
 	string s = getOperationList();
-	File::WriteAllText(filename, s);
+	ofstream file(filename);
+	file << s;
+	file.close();
 }
 
-bool ScriptOperation::initFrameSource(FrameType frameType, int apiCode, string basePath, string templatePath, string start, string length, double fps0, int interval) {
+bool ScriptOperation::initFrameSource(FrameType frameType, int apiCode, string basepath, string templatePath, string start, string length, double fps0, int interval) {
 	bool ok = true;
 
 	if (!frameSource) {
@@ -436,13 +376,13 @@ bool ScriptOperation::initFrameSource(FrameType frameType, int apiCode, string b
 		}
 		if (frameSource)
 		{
-			ok = frameSource->init(apiCode, basePath, templatePath, start, length, fps0, interval);
+			ok = frameSource->init(apiCode, basepath, templatePath, start, length, fps0, interval);
 		}
 	}
 	return ok;
 }
 
-void ScriptOperation::initFrameOutput(FrameType frameType, string basePath, string templatePath, string defaultExtension, string start, string length, double fps, string codecs) {
+void ScriptOperation::initFrameOutput(FrameType frameType, string basepath, string templatePath, string defaultExtension, string start, string length, double fps, string codecs) {
 	if (!frameOutput) {
 		switch (frameType)
 		{
@@ -450,7 +390,7 @@ void ScriptOperation::initFrameOutput(FrameType frameType, string basePath, stri
 		case FrameType::Video: frameOutput = new VideoOutput(); break;
 		}
 		if (frameOutput) {
-			frameOutput->init(basePath, templatePath, defaultExtension, start, length, fps, codecs);
+			frameOutput->init(basepath, templatePath, defaultExtension, start, length, fps, codecs);
 		}
 	}
 }

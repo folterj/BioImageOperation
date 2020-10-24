@@ -33,7 +33,7 @@ public:
 
 	VideoOutput();
 	~VideoOutput();
-	void init(string basePath, string filePath, string defaultExtension = "", string start = "", string length = "", double fps = 0, string codecs = "");
+	void init(string basepath, string filepath, string defaultExtension = "", string start = "", string length = "", double fps = 0, string codecs = "");
 	void reset();
 	bool open();
 	void close();

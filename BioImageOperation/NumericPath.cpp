@@ -36,21 +36,20 @@ void NumericPath::resetFilePath()
 	filei = 0;
 }
 
-bool NumericPath::setInputPath(string basePath, string templatePath)
+bool NumericPath::setInputPath(string basepath, string templatePath)
 {
 	if (templatePath == "") {
 		throw invalid_argument("No path specified");
 	}
 
-	templatePath = Util::combinePath(basePath, templatePath);
+	templatePath = Util::combinePath(basepath, templatePath);
 
 	reset();
 
 	this->templatePath = templatePath;
 	initialPath = templatePath;
 
-	inputFilenames = Util::getImageFileNames(templatePath);
-	sort(inputFilenames.begin(), inputFilenames.end());
+	inputFilenames = Util::getImageFilenames(templatePath);
 	totaln = inputFilenames.size();
 
 	extension = Util::extractFileExtension(templatePath);
@@ -68,7 +67,7 @@ bool NumericPath::setOutputPath(string templatePath)
 	return ok;
 }
 
-bool NumericPath::setOutputPath(string basePath, string templatePath, string defaultExtension)
+bool NumericPath::setOutputPath(string basepath, string templatePath, string defaultExtension)
 {
 	int extPos;
 	int numpos;
@@ -79,7 +78,7 @@ bool NumericPath::setOutputPath(string basePath, string templatePath, string def
 		throw invalid_argument("No path specified");
 	}
 
-	templatePath = Util::combinePath(basePath, templatePath);
+	templatePath = Util::combinePath(basepath, templatePath);
 
 	reset();
 	input = false;

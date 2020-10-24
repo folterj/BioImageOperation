@@ -27,7 +27,7 @@ public:
 	ImageOutput();
 	~ImageOutput();
 	void reset();
-	void init(string basePath, string filePath, string defaultExtension = "", string start = "", string length = "", double fps0 = 1, string codecs = "");
+	void init(string basepath, string filepath, string defaultExtension = "", string start = "", string length = "", double fps0 = 1, string codecs = "");
 	bool writeImage(Mat* image);
 	void close();
 };

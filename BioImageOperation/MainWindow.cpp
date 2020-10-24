@@ -29,8 +29,8 @@ void MainWindow::initOpenCv(string filename) {
 }
 */
 
-void MainWindow::setFilePath(string filePath) {
-	this->filePath = filePath;
+void MainWindow::setFilePath(string filepath) {
+	this->filepath = filepath;
 }
 
 void MainWindow::resetUI() {
@@ -79,7 +79,10 @@ void MainWindow::showErrorMessage(string message) {
 
 void MainWindow::process() {
 	//updateUI(true);
-	scriptProcessing.startProcess(filePath, ui.scriptTextEdit->toPlainText().toStdString());
+
+	ui.scriptTextEdit->setPlainText(QString("OpenVideo('D:\\Video\\test.mkv')"));
+
+	scriptProcessing.startProcess(filepath, ui.scriptTextEdit->toPlainText().toStdString());
 	/*
 	videoCapture.grab();
 	videoCapture.retrieve(videoFrame);

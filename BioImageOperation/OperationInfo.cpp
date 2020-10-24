@@ -10,7 +10,7 @@
 #include "OperationInfo.h"
 
 
-OperationInfo::OperationInfo(ArgumentLabel* requiredArguments, ArgumentLabel* optionalArguments, string description) {
+OperationInfo::OperationInfo(vector<ArgumentLabel> requiredArguments, vector<ArgumentLabel> optionalArguments, string description) {
 	this->requiredArguments = requiredArguments;
 	this->optionalArguments = optionalArguments;
 	this->description = description;

@@ -24,11 +24,11 @@ using namespace cv;
 class Util
 {
 public:
-	static string numPadZeros(int number, string format);
 	static bool contains(string src, string target);
-	template <typename Out>
-	static void split(const string& s, const string& delim, Out result);
-	static vector<string> split(const string& s, const string& delim);
+	static bool contains(vector<string> source, string target);
+	static int getListIndex(vector<string> source, string target);
+	static vector<string> split(const string& s, const string& delim, bool removeEmptyEntries=false);
+	static vector<string> split(const string& s, const vector<string>& delims, bool removeEmptyEntries=false);
 	static string toLower(string s);
 	static string toUpper(string s);
 	static string removeQuotes(string s);
@@ -44,13 +44,12 @@ public:
 	static string rtrim_copy(string s);
 	// trim from both ends (copying)
 	static string trim_copy(string s);
+	static string numPadZeros(int number, string format);
 
 	static double toDouble(string s);
 	static bool isNumeric(string s);
 	static bool toBoolean(string s);
 	static bool isBoolean(string s);
-	static int getListIndex(vector<string> source, string target);
-	static bool listContains(vector<string> source, string target);
 	static int parseFrameTime(string s, double fps);
 	static double calcDistance(double x0, double y0, double x1, double y1);
 	static double calcDistance(double x, double y);
@@ -63,18 +62,18 @@ public:
 	static Scalar getRainbowScale(double scale);
 	static Scalar bgrtoScalar(BGR bgr);
 
-	static Mat loadImage(string fileName);
-	static void saveImage(string fileName, Mat* image);
+	static Mat loadImage(string filename);
+	static void saveImage(string filename, Mat* image);
 	static bool isValidImage(Mat* image);
 	static string getCodecString(int codec);
 
-	static vector<string> getImageFileNames(string searchPath);
+	static vector<string> getImageFilenames(string searchPath);
 	static string extractFilePath(string path);
 	static string extractTitle(string path);
 	static string extractFileName(string path);
-	static string extractFileTitle(string fileName);
-	static string extractFileExtension(string fileName);
-	static string combinePath(string basePath, string templatePath);
+	static string extractFileTitle(string filename);
+	static string extractFileExtension(string filename);
+	static string combinePath(string basepath, string templatePath);
 
 	static QImage matToQImage(cv::Mat const& src);
 };

@@ -9,6 +9,7 @@
 
 #pragma once
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -62,7 +63,7 @@ enum class ArgumentLabel
 	Contour
 };
 
-const vector<string> argumentLabels =
+const vector<string> ArgumentLabels =
 {
 	"None",
 	"Source",

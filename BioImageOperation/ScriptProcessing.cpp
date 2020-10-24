@@ -26,7 +26,7 @@ ScriptProcessing::~ScriptProcessing() {
 }
 
 void ScriptProcessing::reset() {
-	basePath = "";
+	basepath = "";
 	sourceWidth = 0;
 	sourceHeight = 0;
 	sourceFps = 0;
@@ -49,14 +49,17 @@ void ScriptProcessing::registerObserver(Observer* observer) {
 	this->observer = observer;
 }
 
-bool ScriptProcessing::startProcess(string filePath, string script) {
+bool ScriptProcessing::startProcess(string filepath, string script) {
 	reset();
-	basePath = Util::extractFilePath(filePath);
+	basepath = Util::extractFilePath(filepath);
 
 	try {
 		scriptOperations->extract(script, 0);
 		observer->resetProgressTimer();
 
+		//if (processThread.joinable()) {
+		//	processThread.join();
+		//}
 		processThread = thread(&ScriptProcessing::processThreadMethod, this);
 	} catch (exception e) {
 		observer->showErrorMessage(e.what());
@@ -131,13 +134,13 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 	try {
 		switch (operation->operationType) {
 		case ScriptOperationType::SetPath:
-			basePath = operation->getArgument("Path");
+			basepath = operation->getArgument(ArgumentLabel::Path);
 			break;
 		case  ScriptOperationType::Debug:
 			debugMode = true;
 			break;
 		case  ScriptOperationType::OpenVideo:
-			operation->initFrameSource(FrameType::Video, (int)operation->getArgumentNumeric("API"), basePath, operation->getArgument("Path"), operation->getArgument("Start"), operation->getArgument("Length"), 0, (int)operation->getArgumentNumeric("Interval"));
+			operation->initFrameSource(FrameType::Video, (int)operation->getArgumentNumeric(ArgumentLabel::API), basepath, operation->getArgument(ArgumentLabel::Path), operation->getArgument(ArgumentLabel::Start), operation->getArgument(ArgumentLabel::Length), 0, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
 			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage)) {
 				observer->showStatus(operation->frameSource->getLabel(), operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames(), true);
@@ -192,6 +195,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			}
 		}
 		errorMsg += " in\n" + operation->line;
+		cerr << e.what() << endl;
 		observer->showErrorMessage(errorMsg);
 		doAbort(false);
 	} catch (exception e) {
@@ -199,6 +203,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 #ifdef _DEBUG
 		//errorMsg += e->StackTrace;
 #endif
+		cerr << e.what() << endl;
 		observer->showErrorMessage(errorMsg);
 		doAbort(false);
 	}

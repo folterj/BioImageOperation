@@ -36,13 +36,13 @@ void VideoOutput::reset()
 	close();
 }
 
-void VideoOutput::init(string basePath, string filePath, string defaultExtension, string start, string length, double fps, string codecs)
+void VideoOutput::init(string basepath, string filepath, string defaultExtension, string start, string length, double fps, string codecs)
 {
 	string filename;
 
 	reset();
 
-	outputPath.setOutputPath(basePath, filePath, defaultExtension);
+	outputPath.setOutputPath(basepath, filepath, defaultExtension);
 	this->fps = fps;
 
 	if (codecs == "")

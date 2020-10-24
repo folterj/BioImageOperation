@@ -22,7 +22,7 @@ class FrameOutput abstract
 {
 public:
 	virtual void reset() = 0;
-	virtual void init(string basePath, string templatePath, string defaultExtension = "", string start = "", string length = "", double fps = 0, string codecs = "") = 0;
+	virtual void init(string basepath, string templatePath, string defaultExtension = "", string start = "", string length = "", double fps = 0, string codecs = "") = 0;
 	virtual bool writeImage(Mat* image) = 0;
 	virtual void close() = 0;
 };

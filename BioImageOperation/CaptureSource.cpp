@@ -31,12 +31,12 @@ void CaptureSource::reset()
 	close();
 }
 
-bool CaptureSource::init(int apiCode, string basePath, string filePath, string start, string length, double fps0, int interval)
+bool CaptureSource::init(int apiCode, string basepath, string filepath, string start, string length, double fps0, int interval)
 {
 	reset();
 
 	this->apiCode = apiCode;
-	this->source = filePath;
+	this->source = filepath;
 
 	return open();
 }

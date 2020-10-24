@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Argument.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="BioImageOperation.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="CaptureSource.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorScale.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="Constants.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameOutput.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameSource.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageOutput.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageSource.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageWindow.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainWindow.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="NumericPath.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="OperationInfo.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptOperation.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptOperations.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptProcessing.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="Util.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoOutput.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoSource.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Argument.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CaptureSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorScale.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameOutput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageOutput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NumericPath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Observer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OperationInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptOperation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptOperations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptProcessing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoOutput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="ImageWindow.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="MainWindow.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="ImageWindow.ui">
+      <Filter>Resource Files</Filter>
+    </QtUic>
+    <QtUic Include="MainWindow.ui">
+      <Filter>Resource Files</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms;ui;qrc</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="MainWindow.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
+  </ItemGroup>
+</Project>

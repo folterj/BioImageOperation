@@ -32,13 +32,13 @@ void ImageSource::reset()
 	height = 0;
 }
 
-bool ImageSource::init(int apiCode, string basePath, string filePath, string start, string length, double fps0, int interval)
+bool ImageSource::init(int apiCode, string basepath, string filepath, string start, string length, double fps0, int interval)
 {
 	int lengthi = 0;
 
 	reset();
 
-	sourcePath.setInputPath(basePath, filePath);
+	sourcePath.setInputPath(basepath, filepath);
 
 	nfiles = sourcePath.getFileCount();
 	if (nfiles == 0)

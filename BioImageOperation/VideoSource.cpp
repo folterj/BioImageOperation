@@ -42,7 +42,7 @@ void VideoSource::reset()
 	close();
 }
 
-bool VideoSource::init(int apiCode, string basePath, string filePath, string start, string length, double fps0, int interval)
+bool VideoSource::init(int apiCode, string basepath, string filepath, string start, string length, double fps0, int interval)
 {
 	string filename = ".";	// dummy value to pass initial while-loop condition
 	bool ok = false;
@@ -52,7 +52,7 @@ bool VideoSource::init(int apiCode, string basePath, string filePath, string sta
 
 	reset();
 	this->apiCode = apiCode;
-	sourcePath.setInputPath(basePath, filePath);
+	sourcePath.setInputPath(basepath, filepath);
 
 	nsources = sourcePath.getFileCount();
 	if (nsources == 0)

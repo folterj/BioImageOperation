@@ -27,7 +27,7 @@ public:
 	MainWindow(QWidget *parent = Q_NULLPTR);
 	//void initOpenCv(string filename);
 	void process();
-	void setFilePath(string filePath);
+	void setFilePath(string filepath);
 	virtual void resetUI() override;
 	virtual void resetImages() override;
 	virtual void resetProgressTimer() override;
@@ -41,7 +41,7 @@ public:
 	virtual void showErrorMessage(string message) override;
 
 private:
-	string filePath;
+	string filepath;
 	Ui::MainWindow ui;
 	ImageWindow* imageWindow;
 	ScriptProcessing scriptProcessing;

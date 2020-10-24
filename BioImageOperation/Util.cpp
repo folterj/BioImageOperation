@@ -4,34 +4,59 @@
 #include <filesystem>
 
 
-string Util::numPadZeros(int number, string format) {
-	const int buflen = 1000;
-	char buffer[buflen];
-	snprintf(buffer, buflen, format.c_str(), number);
-	return string(buffer);
-}
-
 bool Util::contains(string src, string target) {
 	return (src.find(target) != string::npos);
 }
 
-bool Util::contains(string src, string target) {
-	return (src.find(target) != string::npos);
+bool Util::contains(vector<string> source, string target)
+{
+	auto item = find(begin(source), end(source), target);
+	return (item != end(source));
 }
 
-template <typename Out>
-void Util::split(const string& s, const string& delim, Out result) {
-	istringstream iss(s);
-	string item;
-	while (getline(iss, item, delim)) {
-		*result++ = item;
+int Util::getListIndex(vector<string> source, string target)
+{
+	int index = -1;
+	auto item = find(begin(source), end(source), target);
+	if (item != end(source)) {
+		index = distance(begin(source), item);
 	}
+	return index;
 }
 
-vector<string> Util::split(const string& s, const string& delim) {
-	vector<string> elems;
-	split(s, delim, back_inserter(elems));
-	return elems;
+vector<string> Util::split(const string& s, const string& delim, bool removeEmptyEntries) {
+	vector<string> parts;
+	int i = 0;
+	int i0 = 0;
+	while (i >= 0) {
+		i = s.find(delim, i0);
+		if (i >= 0) {
+			parts.push_back(s.substr(i0, i - i0));
+			i0 = i + 1;
+		}
+	}
+	parts.push_back(s.substr(i0, s.length() - i0));
+	return parts;
+}
+
+vector<string> Util::split(const string& s, const vector<string>& delims, bool removeEmptyEntries) {
+	vector<string> parts;
+	int i = 0;
+	int i0 = 0;
+	while (i >= 0) {
+		for (string delim : delims) {
+			i = s.find(delim, i0);
+			if (i >= 0) {
+				break;
+			}
+		}
+		if (i >= 0) {
+			parts.push_back(s.substr(i0, i - i0));
+			i0 = i + 1;
+		}
+	}
+	parts.push_back(s.substr(i0, s.length() - i0));
+	return parts;
 }
 
 string Util::toLower(string s) {
@@ -91,6 +116,13 @@ string Util::trim_copy(string s) {
 	return s;
 }
 
+string Util::numPadZeros(int number, string format) {
+	const int buflen = 1000;
+	char buffer[buflen];
+	snprintf(buffer, buflen, format.c_str(), number);
+	return string(buffer);
+}
+
 double Util::toDouble(string s)
 {
 	if (isNumeric(s))
@@ -120,36 +152,23 @@ bool Util::isBoolean(string s)
 	return (toLower(s) == "true" || toLower(s) == "false");
 }
 
-int Util::getListIndex(vector<string> source, string target)
-{
-	int index = -1;
-	auto item = find(begin(source), end(source), target);
-	if (item != end(source)) {
-		index = distance(begin(source), item);
-	}
-	return index;
-}
-
-bool Util::listContains(vector<string> source, string target)
-{
-	return (getListIndex(source, target) != end(source));
-}
-
 int Util::parseFrameTime(string s, double fps)
 {
 	int frames = 0;
 	int totalSeconds = 0;
 
-	if (Util::contains(s, ":")) {
-		// time format
-		for (string part : split(s, ":")) {
-			totalSeconds *= 60;
-			totalSeconds += toDouble(part);
+	if (s != "") {
+		if (Util::contains(s, ":")) {
+			// time format
+			for (string part : split(s, ":")) {
+				totalSeconds *= 60;
+				totalSeconds += toDouble(part);
+			}
+			frames = (int)(totalSeconds * fps);
+		} else {
+			// frames
+			frames = stoi(s);
 		}
-		frames = (int)(totalSeconds * fps);
-	} else {
-		// frames
-		frames = stoi(s);
 	}
 	return frames;
 }
@@ -190,9 +209,9 @@ Scalar Util::getLabelColor(int label0)
 		ig = (label / 3) % 3;
 		ib = (label / 9) % 3;
 
-		r = 0.25 * (1 + ir);
-		g = 0.25 * (1 + ig);
-		b = 0.25 * (1 + ib);
+		r = 0.25 * (ir + 1);
+		g = 0.25 * (ig + 1);
+		b = 0.25 * (ib + 1);
 	} else {
 		r = 0.5;
 		g = 0.5;
@@ -334,42 +353,42 @@ string Util::getCodecString(int codec)
 	return codecs;
 }
 
-Mat Util::loadImage(string fileName)
+Mat Util::loadImage(string filename)
 {
-	return imread(fileName, ImreadModes::IMREAD_UNCHANGED);
+	return imread(filename, ImreadModes::IMREAD_UNCHANGED);
 }
 
-void Util::saveImage(string fileName, Mat* image)
+void Util::saveImage(string filename, Mat* image)
 {
-	imwrite(fileName, *image);
+	imwrite(filename, *image);
 }
 
-vector<string> Util::getImageFileNames(string searchPath)
+vector<string> Util::getImageFilenames(string searchPath)
 {
-	vector<string> fileNames;
-	string fileName;
+	vector<string> filenames;
+	string filename;
 	string path = extractFilePath(searchPath);
 	string pattern = extractFileName(searchPath);
 
 	for (const auto& entry : filesystem::directory_iterator(path)) {
-		fileName = entry.path().string();
-		if (fileName._Starts_with(pattern)) {
-			fileNames.push_back(fileName);
+		filename = entry.path().string();
+		if (extractFileName(filename)._Starts_with(pattern)) {
+			filenames.push_back(filename);
 		}
 	}
-	sort(fileNames.begin(), fileNames.end());
-	return fileNames;
+	sort(filenames.begin(), filenames.end());
+	return filenames;
 }
 
 string Util::extractFilePath(string path)
 {
-	string filePath = "";
-	vector<string> parts = split(path, "\\");
+	string filepath = "";
+	vector<string> parts = split(path, vector<string>{"\\", "/"});
 	for (int i = 0; i < (int)parts.size() - 1; i++) {
-		filePath += parts[i];
-		filePath += "\\";
+		filepath += parts[i];
+		filepath += "\\";
 	}
-	return filePath;
+	return filepath;
 }
 
 string Util::extractTitle(string path)
@@ -379,18 +398,18 @@ string Util::extractTitle(string path)
 
 string Util::extractFileName(string path)
 {
-	string fileName = path;
-	vector<string> parts = split(path, "\\");
+	string filename = path;
+	vector<string> parts = split(path, vector<string>{"\\", "/"});
 	if (parts.size() > 1) {
-		fileName = parts[parts.size() - 1];
+		filename = parts[parts.size() - 1];
 	}
-	return fileName;
+	return filename;
 }
 
-string Util::extractFileTitle(string fileName)
+string Util::extractFileTitle(string filename)
 {
 	string fileTitle = "";
-	vector<string> parts = split(fileName, ".");
+	vector<string> parts = split(filename, ".");
 	for (int i = 0; i < parts.size() - 1; i++) {
 		if (i > 0) {
 			fileTitle += ".";
@@ -400,9 +419,9 @@ string Util::extractFileTitle(string fileName)
 	return fileTitle;
 }
 
-string Util::extractFileExtension(string fileName)
+string Util::extractFileExtension(string filename)
 {
-	string fileExtension = fileName;
+	string fileExtension = filename;
 	vector<string> parts = split(fileExtension, ".");
 	if (parts.size() > 1) {
 		fileExtension = parts[parts.size() - 1];
@@ -410,12 +429,12 @@ string Util::extractFileExtension(string fileName)
 	return fileExtension;
 }
 
-string Util::combinePath(string basePath, string templatePath)
+string Util::combinePath(string basepath, string templatePath)
 {
-	if (basePath == "" || Util::contains(templatePath, ":")) {
+	if (basepath == "" || Util::contains(templatePath, ":")) {
 		return templatePath;
 	} else {
-		return (filesystem::path(basePath) / filesystem::path(templatePath)).string();
+		return (filesystem::path(basepath) / filesystem::path(templatePath)).string();
 	}
 }
 

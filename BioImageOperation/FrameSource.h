@@ -23,7 +23,7 @@ class FrameSource abstract
 {
 public:
 	virtual void reset() = 0;
-	virtual bool init(int apiCode, string basePath, string filePath, string start = "", string length = "", double fps0 = 1, int interval = 1) = 0;
+	virtual bool init(int apiCode, string basepath, string filepath, string start = "", string length = "", double fps0 = 1, int interval = 1) = 0;
 	virtual bool getNextImage(Mat* image) = 0;
 	virtual void close() = 0;
 

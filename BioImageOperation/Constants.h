@@ -79,7 +79,7 @@ enum class ScriptOperationType
 	Debug,
 };
 
-const vector<string> scriptOperationTypes =
+const vector<string> ScriptOperationTypes =
 {
 	"None",
 	"SetPath",
@@ -140,6 +140,135 @@ const vector<string> scriptOperationTypes =
 	"Debug"
 };
 
+enum class FrameType
+{
+	Image,
+	Video,
+	Capture
+};
+
+enum class SaveFormat
+{
+	ByTime,
+	ByLabel,
+	Split
+};
+
+enum class ImageColorMode
+{
+	GrayScale,
+	Color,
+	ColorAlpha
+};
+
+enum class Palette
+{
+	Grayscale,
+	Heat,
+	Rainbow,
+};
+
+enum class ClusterDrawMode : int
+{
+	None = 0,
+	Point = 0x01,
+	Circle = 0x02,
+	Box = 0x04,
+	Angle = 0x08,
+	Label = 0x10,
+	Labeln = 0x20,
+	Track = 0x40,
+	Tracks = 0x80,
+	Fill = 0x100,
+	ClusterDefault = Fill,
+	TracksDefault = Tracks,
+};
+
+const vector<string> ClusterDrawModes =
+{
+	"None",
+	"Point",
+	"Circle",
+	"Box",
+	"Angle",
+	"Label",
+	"Labeln",
+	"Track",
+	"Tracks",
+	"Fill",
+	"ClusterDefault",
+	"TracksDefault"
+};
+
+enum class AccumMode
+{
+	Age,
+	Usage
+};
+
+
+enum class PathDrawMode
+{
+	Age,
+	Usage,
+	Usage2,
+	Links,
+	LinksMove,
+};
+
+enum class DrawPosition
+{
+	Full,
+	TopLeft,
+	BottomLeft,
+	TopRight,
+	BottomRight,
+};
+
+const vector<string> argumentValues =
+{
+	"Image",
+	"Video",
+	"Capture",
+
+	"ByTime",
+	"ByLabel",
+	"Split",
+
+	"GrayScale",
+	"Color",
+	"ColorAlpha",
+
+	"Grayscale",
+	"Heat",
+	"Rainbow",
+
+	"None",
+	"Point",
+	"Circle",
+	"Box",
+	"Angle",
+	"Label",
+	"Labeln",
+	"Track",
+	"Tracks",
+	"Fill",
+	"ClusterDefault",
+	"TracksDefault",
+
+	"Age",
+	"Usage",
+	"Usage2",
+	"Links",
+	"LinksMove",
+
+	"Full",
+	"TopLeft",
+	"BottomLeft",
+	"TopRight",
+	"BottomRight"
+};
+
 class Constants
 {
 public:
@@ -169,78 +298,4 @@ public:
 	static const int defMaxInactive;
 	static const int defMaxMove;
 	static const double maxBinaryPixelsFactor;
-};
-
-
-enum class SaveFormat
-{
-	ByTime,
-	ByLabel,
-	Split
-};
-
-
-enum class ImageColorMode
-{
-	GrayScale,
-	Color,
-	ColorAlpha
-};
-
-
-enum class Palette
-{
-	Grayscale,
-	Heat,
-	Rainbow,
-};
-
-
-enum class ClusterDrawMode : int
-{
-	None = 0,
-	Point = 0x01,
-	Circle = 0x02,
-	Box = 0x04,
-	Angle = 0x08,
-	Label = 0x10,
-	Labeln = 0x20,
-	Track = 0x40,
-	Tracks = 0x80,
-	Fill = 0x100,
-	ClusterDefault = Fill,
-	TracksDefault = Tracks,
-};
-
-
-enum class AccumMode
-{
-	Age,
-	Usage
-};
-
-
-enum class PathDrawMode
-{
-	Age,
-	Usage,
-	Usage2,
-	Links,
-	LinksMove,
-};
-
-enum class FrameType
-{
-	Image,
-	Video,
-	Capture
-};
-
-enum class DrawPosition
-{
-	Full,
-	TopLeft,
-	BottomLeft,
-	TopRight,
-	BottomRight,
 };

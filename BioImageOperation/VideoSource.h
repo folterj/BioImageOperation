@@ -46,7 +46,7 @@ public:
 	VideoSource();
 	~VideoSource();
 	void reset();
-	bool init(int apiCode, string basePath, string filePath, string start = "", string length = "", double fps0 = 1, int interval = 1);
+	bool init(int apiCode, string basepath, string filepath, string start = "", string length = "", double fps0 = 1, int interval = 1);
 	bool open();
 	void release();
 	void close();

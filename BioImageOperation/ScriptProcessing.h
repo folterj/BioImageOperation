@@ -38,7 +38,7 @@ public:
 	//ImageTrackers* imageTrackers = new ImageTrackers();
 	Mat* dummyImage = new Mat();
 
-	string basePath;
+	string basepath;
 	int sourceWidth = 0;
 	int sourceHeight = 0;
 	double sourceFps = 0;
@@ -60,7 +60,7 @@ public:
 	/*
 	 * Start processing in separate thread
 	 */
-	bool startProcess(string filePath, string script);
+	bool startProcess(string filepath, string script);
 	void processThreadMethod();
 
 	/*
