@@ -31,7 +31,7 @@ void ScriptOperations::reset() {
 
 void ScriptOperations::extract(string script, int linei0) {
 	ScriptOperation* operation = NULL;
-	vector<string> lines = Util::split(script, string("\r\n"));
+	vector<string> lines = Util::split(script, "\n");
 	string line;
 	bool skipping = false;
 

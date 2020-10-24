@@ -136,9 +136,11 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		case ScriptOperationType::SetPath:
 			basepath = operation->getArgument(ArgumentLabel::Path);
 			break;
+
 		case  ScriptOperationType::Debug:
 			debugMode = true;
 			break;
+
 		case  ScriptOperationType::OpenVideo:
 			operation->initFrameSource(FrameType::Video, (int)operation->getArgumentNumeric(ArgumentLabel::API), basepath, operation->getArgument(ArgumentLabel::Path), operation->getArgument(ArgumentLabel::Start), operation->getArgument(ArgumentLabel::Length), 0, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
 			sourceFrameNumber = operation->frameSource->getFrameNumber();
@@ -154,6 +156,16 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			sourceFps = operation->frameSource->getFps();
 			newImageSet = true;
 			break;
+
+		case ScriptOperationType::ShowImage:
+			//refImage = getLabelOrCurrentImage(operation, image, false);
+			refImage = image;
+
+			if (Util::isValidImage(refImage)) {
+				observer->displayImage(refImage, (int)operation->getArgumentNumeric(ArgumentLabel::None, true));
+			}
+			break;
+
 		}
 
 		if (operation->hasInnerOperations()) {

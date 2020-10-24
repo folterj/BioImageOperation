@@ -70,7 +70,7 @@ void MainWindow::showInfo(string info, int displayi) {
 }
 
 void MainWindow::displayImage(Mat* image, int displayi) {
-
+	imageWindow->draw(image);
 }
 
 void MainWindow::showErrorMessage(string message) {
@@ -80,7 +80,7 @@ void MainWindow::showErrorMessage(string message) {
 void MainWindow::process() {
 	//updateUI(true);
 
-	ui.scriptTextEdit->setPlainText(QString("OpenVideo('D:\\Video\\test.mkv')"));
+	ui.scriptTextEdit->setPlainText(QString("OpenVideo('D:\\Video\\test.mkv')\n{\nShowImage()\n}"));
 
 	scriptProcessing.startProcess(filepath, ui.scriptTextEdit->toPlainText().toStdString());
 	/*
