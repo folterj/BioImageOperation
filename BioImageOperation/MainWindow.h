@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #pragma once
+#include <chrono>
 #include <QMainWindow>
 #include "ui_MainWindow.h"
 #include <opencv2/opencv.hpp>
@@ -18,34 +19,40 @@
 using namespace std;
 using namespace cv;
 
+typedef std::chrono::high_resolution_clock Clock;
+
 
 class MainWindow : public QMainWindow, public Observer
 {
 	Q_OBJECT
-
-public:
-	MainWindow(QWidget *parent = Q_NULLPTR);
-	void process();
-	void setFilePath(string filepath);
-	virtual void resetUI() override;
-	virtual void resetImages() override;
-	virtual void resetProgressTimer() override;
-	virtual void clearStatus() override;
-	virtual void showStatus(int i) override;
-	virtual void showStatus(int i, int tot) override;
-	virtual void showStatus(string label, int i, int tot, bool showFrameProgress) override;
-	virtual void showStatus(string status, double progress) override;
-	virtual void showInfo(string info, int displayi) override;
-	virtual void showErrorMessage(string message) override;
-
-public slots:
-	virtual void displayImage(Mat* image, int displayi) override;
 
 private:
 	string filepath;
 	Ui::MainWindow ui;
 	ImageWindow* imageWindow;
 	ScriptProcessing scriptProcessing;
+	Clock::time_point time;
+	bool statusQueued = false;
+	bool imageQueued = false;
+	int processCount = 0;
+	int processFps = 0;
+
+public:
+	MainWindow(QWidget *parent = Q_NULLPTR);
+	void setFilePath(string filepath);
+	void process();
+	virtual void resetProgressTimer() override;
+	virtual bool checkStatusProcess() override;
+	virtual bool checkImageProcess() override;
+
+public slots:
+	virtual void resetUI() override;
+	virtual void resetImages() override;
+	virtual void clearStatus() override;
+	virtual void showStatus(const char* label, int i, int tot) override;
+	virtual void showInfo(const char* info, int displayi) override;
+	virtual void showError(const char* message) override;
+	virtual void showImage(Mat* image, int displayi) override;
 
 protected:
 	void closeEvent(QCloseEvent* event);

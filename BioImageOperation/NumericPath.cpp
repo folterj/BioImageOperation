@@ -148,7 +148,7 @@ string NumericPath::createFilePath(int i)
 		int num = offset + i;
 		if (numlen > 0) {
 			format = "%0" + to_string(numlen) + "d";
-			nums = Util::numPadZeros(num, format);
+			nums = Util::format(format, num);
 		}
 		path += extension;
 	}

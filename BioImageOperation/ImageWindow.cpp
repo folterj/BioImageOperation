@@ -35,9 +35,8 @@ void ImageWindow::draw(Mat* videoFrame) {
 		show();
 	}
 
-	if (videoFrame) {
-		pixmap.setPixmap(QPixmap::fromImage(Util::matToQImage(*videoFrame)));
-		pixmap.setTransformationMode(Qt::TransformationMode::SmoothTransformation);
-		ui.graphicsView->fitInView(&pixmap, Qt::AspectRatioMode::KeepAspectRatio); // do this @ window resize only?
-	}
+	pixmap.setPixmap(QPixmap::fromImage(Util::matToQImage(*videoFrame)));
+	pixmap.setTransformationMode(Qt::TransformationMode::SmoothTransformation);
+	ui.graphicsView->fitInView(&pixmap, Qt::AspectRatioMode::KeepAspectRatio); // do this @ window resize only?
+	ui.graphicsView->repaint();
 }

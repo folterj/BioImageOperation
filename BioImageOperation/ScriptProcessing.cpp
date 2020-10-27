@@ -33,6 +33,7 @@ void ScriptProcessing::reset() {
 	sourceFps = 0;
 	sourceFrameNumber = 0;
 	logPower = 0;
+	running = false;
 	abort = false;
 
 	scriptOperations->reset();
@@ -43,7 +44,7 @@ void ScriptProcessing::reset() {
 	//accumBuffer->reset();
 
 	//imageTrackers->reset();
-	observer->resetImages();
+	emit resetImages();
 }
 
 void ScriptProcessing::registerObserver(Observer* observer) {
@@ -58,23 +59,31 @@ bool ScriptProcessing::startProcess(string filepath, string script) {
 		scriptOperations->extract(script, 0);
 		observer->resetProgressTimer();
 
-		//if (processThread.joinable()) {
-		//	processThread.join();
-		//}
-		//processThread = thread(&ScriptProcessing::processThreadMethod, this);
+		if (processThread.joinable()) {
+			processThread.join();
+		}
 
-		processThread = QThread::create(&ScriptProcessing::processThreadMethod, this);
-		connect(this, &ScriptProcessing::showImage, (MainWindow*)observer, &MainWindow::displayImage);
-		processThread->start();
+		connect(this, &ScriptProcessing::resetUI, (MainWindow*)observer, &MainWindow::resetUI);
+		connect(this, &ScriptProcessing::resetImages, (MainWindow*)observer, &MainWindow::resetImages);
+		connect(this, &ScriptProcessing::clearStatus, (MainWindow*)observer, &MainWindow::clearStatus);
+		connect(this, &ScriptProcessing::showStatus, (MainWindow*)observer, &MainWindow::showStatus);
+		connect(this, &ScriptProcessing::showInfo, (MainWindow*)observer, &MainWindow::showInfo);
+		connect(this, &ScriptProcessing::showError, (MainWindow*)observer, &MainWindow::showError);
+		connect(this, &ScriptProcessing::showImage, (MainWindow*)observer, &MainWindow::showImage);
+
+		//processThread = QThread::create(&ScriptProcessing::processThreadMethod, this);
+		//processThread->start();
+		processThread = std::thread(&ScriptProcessing::processThreadMethod, this);
 	} catch (exception e) {
-		observer->showErrorMessage(e.what());
-		doAbort(true);
+		emit showError(e.what());
+		doAbort(false);
 		return false;
 	}
 	return true;
 }
 
 void ScriptProcessing::processThreadMethod() {
+	running = true;
 	processOperations(scriptOperations, NULL);
 	doAbort(false);
 }
@@ -150,7 +159,9 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			operation->initFrameSource(FrameType::Video, (int)operation->getArgumentNumeric(ArgumentLabel::API), basepath, operation->getArgument(ArgumentLabel::Path), operation->getArgument(ArgumentLabel::Start), operation->getArgument(ArgumentLabel::Length), 0, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
 			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage)) {
-				observer->showStatus(operation->frameSource->getLabel(), operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames(), true);
+				if (observer->checkStatusProcess()) {
+					emit showStatus(operation->frameSource->getLabel().c_str(), operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames());
+				}
 				done = false;
 			} else {
 				// already past last frame; current image invalid
@@ -168,7 +179,9 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 			if (Util::isValidImage(refImage)) {
 				//observer->displayImage(refImage, (int)operation->getArgumentNumeric(ArgumentLabel::None, true));
-				emit showImage(refImage, (int)operation->getArgumentNumeric(ArgumentLabel::None, true));
+				if (observer->checkImageProcess()) {
+					emit showImage(refImage, (int)operation->getArgumentNumeric(ArgumentLabel::None, true));
+				}
 			}
 			break;
 
@@ -214,7 +227,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		}
 		errorMsg += " in\n" + operation->line;
 		cerr << e.what() << endl;
-		observer->showErrorMessage(errorMsg);
+		emit showError(errorMsg.c_str());
 		doAbort(false);
 	} catch (exception e) {
 		string errorMsg = string(e.what()) + " in\n" + operation->line;
@@ -222,7 +235,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		//errorMsg += e->StackTrace;
 #endif
 		cerr << e.what() << endl;
-		observer->showErrorMessage(errorMsg);
+		emit showError(errorMsg.c_str());
 		doAbort(false);
 	}
 	return done;
@@ -232,16 +245,16 @@ void ScriptProcessing::doAbort(bool tryKill) {
 	abort = true;
 
 	if (tryKill) {
-		//if (processThread.joinable()) {
-		//	this_thread::sleep_for(chrono::milliseconds(100));
+		//if (running) {
+		//	processThread.~thread();
 		//}
 	}
 
 	//imageTrackers->close();
 	scriptOperations->close();
 
-	observer->resetUI();
-	observer->clearStatus();
+	emit resetUI();
+	emit clearStatus();
 
-	exit(0);	// force threads to terminate as well
+	running = false;
 }

@@ -25,11 +25,10 @@ public:
 	virtual void resetImages() = 0;
 	virtual void resetProgressTimer() = 0;
 	virtual void clearStatus() = 0;
-	virtual void showStatus(int i) = 0;
-	virtual void showStatus(int i, int tot) = 0;
-	virtual void showStatus(string label, int i, int tot, bool showFrameProgress) = 0;
-	virtual void showStatus(string status, double progress) = 0;
-	virtual void showInfo(string info, int displayi) = 0;
-	virtual void displayImage(Mat* image, int displayi) = 0;
-	virtual void showErrorMessage(string message) = 0;
+	virtual bool checkStatusProcess() = 0;
+	virtual void showStatus(const char* label, int i, int tot) = 0;
+	virtual void showInfo(const char* info, int displayi) = 0;
+	virtual bool checkImageProcess() = 0;
+	virtual void showImage(Mat* image, int displayi) = 0;
+	virtual void showError(const char* message) = 0;
 };

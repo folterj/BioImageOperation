@@ -44,7 +44,9 @@ public:
 	static string rtrim_copy(string s);
 	// trim from both ends (copying)
 	static string trim_copy(string s);
-	static string numPadZeros(int number, string format);
+	static string format(string format, int number);
+	static string format(string format, double number);
+	static string formatTimespan(int seconds);
 
 	static double toDouble(string s);
 	static bool isNumeric(string s);

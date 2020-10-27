@@ -9,7 +9,7 @@
 
 #pragma once
 #include <thread>
-#include <QThread>
+#include <QObject>
 #include "Observer.h"
 #include "Constants.h"
 #include "ScriptOperations.h"
@@ -30,12 +30,19 @@ class ScriptProcessing : public QObject
 	Q_OBJECT
 
 signals:
-	void showImage(Mat* mat, int displayi);
+	void resetUI();
+	void resetImages();
+	void clearStatus();
+	void showStatus(const char* label, int i, int tot);
+	void showInfo(const char* info, int displayi);
+	void showError(const char* message);
+	void showImage(Mat* image, int displayi);
+
 
 public:
 	Observer* observer;
-	//thread processThread;
-	QThread* processThread;
+	std::thread processThread;
+	//QThread* processThread;
 	ScriptOperations* scriptOperations = new ScriptOperations();
 	//ImageItemList* imageList = new ImageItemList();
 	//AverageBuffer* backgroundBuffer = new AverageBuffer();
@@ -52,6 +59,7 @@ public:
 	int sourceFrameNumber = 0;
 	double logPower = 0;
 	string logPalette;
+	bool running = false;
 	bool abort = false;
 	bool debugMode = false;
 

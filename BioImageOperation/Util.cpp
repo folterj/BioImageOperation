@@ -116,11 +116,38 @@ string Util::trim_copy(string s) {
 	return s;
 }
 
-string Util::numPadZeros(int number, string format) {
+string Util::format(string format, int number) {
 	const int buflen = 1000;
 	char buffer[buflen];
 	snprintf(buffer, buflen, format.c_str(), number);
 	return string(buffer);
+}
+
+string Util::format(string format, double number) {
+	const int buflen = 1000;
+	char buffer[buflen];
+	snprintf(buffer, buflen, format.c_str(), number);
+	return string(buffer);
+}
+
+string Util::formatTimespan(int seconds0) {
+	string s;
+	int hours, minutes;
+	int seconds = seconds0;
+	const int buflen = 1000;
+	char buffer[buflen];
+	hours = seconds / 3600;
+	if (hours > 0) {
+		s += to_string(hours) + ":";
+		seconds %= 3600;
+	}
+	minutes = seconds / 60;
+	if (minutes > 0) {
+		s += to_string(minutes) + ":";
+		seconds %= 60;
+	}
+	s += to_string(seconds);
+	return s;
 }
 
 double Util::toDouble(string s)
