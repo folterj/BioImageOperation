@@ -14,7 +14,6 @@
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent) {
-	//initOpenCv("D:/Video/Ants/bio_ants.mp4");
 
 	ui.setupUi(this);
 	connect(ui.processButton, &QAbstractButton::clicked, this, &MainWindow::process);
@@ -23,11 +22,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 	scriptProcessing.registerObserver(this);
 }
-/*
-void MainWindow::initOpenCv(string filename) {
-	videoCapture.open(filename);
-}
-*/
 
 void MainWindow::setFilePath(string filepath) {
 	this->filepath = filepath;
@@ -83,12 +77,6 @@ void MainWindow::process() {
 	ui.scriptTextEdit->setPlainText(QString("OpenVideo('D:\\Video\\test.mkv')\n{\nShowImage()\n}"));
 
 	scriptProcessing.startProcess(filepath, ui.scriptTextEdit->toPlainText().toStdString());
-	/*
-	videoCapture.grab();
-	videoCapture.retrieve(videoFrame);
-	//videoCapture >> videoFrame;
-	imageWindow->draw(&videoFrame);
-*/
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {

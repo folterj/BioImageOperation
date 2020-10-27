@@ -9,6 +9,7 @@
 
 #pragma once
 #include <thread>
+#include <QThread>
 #include "Observer.h"
 #include "Constants.h"
 #include "ScriptOperations.h"
@@ -24,11 +25,17 @@
  * Main processing of the operations recevied from the script
  */
 
-class ScriptProcessing
+class ScriptProcessing : public QObject
 {
+	Q_OBJECT
+
+signals:
+	void showImage(Mat* mat, int displayi);
+
 public:
 	Observer* observer;
-	thread processThread;
+	//thread processThread;
+	QThread* processThread;
 	ScriptOperations* scriptOperations = new ScriptOperations();
 	//ImageItemList* imageList = new ImageItemList();
 	//AverageBuffer* backgroundBuffer = new AverageBuffer();

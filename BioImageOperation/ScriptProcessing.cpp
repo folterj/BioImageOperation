@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #include "ScriptProcessing.h"
+#include "MainWindow.h"
 //#include "ImageOperations.h"
 #include "NumericPath.h"
 #include "Constants.h"
@@ -60,7 +61,11 @@ bool ScriptProcessing::startProcess(string filepath, string script) {
 		//if (processThread.joinable()) {
 		//	processThread.join();
 		//}
-		processThread = thread(&ScriptProcessing::processThreadMethod, this);
+		//processThread = thread(&ScriptProcessing::processThreadMethod, this);
+
+		processThread = QThread::create(&ScriptProcessing::processThreadMethod, this);
+		connect(this, &ScriptProcessing::showImage, (MainWindow*)observer, &MainWindow::displayImage);
+		processThread->start();
 	} catch (exception e) {
 		observer->showErrorMessage(e.what());
 		doAbort(true);
@@ -162,7 +167,8 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			refImage = image;
 
 			if (Util::isValidImage(refImage)) {
-				observer->displayImage(refImage, (int)operation->getArgumentNumeric(ArgumentLabel::None, true));
+				//observer->displayImage(refImage, (int)operation->getArgumentNumeric(ArgumentLabel::None, true));
+				emit showImage(refImage, (int)operation->getArgumentNumeric(ArgumentLabel::None, true));
 			}
 			break;
 
@@ -226,9 +232,9 @@ void ScriptProcessing::doAbort(bool tryKill) {
 	abort = true;
 
 	if (tryKill) {
-		if (processThread.joinable()) {
-			this_thread::sleep_for(chrono::milliseconds(100));
-		}
+		//if (processThread.joinable()) {
+		//	this_thread::sleep_for(chrono::milliseconds(100));
+		//}
 	}
 
 	//imageTrackers->close();

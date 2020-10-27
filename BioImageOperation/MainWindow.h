@@ -19,13 +19,12 @@ using namespace std;
 using namespace cv;
 
 
-class MainWindow : public QMainWindow, Observer
+class MainWindow : public QMainWindow, public Observer
 {
 	Q_OBJECT
 
 public:
 	MainWindow(QWidget *parent = Q_NULLPTR);
-	//void initOpenCv(string filename);
 	void process();
 	void setFilePath(string filepath);
 	virtual void resetUI() override;
@@ -37,16 +36,16 @@ public:
 	virtual void showStatus(string label, int i, int tot, bool showFrameProgress) override;
 	virtual void showStatus(string status, double progress) override;
 	virtual void showInfo(string info, int displayi) override;
-	virtual void displayImage(Mat* image, int displayi) override;
 	virtual void showErrorMessage(string message) override;
+
+public slots:
+	virtual void displayImage(Mat* image, int displayi) override;
 
 private:
 	string filepath;
 	Ui::MainWindow ui;
 	ImageWindow* imageWindow;
 	ScriptProcessing scriptProcessing;
-	//VideoCapture videoCapture;
-	//Mat videoFrame;
 
 protected:
 	void closeEvent(QCloseEvent* event);

@@ -125,21 +125,38 @@ string Util::numPadZeros(int number, string format) {
 
 double Util::toDouble(string s)
 {
-	if (isNumeric(s))
-	{
-		return stod(s);
+	double d = 0;
+	size_t stodEnd;
+	if (s != "") {
+		d = stod(s, &stodEnd);
+		if (stodEnd != s.size()) {
+			throw invalid_argument("Invalid numeric value: " + s);
+		}
 	}
-	return 0;
+	return d;
 }
 
 bool Util::isNumeric(string s)
 {
-	try {
-		stod(s);
-		return true;
-	} catch (...) {
+	bool ok = (s != "");
+	int digits = 0;
+	int dots = 0;
+
+	for (char c : s) {
+		if (c == '.') {
+			dots++;
+			if (dots > 1) {
+				ok = false;
+			}
+		} else {
+			if (isdigit(c)) {
+				digits++;
+			} else {
+				ok = false;
+			}
+		}
 	}
-	return false;
+	return ok;
 }
 
 bool Util::toBoolean(string s)

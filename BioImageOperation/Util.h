@@ -20,7 +20,7 @@ using namespace cv;
 /*
  * General utilities
  */
- 
+
 class Util
 {
 public:
