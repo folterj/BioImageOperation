@@ -33,7 +33,6 @@ void ScriptProcessing::reset() {
 	sourceFps = 0;
 	sourceFrameNumber = 0;
 	logPower = 0;
-	running = false;
 	abort = false;
 
 	scriptOperations->reset();
@@ -49,6 +48,14 @@ void ScriptProcessing::reset() {
 
 void ScriptProcessing::registerObserver(Observer* observer) {
 	this->observer = observer;
+
+	connect(this, &ScriptProcessing::resetUI, (MainWindow*)observer, &MainWindow::resetUI);
+	connect(this, &ScriptProcessing::resetImages, (MainWindow*)observer, &MainWindow::resetImages);
+	connect(this, &ScriptProcessing::clearStatus, (MainWindow*)observer, &MainWindow::clearStatus);
+	connect(this, &ScriptProcessing::showStatus, (MainWindow*)observer, &MainWindow::showStatus);
+	connect(this, &ScriptProcessing::showInfo, (MainWindow*)observer, &MainWindow::showInfo);
+	connect(this, &ScriptProcessing::showError, (MainWindow*)observer, &MainWindow::showError);
+	connect(this, &ScriptProcessing::showImage, (MainWindow*)observer, &MainWindow::showImage);
 }
 
 bool ScriptProcessing::startProcess(string filepath, string script) {
@@ -59,33 +66,20 @@ bool ScriptProcessing::startProcess(string filepath, string script) {
 		scriptOperations->extract(script, 0);
 		observer->resetProgressTimer();
 
-		if (processThread.joinable()) {
-			processThread.join();
-		}
-
-		connect(this, &ScriptProcessing::resetUI, (MainWindow*)observer, &MainWindow::resetUI);
-		connect(this, &ScriptProcessing::resetImages, (MainWindow*)observer, &MainWindow::resetImages);
-		connect(this, &ScriptProcessing::clearStatus, (MainWindow*)observer, &MainWindow::clearStatus);
-		connect(this, &ScriptProcessing::showStatus, (MainWindow*)observer, &MainWindow::showStatus);
-		connect(this, &ScriptProcessing::showInfo, (MainWindow*)observer, &MainWindow::showInfo);
-		connect(this, &ScriptProcessing::showError, (MainWindow*)observer, &MainWindow::showError);
-		connect(this, &ScriptProcessing::showImage, (MainWindow*)observer, &MainWindow::showImage);
-
 		//processThread = QThread::create(&ScriptProcessing::processThreadMethod, this);
 		//processThread->start();
-		processThread = std::thread(&ScriptProcessing::processThreadMethod, this);
+		processThread = new std::thread(&ScriptProcessing::processThreadMethod, this);
 	} catch (exception e) {
 		emit showError(e.what());
-		doAbort(false);
+		doAbort();
 		return false;
 	}
 	return true;
 }
 
 void ScriptProcessing::processThreadMethod() {
-	running = true;
 	processOperations(scriptOperations, NULL);
-	doAbort(false);
+	doAbort();
 }
 
 void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOperation* prevOperation0) {
@@ -228,7 +222,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		errorMsg += " in\n" + operation->line;
 		cerr << e.what() << endl;
 		emit showError(errorMsg.c_str());
-		doAbort(false);
+		doAbort();
 	} catch (exception e) {
 		string errorMsg = string(e.what()) + " in\n" + operation->line;
 #ifdef _DEBUG
@@ -236,25 +230,17 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 #endif
 		cerr << e.what() << endl;
 		emit showError(errorMsg.c_str());
-		doAbort(false);
+		doAbort();
 	}
 	return done;
 }
 
-void ScriptProcessing::doAbort(bool tryKill) {
+void ScriptProcessing::doAbort() {
 	abort = true;
-
-	if (tryKill) {
-		//if (running) {
-		//	processThread.~thread();
-		//}
-	}
 
 	//imageTrackers->close();
 	scriptOperations->close();
 
 	emit resetUI();
 	emit clearStatus();
-
-	running = false;
 }

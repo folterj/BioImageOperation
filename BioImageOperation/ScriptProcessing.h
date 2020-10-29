@@ -41,7 +41,7 @@ signals:
 
 public:
 	Observer* observer;
-	std::thread processThread;
+	std::thread* processThread;
 	//QThread* processThread;
 	ScriptOperations* scriptOperations = new ScriptOperations();
 	//ImageItemList* imageList = new ImageItemList();
@@ -59,7 +59,6 @@ public:
 	int sourceFrameNumber = 0;
 	double logPower = 0;
 	string logPalette;
-	bool running = false;
 	bool abort = false;
 	bool debugMode = false;
 
@@ -96,5 +95,5 @@ public:
 	/*
 	 * Abort thread, attempt closing output streams to prevent data loss
 	 */
-	void doAbort(bool tryKill);
+	void doAbort();
 };
