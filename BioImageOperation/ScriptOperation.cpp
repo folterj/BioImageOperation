@@ -368,14 +368,12 @@ bool ScriptOperation::initFrameSource(FrameType frameType, int apiCode, string b
 	bool ok = true;
 
 	if (!frameSource) {
-		switch (frameType)
-		{
+		switch (frameType) {
 		case FrameType::Image: frameSource = new ImageSource(); break;
 		case FrameType::Video: frameSource = new VideoSource(); break;
 		case FrameType::Capture: frameSource = new CaptureSource(); break;
 		}
-		if (frameSource)
-		{
+		if (frameSource) {
 			ok = frameSource->init(apiCode, basepath, templatePath, start, length, fps0, interval);
 		}
 	}
@@ -384,8 +382,7 @@ bool ScriptOperation::initFrameSource(FrameType frameType, int apiCode, string b
 
 void ScriptOperation::initFrameOutput(FrameType frameType, string basepath, string templatePath, string defaultExtension, string start, string length, double fps, string codecs) {
 	if (!frameOutput) {
-		switch (frameType)
-		{
+		switch (frameType) {
 		case FrameType::Image: frameOutput = new ImageOutput(); break;
 		case FrameType::Video: frameOutput = new VideoOutput(); break;
 		}

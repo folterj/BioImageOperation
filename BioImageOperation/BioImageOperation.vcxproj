@@ -114,20 +114,40 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AccumBuffer.cpp" />
     <ClCompile Include="Argument.cpp" />
+    <ClCompile Include="AverageBuffer.cpp" />
+    <ClCompile Include="Averager.cpp" />
     <ClCompile Include="CaptureSource.cpp" />
+    <ClCompile Include="Cluster.cpp" />
+    <ClCompile Include="ClusterTrack.cpp" />
     <ClCompile Include="ColorScale.cpp" />
     <ClCompile Include="Constants.cpp" />
     <ClCompile Include="FrameOutput.cpp" />
     <ClCompile Include="FrameSource.cpp" />
+    <ClCompile Include="ImageItem.cpp" />
+    <ClCompile Include="ImageItemList.cpp" />
+    <ClCompile Include="ImageOperations.cpp" />
     <ClCompile Include="ImageOutput.cpp" />
+    <ClCompile Include="ImageSeries.cpp" />
     <ClCompile Include="ImageSource.cpp" />
+    <ClCompile Include="ImageTracker.cpp" />
+    <ClCompile Include="ImageTrackers.cpp" />
     <ClCompile Include="ImageWindow.cpp" />
+    <ClCompile Include="Keepalive.cpp" />
     <ClCompile Include="NumericPath.cpp" />
     <ClCompile Include="OperationInfo.cpp" />
+    <ClCompile Include="OutputStream.cpp" />
+    <ClCompile Include="ParamRange.cpp" />
+    <ClCompile Include="PathLink.cpp" />
+    <ClCompile Include="PathNode.cpp" />
     <ClCompile Include="ScriptOperation.cpp" />
     <ClCompile Include="ScriptOperations.cpp" />
     <ClCompile Include="ScriptProcessing.cpp" />
+    <ClCompile Include="StatData.cpp" />
+    <ClCompile Include="TrackClusterMatch.cpp" />
+    <ClCompile Include="TrackingParams.cpp" />
+    <ClCompile Include="TrackingStats.cpp" />
     <ClCompile Include="Util.cpp" />
     <ClCompile Include="VideoOutput.cpp" />
     <ClCompile Include="VideoSource.cpp" />
@@ -139,12 +159,32 @@
     <ClCompile Include="BioImageOperation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AccumBuffer.h" />
+    <ClInclude Include="AverageBuffer.h" />
+    <ClInclude Include="Averager.h" />
     <ClInclude Include="CaptureSource.h" />
+    <ClInclude Include="Cluster.h" />
+    <ClInclude Include="ClusterTrack.h" />
     <ClInclude Include="FrameOutput.h" />
+    <ClInclude Include="ImageItem.h" />
+    <ClInclude Include="ImageItemList.h" />
+    <ClInclude Include="ImageOperations.h" />
     <ClInclude Include="ImageOutput.h" />
+    <ClInclude Include="ImageSeries.h" />
     <ClInclude Include="ImageSource.h" />
+    <ClInclude Include="ImageTracker.h" />
+    <ClInclude Include="ImageTrackers.h" />
+    <ClInclude Include="Keepalive.h" />
     <ClInclude Include="NumericPath.h" />
     <ClInclude Include="OperationInfo.h" />
+    <ClInclude Include="OutputStream.h" />
+    <ClInclude Include="ParamRange.h" />
+    <ClInclude Include="PathLink.h" />
+    <ClInclude Include="PathNode.h" />
+    <ClInclude Include="StatData.h" />
+    <ClInclude Include="TrackClusterMatch.h" />
+    <ClInclude Include="TrackingParams.h" />
+    <ClInclude Include="TrackingStats.h" />
     <ClInclude Include="VideoOutput.h" />
     <ClInclude Include="VideoSource.h" />
     <QtMoc Include="ImageWindow.h" />

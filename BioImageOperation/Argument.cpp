@@ -41,8 +41,7 @@ Argument::Argument(string arg) {
 	}
 }
 
-ArgumentLabel Argument::getArgumentLabel(string arg)
-{
+ArgumentLabel Argument::getArgumentLabel(string arg) {
 	ArgumentLabel label = ArgumentLabel::None;
 	int enumIndex = Util::getListIndex(ArgumentLabels, arg);
 	if (enumIndex >= 0) {

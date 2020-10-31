@@ -11,17 +11,14 @@
 #include "Util.h"
 
 
-ImageSource::ImageSource()
-{
+ImageSource::ImageSource() {
 }
 
-ImageSource::~ImageSource()
-{
+ImageSource::~ImageSource() {
 	close();
 }
 
-void ImageSource::reset()
-{
+void ImageSource::reset() {
 	sourcePath.reset();
 	nfiles = 0;
 	filei = 0;
@@ -32,8 +29,7 @@ void ImageSource::reset()
 	height = 0;
 }
 
-bool ImageSource::init(int apiCode, string basepath, string filepath, string start, string length, double fps0, int interval)
-{
+bool ImageSource::init(int apiCode, string basepath, string filepath, string start, string length, double fps0, int interval) {
 	int lengthi = 0;
 
 	reset();
@@ -41,31 +37,26 @@ bool ImageSource::init(int apiCode, string basepath, string filepath, string sta
 	sourcePath.setInputPath(basepath, filepath);
 
 	nfiles = sourcePath.getFileCount();
-	if (nfiles == 0)
-	{
+	if (nfiles == 0) {
 		throw ios_base::failure("File(s) not found: " + sourcePath.templatePath);
 	}
 
 	this->start = Util::parseFrameTime(start, fps0);
 	lengthi = Util::parseFrameTime(length, fps0);
 
-	if (lengthi > 0)
-	{
+	if (lengthi > 0) {
 		this->end = this->start + lengthi;
-		if (this->end > nfiles)
-		{
+		if (this->end > nfiles) {
 			this->end = nfiles;
 		}
 	}
 
-	if (this->end == 0)
-	{
+	if (this->end == 0) {
 		this->end = nfiles;
 	}
 
 	this->interval = interval;
-	if (this->interval == 0)
-	{
+	if (this->interval == 0) {
 		this->interval = 1;
 	}
 
@@ -74,76 +65,61 @@ bool ImageSource::init(int apiCode, string basepath, string filepath, string sta
 	return open();
 }
 
-bool ImageSource::open()
-{
+bool ImageSource::open() {
 	return true;
 }
 
-void ImageSource::close()
-{
+void ImageSource::close() {
 }
 
-bool ImageSource::getNextImage(Mat* image)
-{
+bool ImageSource::getNextImage(Mat* image) {
 	bool more = false;
 	string filename = sourcePath.createFilePath(filei);
-	
+
 	label = Util::extractFileName(filename);
 
-	if (filename != "")
-	{
+	if (filename != "") {
 		*image = Util::loadImage(filename);
-		if (Util::isValidImage(image))
-		{
+		if (Util::isValidImage(image)) {
 			width = image->cols;
 			height = image->rows;
-		}
-		else
-		{
+		} else {
 			throw ios_base::failure("Image load error " + filename);
 		}
 		filei += interval;
 		more = (filei < end);
 	}
 
-	if (!more)
-	{
+	if (!more) {
 		close();
 	}
 	return more;
 }
 
-int ImageSource::getWidth()
-{
+int ImageSource::getWidth() {
 	return width;
 }
 
-int ImageSource::getHeight()
-{
+int ImageSource::getHeight() {
 	return height;
 }
 
-double ImageSource::getFps()
-{
+double ImageSource::getFps() {
 	return 0;
 }
 
-int ImageSource::getFrameNumber()
-{
+int ImageSource::getFrameNumber() {
 	return filei;
 }
 
-string ImageSource::getLabel()
-{
+string ImageSource::getLabel() {
 	return label;
 }
 
-int ImageSource::getCurrentFrame()
-{
+int ImageSource::getCurrentFrame() {
 	return filei - start;
 }
 
-int ImageSource::getTotalFrames()
-{
+int ImageSource::getTotalFrames() {
 	return end - start;
 }

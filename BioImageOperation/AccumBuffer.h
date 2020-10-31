@@ -8,32 +8,27 @@
  *****************************************************************************/
 
 #pragma once
-#include <QMainWindow>
-#include <QGraphicsPixmapItem>
-#include "ui_ImageWindow.h"
 #include <opencv2/opencv.hpp>
+#include "Constants.h"
 
 using namespace cv;
 
 
-class ImageWindow : public QMainWindow
+/*
+ * Class for calculating accumulative image
+ */
+
+class AccumBuffer
 {
-	Q_OBJECT
-
-private:
-	Ui::ImageWindow ui;
-	QGraphicsPixmapItem pixmap;
-	int title;
-	int swidth = 0;
-	int sheight = 0;
-	int displayCount = 0;
-	int displayFps = 0;
-
 public:
-	ImageWindow(QWidget *parent = Q_NULLPTR);
-	~ImageWindow();
-	void setTitle(int title);
-	void updateTitle();
-	void draw(Mat* videoFrame);
-	void updateFps();
+	Mat accumImage, helpImage;
+	AccumMode accumMode = AccumMode::Age;
+	int total;
+	bool set = false;
+
+	AccumBuffer();
+	void reset();
+	void create(int width, int height);
+	void addImage(Mat* image, AccumMode accumMode);
+	void getImage(Mat* dest, float power, Palette palette);
 };

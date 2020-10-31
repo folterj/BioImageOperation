@@ -30,5 +30,5 @@ public:
 	virtual void showInfo(const char* info, int displayi) = 0;
 	virtual bool checkImageProcess() = 0;
 	virtual void showImage(Mat* image, int displayi) = 0;
-	virtual void showError(const char* message) = 0;
+	virtual void showDialog(const char* message) = 0;
 };

@@ -9,7 +9,7 @@
 
 #include "ScriptProcessing.h"
 #include "MainWindow.h"
-//#include "ImageOperations.h"
+#include "ImageOperations.h"
 #include "NumericPath.h"
 #include "Constants.h"
 #include "Util.h"
@@ -36,11 +36,11 @@ void ScriptProcessing::reset() {
 	abort = false;
 
 	scriptOperations->reset();
-	//imageList->reset();
-	//backgroundBuffer->reset();
-	//averageBuffer->reset();
-	//imageSeries->reset();
-	//accumBuffer->reset();
+	imageList->reset();
+	backgroundBuffer->reset();
+	averageBuffer->reset();
+	imageSeries->reset();
+	accumBuffer->reset();
 
 	//imageTrackers->reset();
 	emit resetImages();
@@ -54,8 +54,8 @@ void ScriptProcessing::registerObserver(Observer* observer) {
 	connect(this, &ScriptProcessing::clearStatus, (MainWindow*)observer, &MainWindow::clearStatus);
 	connect(this, &ScriptProcessing::showStatus, (MainWindow*)observer, &MainWindow::showStatus);
 	connect(this, &ScriptProcessing::showInfo, (MainWindow*)observer, &MainWindow::showInfo);
-	connect(this, &ScriptProcessing::showError, (MainWindow*)observer, &MainWindow::showError);
 	connect(this, &ScriptProcessing::showImage, (MainWindow*)observer, &MainWindow::showImage);
+	connect(this, &ScriptProcessing::showDialog, (MainWindow*)observer, &MainWindow::showDialog);
 }
 
 bool ScriptProcessing::startProcess(string filepath, string script) {
@@ -70,7 +70,7 @@ bool ScriptProcessing::startProcess(string filepath, string script) {
 		//processThread->start();
 		processThread = new std::thread(&ScriptProcessing::processThreadMethod, this);
 	} catch (exception e) {
-		emit showError(e.what());
+		emit showDialog(e.what());
 		doAbort();
 		return false;
 	}
@@ -172,7 +172,6 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			refImage = image;
 
 			if (Util::isValidImage(refImage)) {
-				//observer->displayImage(refImage, (int)operation->getArgumentNumeric(ArgumentLabel::None, true));
 				if (observer->checkImageProcess()) {
 					emit showImage(refImage, (int)operation->getArgumentNumeric(ArgumentLabel::None, true));
 				}
@@ -190,9 +189,9 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		if (operation->asignee != "") {
 			if (newImageSet) {
-				//imageList->setImage(newImage, operation->asignee);
+				imageList->setImage(newImage, operation->asignee);
 			} else {
-				//imageList->setImage(image, operation->asignee);
+				imageList->setImage(image, operation->asignee);
 			}
 		} else {
 			if (newImageSet) {
@@ -221,7 +220,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		}
 		errorMsg += " in\n" + operation->line;
 		cerr << e.what() << endl;
-		emit showError(errorMsg.c_str());
+		emit showDialog(errorMsg.c_str());
 		doAbort();
 	} catch (exception e) {
 		string errorMsg = string(e.what()) + " in\n" + operation->line;
@@ -229,7 +228,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		//errorMsg += e->StackTrace;
 #endif
 		cerr << e.what() << endl;
-		emit showError(errorMsg.c_str());
+		emit showDialog(errorMsg.c_str());
 		doAbort();
 	}
 	return done;

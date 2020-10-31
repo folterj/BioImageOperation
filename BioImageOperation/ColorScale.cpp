@@ -15,14 +15,12 @@ BGR ColorScale::grayTable[scaleLength];
 BGR ColorScale::heatTable[scaleLength];
 BGR ColorScale::rainbowTable[scaleLength];
 
-void ColorScale::init()
-{
+void ColorScale::init() {
 	// initialise lookup table
 	double scale;
 	cv::Scalar color;
 
-	for (int i = 0; i < scaleLength; i++)
-	{
+	for (int i = 0; i < scaleLength; i++) {
 		scale = (double)i / scaleLength;
 
 		grayTable[i].b = (unsigned char)((1 - scale) * 0xFF);
@@ -41,60 +39,42 @@ void ColorScale::init()
 	}
 }
 
-BGR ColorScale::getGrayScale(float scale)
-{
+BGR ColorScale::getGrayScale(float scale) {
 	int i;
 
-	if (scale < 0)
-	{
+	if (scale < 0) {
 		i = 0;
-	}
-	else if (scale >= 1)
-	{
+	} else if (scale >= 1) {
 		i = scaleLength - 1;
-	}
-	else
-	{
+	} else {
 		i = (int)(scale * scaleLength);
 	}
 
 	return grayTable[i];
 }
 
-BGR ColorScale::getHeatScale(float scale)
-{
+BGR ColorScale::getHeatScale(float scale) {
 	int i;
 
-	if (scale < 0)
-	{
+	if (scale < 0) {
 		i = 0;
-	}
-	else if (scale >= 1)
-	{
+	} else if (scale >= 1) {
 		i = scaleLength - 1;
-	}
-	else
-	{
+	} else {
 		i = (int)(scale * scaleLength);
 	}
 
 	return heatTable[i];
 }
 
-BGR ColorScale::getRainbowScale(float scale)
-{
+BGR ColorScale::getRainbowScale(float scale) {
 	int i;
 
-	if (scale < 0)
-	{
+	if (scale < 0) {
 		i = 0;
-	}
-	else if (scale >= 1)
-	{
+	} else if (scale >= 1) {
 		i = scaleLength - 1;
-	}
-	else
-	{
+	} else {
 		i = (int)(scale * scaleLength);
 	}
 

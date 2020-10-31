@@ -8,32 +8,15 @@
  *****************************************************************************/
 
 #pragma once
-#include <QMainWindow>
-#include <QGraphicsPixmapItem>
-#include "ui_ImageWindow.h"
-#include <opencv2/opencv.hpp>
-
-using namespace cv;
 
 
-class ImageWindow : public QMainWindow
+/*
+ * Prevent Windows from sleeping while busy processing
+ */
+
+class Keepalive
 {
-	Q_OBJECT
-
-private:
-	Ui::ImageWindow ui;
-	QGraphicsPixmapItem pixmap;
-	int title;
-	int swidth = 0;
-	int sheight = 0;
-	int displayCount = 0;
-	int displayFps = 0;
-
 public:
-	ImageWindow(QWidget *parent = Q_NULLPTR);
-	~ImageWindow();
-	void setTitle(int title);
-	void updateTitle();
-	void draw(Mat* videoFrame);
-	void updateFps();
+	static void startKeepAlive();
+	static void stopKeepAlive();
 };

@@ -8,32 +8,28 @@
  *****************************************************************************/
 
 #pragma once
-#include <QMainWindow>
-#include <QGraphicsPixmapItem>
-#include "ui_ImageWindow.h"
 #include <opencv2/opencv.hpp>
+#include "Observer.h"
 
+using namespace std;
 using namespace cv;
 
 
-class ImageWindow : public QMainWindow
+/*
+ * Storage of (limmited) list of images
+ */
+
+class ImageSeries
 {
-	Q_OBJECT
-
-private:
-	Ui::ImageWindow ui;
-	QGraphicsPixmapItem pixmap;
-	int title;
-	int swidth = 0;
-	int sheight = 0;
-	int displayCount = 0;
-	int displayFps = 0;
-
 public:
-	ImageWindow(QWidget *parent = Q_NULLPTR);
-	~ImageWindow();
-	void setTitle(int title);
-	void updateTitle();
-	void draw(Mat* videoFrame);
-	void updateFps();
+	deque<Mat> images;
+	int width = 0;
+	int height = 0;
+
+	ImageSeries();
+	~ImageSeries();
+
+	void reset();
+	void addImage(Mat* image, int bufferSize = 0);
+	bool getMedian(OutputArray dest, Observer* observer);
 };

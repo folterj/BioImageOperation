@@ -8,32 +8,29 @@
  *****************************************************************************/
 
 #pragma once
-#include <QMainWindow>
-#include <QGraphicsPixmapItem>
-#include "ui_ImageWindow.h"
 #include <opencv2/opencv.hpp>
+#include "PathNode.h"
 
 using namespace cv;
 
 
-class ImageWindow : public QMainWindow
+/*
+ * Link between path nodes
+ */
+
+class PathLink
 {
-	Q_OBJECT
-
-private:
-	Ui::ImageWindow ui;
-	QGraphicsPixmapItem pixmap;
-	int title;
-	int swidth = 0;
-	int sheight = 0;
-	int displayCount = 0;
-	int displayFps = 0;
-
 public:
-	ImageWindow(QWidget *parent = Q_NULLPTR);
-	~ImageWindow();
-	void setTitle(int title);
-	void updateTitle();
-	void draw(Mat* videoFrame);
-	void updateFps();
+	PathNode* node1;
+	PathNode* node2;
+	int nNormal = 0;
+	int nReverse = 0;
+	double animPos = 0;
+
+	PathLink();
+	PathLink(PathNode* node1, PathNode* node2);
+	void addMatch(bool normalDirection);
+	int getMax();
+	double getAccumUsage(bool normalDirection, int maxUsage);
+	void draw(Mat* image, Scalar color, int maxUsage, bool animate);
 };

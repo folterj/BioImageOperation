@@ -14,11 +14,11 @@
 #include "Constants.h"
 #include "ScriptOperations.h"
 #include "ScriptOperation.h"
-//#include "ImageItemList.h"
-//#include "ImageTrackers.h"
-//#include "AverageBuffer.h"
-//#include "ImageSeries.h"
-//#include "AccumBuffer.h"
+#include "ImageItemList.h"
+#include "ImageTrackers.h"
+#include "AverageBuffer.h"
+#include "ImageSeries.h"
+#include "AccumBuffer.h"
 
 
 /*
@@ -35,8 +35,8 @@ signals:
 	void clearStatus();
 	void showStatus(const char* label, int i, int tot);
 	void showInfo(const char* info, int displayi);
-	void showError(const char* message);
 	void showImage(Mat* image, int displayi);
+	void showDialog(const char* message);
 
 
 public:
@@ -44,12 +44,12 @@ public:
 	std::thread* processThread;
 	//QThread* processThread;
 	ScriptOperations* scriptOperations = new ScriptOperations();
-	//ImageItemList* imageList = new ImageItemList();
-	//AverageBuffer* backgroundBuffer = new AverageBuffer();
-	//AverageBuffer* averageBuffer = new AverageBuffer();
-	//ImageSeries* imageSeries = new ImageSeries();
-	//AccumBuffer* accumBuffer = new AccumBuffer();
-	//ImageTrackers* imageTrackers = new ImageTrackers();
+	ImageItemList* imageList = new ImageItemList();
+	AverageBuffer* backgroundBuffer = new AverageBuffer();
+	AverageBuffer* averageBuffer = new AverageBuffer();
+	ImageSeries* imageSeries = new ImageSeries();
+	AccumBuffer* accumBuffer = new AccumBuffer();
+	ImageTrackers* imageTrackers = new ImageTrackers();
 	Mat* dummyImage = new Mat();
 
 	string basepath;

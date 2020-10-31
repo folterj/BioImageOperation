@@ -11,17 +11,14 @@
 #include "Util.h"
 
 
-CaptureSource::CaptureSource()
-{
+CaptureSource::CaptureSource() {
 }
 
-CaptureSource::~CaptureSource()
-{
+CaptureSource::~CaptureSource() {
 	close();
 }
 
-void CaptureSource::reset()
-{
+void CaptureSource::reset() {
 	source = "";
 	apiCode = VideoCaptureAPIs::CAP_ANY;
 	framei = 0;
@@ -31,8 +28,7 @@ void CaptureSource::reset()
 	close();
 }
 
-bool CaptureSource::init(int apiCode, string basepath, string filepath, string start, string length, double fps0, int interval)
-{
+bool CaptureSource::init(int apiCode, string basepath, string filepath, string start, string length, double fps0, int interval) {
 	reset();
 
 	this->apiCode = apiCode;
@@ -41,37 +37,28 @@ bool CaptureSource::init(int apiCode, string basepath, string filepath, string s
 	return open();
 }
 
-bool CaptureSource::open()
-{
+bool CaptureSource::open() {
 	bool isSourceIndex = false;
 	int index;
 	string message;
 
-	if (!videoIsOpen)
-	{
-		if (Util::isNumeric(source))
-		{
+	if (!videoIsOpen) {
+		if (Util::isNumeric(source)) {
 			index = stoi(source);
 			isSourceIndex = true;
 		}
 
-		if (isSourceIndex)
-		{
-			if (videoCapture.open(index, apiCode))
-			{
+		if (isSourceIndex) {
+			if (videoCapture.open(index, apiCode)) {
 				videoIsOpen = videoCapture.isOpened();
 			}
-		}
-		else
-		{
-			if (videoCapture.open(source, apiCode))
-			{
+		} else {
+			if (videoCapture.open(source, apiCode)) {
 				videoIsOpen = videoCapture.isOpened();
 			}
 		}
 
-		if (!videoIsOpen)
-		{
+		if (!videoIsOpen) {
 			close();
 			message = "Unable to open capture";
 			if (apiCode != 0) {
@@ -79,9 +66,7 @@ bool CaptureSource::open()
 			}
 			message += " source: " + source;
 			throw ios_base::failure(message);
-		}
-		else
-		{
+		} else {
 			width = (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_WIDTH);
 			height = (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_HEIGHT);
 			fps = videoCapture.get(VideoCaptureProperties::CAP_PROP_FPS);
@@ -90,25 +75,20 @@ bool CaptureSource::open()
 	return videoIsOpen;
 }
 
-bool CaptureSource::getNextImage(Mat* image)
-{
+bool CaptureSource::getNextImage(Mat* image) {
 	bool frameOk = false;
 
-	do
-	{
+	do {
 		frameOk = videoCapture.grab();
-		if (!frameOk)
-		{
+		if (!frameOk) {
 			close();
 			break;
 		}
 		framei++;
 	} while ((framei % interval) != 0);
 
-	if (frameOk)
-	{
-		if (!videoCapture.retrieve(*image))
-		{
+	if (frameOk) {
+		if (!videoCapture.retrieve(*image)) {
 			videoIsOpen = false;
 		}
 	}
@@ -116,43 +96,35 @@ bool CaptureSource::getNextImage(Mat* image)
 	return (frameOk && videoIsOpen);
 }
 
-void CaptureSource::close()
-{
+void CaptureSource::close() {
 	videoCapture.release();
 	videoIsOpen = false;
 }
 
-int CaptureSource::getWidth()
-{
+int CaptureSource::getWidth() {
 	return width;
 }
 
-int CaptureSource::getHeight()
-{
+int CaptureSource::getHeight() {
 	return height;
 }
 
-double CaptureSource::getFps()
-{
+double CaptureSource::getFps() {
 	return fps;
 }
 
-int CaptureSource::getFrameNumber()
-{
+int CaptureSource::getFrameNumber() {
 	return framei;
 }
 
-string CaptureSource::getLabel()
-{
+string CaptureSource::getLabel() {
 	return "";
 }
 
-int CaptureSource::getCurrentFrame()
-{
+int CaptureSource::getCurrentFrame() {
 	return framei;
 }
 
-int CaptureSource::getTotalFrames()
-{
+int CaptureSource::getTotalFrames() {
 	return 0;
 }

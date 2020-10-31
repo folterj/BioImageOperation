@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <QImage>
+#include <opencv2/opencv.hpp>
 #include "ColorScale.h"
 
 using namespace std;
@@ -44,9 +45,9 @@ public:
 	static string rtrim_copy(string s);
 	// trim from both ends (copying)
 	static string trim_copy(string s);
-	static string format(string format, int number);
-	static string format(string format, double number);
+	static string format(string format, ...);
 	static string formatTimespan(int seconds);
+	static QString convertToQString(string s);
 
 	static double toDouble(string s);
 	static bool isNumeric(string s);

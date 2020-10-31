@@ -30,13 +30,41 @@ ImageWindow::ImageWindow(QWidget *parent)
 ImageWindow::~ImageWindow() {
 }
 
+void ImageWindow::setTitle(int title) {
+	this->title = title;
+	updateTitle();
+}
+
+void ImageWindow::updateTitle() {
+	string s = Util::format("BIO Image %d", title);
+
+	if (swidth != 0 && sheight != 0) {
+		s += Util::format(" %dx%d", swidth, sheight);
+	}
+	if (displayFps != 0) {
+		s += Util::format(" @%dfps", displayFps);
+	}
+	setWindowTitle(Util::convertToQString(s));
+}
+
 void ImageWindow::draw(Mat* videoFrame) {
 	if (isHidden()) {
 		show();
 	}
 
+	swidth = videoFrame->cols;
+	sheight = videoFrame->rows;
+
 	pixmap.setPixmap(QPixmap::fromImage(Util::matToQImage(*videoFrame)));
 	pixmap.setTransformationMode(Qt::TransformationMode::SmoothTransformation);
 	ui.graphicsView->fitInView(&pixmap, Qt::AspectRatioMode::KeepAspectRatio); // do this @ window resize only?
 	ui.graphicsView->repaint();
+
+	displayCount++;
+	updateTitle();
+}
+
+void ImageWindow::updateFps() {
+	displayFps = displayCount;
+	displayCount = 0;
 }

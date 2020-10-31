@@ -1,21 +1,19 @@
-#include "Util.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <filesystem>
+#include "Util.h"
 
 
 bool Util::contains(string src, string target) {
 	return (src.find(target) != string::npos);
 }
 
-bool Util::contains(vector<string> source, string target)
-{
+bool Util::contains(vector<string> source, string target) {
 	auto item = find(begin(source), end(source), target);
 	return (item != end(source));
 }
 
-int Util::getListIndex(vector<string> source, string target)
-{
+int Util::getListIndex(vector<string> source, string target) {
 	int index = -1;
 	auto item = find(begin(source), end(source), target);
 	if (item != end(source)) {
@@ -84,13 +82,13 @@ string Util::removeQuotes(string s) {
 void Util::ltrim(string& s) {
 	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
 		return !std::isspace(ch);
-	}));
+		}));
 }
 
 void Util::rtrim(string& s) {
 	s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
 		return !std::isspace(ch);
-	}).base(), s.end());
+		}).base(), s.end());
 }
 
 void Util::trim(string& s) {
@@ -116,17 +114,13 @@ string Util::trim_copy(string s) {
 	return s;
 }
 
-string Util::format(string format, int number) {
+string Util::format(string format, ...) {
 	const int buflen = 1000;
 	char buffer[buflen];
-	snprintf(buffer, buflen, format.c_str(), number);
-	return string(buffer);
-}
-
-string Util::format(string format, double number) {
-	const int buflen = 1000;
-	char buffer[buflen];
-	snprintf(buffer, buflen, format.c_str(), number);
+	va_list args;
+	va_start(args, format);
+	vsnprintf(buffer, buflen, format.c_str(), args);
+	va_end(args);
 	return string(buffer);
 }
 
@@ -150,8 +144,11 @@ string Util::formatTimespan(int seconds0) {
 	return s;
 }
 
-double Util::toDouble(string s)
-{
+QString Util::convertToQString(string s) {
+	return QString::fromUtf8(s.c_str());
+}
+
+double Util::toDouble(string s) {
 	double d = 0;
 	size_t stodEnd;
 	if (s != "") {
@@ -163,8 +160,7 @@ double Util::toDouble(string s)
 	return d;
 }
 
-bool Util::isNumeric(string s)
-{
+bool Util::isNumeric(string s) {
 	bool ok = (s != "");
 	int digits = 0;
 	int dots = 0;
@@ -186,18 +182,15 @@ bool Util::isNumeric(string s)
 	return ok;
 }
 
-bool Util::toBoolean(string s)
-{
+bool Util::toBoolean(string s) {
 	return (toLower(s) == "true");
 }
 
-bool Util::isBoolean(string s)
-{
+bool Util::isBoolean(string s) {
 	return (toLower(s) == "true" || toLower(s) == "false");
 }
 
-int Util::parseFrameTime(string s, double fps)
-{
+int Util::parseFrameTime(string s, double fps) {
 	int frames = 0;
 	int totalSeconds = 0;
 
@@ -217,32 +210,27 @@ int Util::parseFrameTime(string s, double fps)
 	return frames;
 }
 
-double Util::calcDistance(double x0, double y0, double x1, double y1)
-{
+double Util::calcDistance(double x0, double y0, double x1, double y1) {
 	return calcDistance(x1 - x0, y1 - y0);
 }
 
-double Util::calcDistance(double x, double y)
-{
+double Util::calcDistance(double x, double y) {
 	return sqrt(x * x + y * y);
 }
 
-double Util::getMomentsAngle(Moments* moments)
-{
+double Util::getMomentsAngle(Moments* moments) {
 	return 0.5 * atan2(2 * moments->mu11, moments->mu20 - moments->mu02);
 	//return 0.5 * cv::fastAtan2(2 * moments->mu11, moments->mu20 - moments->mu02);
 }
 
-double Util::calcAngleDif(double angle1, double angle2)
-{
+double Util::calcAngleDif(double angle1, double angle2) {
 	double dangle = angle2 - angle1;
 	while (dangle < -M_PI) dangle += 2 * M_PI;
 	while (dangle > M_PI) dangle -= 2 * M_PI;
 	return dangle;
 }
 
-Scalar Util::getLabelColor(int label0)
-{
+Scalar Util::getLabelColor(int label0) {
 	int label;
 	int ir, ig, ib;
 	double r, g, b;
@@ -264,8 +252,7 @@ Scalar Util::getLabelColor(int label0)
 	return Scalar(b * 0xFF, g * 0xFF, r * 0xFF);
 }
 
-Scalar Util::getHeatScale(double scale)
-{
+Scalar Util::getHeatScale(double scale) {
 	double r = 0;
 	double g = 0;
 	double b = 0;
@@ -277,8 +264,7 @@ Scalar Util::getHeatScale(double scale)
 	colScale = scale * 4;
 	intScale = (int)colScale;
 	floatScale = colScale - intScale;
-	switch (intScale)
-	{
+	switch (intScale) {
 	case 0:
 		// white - yellow
 		r = 1;
@@ -308,8 +294,7 @@ Scalar Util::getHeatScale(double scale)
 	return Scalar((unsigned char)(f * r * 0xFF), (unsigned char)(f * g * 0xFF), (unsigned char)(f * b * 0xFF));
 }
 
-Scalar Util::getRainbowScale(double scale)
-{
+Scalar Util::getRainbowScale(double scale) {
 	double r = 0;
 	double g = 0;
 	double b = 0;
@@ -321,8 +306,7 @@ Scalar Util::getRainbowScale(double scale)
 	colScale = scale * 6;
 	intScale = (int)colScale;
 	floatScale = colScale - intScale;
-	switch (intScale)
-	{
+	switch (intScale) {
 	case 0:
 		// red - yellow
 		r = 1 - floatScale;
@@ -364,51 +348,40 @@ Scalar Util::getRainbowScale(double scale)
 	return Scalar((unsigned char)(f * r * 0xFF), (unsigned char)(f * g * 0xFF), (unsigned char)(f * b * 0xFF));
 }
 
-Scalar Util::bgrtoScalar(BGR bgr)
-{
+Scalar Util::bgrtoScalar(BGR bgr) {
 	return Scalar(bgr.b, bgr.g, bgr.r);
 }
 
-bool Util::isValidImage(Mat* image)
-{
-	if (image)
-	{
+bool Util::isValidImage(Mat* image) {
+	if (image) {
 		return (!image->empty() && image->dims == 2);
 	}
 	return false;
 }
 
-string Util::getCodecString(int codec)
-{
+string Util::getCodecString(int codec) {
 	string codecs = "";
-	
-	if (codec > 0)
-	{
-		for (int i = 0; i < 4; i++)
-		{
+
+	if (codec > 0) {
+		for (int i = 0; i < 4; i++) {
 			codecs += (char)(codec & 0xFF);
 			codec /= 0x100;
 		}
-	}
-	else
-	{
+	} else {
 		codecs = "";
 	}
 	return codecs;
 }
 
-Mat Util::loadImage(string filename)
-{
+Mat Util::loadImage(string filename) {
 	return imread(filename, ImreadModes::IMREAD_UNCHANGED);
 }
 
-void Util::saveImage(string filename, Mat* image)
-{
+void Util::saveImage(string filename, Mat* image) {
 	imwrite(filename, *image);
 }
 
-vector<string> Util::getImageFilenames(string searchPath)
-{
+vector<string> Util::getImageFilenames(string searchPath) {
 	vector<string> filenames;
 	string filename;
 	string path = extractFilePath(searchPath);
@@ -424,8 +397,7 @@ vector<string> Util::getImageFilenames(string searchPath)
 	return filenames;
 }
 
-string Util::extractFilePath(string path)
-{
+string Util::extractFilePath(string path) {
 	string filepath = "";
 	vector<string> parts = split(path, vector<string>{"\\", "/"});
 	for (int i = 0; i < (int)parts.size() - 1; i++) {
@@ -435,13 +407,11 @@ string Util::extractFilePath(string path)
 	return filepath;
 }
 
-string Util::extractTitle(string path)
-{
+string Util::extractTitle(string path) {
 	return extractFileTitle(extractFileName(path));
 }
 
-string Util::extractFileName(string path)
-{
+string Util::extractFileName(string path) {
 	string filename = path;
 	vector<string> parts = split(path, vector<string>{"\\", "/"});
 	if (parts.size() > 1) {
@@ -450,8 +420,7 @@ string Util::extractFileName(string path)
 	return filename;
 }
 
-string Util::extractFileTitle(string filename)
-{
+string Util::extractFileTitle(string filename) {
 	string fileTitle = "";
 	vector<string> parts = split(filename, ".");
 	for (int i = 0; i < parts.size() - 1; i++) {
@@ -463,8 +432,7 @@ string Util::extractFileTitle(string filename)
 	return fileTitle;
 }
 
-string Util::extractFileExtension(string filename)
-{
+string Util::extractFileExtension(string filename) {
 	string fileExtension = filename;
 	vector<string> parts = split(fileExtension, ".");
 	if (parts.size() > 1) {
@@ -473,8 +441,7 @@ string Util::extractFileExtension(string filename)
 	return fileExtension;
 }
 
-string Util::combinePath(string basepath, string templatePath)
-{
+string Util::combinePath(string basepath, string templatePath) {
 	if (basepath == "" || Util::contains(templatePath, ":")) {
 		return templatePath;
 	} else {
@@ -482,8 +449,7 @@ string Util::combinePath(string basepath, string templatePath)
 	}
 }
 
-QImage Util::matToQImage(cv::Mat const& src)
-{
+QImage Util::matToQImage(cv::Mat const& src) {
 	QImage qimage(src.data, src.cols, src.rows, src.step, QImage::Format_RGB888);
 	return qimage.rgbSwapped();
 }

@@ -10,6 +10,7 @@
 #pragma once
 #include <chrono>
 #include <QMainWindow>
+#include <QTimer>
 #include "ui_MainWindow.h"
 #include <opencv2/opencv.hpp>
 #include "Observer.h"
@@ -29,8 +30,9 @@ class MainWindow : public QMainWindow, public Observer
 private:
 	string filepath;
 	Ui::MainWindow ui;
-	ImageWindow* imageWindow;
+	ImageWindow imageWindows[4];
 	ScriptProcessing scriptProcessing;
+	QTimer* timer;
 	Clock::time_point time;
 	bool statusQueued = false;
 	bool imageQueued = false;
@@ -51,8 +53,9 @@ public slots:
 	virtual void clearStatus() override;
 	virtual void showStatus(const char* label, int i, int tot) override;
 	virtual void showInfo(const char* info, int displayi) override;
-	virtual void showError(const char* message) override;
 	virtual void showImage(Mat* image, int displayi) override;
+	virtual void showDialog(const char* message) override;
+	void timerElapsed();
 
 protected:
 	void closeEvent(QCloseEvent* event);

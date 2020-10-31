@@ -12,12 +12,10 @@
 #include "Util.h"
 
 
-NumericPath::NumericPath()
-{
+NumericPath::NumericPath() {
 }
 
-void NumericPath::reset()
-{
+void NumericPath::reset() {
 	inputFilenames.clear();
 	templatePath = "";
 	initialPath = "";
@@ -31,13 +29,11 @@ void NumericPath::reset()
 	input = true;
 }
 
-void NumericPath::resetFilePath()
-{
+void NumericPath::resetFilePath() {
 	filei = 0;
 }
 
-bool NumericPath::setInputPath(string basepath, string templatePath)
-{
+bool NumericPath::setInputPath(string basepath, string templatePath) {
 	if (templatePath == "") {
 		throw invalid_argument("No path specified");
 	}
@@ -59,16 +55,14 @@ bool NumericPath::setInputPath(string basepath, string templatePath)
 	return set;
 }
 
-bool NumericPath::setOutputPath(string templatePath)
-{
+bool NumericPath::setOutputPath(string templatePath) {
 	bool ok = setOutputPath("", templatePath, "");
 	offset = 0;
 	numlen = 1;
 	return ok;
 }
 
-bool NumericPath::setOutputPath(string basepath, string templatePath, string defaultExtension)
-{
+bool NumericPath::setOutputPath(string basepath, string templatePath, string defaultExtension) {
 	int extPos;
 	int numpos;
 	int test;
@@ -101,41 +95,34 @@ bool NumericPath::setOutputPath(string basepath, string templatePath, string def
 		try {
 			test = stoi(templatePath.substr(numpos, numlen + 1));
 			ok = true;
-		}
-		catch (...) {
+		} catch (...) {
 			ok = false;
 		}
-		if (ok)
-		{
+		if (ok) {
 			offset = test;
 			numpos--;
 			numlen++;
-		}
-		else
-		{
+		} else {
 			numpos++;
 		}
 	}
 	initialPath = templatePath.substr(0, numpos);
-	
+
 	set = filesystem::exists(Util::extractFilePath(initialPath));
 
 	return set;
 }
 
-string NumericPath::createFilePath()
-{
+string NumericPath::createFilePath() {
 	currentPath = createFilePath(filei++);
 	return currentPath;
 }
 
-string NumericPath::currentFilePath()
-{
+string NumericPath::currentFilePath() {
 	return currentPath;
 }
 
-string NumericPath::createFilePath(int i)
-{
+string NumericPath::createFilePath(int i) {
 	string path = "";
 	string format, nums;
 
@@ -156,17 +143,14 @@ string NumericPath::createFilePath(int i)
 	return path;
 }
 
-bool NumericPath::isSet()
-{
+bool NumericPath::isSet() {
 	return set;
 }
 
-int NumericPath::getFileCount()
-{
+int NumericPath::getFileCount() {
 	return totaln;
 }
 
-string NumericPath::getOriginalPath()
-{
+string NumericPath::getOriginalPath() {
 	return templatePath;
 }

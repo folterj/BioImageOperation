@@ -13,16 +13,22 @@
 // https://mithatkonar.com/wiki/doku.php/qt/toward_robust_icon_support
 
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent) {
 
 	ui.setupUi(this);
 	connect(ui.processButton, &QAbstractButton::clicked, this, &MainWindow::process);
 	connect(ui.abortButton, &QAbstractButton::clicked, &scriptProcessing, &ScriptProcessing::doAbort);
 
-	imageWindow = new ImageWindow();
+	for (int i = 0; i < Constants::nDisplays; i++) {
+		imageWindows[i].setTitle(i);
+	}
 
 	scriptProcessing.registerObserver(this);
+
+	timer = new QTimer(this);
+	connect(timer, SIGNAL(timeout()), this, SLOT(timerElapsed()));
+	timer->start(1s);
 }
 
 void MainWindow::setFilePath(string filepath) {
@@ -42,7 +48,11 @@ void MainWindow::resetUI() {
 }
 
 void MainWindow::resetImages() {
-
+	/*
+	for (int i = 0; i < Constants::nDisplays; i++) {
+		imageWindows[i].reset();
+	}
+	*/
 }
 
 void MainWindow::resetProgressTimer() {
@@ -51,6 +61,17 @@ void MainWindow::resetProgressTimer() {
 	processFps = 0;
 	statusQueued = false;
 	imageQueued = false;
+}
+
+void MainWindow::timerElapsed() {
+	if (processCount != 0) {
+		processFps = processCount;
+		processCount = 0;
+	}
+
+	for (int i = 0; i < Constants::nDisplays; i++) {
+		imageWindows[i].updateFps();
+	}
 }
 
 void MainWindow::clearStatus() {
@@ -69,14 +90,14 @@ void MainWindow::showStatus(const char* label, int i, int tot) {
 	string s;
 	double progress = 0;
 	Clock::time_point now;
-	Clock::duration totalElapsed;
+	chrono::duration<double> totalElapsed;
 	double totalElapseds;
 	double avgFrametime;
 	double estimateLeft = 0;
 
 	now = Clock::now();
 	totalElapsed = now - time;
-	totalElapseds = (double)totalElapsed.count() / 1000000000;
+	totalElapseds = totalElapsed.count();
 	avgFrametime = totalElapseds / (i + 1);
 
 	if (tot > 0) {
@@ -87,24 +108,19 @@ void MainWindow::showStatus(const char* label, int i, int tot) {
 		estimateLeft = totalElapseds * (1 / progress - 1);
 	}
 
-	s += " " + string(label);
-	s += Util::format(" (%.d)", i) + Util::format(" %.3fs", avgFrametime) + Util::format(" %.dfps", processFps);
+	s += Util::format(" %s (#%d) %.3fs @%dfps", label, i, avgFrametime, processFps);
 	s += " Elapsed: " + Util::formatTimespan((int)totalElapseds);
 	if (estimateLeft > 0) {
 		s += " Left: " + Util::formatTimespan((int)estimateLeft);
 	}
 
-	ui.statusBar->showMessage(QString::fromUtf8(s.c_str()));
+	ui.statusBar->showMessage(Util::convertToQString(s));
 	ui.progressBar->setValue((int)(100 * progress));
 	statusQueued = false;
 }
 
 void MainWindow::showInfo(const char* info, int displayi) {
 	//infoForms[displayi]->showInfo(info);
-}
-
-void MainWindow::showError(const char* message) {
-	//MessageBox::Show(message, "Operation error");
 }
 
 bool MainWindow::checkImageProcess() {
@@ -114,8 +130,18 @@ bool MainWindow::checkImageProcess() {
 }
 
 void MainWindow::showImage(Mat* image, int displayi) {
-	imageWindow->draw(image);
+	if (displayi < 0 || displayi >= Constants::nDisplays) {
+		displayi = 0;
+	}
+
+	//if (imageWindows[displayi].setImage(image)) {
+		imageWindows[displayi].draw(image);
+	//}
 	imageQueued = false;
+}
+
+void MainWindow::showDialog(const char* message) {
+	//MessageBox::Show(message, "Operation error");
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {

@@ -8,32 +8,37 @@
  *****************************************************************************/
 
 #pragma once
-#include <QMainWindow>
-#include <QGraphicsPixmapItem>
-#include "ui_ImageWindow.h"
+#include <vector>
 #include <opencv2/opencv.hpp>
+#include "Constants.h"
 
+using namespace std;
 using namespace cv;
 
 
-class ImageWindow : public QMainWindow
+/*
+ * Tracked cluster element
+ */
+
+class ClusterTrack;	// forward declaration
+
+class PathNode
 {
-	Q_OBJECT
-
-private:
-	Ui::ImageWindow ui;
-	QGraphicsPixmapItem pixmap;
-	int title;
-	int swidth = 0;
-	int sheight = 0;
-	int displayCount = 0;
-	int displayFps = 0;
-
 public:
-	ImageWindow(QWidget *parent = Q_NULLPTR);
-	~ImageWindow();
-	void setTitle(int title);
-	void updateTitle();
-	void draw(Mat* videoFrame);
-	void updateFps();
+	int label = 0;
+
+	double x = 0;
+	double y = 0;
+
+	vector<int> usage;
+	int age = 0;
+	int accumUsage = 1;
+	int lastUse = 1;
+
+	PathNode(int label, ClusterTrack* clusterTrack);
+	void updateUse(int pathAge);
+	double getAccumUsage();
+	double getAccumUsage2(int totalAge);
+	double matchDistance(ClusterTrack* clusterTrack, double maxDistance);
+	void draw(Mat* image, Scalar color);
 };

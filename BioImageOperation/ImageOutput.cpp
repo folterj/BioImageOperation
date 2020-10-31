@@ -11,57 +11,47 @@
 #include "Util.h"
 
 
-ImageOutput::ImageOutput()
-{
+ImageOutput::ImageOutput() {
 }
 
-ImageOutput::~ImageOutput()
-{
+ImageOutput::~ImageOutput() {
 	close();
 }
 
-void ImageOutput::reset()
-{
+void ImageOutput::reset() {
 	outputPath.reset();
 	start = 0;
 	end = 0;
 	filei = 0;
 }
 
-void ImageOutput::init(string basepath, string filepath, string defaultExtension, string start, string length, double fps0, string codecs)
-{
+void ImageOutput::init(string basepath, string filepath, string defaultExtension, string start, string length, double fps0, string codecs) {
 	reset();
 	int lengthi;
 
-	if (!outputPath.setOutputPath(basepath, filepath, defaultExtension))
-	{
+	if (!outputPath.setOutputPath(basepath, filepath, defaultExtension)) {
 		throw ios_base::failure("Unable to write to " + Util::extractFilePath(outputPath.initialPath));
 	}
 
-	if (fps0 == 0)
-	{
+	if (fps0 == 0) {
 		fps0 = 1;
 	}
 
 	this->start = Util::parseFrameTime(start, fps0);
 	lengthi = Util::parseFrameTime(length, fps0);
 
-	if (lengthi > 0)
-	{
+	if (lengthi > 0) {
 		this->end = this->start + lengthi;
 	}
 }
 
-bool ImageOutput::writeImage(Mat* image)
-{
-	if (filei >= start && (filei < end || end == 0))
-	{
+bool ImageOutput::writeImage(Mat* image) {
+	if (filei >= start && (filei < end || end == 0)) {
 		Util::saveImage(outputPath.createFilePath(filei), image);
 	}
 	filei++;
 	return true;
 }
 
-void ImageOutput::close()
-{
+void ImageOutput::close() {
 }
