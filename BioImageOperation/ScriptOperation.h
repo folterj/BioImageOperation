@@ -49,11 +49,11 @@ public:
 	void checkArguments();
 	bool hasInnerOperations();
 	ScriptOperation* getNextInnerOperation();
-	string getArgument(ArgumentLabel label);
+	string getArgument(ArgumentLabel label = ArgumentLabel::None);
 	string getArgument(ArgumentLabel label, string defaultArgument);
 	double getArgumentNumeric(ArgumentLabel label = ArgumentLabel::None, bool oneBase = false);
 	bool getArgumentBoolean(ArgumentLabel label = ArgumentLabel::None);
-	ClusterDrawMode getClusterDrawMode(ClusterDrawMode defaultArgument);
+	int getClusterDrawMode(ClusterDrawMode defaultArgument);
 	static OperationInfo getOperationInfo(ScriptOperationType type);
 	static string getOperationList();
 	static void writeOperationList(string filename);

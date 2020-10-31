@@ -114,6 +114,24 @@ string Util::trim_copy(string s) {
 	return s;
 }
 
+string Util::replace(string s, string target, string replacement) {
+	string output = "";
+	int i = 0;
+	int i0;
+
+	while (i >= 0) {
+		i0 = i;
+		i = s.find(target, i);
+		if (i >= 0) {
+			output += s.substr(i0, i - i0) + replacement;
+			i += target.length();
+		} else {
+			output += s.substr(i0);
+		}
+	}
+	return output;
+}
+
 string Util::format(string format, ...) {
 	const int buflen = 1000;
 	char buffer[buflen];
@@ -350,6 +368,20 @@ Scalar Util::getRainbowScale(double scale) {
 
 Scalar Util::bgrtoScalar(BGR bgr) {
 	return Scalar(bgr.b, bgr.g, bgr.r);
+}
+
+string Util::getExceptionDetail(exception e, int level) {
+	string s = e.what();
+	string inner;
+	try {
+		std::rethrow_if_nested(e);
+	} catch (exception e) {
+		inner = getExceptionDetail(e, level + 1);		// recursive
+		if (inner != "") {
+			s += " - " + inner;
+		}
+	} catch (...) { }
+	return s;
 }
 
 bool Util::isValidImage(Mat* image) {

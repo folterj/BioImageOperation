@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(ui.abortButton, &QAbstractButton::clicked, &scriptProcessing, &ScriptProcessing::doAbort);
 
 	for (int i = 0; i < Constants::nDisplays; i++) {
-		imageWindows[i].setTitle(i);
+		imageWindows[i].init(this, i);
 	}
 
 	scriptProcessing.registerObserver(this);
@@ -86,7 +86,7 @@ bool MainWindow::checkStatusProcess() {
 	return ok;
 }
 
-void MainWindow::showStatus(const char* label, int i, int tot) {
+void MainWindow::showStatus(int i, int tot, const char* label) {
 	string s;
 	double progress = 0;
 	Clock::time_point now;
@@ -94,6 +94,10 @@ void MainWindow::showStatus(const char* label, int i, int tot) {
 	double totalElapseds;
 	double avgFrametime;
 	double estimateLeft = 0;
+
+	if (!statusQueued) {
+		return;			// ignore queued events on abort
+	}
 
 	now = Clock::now();
 	totalElapsed = now - time;
@@ -130,6 +134,10 @@ bool MainWindow::checkImageProcess() {
 }
 
 void MainWindow::showImage(Mat* image, int displayi) {
+	if (!imageQueued) {
+		return;			// ignore queued events on abort
+	}
+
 	if (displayi < 0 || displayi >= Constants::nDisplays) {
 		displayi = 0;
 	}

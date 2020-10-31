@@ -45,6 +45,7 @@ public:
 	static string rtrim_copy(string s);
 	// trim from both ends (copying)
 	static string trim_copy(string s);
+	static string replace(string s, string target, string replacement);
 	static string format(string format, ...);
 	static string formatTimespan(int seconds);
 	static QString convertToQString(string s);
@@ -65,6 +66,7 @@ public:
 	static Scalar getRainbowScale(double scale);
 	static Scalar bgrtoScalar(BGR bgr);
 
+	static string getExceptionDetail(exception e, int level = 0);
 	static Mat loadImage(string filename);
 	static void saveImage(string filename, Mat* image);
 	static bool isValidImage(Mat* image);

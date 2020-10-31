@@ -51,7 +51,7 @@ public slots:
 	virtual void resetUI() override;
 	virtual void resetImages() override;
 	virtual void clearStatus() override;
-	virtual void showStatus(const char* label, int i, int tot) override;
+	virtual void showStatus(int i, int tot = 0, const char* label = "") override;
 	virtual void showInfo(const char* info, int displayi) override;
 	virtual void showImage(Mat* image, int displayi) override;
 	virtual void showDialog(const char* message) override;

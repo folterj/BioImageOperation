@@ -33,7 +33,7 @@ signals:
 	void resetUI();
 	void resetImages();
 	void clearStatus();
-	void showStatus(const char* label, int i, int tot);
+	void showStatus(int i, int tot = 0, const char* label = "");
 	void showInfo(const char* info, int displayi);
 	void showImage(Mat* image, int displayi);
 	void showDialog(const char* message);
@@ -58,7 +58,7 @@ public:
 	double sourceFps = 0;
 	int sourceFrameNumber = 0;
 	double logPower = 0;
-	string logPalette;
+	Palette logPalette;
 	bool abort = false;
 	bool debugMode = false;
 
@@ -89,8 +89,8 @@ public:
 	/*
 	 * Helper function to get reference image, or else current image
 	 */
-	//Mat* getLabelOrCurrentImage(ScriptOperation* operation, Mat* currentImage, bool explicitArgument);
-	//double getTime(int frame);
+	Mat* getLabelOrCurrentImage(ScriptOperation* operation, Mat* currentImage, bool explicitArgument);
+	double getTime(int frame);
 
 	/*
 	 * Abort thread, attempt closing output streams to prevent data loss

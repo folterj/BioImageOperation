@@ -84,7 +84,7 @@ bool ImageSeries::getMedian(OutputArray dest, Observer* observer) {
 			outData[y * width + x] = median;
 		}
 		if (observer) {
-			observer->showStatus("", y, height);
+			observer->showStatus(y, height);
 		}
 	}
 	return true;

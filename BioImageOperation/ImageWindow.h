@@ -12,6 +12,7 @@
 #include <QGraphicsPixmapItem>
 #include "ui_ImageWindow.h"
 #include <opencv2/opencv.hpp>
+#include "Observer.h"
 
 using namespace cv;
 
@@ -23,6 +24,8 @@ class ImageWindow : public QMainWindow
 private:
 	Ui::ImageWindow ui;
 	QGraphicsPixmapItem pixmap;
+	Observer* observer;
+	Mat* image;
 	int title;
 	int swidth = 0;
 	int sheight = 0;
@@ -30,10 +33,11 @@ private:
 	int displayFps = 0;
 
 public:
-	ImageWindow(QWidget *parent = Q_NULLPTR);
+	ImageWindow(QWidget* parent = Q_NULLPTR);
 	~ImageWindow();
-	void setTitle(int title);
+	void init(Observer* observer, int title);
 	void updateTitle();
-	void draw(Mat* videoFrame);
+	void draw(Mat* image);
 	void updateFps();
+	void saveImage();
 };

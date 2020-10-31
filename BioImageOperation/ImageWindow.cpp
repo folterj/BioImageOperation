@@ -8,6 +8,8 @@
  *****************************************************************************/
 
 #include "ImageWindow.h"
+#include <QFileDialog>
+#include "Constants.h"
 #include "Util.h"
 
 // https://stackoverflow.com/questions/21246766/how-to-efficiently-display-opencv-video-in-qt
@@ -19,7 +21,7 @@
 // https://stackoverflow.com/questions/4093159/what-is-the-correct-way-to-implement-a-qthread-example-please
 
 
-ImageWindow::ImageWindow(QWidget *parent)
+ImageWindow::ImageWindow(QWidget* parent)
 	: QMainWindow(parent) {
 	ui.setupUi(this);
 
@@ -30,7 +32,8 @@ ImageWindow::ImageWindow(QWidget *parent)
 ImageWindow::~ImageWindow() {
 }
 
-void ImageWindow::setTitle(int title) {
+void ImageWindow::init(Observer* observer, int title) {
+	this->observer = observer;
 	this->title = title;
 	updateTitle();
 }
@@ -47,15 +50,16 @@ void ImageWindow::updateTitle() {
 	setWindowTitle(Util::convertToQString(s));
 }
 
-void ImageWindow::draw(Mat* videoFrame) {
+void ImageWindow::draw(Mat* image) {
 	if (isHidden()) {
 		show();
 	}
 
-	swidth = videoFrame->cols;
-	sheight = videoFrame->rows;
+	swidth = image->cols;
+	sheight = image->rows;
+	this->image = image;
 
-	pixmap.setPixmap(QPixmap::fromImage(Util::matToQImage(*videoFrame)));
+	pixmap.setPixmap(QPixmap::fromImage(Util::matToQImage(*image)));
 	pixmap.setTransformationMode(Qt::TransformationMode::SmoothTransformation);
 	ui.graphicsView->fitInView(&pixmap, Qt::AspectRatioMode::KeepAspectRatio); // do this @ window resize only?
 	ui.graphicsView->repaint();
@@ -67,4 +71,36 @@ void ImageWindow::draw(Mat* videoFrame) {
 void ImageWindow::updateFps() {
 	displayFps = displayCount;
 	displayCount = 0;
+}
+
+void ImageWindow::saveImage() {
+	QString qfilename;
+	string filename;
+	string extension;
+	int extPos;
+
+	try {
+		qfilename = QFileDialog::getSaveFileName(this, tr("Save Image"));
+		if (qfilename != "") {
+			filename = qfilename.toStdString();
+			extPos = filename.rfind(".");
+			if (extPos < 0) {
+				extension = Constants::defaultImageExtension;
+				if (!extension._Starts_with(".")) {
+					extension = "." + extension;
+				}
+				filename += extension;
+			}
+			Util::saveImage(filename, image);
+		}
+	} catch (cv::Exception e) {
+		// opencv exception
+		if (e.err != "") {
+			observer->showDialog(e.err.c_str());
+		} else {
+			observer->showDialog(e.msg.c_str());
+		}
+	} catch (std::exception e) {
+		observer->showDialog(Util::getExceptionDetail(e).c_str());
+	}
 }

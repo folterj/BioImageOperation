@@ -50,10 +50,10 @@ enum class ScriptOperationType
 	Add,
 	Multiply,
 	Invert,
-	RollingBall,
 
 	UpdateBackground,
 	UpdateAverage,
+	ClearSeries,
 	AddSeries,
 	GetSeriesMedian,
 	AddAccum,
@@ -111,10 +111,10 @@ const vector<string> ScriptOperationTypes =
 	"Add",
 	"Multiply",
 	"Invert",
-	"RollingBall",
 
 	"UpdateBackground",
 	"UpdateAverage",
+	"ClearSeries",
 	"AddSeries",
 	"GetSeriesMedian",
 	"AddAccum",

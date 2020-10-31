@@ -9,6 +9,8 @@
 
 #include "OperationInfo.h"
 
+OperationInfo::OperationInfo() {
+}
 
 OperationInfo::OperationInfo(vector<ArgumentLabel> requiredArguments, vector<ArgumentLabel> optionalArguments, string description) {
 	this->requiredArguments = requiredArguments;

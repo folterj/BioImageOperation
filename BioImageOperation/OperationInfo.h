@@ -22,5 +22,6 @@ public:
 	vector<ArgumentLabel> optionalArguments;
 	string description = "";
 
+	OperationInfo();
 	OperationInfo(vector<ArgumentLabel> requiredArguments, vector<ArgumentLabel> optionalArguments, string description);
 };
