@@ -81,19 +81,19 @@ void ScriptProcessing::reset() {
 	accumBuffer->reset();
 
 	imageTrackers->reset();
-	emit resetImages();
+	resetImages();
 }
 
 void ScriptProcessing::registerObserver(Observer* observer) {
 	this->observer = observer;
 
-	connect(this, &ScriptProcessing::resetUI, (MainWindow*)observer, &MainWindow::resetUI);
-	connect(this, &ScriptProcessing::resetImages, (MainWindow*)observer, &MainWindow::resetImages);
-	connect(this, &ScriptProcessing::clearStatus, (MainWindow*)observer, &MainWindow::clearStatus);
-	connect(this, &ScriptProcessing::showStatus, (MainWindow*)observer, &MainWindow::showStatus);
-	connect(this, &ScriptProcessing::showInfo, (MainWindow*)observer, &MainWindow::showInfo);
-	connect(this, &ScriptProcessing::showImage, (MainWindow*)observer, &MainWindow::showImage);
-	connect(this, &ScriptProcessing::showDialog, (MainWindow*)observer, &MainWindow::showDialog);
+	connect(this, &ScriptProcessing::resetUIQt, (MainWindow*)observer, &MainWindow::resetUI);
+	connect(this, &ScriptProcessing::resetImagesQt, (MainWindow*)observer, &MainWindow::resetImages);
+	connect(this, &ScriptProcessing::clearStatusQt, (MainWindow*)observer, &MainWindow::clearStatus);
+	connect(this, &ScriptProcessing::showStatusQt, (MainWindow*)observer, &MainWindow::showStatus);
+	connect(this, &ScriptProcessing::showInfoQt, (MainWindow*)observer, &MainWindow::showInfo);
+	connect(this, &ScriptProcessing::showImageQt, (MainWindow*)observer, &MainWindow::showImage);
+	connect(this, &ScriptProcessing::showDialogQt, (MainWindow*)observer, &MainWindow::showDialog);
 }
 
 bool ScriptProcessing::startProcess(string filepath, string script) {
@@ -108,7 +108,7 @@ bool ScriptProcessing::startProcess(string filepath, string script) {
 		//processThread->start();
 		processThread = new std::thread(&ScriptProcessing::processThreadMethod, this);
 	} catch (exception e) {
-		emit showDialog(Util::getExceptionDetail(e).c_str());
+		showDialog(Util::getExceptionDetail(e));
 		doAbort();
 		return false;
 	}
@@ -201,9 +201,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			operation->initFrameSource(FrameType::Image, 0, basepath, operation->getArgument(ArgumentLabel::Path), operation->getArgument(ArgumentLabel::Start), operation->getArgument(ArgumentLabel::Length), sourceFps, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
 			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage)) {
-				if (observer->checkStatusProcess()) {
-					emit showStatus(operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames());
-				}
+				showStatus(operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames());
 				done = false;
 			}
 			sourceWidth = operation->frameSource->getWidth();
@@ -215,9 +213,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			operation->initFrameSource(FrameType::Video, (int)operation->getArgumentNumeric(ArgumentLabel::API), basepath, operation->getArgument(ArgumentLabel::Path), operation->getArgument(ArgumentLabel::Start), operation->getArgument(ArgumentLabel::Length), 0, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
 			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage)) {
-				if (observer->checkStatusProcess()) {
-					emit showStatus(operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames(), operation->frameSource->getLabel().c_str());
-				}
+				showStatus(operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames(), operation->frameSource->getLabel());
 				done = false;
 			} else {
 				// already past last frame; current image invalid
@@ -237,9 +233,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			operation->initFrameSource(FrameType::Capture, (int)operation->getArgumentNumeric(ArgumentLabel::API), basepath, source, "", "", 0, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
 			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage)) {
-				if (observer->checkStatusProcess()) {
-					emit showStatus(operation->frameSource->getCurrentFrame());
-				}
+				showStatus(operation->frameSource->getCurrentFrame());
 				done = false;
 			} else {
 				// capture failed; current image invalid
@@ -267,9 +261,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		case ScriptOperationType::ShowImage:
 			refImage = getLabelOrCurrentImage(operation, image, false);
 			if (Util::isValidImage(refImage)) {
-				if (observer->checkImageProcess()) {
-					emit showImage(refImage, (int)operation->getArgumentNumeric(ArgumentLabel::None, true));
-				}
+				showImage(refImage, (int)operation->getArgumentNumeric(ArgumentLabel::None, true));
 			}
 			break;
 
@@ -426,7 +418,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::ShowTrackInfo:
-			emit showInfo(imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->getInfo().c_str(), (int)operation->getArgumentNumeric(ArgumentLabel::Display, true));
+			showInfo(imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->getInfo(), (int)operation->getArgumentNumeric(ArgumentLabel::Display, true));
 			break;
 
 		case ScriptOperationType::DrawTrackInfo:
@@ -465,9 +457,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				// show in separate display
 				ImageOperations::create(newImage, 1000, 1000);
 				ImageOperations::drawLegend(*newImage, *newImage, ArgumentValue::Full, logPower, logPalette);
-				if (observer->checkStatusProcess()) {
-					emit showImage(newImage, displayi - 1);		// manual one-base correction
-				}
+				showImage(newImage, displayi - 1);		// manual one-base correction
 			} else {
 				// draw on image
 				ImageOperations::drawLegend(*getLabelOrCurrentImage(operation, image, true), *newImage, operation->getArgument(ArgumentLabel::Position, ArgumentValue::BottomRight), logPower, logPalette);
@@ -529,12 +519,12 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		}
 		errorMsg += " in\n" + operation->line;
 		cerr << e.what() << endl;
-		emit showDialog(errorMsg.c_str());
+		showDialog(errorMsg);
 		doAbort();
 	} catch (std::exception e) {
 		string errorMsg = Util::getExceptionDetail(e) + " in\n" + operation->line;
 		cerr << e.what() << endl;
-		emit showDialog(errorMsg.c_str());
+		showDialog(errorMsg);
 		doAbort();
 	}
 	return done;
@@ -573,6 +563,38 @@ void ScriptProcessing::doAbort() {
 	scriptOperations->close();
 
 	observer->resetProgressTimer();
-	emit resetUI();
-	emit clearStatus();
+	resetUI();
+	clearStatus();
+}
+
+void ScriptProcessing::resetUI() {
+	emit resetUIQt();
+}
+
+void ScriptProcessing::resetImages() {
+	emit resetImagesQt();
+}
+
+void ScriptProcessing::clearStatus() {
+	emit clearStatusQt();
+}
+
+void ScriptProcessing::showStatus(int i, int tot, string label) {
+	if (observer->checkStatusProcess()) {
+		emit showStatusQt(i, tot, label.c_str());
+	}
+}
+
+void ScriptProcessing::showInfo(string info, int displayi) {
+	emit showInfoQt(info.c_str(), displayi);
+}
+
+void ScriptProcessing::showImage(Mat* image, int displayi) {
+	if (observer->checkImageProcess()) {
+		emit showImageQt(image, displayi);
+	}
+}
+
+void ScriptProcessing::showDialog(string message) {
+	emit showDialogQt(message.c_str());
 }

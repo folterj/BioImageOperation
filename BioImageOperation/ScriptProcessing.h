@@ -29,16 +29,6 @@ class ScriptProcessing : public QObject
 {
 	Q_OBJECT
 
-signals:
-	void resetUI();
-	void resetImages();
-	void clearStatus();
-	void showStatus(int i, int tot = 0, const char* label = "");
-	void showInfo(const char* info, int displayi);
-	void showImage(Mat* image, int displayi);
-	void showDialog(const char* message);
-
-
 public:
 	Observer* observer;
 	std::thread* processThread;
@@ -96,4 +86,22 @@ public:
 	 * Abort thread, attempt closing output streams to prevent data loss
 	 */
 	void doAbort();
+
+	// 'Internal' functions encapsulating Qt signal emits
+	void resetUI();
+	void resetImages();
+	void clearStatus();
+	void showStatus(int i, int tot = 0, string label = "");
+	void showInfo(string info, int displayi);
+	void showImage(Mat* image, int displayi);
+	void showDialog(string message);
+
+signals:
+	void resetUIQt();
+	void resetImagesQt();
+	void clearStatusQt();
+	void showStatusQt(int i, int tot = 0, const char* label = "");
+	void showInfoQt(const char* info, int displayi);
+	void showImageQt(Mat* image, int displayi);
+	void showDialogQt(const char* message);
 };
