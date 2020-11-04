@@ -50,11 +50,12 @@ public:
 	bool hasInnerOperations();
 	ScriptOperation* getNextInnerOperation();
 	string getArgument(ArgumentLabel label = ArgumentLabel::None);
-	string getArgument(ArgumentLabel label, string defaultArgument);
+	ArgumentValue getArgument(ArgumentLabel label, ArgumentValue defaultArgument);
 	double getArgumentNumeric(ArgumentLabel label = ArgumentLabel::None, bool oneBase = false);
 	bool getArgumentBoolean(ArgumentLabel label = ArgumentLabel::None);
 	int getClusterDrawMode(ClusterDrawMode defaultArgument);
 	static OperationInfo getOperationInfo(ScriptOperationType type);
+	static ArgumentType getExpectedArgumentType(ArgumentLabel argument);
 	static string getOperationList();
 	static void writeOperationList(string filename);
 

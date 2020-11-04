@@ -9,6 +9,7 @@
 
 #include "Argument.h"
 #include "Util.h"
+#include "Constants.h"
 
 
 Argument::Argument(string arg) {
@@ -48,4 +49,44 @@ ArgumentLabel Argument::getArgumentLabel(string arg) {
 		label = (ArgumentLabel)enumIndex;
 	}
 	return label;
+}
+
+bool Argument::checkType(ArgumentType argumentType) {
+	bool ok = true;
+	double x;
+
+	switch (argumentType) {
+	case ArgumentType::Num:
+		ok = Util::isNumeric(value);
+		break;
+
+	case ArgumentType::Fraction:
+		ok = Util::isNumeric(value);
+		if (ok) {
+			x = stof(value);
+			ok = (x >= 0 && x <= 1);
+		}
+		break;
+
+	case ArgumentType::Display:
+		ok = Util::isNumeric(value);
+		if (ok) {
+			x = stoi(value);
+			ok = (x >= 0 && x < Constants::nDisplays);
+		}
+		break;
+
+	case ArgumentType::Bool:
+		if (value != "") {
+			ok = Util::isBoolean(value);
+		}
+		break;
+
+	case ArgumentType::Codec:
+		ok = (value.size() == 4);
+		break;
+
+	}
+
+	return ok;
 }

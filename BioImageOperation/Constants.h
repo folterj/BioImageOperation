@@ -147,27 +147,6 @@ enum class FrameType
 	Capture
 };
 
-enum class SaveFormat
-{
-	ByTime,
-	ByLabel,
-	Split
-};
-
-enum class ImageColorMode
-{
-	GrayScale,
-	Color,
-	ColorAlpha
-};
-
-enum class Palette
-{
-	Grayscale,
-	Heat,
-	Rainbow,
-};
-
 enum class ClusterDrawMode : int
 {
 	None = 0,
@@ -200,32 +179,38 @@ const vector<string> ClusterDrawModes =
 	"TracksDefault"
 };
 
-enum class AccumMode
+enum class ArgumentValue
 {
-	Age,
-	Usage
-};
+	Image,
+	Video,
+	Capture,
 
+	ByTime,
+	ByLabel,
+	Split,
 
-enum class PathDrawMode
-{
+	GrayScale,
+	Color,
+	ColorAlpha,
+
+	Grayscale,
+	Heat,
+	Rainbow,
+
 	Age,
 	Usage,
 	Usage2,
 	Links,
 	LinksMove,
-};
 
-enum class DrawPosition
-{
 	Full,
 	TopLeft,
 	BottomLeft,
 	TopRight,
-	BottomRight,
+	BottomRight
 };
 
-const vector<string> argumentValues =
+const vector<string> ArgumentValues =
 {
 	"Image",
 	"Video",
@@ -242,19 +227,6 @@ const vector<string> argumentValues =
 	"Grayscale",
 	"Heat",
 	"Rainbow",
-
-	"None",
-	"Point",
-	"Circle",
-	"Box",
-	"Angle",
-	"Label",
-	"Labeln",
-	"Track",
-	"Tracks",
-	"Fill",
-	"ClusterDefault",
-	"TracksDefault",
 
 	"Age",
 	"Usage",

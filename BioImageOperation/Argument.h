@@ -18,6 +18,21 @@ using namespace std;
  * All labels for script operation arguments
  */
 
+enum class ArgumentType
+{
+	None,
+	Bool,
+	Num,
+	Fraction,
+	Var,
+	Label,
+	Display,
+	Tracker,
+	Enum,
+	Path,
+	Codec,
+};
+
 enum class ArgumentLabel
 {
 	None,
@@ -112,10 +127,12 @@ class Argument
 {
 public:
 	string allArgument;
+	ArgumentType argumentType = ArgumentType::None;
 	ArgumentLabel argumentLabel = ArgumentLabel::None;
 	string value = "";
 	bool required = false;
 
 	Argument(string arg);
 	ArgumentLabel getArgumentLabel(string arg);
+	bool checkType(ArgumentType argumentType);
 };

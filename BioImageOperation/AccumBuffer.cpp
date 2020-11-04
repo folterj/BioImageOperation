@@ -30,7 +30,7 @@ void AccumBuffer::create(int width, int height) {
 	set = true;
 }
 
-void AccumBuffer::addImage(Mat* image, AccumMode accumMode) {
+void AccumBuffer::addImage(Mat* image, ArgumentValue accumMode) {
 	// assume binary image
 	this->accumMode = accumMode;
 
@@ -38,17 +38,17 @@ void AccumBuffer::addImage(Mat* image, AccumMode accumMode) {
 		create(image->cols, image->rows);
 	}
 
-	if (accumMode == AccumMode::Usage) {
+	if (accumMode == ArgumentValue::Usage) {
 		helpImage.setTo(1);							// binary image has values 0 or 255 -> instead use 0 or 1
 		accumulate(helpImage, accumImage, *image);	// use image as mask (add)
-	} else if (accumMode == AccumMode::Age) {
+	} else if (accumMode == ArgumentValue::Age) {
 		helpImage.setTo(total);
 		helpImage.copyTo(accumImage, *image);		// use image as mask (replace)
 	}
 	total++;
 }
 
-void AccumBuffer::getImage(Mat* dest, float power, Palette palette) {
+void AccumBuffer::getImage(Mat* dest, float power, ArgumentValue palette) {
 	Mat image;
 	float* inData;
 	unsigned char* outData;
@@ -75,8 +75,8 @@ void AccumBuffer::getImage(Mat* dest, float power, Palette palette) {
 			// process any non-zero pixel
 			if (val != 0) {
 				switch (accumMode) {
-				case AccumMode::Age: scale = (float)1 / (total - val); break;
-				case AccumMode::Usage: scale = (float)val / total; break;
+				case ArgumentValue::Age: scale = (float)1 / (total - val); break;
+				case ArgumentValue::Usage: scale = (float)val / total; break;
 				}
 				// 	colScale: 0...1
 				colScale = -log10(scale) / power;		// log: 1(E0) ... 1E-[power]
@@ -89,9 +89,9 @@ void AccumBuffer::getImage(Mat* dest, float power, Palette palette) {
 				}
 
 				switch (palette) {
-				case Palette::Grayscale: color = ColorScale::getGrayScale(colScale); break;
-				case Palette::Heat: color = ColorScale::getHeatScale(colScale); break;
-				case Palette::Rainbow: color = ColorScale::getRainbowScale(colScale); break;
+				case ArgumentValue::Grayscale: color = ColorScale::getGrayScale(colScale); break;
+				case ArgumentValue::Heat: color = ColorScale::getHeatScale(colScale); break;
+				case ArgumentValue::Rainbow: color = ColorScale::getRainbowScale(colScale); break;
 				}
 				outData[pixeli * 3 + 0] = color.b;
 				outData[pixeli * 3 + 1] = color.g;
