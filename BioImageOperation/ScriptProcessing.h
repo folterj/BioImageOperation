@@ -48,7 +48,7 @@ public:
 	double sourceFps = 0;
 	int sourceFrameNumber = 0;
 	double logPower = 0;
-	ArgumentValue logPalette;
+	Palette logPalette;
 	bool abort = false;
 	bool debugMode = false;
 

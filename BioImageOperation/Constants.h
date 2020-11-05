@@ -147,6 +147,48 @@ enum class FrameType
 	Capture
 };
 
+enum class SaveFormat
+{
+	ByTime,
+	ByLabel,
+	Split
+};
+
+const vector<string> SaveFormats =
+{
+	"ByTime",
+	"ByLabel",
+	"Split"
+};
+
+enum class ImageColorMode
+{
+	GrayScale,
+	Color,
+	ColorAlpha
+};
+
+const vector<string> ImageColorModes =
+{
+	"GrayScale",
+	"Color",
+	"ColorAlpha"
+};
+
+enum class Palette
+{
+	Grayscale,
+	Heat,
+	Rainbow
+};
+
+const vector<string> Palettes =
+{
+	"GrayScale",
+	"Heat",
+	"Rainbow"
+};
+
 enum class ClusterDrawMode : int
 {
 	None = 0,
@@ -160,7 +202,7 @@ enum class ClusterDrawMode : int
 	Tracks = 0x80,
 	Fill = 0x100,
 	ClusterDefault = Fill,
-	TracksDefault = Tracks,
+	TracksDefault = Tracks
 };
 
 const vector<string> ClusterDrawModes =
@@ -179,30 +221,38 @@ const vector<string> ClusterDrawModes =
 	"TracksDefault"
 };
 
-enum class ArgumentValue
+enum class AccumMode
 {
-	Image,
-	Video,
-	Capture,
+	Age,
+	Usage
+};
 
-	ByTime,
-	ByLabel,
-	Split,
+const vector<string> AccumModes =
+{
+	"Age",
+	"Usage"
+};
 
-	GrayScale,
-	Color,
-	ColorAlpha,
-
-	Grayscale,
-	Heat,
-	Rainbow,
-
+enum class PathDrawMode
+{
 	Age,
 	Usage,
 	Usage2,
 	Links,
-	LinksMove,
+	LinksMove
+};
 
+const vector<string> PathDrawModes =
+{
+	"Age",
+	"Usage",
+	"Usage2",
+	"Links",
+	"LinksMove"
+};
+
+enum class DrawPosition
+{
 	Full,
 	TopLeft,
 	BottomLeft,
@@ -210,30 +260,8 @@ enum class ArgumentValue
 	BottomRight
 };
 
-const vector<string> ArgumentValues =
+const vector<string> DrawPositions =
 {
-	"Image",
-	"Video",
-	"Capture",
-
-	"ByTime",
-	"ByLabel",
-	"Split",
-
-	"GrayScale",
-	"Color",
-	"ColorAlpha",
-
-	"Grayscale",
-	"Heat",
-	"Rainbow",
-
-	"Age",
-	"Usage",
-	"Usage2",
-	"Links",
-	"LinksMove",
-
 	"Full",
 	"TopLeft",
 	"BottomLeft",

@@ -190,7 +190,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				width = sourceWidth;
 				height = sourceHeight;
 			}
-			ImageOperations::create(newImage, width, height, operation->getArgument(ArgumentLabel::ColorMode, ArgumentValue::Color), operation->getArgumentNumeric(ArgumentLabel::Red), operation->getArgumentNumeric(ArgumentLabel::Green), operation->getArgumentNumeric(ArgumentLabel::Blue));
+			ImageOperations::create(newImage, width, height, (ImageColorMode)operation->getArgument(ArgumentLabel::ColorMode, (int)ImageColorMode::Color), operation->getArgumentNumeric(ArgumentLabel::Red), operation->getArgumentNumeric(ArgumentLabel::Green), operation->getArgumentNumeric(ArgumentLabel::Blue));
 			sourceWidth = width;
 			sourceHeight = height;
 			sourceFrameNumber = 0;
@@ -377,12 +377,12 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::AddAccum:
-			accumBuffer->addImage(getLabelOrCurrentImage(operation, image, true), operation->getArgument(ArgumentLabel::AccumMode, ArgumentValue::Age));
+			accumBuffer->addImage(getLabelOrCurrentImage(operation, image, true), (AccumMode)operation->getArgument(ArgumentLabel::AccumMode, (int)AccumMode::Age));
 			break;
 
 		case ScriptOperationType::GetAccum:
 			logPower = operation->getArgumentNumeric();
-			logPalette = operation->getArgument(ArgumentLabel::Palette, ArgumentValue::Grayscale);
+			logPalette = (Palette)operation->getArgument(ArgumentLabel::Palette, (int)Palette::Grayscale);
 			accumBuffer->getImage(newImage, (float)logPower, logPalette);
 			newImageSet = true;
 			break;
@@ -411,9 +411,9 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::DrawPaths:
 			logPower = operation->getArgumentNumeric();
-			logPalette = operation->getArgument(ArgumentLabel::Palette, ArgumentValue::Grayscale);
+			logPalette = (Palette)operation->getArgument(ArgumentLabel::Palette, (int)Palette::Grayscale);
 			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->drawPaths(getLabelOrCurrentImage(operation, image, true), newImage,
-				operation->getArgument(ArgumentLabel::PathDrawMode, ArgumentValue::Age), (float)logPower, logPalette);
+				(PathDrawMode)operation->getArgument(ArgumentLabel::PathDrawMode, (int)PathDrawMode::Age), (float)logPower, logPalette);
 			newImageSet = true;
 			break;
 
@@ -428,12 +428,12 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::SaveClusters:
 			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultDataExtension);
-			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->saveClusters(outputPath.createFilePath(frame), frame, getTime(frame), operation->getArgument(ArgumentLabel::Format, ArgumentValue::ByTime), operation->getArgumentBoolean(ArgumentLabel::Contour));
+			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->saveClusters(outputPath.createFilePath(frame), frame, getTime(frame), (SaveFormat)operation->getArgument(ArgumentLabel::Format, (int)SaveFormat::ByTime), operation->getArgumentBoolean(ArgumentLabel::Contour));
 			break;
 
 		case ScriptOperationType::SaveTracks:
 			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultDataExtension);
-			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->saveTracks(outputPath.createFilePath(frame), frame, getTime(frame), operation->getArgument(ArgumentLabel::Format, ArgumentValue::ByTime), operation->getArgumentBoolean(ArgumentLabel::Contour));
+			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->saveTracks(outputPath.createFilePath(frame), frame, getTime(frame), (SaveFormat)operation->getArgument(ArgumentLabel::Format, (int)SaveFormat::ByTime), operation->getArgumentBoolean(ArgumentLabel::Contour));
 			break;
 
 		case ScriptOperationType::SavePaths:
@@ -456,11 +456,11 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			if (displayi > 0) {
 				// show in separate display
 				ImageOperations::create(newImage, 1000, 1000);
-				ImageOperations::drawLegend(*newImage, *newImage, ArgumentValue::Full, logPower, logPalette);
+				ImageOperations::drawLegend(*newImage, *newImage, DrawPosition::Full, logPower, logPalette);
 				showImage(newImage, displayi - 1);		// manual one-base correction
 			} else {
 				// draw on image
-				ImageOperations::drawLegend(*getLabelOrCurrentImage(operation, image, true), *newImage, operation->getArgument(ArgumentLabel::Position, ArgumentValue::BottomRight), logPower, logPalette);
+				ImageOperations::drawLegend(*getLabelOrCurrentImage(operation, image, true), *newImage, (DrawPosition)operation->getArgument(ArgumentLabel::Position, (int)DrawPosition::BottomRight), logPower, logPalette);
 				newImageSet = true;
 			}
 			break;

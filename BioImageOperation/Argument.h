@@ -24,13 +24,19 @@ enum class ArgumentType
 	Bool,
 	Num,
 	Fraction,
-	Var,
+	TimeFrame,
 	Label,
 	Display,
 	Tracker,
-	Enum,
 	Path,
 	Codec,
+	ColorMode,
+	AccumMode,
+	Palette,
+	DrawMode,
+	PathDrawMode,
+	Format,
+	Position,
 };
 
 enum class ArgumentLabel
@@ -130,9 +136,10 @@ public:
 	ArgumentType argumentType = ArgumentType::None;
 	ArgumentLabel argumentLabel = ArgumentLabel::None;
 	string value = "";
+	int valueEnum;
 	bool required = false;
 
 	Argument(string arg);
 	ArgumentLabel getArgumentLabel(string arg);
-	bool checkType(ArgumentType argumentType);
+	int parseType(ArgumentType argumentType);
 };

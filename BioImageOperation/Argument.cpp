@@ -51,11 +51,18 @@ ArgumentLabel Argument::getArgumentLabel(string arg) {
 	return label;
 }
 
-bool Argument::checkType(ArgumentType argumentType) {
-	bool ok = true;
+int Argument::parseType(ArgumentType argumentType) {
+	int parsed = -1;
+	bool ok = false;
 	double x;
+	vector<string> parts;
 
 	switch (argumentType) {
+	case ArgumentType::Path:
+		// * check if path exists?
+		ok = true;
+		break;
+
 	case ArgumentType::Num:
 		ok = Util::isNumeric(value);
 		break;
@@ -65,6 +72,22 @@ bool Argument::checkType(ArgumentType argumentType) {
 		if (ok) {
 			x = stof(value);
 			ok = (x >= 0 && x <= 1);
+		}
+		break;
+
+	case ArgumentType::TimeFrame:
+		if (value.find(":") >= 0) {
+			parts = Util::split(value, ":");
+			for (string part : parts) {
+				if (part != "") {
+					ok = Util::isNumeric(value);
+					if (!ok) {
+						break;
+					}
+				}
+			}
+		} else {
+			ok = Util::isNumeric(value);
 		}
 		break;
 
@@ -86,7 +109,38 @@ bool Argument::checkType(ArgumentType argumentType) {
 		ok = (value.size() == 4);
 		break;
 
+	case ArgumentType::AccumMode:
+		parsed = Util::getListIndex(AccumModes, value);
+		break;
+
+	case ArgumentType::ColorMode:
+		parsed = Util::getListIndex(ImageColorModes, value);
+		break;
+
+	case ArgumentType::DrawMode:
+		parsed = Util::getListIndex(ClusterDrawModes, value);
+		break;
+
+	case ArgumentType::Format:
+		parsed = Util::getListIndex(SaveFormats, value);
+		break;
+
+	case ArgumentType::Palette:
+		parsed = Util::getListIndex(Palettes, value);
+		break;
+
+	case ArgumentType::PathDrawMode:
+		parsed = Util::getListIndex(PathDrawModes, value);
+		break;
+
+	case ArgumentType::Position:
+		parsed = Util::getListIndex(DrawPositions, value);
+		break;
+
 	}
 
-	return ok;
+	if (ok) {
+		parsed = 0;
+	}
+	return parsed;
 }

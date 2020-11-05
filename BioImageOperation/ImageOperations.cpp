@@ -12,7 +12,7 @@
 #include "ColorScale.h"
 
 
-void ImageOperations::create(Mat* image, int width, int height, ArgumentValue colorMode, double r, double g, double b) {
+void ImageOperations::create(Mat* image, int width, int height, ImageColorMode colorMode, double r, double g, double b) {
 	int nchannels = 1;
 
 	if (width == 0 || height == 0) {
@@ -20,8 +20,8 @@ void ImageOperations::create(Mat* image, int width, int height, ArgumentValue co
 	}
 
 	switch (colorMode) {
-	case ArgumentValue::Color: nchannels = 3; break;
-	case ArgumentValue::ColorAlpha: nchannels = 4; break;
+	case ImageColorMode::Color: nchannels = 3; break;
+	case ImageColorMode::ColorAlpha: nchannels = 4; break;
 	}
 
 	image->create(height, width, CV_MAKETYPE(CV_8U, nchannels));
@@ -131,7 +131,7 @@ void ImageOperations::invert(InputArray source, OutputArray dest) {
 	bitwise_not(source, dest);
 }
 
-void ImageOperations::drawLegend(InputArray source, OutputArray dest, ArgumentValue position, double logPower, ArgumentValue palette) {
+void ImageOperations::drawLegend(InputArray source, OutputArray dest, DrawPosition position, double logPower, Palette palette) {
 	double vwidth = 0.05;
 	double vheight = 0.25;
 	int width = source.cols();
@@ -142,10 +142,10 @@ void ImageOperations::drawLegend(InputArray source, OutputArray dest, ArgumentVa
 	bool isColor = (source.channels() > 1);
 
 	switch (position) {
-	case ArgumentValue::TopLeft: left = 0; top = 0; break;
-	case ArgumentValue::BottomLeft: left = width - lwidth; top = height - lheight; break;
-	case ArgumentValue::TopRight: left = 0; top = 0; break;
-	case ArgumentValue::BottomRight: left = width - lwidth; top = height - lheight; break;
+	case DrawPosition::TopLeft: left = 0; top = 0; break;
+	case DrawPosition::BottomLeft: left = width - lwidth; top = height - lheight; break;
+	case DrawPosition::TopRight: left = 0; top = 0; break;
+	case DrawPosition::BottomRight: left = width - lwidth; top = height - lheight; break;
 	default: left = 0; top = 0; lwidth = width; lheight = height; break;
 	}
 
@@ -158,7 +158,7 @@ void ImageOperations::drawLegend(InputArray source, OutputArray dest, ArgumentVa
 	}
 }
 
-void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, ArgumentValue palette) {
+void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Palette palette) {
 	Scalar background = Scalar(0, 0, 0);
 	Scalar infoColor = Scalar(0x7F, 0x7F, 0x7F);
 	BGR color;
@@ -193,8 +193,8 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Argu
 	for (int y = ystart; y < yend; y++) {
 		val = (float)(y - ystart) / yrange;
 		switch (palette) {
-		case ArgumentValue::Heat: color = ColorScale::getHeatScale(val); break;
-		case ArgumentValue::Rainbow: color = ColorScale::getRainbowScale(val); break;
+		case Palette::Heat: color = ColorScale::getHeatScale(val); break;
+		case Palette::Rainbow: color = ColorScale::getRainbowScale(val); break;
 		default: color = ColorScale::getGrayScale(val); break;
 		}
 

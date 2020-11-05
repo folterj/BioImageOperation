@@ -22,13 +22,13 @@ class AccumBuffer
 {
 public:
 	Mat accumImage, helpImage;
-	ArgumentValue accumMode = ArgumentValue::Age;
+	AccumMode accumMode = AccumMode::Age;
 	int total;
 	bool set = false;
 
 	AccumBuffer();
 	void reset();
 	void create(int width, int height);
-	void addImage(Mat* image, ArgumentValue accumMode);
-	void getImage(Mat* dest, float power, ArgumentValue palette);
+	void addImage(Mat* image, AccumMode accumMode);
+	void getImage(Mat* dest, float power, Palette palette);
 };

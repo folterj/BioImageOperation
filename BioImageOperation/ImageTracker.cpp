@@ -578,7 +578,7 @@ void ImageTracker::drawTracks(Mat* source, Mat* dest, int drawMode, int ntracks)
 	}
 }
 
-void ImageTracker::drawPaths(Mat* source, Mat* dest, ArgumentValue drawMode, float power, ArgumentValue palette) {
+void ImageTracker::drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, float power, Palette palette) {
 	float scale, colScale;
 	int maxUsage = 0;
 	BGR color;
@@ -590,8 +590,8 @@ void ImageTracker::drawPaths(Mat* source, Mat* dest, ArgumentValue drawMode, flo
 		power = 6;
 	}
 
-	if (drawMode == ArgumentValue::Links || drawMode == ArgumentValue::LinksMove) {
-		animate = (drawMode == ArgumentValue::LinksMove);
+	if (drawMode == PathDrawMode::Links || drawMode == PathDrawMode::LinksMove) {
+		animate = (drawMode == PathDrawMode::LinksMove);
 		// sort highest last so drawn on top
 		sort(pathLinks.begin(), pathLinks.end(),
 			[](PathLink* a, PathLink* b) { return a->getMax() < b->getMax(); });
@@ -612,9 +612,9 @@ void ImageTracker::drawPaths(Mat* source, Mat* dest, ArgumentValue drawMode, flo
 			}
 
 			switch (palette) {
-			case ArgumentValue::Grayscale: color = ColorScale::getGrayScale(colScale); break;
-			case ArgumentValue::Heat: color = ColorScale::getHeatScale(colScale); break;
-			case ArgumentValue::Rainbow: color = ColorScale::getRainbowScale(colScale); break;
+			case Palette::Grayscale: color = ColorScale::getGrayScale(colScale); break;
+			case Palette::Heat: color = ColorScale::getHeatScale(colScale); break;
+			case Palette::Rainbow: color = ColorScale::getRainbowScale(colScale); break;
 			}
 
 			link->draw(dest, Util::bgrtoScalar(color), maxUsage, animate);
@@ -622,9 +622,9 @@ void ImageTracker::drawPaths(Mat* source, Mat* dest, ArgumentValue drawMode, flo
 	} else {
 		for (PathNode* node : pathNodes) {
 			switch (drawMode) {
-			case ArgumentValue::Age: scale = (float)(1.0 / node->lastUse); break;	// *** same as 1f / (total - lastuse), with lastuse only assigned to once without need to increment continuously?
-			case ArgumentValue::Usage: scale = (float)node->getAccumUsage(); break;
-			case ArgumentValue::Usage2: scale = (float)node->getAccumUsage2(pathAge); break;
+			case PathDrawMode::Age: scale = (float)(1.0 / node->lastUse); break;	// *** same as 1f / (total - lastuse), with lastuse only assigned to once without need to increment continuously?
+			case PathDrawMode::Usage: scale = (float)node->getAccumUsage(); break;
+			case PathDrawMode::Usage2: scale = (float)node->getAccumUsage2(pathAge); break;
 			}
 			// 	colScale: 0...1
 			colScale = -log10(scale) / power;		// log: 1(E0) ... 1E-[power]
@@ -637,9 +637,9 @@ void ImageTracker::drawPaths(Mat* source, Mat* dest, ArgumentValue drawMode, flo
 			}
 
 			switch (palette) {
-			case ArgumentValue::Grayscale: color = ColorScale::getGrayScale(colScale); break;
-			case ArgumentValue::Heat: color = ColorScale::getHeatScale(colScale); break;
-			case ArgumentValue::Rainbow: color = ColorScale::getRainbowScale(colScale); break;
+			case Palette::Grayscale: color = ColorScale::getGrayScale(colScale); break;
+			case Palette::Heat: color = ColorScale::getHeatScale(colScale); break;
+			case Palette::Rainbow: color = ColorScale::getRainbowScale(colScale); break;
 			}
 
 			node->draw(dest, Util::bgrtoScalar(color));
@@ -715,7 +715,7 @@ string ImageTracker::getInfo() {
  * Save routines
  */
 
-void ImageTracker::saveClusters(string filename, int frame, double time, ArgumentValue saveFormat, bool writeContour) {
+void ImageTracker::saveClusters(string filename, int frame, double time, SaveFormat saveFormat, bool writeContour) {
 	OutputStream outStream;
 	string s = "";
 	string header;
@@ -733,12 +733,12 @@ void ImageTracker::saveClusters(string filename, int frame, double time, Argumen
 	header += "\n";
 	nmaincols = Util::split(header, ",").size() - 2;
 
-	if (saveFormat != ArgumentValue::Split) {
+	if (saveFormat != SaveFormat::Split) {
 		clusterStream.init(filename, header);
 	}
 
 	if (clusterParamsFinalised) {
-		if (saveFormat == ArgumentValue::ByLabel) {
+		if (saveFormat == SaveFormat::ByLabel) {
 			for (Cluster* cluster : clusters) {
 				maxi = max(cluster->getFirstLabel(), maxi);
 			}
@@ -757,11 +757,11 @@ void ImageTracker::saveClusters(string filename, int frame, double time, Argumen
 				}
 			}
 			s += "\n";
-		} else if (saveFormat == ArgumentValue::ByTime) {
+		} else if (saveFormat == SaveFormat::ByTime) {
 			for (Cluster* cluster : clusters) {
 				s += Util::format("%d,%f,%s\n", frame, time, cluster->getCsv(writeContour).c_str());
 			}
-		} else if (saveFormat == ArgumentValue::Split) {
+		} else if (saveFormat == SaveFormat::Split) {
 			for (Cluster* cluster : clusters) {
 				s += Util::format("%d,%f,%s\n", frame, time, cluster->getCsv(writeContour).c_str());
 				filepath.setOutputPath(filename);
@@ -771,13 +771,13 @@ void ImageTracker::saveClusters(string filename, int frame, double time, Argumen
 			}
 		}
 
-		if (saveFormat != ArgumentValue::Split) {
+		if (saveFormat != SaveFormat::Split) {
 			clusterStream.write(s);
 		}
 	}
 }
 
-void ImageTracker::saveTracks(string filename, int frame, double time, ArgumentValue saveFormat, bool writeContour) {
+void ImageTracker::saveTracks(string filename, int frame, double time, SaveFormat saveFormat, bool writeContour) {
 	OutputStream outStream;
 	string s = "";
 	string header;
@@ -795,12 +795,12 @@ void ImageTracker::saveTracks(string filename, int frame, double time, ArgumentV
 	header += "\n";
 	nmaincols = Util::split(header, ",").size() - 2;
 
-	if (saveFormat != ArgumentValue::Split) {
+	if (saveFormat != SaveFormat::Split) {
 		trackStream.init(filename, header);
 	}
 
 	if (trackParamsFinalised) {
-		if (saveFormat == ArgumentValue::ByLabel) {
+		if (saveFormat == SaveFormat::ByLabel) {
 			for (ClusterTrack* track : clusterTracks) {
 				maxi = max(track->label, maxi);
 			}
@@ -819,11 +819,11 @@ void ImageTracker::saveTracks(string filename, int frame, double time, ArgumentV
 				}
 			}
 			s += "\n";
-		} else if (saveFormat == ArgumentValue::ByTime) {
+		} else if (saveFormat == SaveFormat::ByTime) {
 			for (ClusterTrack* track : clusterTracks) {
 				s += Util::format("%d,%f,%s\n", frame, time, track->getCsv(findTrackedCluster(track), writeContour).c_str());
 			}
-		} else if (saveFormat == ArgumentValue::Split) {
+		} else if (saveFormat == SaveFormat::Split) {
 			for (ClusterTrack* track : clusterTracks) {
 				s += Util::format("%d,%f,%s\n", frame, time, track->getCsv(findTrackedCluster(track), writeContour).c_str());
 				filepath.setOutputPath(filename);
@@ -833,7 +833,7 @@ void ImageTracker::saveTracks(string filename, int frame, double time, ArgumentV
 			}
 		}
 
-		if (saveFormat != ArgumentValue::Split) {
+		if (saveFormat != SaveFormat::Split) {
 			trackStream.write(s);
 		}
 	}

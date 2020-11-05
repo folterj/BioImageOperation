@@ -46,11 +46,11 @@ public:
 	~ScriptOperation();
 	void reset();
 	void extract(string line);
-	void checkArguments();
+	void parseArguments();
 	bool hasInnerOperations();
 	ScriptOperation* getNextInnerOperation();
 	string getArgument(ArgumentLabel label = ArgumentLabel::None);
-	ArgumentValue getArgument(ArgumentLabel label, ArgumentValue defaultArgument);
+	int getArgument(ArgumentLabel label, int defaultArgument);
 	double getArgumentNumeric(ArgumentLabel label = ArgumentLabel::None, bool oneBase = false);
 	bool getArgumentBoolean(ArgumentLabel label = ArgumentLabel::None);
 	int getClusterDrawMode(ClusterDrawMode defaultArgument);

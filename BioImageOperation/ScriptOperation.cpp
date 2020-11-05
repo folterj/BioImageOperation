@@ -108,13 +108,13 @@ void ScriptOperation::extract(string line) {
 
 	if (Util::contains(ScriptOperationTypes, operation)) {
 		operationType = (ScriptOperationType)Util::getListIndex(ScriptOperationTypes, operation);
-		checkArguments();
+		parseArguments();
 	} else {
 		throw invalid_argument("Unkown operation: " + operation);
 	}
 }
 
-void ScriptOperation::checkArguments() {
+void ScriptOperation::parseArguments() {
 	OperationInfo info = getOperationInfo(operationType);
 	vector<ArgumentLabel> requiredArguments = info.requiredArguments;
 	vector<ArgumentLabel> optionalArguments = info.optionalArguments;
@@ -143,7 +143,8 @@ void ScriptOperation::checkArguments() {
 				}
 			}
 			if (found) {
-				if (!foundArgument->checkType(expectedType)) {
+				foundArgument->valueEnum = foundArgument->parseType(expectedType);
+				if (foundArgument->valueEnum < 0) {
 					s = "Unexpected value for argument: " + foundArgument->allArgument;
 					throw invalid_argument(s);
 				}
@@ -210,19 +211,24 @@ string ScriptOperation::getArgument(ArgumentLabel label) {
 	return arg;
 }
 
-ArgumentValue ScriptOperation::getArgument(ArgumentLabel label, ArgumentValue defaultArgument) {
-	ArgumentValue argumentValue;
-	string arg = getArgument(label);
-	if (arg != "") {
-		if (Util::contains(ArgumentValues, arg)) {
-			argumentValue = (ArgumentValue)Util::getListIndex(ArgumentValues, arg);
-		} else {
-			throw invalid_argument("Unkown argument: " + arg);
+int ScriptOperation::getArgument(ArgumentLabel label, int defaultArgument) {
+	int argumentValue = -1;
+
+	if (label != ArgumentLabel::None) {
+		// search for label
+		for (Argument* argument : arguments) {
+			if (argument->argumentLabel == label) {
+				argumentValue = argument->valueEnum;
+				break;
+			}
 		}
-	} else {
+	} else if (arguments.size() > 0) {
+		// else return first argument
+		argumentValue = arguments.at(0)->valueEnum;
+	}
+	if (argumentValue < 0) {
 		argumentValue = defaultArgument;
 	}
-
 	return argumentValue;
 }
 
@@ -662,21 +668,40 @@ ArgumentType ScriptOperation::getExpectedArgumentType(ArgumentLabel argument) {
 
 	case ArgumentLabel::Start:
 	case ArgumentLabel::Length:
-		type = ArgumentType::Var;
-		break;
-
-	case ArgumentLabel::ColorMode:
-	case ArgumentLabel::AccumMode:
-	case ArgumentLabel::Palette:
-	case ArgumentLabel::DrawMode:
-	case ArgumentLabel::PathDrawMode:
-	case ArgumentLabel::Format:
-	case ArgumentLabel::Position:
-		type = ArgumentType::Enum;
+		type = ArgumentType::TimeFrame;
 		break;
 
 	case ArgumentLabel::Codec:
 		type = ArgumentType::Codec;
+		break;
+
+	case ArgumentLabel::ColorMode:
+		type = ArgumentType::ColorMode;
+		break;
+
+	case ArgumentLabel::AccumMode:
+		type = ArgumentType::AccumMode;
+		break;
+
+	case ArgumentLabel::Palette:
+		type = ArgumentType::Palette;
+		break;
+
+	case ArgumentLabel::DrawMode:
+		type = ArgumentType::DrawMode;
+		break;
+
+	case ArgumentLabel::PathDrawMode:
+		type = ArgumentType::PathDrawMode;
+		break;
+
+	case ArgumentLabel::Format:
+		type = ArgumentType::Format;
+		break;
+
+	case ArgumentLabel::Position:
+		type = ArgumentType::Position;
+		break;
 
 		// end of switch
 	}
