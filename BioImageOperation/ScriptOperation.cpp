@@ -143,8 +143,7 @@ void ScriptOperation::parseArguments() {
 				}
 			}
 			if (found) {
-				foundArgument->valueEnum = foundArgument->parseType(expectedType);
-				if (foundArgument->valueEnum < 0) {
+				if (!foundArgument->parseType(expectedType)) {
 					s = "Unexpected value for argument: " + foundArgument->allArgument;
 					throw invalid_argument(s);
 				}

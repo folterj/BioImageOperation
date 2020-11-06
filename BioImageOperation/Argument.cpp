@@ -51,15 +51,15 @@ ArgumentLabel Argument::getArgumentLabel(string arg) {
 	return label;
 }
 
-int Argument::parseType(ArgumentType argumentType) {
-	int parsed = -1;
+bool Argument::parseType(ArgumentType argumentType) {
 	bool ok = false;
 	double x;
 	vector<string> parts;
 
+	valueEnum = -1;
+
 	switch (argumentType) {
 	case ArgumentType::Path:
-		// * check if path exists?
 		ok = true;
 		break;
 
@@ -100,6 +100,7 @@ int Argument::parseType(ArgumentType argumentType) {
 		break;
 
 	case ArgumentType::Bool:
+		// no value is valid (interpreted as true)
 		if (value != "") {
 			ok = Util::isBoolean(value);
 		}
@@ -110,37 +111,35 @@ int Argument::parseType(ArgumentType argumentType) {
 		break;
 
 	case ArgumentType::AccumMode:
-		parsed = Util::getListIndex(AccumModes, value);
+		valueEnum = Util::getListIndex(AccumModes, value);
 		break;
 
 	case ArgumentType::ColorMode:
-		parsed = Util::getListIndex(ImageColorModes, value);
+		valueEnum = Util::getListIndex(ImageColorModes, value);
 		break;
 
 	case ArgumentType::DrawMode:
-		parsed = Util::getListIndex(ClusterDrawModes, value);
+		valueEnum = Util::getListIndex(ClusterDrawModes, value);
 		break;
 
 	case ArgumentType::Format:
-		parsed = Util::getListIndex(SaveFormats, value);
+		valueEnum = Util::getListIndex(SaveFormats, value);
 		break;
 
 	case ArgumentType::Palette:
-		parsed = Util::getListIndex(Palettes, value);
+		valueEnum = Util::getListIndex(Palettes, value);
 		break;
 
 	case ArgumentType::PathDrawMode:
-		parsed = Util::getListIndex(PathDrawModes, value);
+		valueEnum = Util::getListIndex(PathDrawModes, value);
 		break;
 
 	case ArgumentType::Position:
-		parsed = Util::getListIndex(DrawPositions, value);
+		valueEnum = Util::getListIndex(DrawPositions, value);
 		break;
-
 	}
-
-	if (ok) {
-		parsed = 0;
+	if (valueEnum >= 0) {
+		ok = true;
 	}
-	return parsed;
+	return ok;
 }

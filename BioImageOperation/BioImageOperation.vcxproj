@@ -145,6 +145,7 @@
     <ClCompile Include="ScriptOperations.cpp" />
     <ClCompile Include="ScriptProcessing.cpp" />
     <ClCompile Include="StatData.cpp" />
+    <ClCompile Include="TextWindow.cpp" />
     <ClCompile Include="TrackClusterMatch.cpp" />
     <ClCompile Include="TrackingParams.cpp" />
     <ClCompile Include="TrackingStats.cpp" />
@@ -157,6 +158,7 @@
     <QtMoc Include="MainWindow.h" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="BioImageOperation.cpp" />
+    <QtUic Include="TextWindow.ui" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AccumBuffer.h" />
@@ -182,6 +184,7 @@
     <ClInclude Include="PathLink.h" />
     <ClInclude Include="PathNode.h" />
     <ClInclude Include="StatData.h" />
+    <QtMoc Include="TextWindow.h" />
     <ClInclude Include="TrackClusterMatch.h" />
     <ClInclude Include="TrackingParams.h" />
     <ClInclude Include="TrackingStats.h" />

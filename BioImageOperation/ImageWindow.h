@@ -36,8 +36,8 @@ public:
 	ImageWindow(QWidget* parent = Q_NULLPTR);
 	~ImageWindow();
 	void init(Observer* observer, int title);
-	void updateTitle();
-	void draw(Mat* image);
 	void updateFps();
+	void updateTitle();
+	void showImage(Mat* image);
 	void saveImage();
 };

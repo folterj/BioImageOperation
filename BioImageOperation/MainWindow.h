@@ -15,6 +15,7 @@
 #include <opencv2/opencv.hpp>
 #include "Observer.h"
 #include "ImageWindow.h"
+#include "TextWindow.h"
 #include "ScriptProcessing.h"
 
 using namespace std;
@@ -28,12 +29,15 @@ class MainWindow : public QMainWindow, public Observer
 	Q_OBJECT
 
 private:
-	string filepath;
 	Ui::MainWindow ui;
 	ImageWindow imageWindows[4];
+	TextWindow textWindows[4];
+	TextWindow operationsTextForm;
 	ScriptProcessing scriptProcessing;
 	QTimer* timer;
 	Clock::time_point time;
+	string filepath;
+	bool fileModified = false;
 	bool statusQueued = false;
 	bool imageQueued = false;
 	int processCount = 0;
@@ -42,7 +46,15 @@ private:
 public:
 	MainWindow(QWidget *parent = Q_NULLPTR);
 	void setFilePath(string filepath);
+	void updateTitle();
+	void clearInput();
+	void openDialog();
+	void saveDialog();
+	void save();
+	void askSaveChanges();
+	void textChanged();
 	void process();
+	void updateUI(bool start);
 	virtual void resetProgressTimer() override;
 	virtual bool checkStatusProcess() override;
 	virtual bool checkImageProcess() override;
@@ -52,9 +64,9 @@ public slots:
 	virtual void resetImages() override;
 	virtual void clearStatus() override;
 	virtual void showStatus(int i, int tot = 0, const char* label = "") override;
-	virtual void showInfo(const char* info, int displayi) override;
+	virtual void showDialog(const char* message, MessageLevel level = MessageLevel::Info) override;
+	virtual void showText(const char* text, int displayi) override;
 	virtual void showImage(Mat* image, int displayi) override;
-	virtual void showDialog(const char* message) override;
 	void timerElapsed();
 
 protected:

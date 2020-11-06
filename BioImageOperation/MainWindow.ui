@@ -16,7 +16,11 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QPlainTextEdit" name="scriptTextEdit"/>
+     <widget class="QPlainTextEdit" name="scriptTextEdit">
+      <property name="tabStopWidth">
+       <number>20</number>
+      </property>
+     </widget>
     </item>
     <item>
      <layout class="QHBoxLayout">
@@ -54,6 +58,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="abortButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Abort</string>
         </property>
@@ -109,10 +116,6 @@
    </property>
   </action>
   <action name="actionClear">
-   <property name="icon">
-    <iconset theme="document-new">
-     <normaloff>.</normaloff>.</iconset>
-   </property>
    <property name="text">
     <string>Clear</string>
    </property>

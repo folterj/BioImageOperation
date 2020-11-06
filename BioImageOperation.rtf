@@ -1,0 +1,151 @@
+{\rtf1\ansi\deff0 {\fonttbl {\f0 Consolas;}}
+{\colortbl;\red0\green0\blue0;\red127\green127\blue127;\red0\green0\blue255;}\margl720\margr720\margt720\margb720 \fs20
+\b BioImageOperation script operations\b0\line
+\line
+\b SetPath\b0 (Path) \line
+{\cf3 \tab \bullet Set path for relative file paths (by default path of current script file)}\line
+\line
+\b CreateImage\b0 ({\cf2 Width}, {\cf2 Height}, {\cf2 ColorMode}, {\cf2 Red}, {\cf2 Green}, {\cf2 Blue}) \line
+{\cf3 \tab \bullet Create a new image}\line
+\line
+\b OpenImage\b0 (Path, {\cf2 Start}, {\cf2 Length}, {\cf2 Interval}) \line
+{\cf3 \tab \bullet Open image file(s) for processing, accepts file name pattern, start/length #}\line
+\line
+\b OpenVideo\b0 (Path, {\cf2 API}, {\cf2 Start}, {\cf2 Length}, {\cf2 Interval}) \line
+{\cf3 \tab \bullet Open video file(s) and process frames, accepts file name pattern, start/length frames or time (ffmpeg formats supported) (API: See OpenCV API codes)}\line
+\line
+\b OpenCapture\b0 ({\cf2 API}, {\cf2 Path}, {\cf2 Source}, {\cf2 Width}, {\cf2 Height}, {\cf2 Interval}) \line
+{\cf3 \tab \bullet Open capturing from video (IP) path or camera source (#) (API: See OpenCV API codes)}\line
+\line
+\b SaveImage\b0 (Path, {\cf2 Label}, {\cf2 Start}, {\cf2 Length}) \line
+{\cf3 \tab \bullet Save image to file, start/length frames or time}\line
+\line
+\b SaveVideo\b0 (Path, {\cf2 Label}, {\cf2 Start}, {\cf2 Length}, {\cf2 Fps}, {\cf2 Codec}) \line
+{\cf3 \tab \bullet Create video file and save image to video file, start/length frames or time, using fourcc codec string (supports installed encoders)}\line
+\line
+\b ShowImage\b0 ({\cf2 Label}, {\cf2 Display}) \line
+{\cf3 \tab \bullet Show image on screen (low priority screen updates) (display: 1 - 4)}\line
+\line
+\b StoreImage\b0 (Label) \line
+{\cf3 \tab \bullet Store current image in memory}\line
+\line
+\b GetImage\b0 (Label) \line
+{\cf3 \tab \bullet Get specified stored image from memory}\line
+\line
+\b Grayscale\b0 ({\cf2 Label}) \line
+{\cf3 \tab \bullet Convert image to gray scale}\line
+\line
+\b Color\b0 ({\cf2 Label}) \line
+{\cf3 \tab \bullet Convert image to color}\line
+\line
+\b ColorAlpha\b0 ({\cf2 Label}) \line
+{\cf3 \tab \bullet Convert image to color with alpha channel}\line
+\line
+\b GetSaturation\b0 ({\cf2 Label}) \line
+{\cf3 \tab \bullet Extract saturation from image}\line
+\line
+\b GetHsValue\b0 ({\cf2 Label}) \line
+{\cf3 \tab \bullet Extract (HSV) Value from image}\line
+\line
+\b GetHsLightness\b0 ({\cf2 Label}) \line
+{\cf3 \tab \bullet Extract (HSL) Lightness from image}\line
+\line
+\b Scale\b0 (Width, Height, {\cf2 Label}) \line
+{\cf3 \tab \bullet Scale image}\line
+\line
+\b Crop\b0 (X, Y, Width, Height, {\cf2 Label}) \line
+{\cf3 \tab \bullet Crop image}\line
+\line
+\b Mask\b0 (Label) \line
+{\cf3 \tab \bullet Perform mask on current image}\line
+\line
+\b Threshold\b0 ({\cf2 Label}, {\cf2 Level}) \line
+{\cf3 \tab \bullet Convert image to binary using threshold level, or in case not provided using automatic Otsu method}\line
+\line
+\b Difference\b0 (Label) \line
+{\cf3 \tab \bullet Perform difference of current image and specified image}\line
+\line
+\b DifferenceAbs\b0 (Label) \line
+{\cf3 \tab \bullet Perform absolute difference of current image and specified image}\line
+\line
+\b Add\b0 (Label) \line
+{\cf3 \tab \bullet Adds specified image to current image}\line
+\line
+\b Multiply\b0 (Factor) \line
+{\cf3 \tab \bullet Perform multiplication of all color channels by specified factor}\line
+\line
+\b Invert\b0 ({\cf2 Label}) \line
+{\cf3 \tab \bullet Invert image}\line
+\line
+\b UpdateBackground\b0 ({\cf2 Label}, {\cf2 Weight}) \line
+{\cf3 \tab \bullet Add image to the adaptive background buffer}\line
+\line
+\b UpdateAverage\b0 ({\cf2 Label}, {\cf2 Weight}) \line
+{\cf3 \tab \bullet Add image to the average buffer}\line
+\line
+\b ClearSeries\b0 () \line
+{\cf3 \tab \bullet Clear image series buffer}\line
+\line
+\b AddSeries\b0 ({\cf2 Label}, {\cf2 Maximum}) \line
+{\cf3 \tab \bullet Add image to image series buffer}\line
+\line
+\b GetSeriesMedian\b0 () \line
+{\cf3 \tab \bullet Retrieve median image of image series buffer}\line
+\line
+\b AddAccum\b0 ({\cf2 Label}, {\cf2 AccumMode}) \line
+{\cf3 \tab \bullet Add image to the accumulative buffer (AccumMode: Age, Usage)}\line
+\line
+\b GetAccum\b0 ({\cf2 Power}, {\cf2 Palette}) \line
+{\cf3 \tab \bullet Retrieve the accumulative buffer and convert to image (Palette: Grayscale, Heat, Rainbow)}\line
+\line
+\b CreateClusters\b0 ({\cf2 Tracker}, {\cf2 MinArea}, {\cf2 MaxArea}) \line
+{\cf3 \tab \bullet Create clusters; auto calibrate using initial images if no parameters specified}\line
+\line
+\b CreateTracks\b0 ({\cf2 Tracker}, {\cf2 MaxMove}, {\cf2 MinActive}, {\cf2 MaxInactive}) \line
+{\cf3 \tab \bullet Create cluster tracking; auto calibrate using initial images if no parameters specified}\line
+\line
+\b CreatePaths\b0 ({\cf2 Tracker}, {\cf2 Distance}) \line
+{\cf3 \tab \bullet Create common path usage}\line
+\line
+\b DrawClusters\b0 ({\cf2 Label}, {\cf2 Tracker}, {\cf2 DrawMode}) \line
+{\cf3 \tab \bullet Draw clusters (DrawMode: Point|Circle|Box|Angle|Label|Labeln|Fill)}\line
+\line
+\b DrawTracks\b0 ({\cf2 Label}, {\cf2 Tracker}, {\cf2 DrawMode}) \line
+{\cf3 \tab \bullet Draw tracked clusters (DrawMode: Point|Circle|Box|Angle|Label|Labeln|Track|Tracks)}\line
+\line
+\b DrawPaths\b0 ({\cf2 Label}, {\cf2 Tracker}, {\cf2 PathDrawMode}, {\cf2 Power}, {\cf2 Palette}) \line
+{\cf3 \tab \bullet Draw common paths (PathDrawMode: Age, Usage, Links, LinksMove) (Palette: Grayscale, Heat, Rainbow)}\line
+\line
+\b SaveClusters\b0 (Path, {\cf2 Tracker}, {\cf2 Format}, {\cf2 Contour}) \line
+{\cf3 \tab \bullet Save clusters to CSV file (Format: ByTime, ByLabel, Split)}\line
+\line
+\b SaveTracks\b0 (Path, {\cf2 Tracker}, {\cf2 Format}, {\cf2 Contour}) \line
+{\cf3 \tab \bullet Save cluster tracking to CSV file (Format: ByTime, ByLabel, Split)}\line
+\line
+\b SavePaths\b0 (Path, {\cf2 Tracker}) \line
+{\cf3 \tab \bullet Save paths to CSV file}\line
+\line
+\b ShowTrackInfo\b0 ({\cf2 Tracker}, {\cf2 Display}) \line
+{\cf3 \tab \bullet Show tracking information on screen (Display: 1 - 4)}\line
+\line
+\b DrawTrackInfo\b0 ({\cf2 Label}, {\cf2 Tracker}) \line
+{\cf3 \tab \bullet Draw tracking stats on image}\line
+\line
+\b SaveTrackInfo\b0 (Path, {\cf2 Tracker}) \line
+{\cf3 \tab \bullet Save tracking information to CSV file}\line
+\line
+\b SaveTrackLog\b0 (Path, {\cf2 Tracker}) \line
+{\cf3 \tab \bullet Save tracking log to CSV file}\line
+\line
+\b DrawLegend\b0 ({\cf2 Label}, {\cf2 Display}, {\cf2 Position}) \line
+{\cf3 \tab \bullet Draw legend (Display: 1 - 4 or Position on image: TopLeft, BottomLeft, TopRight, BottomRight)}\line
+\line
+\b Wait\b0 ({\cf2 MS}) \line
+{\cf3 \tab \bullet Pause execution for a period (1000 ms default)}\line
+\line
+\b Debug\b0 () \line
+{\cf3 \tab \bullet Debug mode}\line
+\line
+\line
+\b Arguments:\b0 \tab Required \tab {\cf2 Optional}\line
+}

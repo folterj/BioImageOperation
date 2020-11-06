@@ -91,9 +91,9 @@ void ScriptProcessing::registerObserver(Observer* observer) {
 	connect(this, &ScriptProcessing::resetImagesQt, (MainWindow*)observer, &MainWindow::resetImages);
 	connect(this, &ScriptProcessing::clearStatusQt, (MainWindow*)observer, &MainWindow::clearStatus);
 	connect(this, &ScriptProcessing::showStatusQt, (MainWindow*)observer, &MainWindow::showStatus);
-	connect(this, &ScriptProcessing::showInfoQt, (MainWindow*)observer, &MainWindow::showInfo);
-	connect(this, &ScriptProcessing::showImageQt, (MainWindow*)observer, &MainWindow::showImage);
 	connect(this, &ScriptProcessing::showDialogQt, (MainWindow*)observer, &MainWindow::showDialog);
+	connect(this, &ScriptProcessing::showTextQt, (MainWindow*)observer, &MainWindow::showText);
+	connect(this, &ScriptProcessing::showImageQt, (MainWindow*)observer, &MainWindow::showImage);
 }
 
 bool ScriptProcessing::startProcess(string filepath, string script) {
@@ -108,7 +108,7 @@ bool ScriptProcessing::startProcess(string filepath, string script) {
 		//processThread->start();
 		processThread = new std::thread(&ScriptProcessing::processThreadMethod, this);
 	} catch (exception e) {
-		showDialog(Util::getExceptionDetail(e));
+		showDialog(Util::getExceptionDetail(e), MessageLevel::Warning);
 		doAbort();
 		return false;
 	}
@@ -418,7 +418,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::ShowTrackInfo:
-			showInfo(imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->getInfo(), (int)operation->getArgumentNumeric(ArgumentLabel::Display, true));
+			showText(imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->getInfo(), (int)operation->getArgumentNumeric(ArgumentLabel::Display, true));
 			break;
 
 		case ScriptOperationType::DrawTrackInfo:
@@ -519,12 +519,12 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		}
 		errorMsg += " in\n" + operation->line;
 		cerr << e.what() << endl;
-		showDialog(errorMsg);
+		showDialog(errorMsg, MessageLevel::Error);
 		doAbort();
 	} catch (std::exception e) {
 		string errorMsg = Util::getExceptionDetail(e) + " in\n" + operation->line;
 		cerr << e.what() << endl;
-		showDialog(errorMsg);
+		showDialog(errorMsg, MessageLevel::Error);
 		doAbort();
 	}
 	return done;
@@ -585,16 +585,16 @@ void ScriptProcessing::showStatus(int i, int tot, string label) {
 	}
 }
 
-void ScriptProcessing::showInfo(string info, int displayi) {
-	emit showInfoQt(info.c_str(), displayi);
+void ScriptProcessing::showDialog(string message, MessageLevel level) {
+	emit showDialogQt(message.c_str(), level);
+}
+
+void ScriptProcessing::showText(string text, int displayi) {
+	emit showTextQt(text.c_str(), displayi);
 }
 
 void ScriptProcessing::showImage(Mat* image, int displayi) {
 	if (observer->checkImageProcess()) {
 		emit showImageQt(image, displayi);
 	}
-}
-
-void ScriptProcessing::showDialog(string message) {
-	emit showDialogQt(message.c_str());
 }

@@ -8,6 +8,9 @@
  *****************************************************************************/
 
 #include "MainWindow.h"
+#include <QMessageBox>
+#include <QFileDialog>
+#include "Keepalive.h"
 #include "Util.h"
 
 // https://mithatkonar.com/wiki/doku.php/qt/toward_robust_icon_support
@@ -17,11 +20,23 @@ MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent) {
 
 	ui.setupUi(this);
+	connect(ui.actionNew, &QAction::triggered, this, &MainWindow::clearInput);
+	connect(ui.actionOpen, &QAction::triggered, this, &MainWindow::openDialog);
+	connect(ui.actionSave, &QAction::triggered, this, &MainWindow::save);
+	connect(ui.actionSave_As, &QAction::triggered, this, &MainWindow::saveDialog);
+	connect(ui.actionExit, &QAction::triggered, this, &QWidget::close);
+
+	connect(ui.scriptTextEdit, &QPlainTextEdit::textChanged, this, &MainWindow::textChanged);
+
 	connect(ui.processButton, &QAbstractButton::clicked, this, &MainWindow::process);
 	connect(ui.abortButton, &QAbstractButton::clicked, &scriptProcessing, &ScriptProcessing::doAbort);
 
 	for (int i = 0; i < Constants::nDisplays; i++) {
 		imageWindows[i].init(this, i);
+	}
+
+	for (int i = 0; i < Constants::nDisplays; i++) {
+		textWindows[i].init(this, i);
 	}
 
 	scriptProcessing.registerObserver(this);
@@ -35,16 +50,109 @@ void MainWindow::setFilePath(string filepath) {
 	this->filepath = filepath;
 }
 
+void MainWindow::updateTitle() {
+	string title = "Bio Image Operation";
+	string fileTitle = Util::extractTitle(filepath);
+	if (fileTitle != "") {
+		title += " - " + fileTitle;
+		if (fileModified) {
+			title += "*";
+		}
+	}
+	setWindowTitle(Util::convertToQString(title));
+}
+
+void MainWindow::clearInput() {
+	ui.scriptTextEdit->clear();
+	fileModified = false;
+}
+
+void MainWindow::openDialog() {
+	QString qfilename;
+	string text = "";
+	string line;
+
+	try {
+		qfilename = QFileDialog::getOpenFileName(this, tr("Load script"));
+		if (qfilename != "") {
+			filepath = qfilename.toStdString();
+			scriptProcessing.doAbort();
+			clearInput();
+			ui.scriptTextEdit->setPlainText(Util::convertToQString(Util::readText(filepath)));
+			fileModified = false;
+			updateTitle();
+		}
+	} catch (std::exception e) {
+		showDialog(Util::getExceptionDetail(e).c_str());
+	}
+}
+
+void MainWindow::saveDialog() {
+	QString qfilename;
+	string extension;
+	int extPos;
+
+	try {
+		qfilename = QFileDialog::getSaveFileName(this, tr("Save script"));
+		if (qfilename != "") {
+			filepath = qfilename.toStdString();
+			save();
+		}
+	} catch (std::exception e) {
+		showDialog(Util::getExceptionDetail(e).c_str());
+	}
+}
+
+void MainWindow::save() {
+	try {
+		OutputStream output;
+		output.init(filepath);
+		output.write(ui.scriptTextEdit->toPlainText().toStdString());
+		output.closeStream();
+
+		if (fileModified) {
+			fileModified = false;
+			updateTitle();
+		}
+	} catch (std::exception e) {
+		showDialog(Util::getExceptionDetail(e).c_str());
+	}
+}
+
+void MainWindow::askSaveChanges() {
+	if (fileModified) {
+		if (QMessageBox::question(this, "File modified", "Save changes?", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+			save();
+		}
+	}
+}
+
+void MainWindow::textChanged() {
+	if (!fileModified) {
+		fileModified = true;
+		updateTitle();
+	}
+}
+
 void MainWindow::process() {
-	//updateUI(true);
-
-	ui.scriptTextEdit->setPlainText(QString("OpenVideo('D:\\Video\\test.mkv')\n{\nShowImage()\n}"));
-
+	updateUI(true);
 	scriptProcessing.startProcess(filepath, ui.scriptTextEdit->toPlainText().toStdString());
 }
 
-void MainWindow::resetUI() {
+void MainWindow::updateUI(bool start) {
+	ui.processButton->setEnabled(!start);
+	ui.abortButton->setEnabled(start);
+	ui.scriptTextEdit->setReadOnly(start);
 
+	if (start) {
+		Keepalive::startKeepAlive();
+	} else {
+		Keepalive::stopKeepAlive();
+	}
+}
+
+void MainWindow::resetUI() {
+	updateUI(false);
 }
 
 void MainWindow::resetImages() {
@@ -123,8 +231,24 @@ void MainWindow::showStatus(int i, int tot, const char* label) {
 	statusQueued = false;
 }
 
-void MainWindow::showInfo(const char* info, int displayi) {
-	//infoForms[displayi]->showInfo(info);
+void MainWindow::showDialog(const char* message, MessageLevel level) {
+	switch (level) {
+	case MessageLevel::Error:
+		QMessageBox::critical(this, "BIO", message);
+		break;
+
+	case MessageLevel::Warning:
+		QMessageBox::warning(this, "BIO", message);
+		break;
+
+	default:
+		QMessageBox::information(this, "BIO", message);
+		break;
+	}
+}
+
+void MainWindow::showText(const char* text, int displayi) {
+	textWindows[displayi].showText(text);
 }
 
 bool MainWindow::checkImageProcess() {
@@ -142,16 +266,12 @@ void MainWindow::showImage(Mat* image, int displayi) {
 		displayi = 0;
 	}
 
-	//if (imageWindows[displayi].setImage(image)) {
-		imageWindows[displayi].draw(image);
-	//}
+	imageWindows[displayi].showImage(image);
 	imageQueued = false;
 }
 
-void MainWindow::showDialog(const char* message) {
-	//MessageBox::Show(message, "Operation error");
-}
-
 void MainWindow::closeEvent(QCloseEvent* event) {
-	exit(0);	// when main window is closed: close all child windows
+	askSaveChanges();
+	// when main window is closed: close all child windows
+	exit(0);
 }

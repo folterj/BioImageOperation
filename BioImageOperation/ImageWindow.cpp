@@ -38,6 +38,11 @@ void ImageWindow::init(Observer* observer, int title) {
 	updateTitle();
 }
 
+void ImageWindow::updateFps() {
+	displayFps = displayCount;
+	displayCount = 0;
+}
+
 void ImageWindow::updateTitle() {
 	string s = Util::format("BIO Image %d", title);
 
@@ -50,7 +55,7 @@ void ImageWindow::updateTitle() {
 	setWindowTitle(Util::convertToQString(s));
 }
 
-void ImageWindow::draw(Mat* image) {
+void ImageWindow::showImage(Mat* image) {
 	if (isHidden()) {
 		show();
 	}
@@ -66,11 +71,6 @@ void ImageWindow::draw(Mat* image) {
 
 	displayCount++;
 	updateTitle();
-}
-
-void ImageWindow::updateFps() {
-	displayFps = displayCount;
-	displayCount = 0;
 }
 
 void ImageWindow::saveImage() {

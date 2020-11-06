@@ -140,6 +140,13 @@ const vector<string> ScriptOperationTypes =
 	"Debug"
 };
 
+enum class MessageLevel
+{
+	Info,
+	Warning,
+	Error
+};
+
 enum class FrameType
 {
 	Image,

@@ -1,6 +1,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <filesystem>
+#include <fstream>
 #include "Util.h"
 
 
@@ -226,6 +227,13 @@ int Util::parseFrameTime(string s, double fps) {
 		}
 	}
 	return frames;
+}
+
+string Util::readText(string filename) {
+	ifstream input(filename);
+	ostringstream ss;
+	ss << input.rdbuf();
+	return ss.str();
 }
 
 double Util::calcDistance(double x0, double y0, double x1, double y1) {

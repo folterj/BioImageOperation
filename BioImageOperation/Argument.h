@@ -136,10 +136,10 @@ public:
 	ArgumentType argumentType = ArgumentType::None;
 	ArgumentLabel argumentLabel = ArgumentLabel::None;
 	string value = "";
-	int valueEnum;
+	int valueEnum = -1;
 	bool required = false;
 
 	Argument(string arg);
 	ArgumentLabel getArgumentLabel(string arg);
-	int parseType(ArgumentType argumentType);
+	bool parseType(ArgumentType argumentType);
 };
