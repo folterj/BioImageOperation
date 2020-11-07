@@ -44,6 +44,6 @@ ImageTracker* ImageTrackers::getTracker(Observer* observer, string trackerId, bo
 		push_back(newTracker);
 		return newTracker;
 	}
-	throw invalid_argument("Tracker with ID: " + trackerId + " not found");
+	throw invalid_argument("Tracker with ID: '" + trackerId + "' not found");
 	return NULL;
 }

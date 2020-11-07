@@ -599,7 +599,9 @@ void ScriptProcessing::showDialog(string message, MessageLevel level) {
 }
 
 void ScriptProcessing::showText(string text, int displayi) {
-	emit showTextQt(text.c_str(), displayi);
+	if (observer->checkTextProcess()) {
+		emit showTextQt(text.c_str(), displayi);
+	}
 }
 
 void ScriptProcessing::showImage(Mat* image, int displayi) {

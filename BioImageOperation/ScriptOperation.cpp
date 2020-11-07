@@ -206,7 +206,6 @@ string ScriptOperation::getArgument(ArgumentLabel label) {
 		// else return first argument
 		arg = arguments.at(0)->value;
 	}
-
 	return arg;
 }
 
@@ -766,8 +765,7 @@ string ScriptOperation::getOperationList() {
 
 void ScriptOperation::writeOperationList(string filename) {
 	string s = getOperationList();
-	OutputStream outputStream;
-	outputStream.init(filename);
+	OutputStream outputStream(filename);
 	outputStream.write(s);
 	outputStream.closeStream();
 }

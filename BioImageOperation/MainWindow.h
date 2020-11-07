@@ -38,6 +38,7 @@ private:
 	string filepath;
 	bool fileModified = false;
 	bool statusQueued = false;
+	bool textQueued = false;
 	bool imageQueued = false;
 	int processCount = 0;
 	int processFps = 0;
@@ -56,6 +57,7 @@ public:
 	void updateUI(bool start);
 	virtual void resetProgressTimer() override;
 	virtual bool checkStatusProcess() override;
+	virtual bool checkTextProcess() override;
 	virtual bool checkImageProcess() override;
 
 public slots:

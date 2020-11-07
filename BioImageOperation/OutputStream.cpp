@@ -15,6 +15,12 @@
 OutputStream::OutputStream() {
 }
 
+OutputStream::OutputStream(string filename, bool append) {
+	this->filename = filename;
+	open(filename, std::ios_base::out);
+	isOpen = is_open();
+}
+
 OutputStream::~OutputStream() {
 	closeStream();
 }
@@ -37,7 +43,6 @@ void OutputStream::init(string filename, string header) {
 			write(header);
 		}
 	}
-
 	isOpen = is_open();
 }
 

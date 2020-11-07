@@ -108,8 +108,7 @@ void MainWindow::saveDialog() {
 
 void MainWindow::save() {
 	try {
-		OutputStream output;
-		output.init(filepath);
+		OutputStream output(filepath);
 		output.write(ui.scriptTextEdit->toPlainText().toStdString());
 		output.closeStream();
 
@@ -179,6 +178,7 @@ void MainWindow::resetProgressTimer() {
 	processCount = 0;
 	processFps = 0;
 	statusQueued = false;
+	textQueued = false;
 	imageQueued = false;
 }
 
@@ -274,12 +274,23 @@ void MainWindow::showDialog(const char* message, int level) {
 	}
 }
 
+bool MainWindow::checkTextProcess() {
+	bool ok = !textQueued;
+	textQueued = true;
+	return ok;
+}
+
 void MainWindow::showText(const char* text, int displayi) {
+	if (!textQueued) {
+		return;			// ignore queued events on abort
+	}
+
 	try {
 		textWindows[displayi].showText(string(text));
 	} catch (exception e) {
 		showDialog(Util::getExceptionDetail(e).c_str(), (int)MessageLevel::Error);
 	}
+	textQueued = false;
 }
 
 bool MainWindow::checkImageProcess() {

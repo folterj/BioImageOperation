@@ -29,6 +29,7 @@ public:
 	virtual bool checkStatusProcess() = 0;
 	virtual void showStatus(int i, int tot = 0, const char* label = "") = 0;
 	virtual void showDialog(const char* message, int level = (int)MessageLevel::Info) = 0;
+	virtual bool checkTextProcess() = 0;
 	virtual void showText(const char* text, int displayi) = 0;
 	virtual bool checkImageProcess() = 0;
 	virtual void showImage(Mat* image, int displayi) = 0;
