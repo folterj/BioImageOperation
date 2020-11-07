@@ -20,10 +20,9 @@ void TextWindow::updateTitle() {
 	setWindowTitle(Util::convertToQString(s));
 }
 
-void TextWindow::showText(const char* text) {
+void TextWindow::showText(string text) {
 	if (isHidden()) {
 		show();
 	}
-
-	ui.textEdit->setPlainText(text);
+	ui.textEdit->setPlainText(Util::convertToQString(text));
 }

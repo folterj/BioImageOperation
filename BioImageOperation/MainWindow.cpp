@@ -25,6 +25,8 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(ui.actionSave, &QAction::triggered, this, &MainWindow::save);
 	connect(ui.actionSave_As, &QAction::triggered, this, &MainWindow::saveDialog);
 	connect(ui.actionExit, &QAction::triggered, this, &QWidget::close);
+	connect(ui.actionCheck_for_Updates, &QAction::triggered, this, &MainWindow::checkUpdates);
+	connect(ui.actionAbout, &QAction::triggered, this, &MainWindow::showAbout);
 
 	connect(ui.scriptTextEdit, &QPlainTextEdit::textChanged, this, &MainWindow::textChanged);
 
@@ -48,6 +50,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 void MainWindow::setFilePath(string filepath) {
 	this->filepath = filepath;
+	updateTitle();
 }
 
 void MainWindow::updateTitle() {
@@ -152,15 +155,23 @@ void MainWindow::updateUI(bool start) {
 }
 
 void MainWindow::resetUI() {
-	updateUI(false);
+	try {
+		updateUI(false);
+	} catch (exception e) {
+		showDialog(Util::getExceptionDetail(e).c_str(), (int)MessageLevel::Error);
+	}
 }
 
 void MainWindow::resetImages() {
+	try {
 	/*
-	for (int i = 0; i < Constants::nDisplays; i++) {
-		imageWindows[i].reset();
-	}
+		for (int i = 0; i < Constants::nDisplays; i++) {
+			imageWindows[i].reset();
+		}
 	*/
+	} catch (exception e) {
+		showDialog(Util::getExceptionDetail(e).c_str(), (int)MessageLevel::Error);
+	}
 }
 
 void MainWindow::resetProgressTimer() {
@@ -177,14 +188,22 @@ void MainWindow::timerElapsed() {
 		processCount = 0;
 	}
 
-	for (int i = 0; i < Constants::nDisplays; i++) {
-		imageWindows[i].updateFps();
+	try {
+		for (int i = 0; i < Constants::nDisplays; i++) {
+			imageWindows[i].updateFps();
+		}
+	} catch (exception e) {
+		showDialog(Util::getExceptionDetail(e).c_str(), (int)MessageLevel::Error);
 	}
 }
 
 void MainWindow::clearStatus() {
-	ui.statusBar->clearMessage();
-	ui.progressBar->setValue(0);
+	try {
+		ui.statusBar->clearMessage();
+		ui.progressBar->setValue(0);
+	} catch (exception e) {
+		showDialog(Util::getExceptionDetail(e).c_str(), (int)MessageLevel::Error);
+	}
 }
 
 bool MainWindow::checkStatusProcess() {
@@ -207,48 +226,60 @@ void MainWindow::showStatus(int i, int tot, const char* label) {
 		return;			// ignore queued events on abort
 	}
 
-	now = Clock::now();
-	totalElapsed = now - time;
-	totalElapseds = totalElapsed.count();
-	avgFrametime = totalElapseds / (i + 1);
+	try {
+		now = Clock::now();
+		totalElapsed = now - time;
+		totalElapseds = totalElapsed.count();
+		avgFrametime = totalElapseds / (i + 1);
 
-	if (tot > 0) {
-		progress = (double)i / tot;
-		s += Util::format("%.2f", progress);
-	}
-	if (progress > 0) {
-		estimateLeft = totalElapseds * (1 / progress - 1);
-	}
+		if (tot > 0) {
+			progress = (double)i / tot;
+			s += Util::format("%.2f", progress);
+		}
+		if (progress > 0) {
+			estimateLeft = totalElapseds * (1 / progress - 1);
+		}
 
-	s += Util::format(" %s (#%d) %.3fs @%dfps", label, i, avgFrametime, processFps);
-	s += " Elapsed: " + Util::formatTimespan((int)totalElapseds);
-	if (estimateLeft > 0) {
-		s += " Left: " + Util::formatTimespan((int)estimateLeft);
-	}
+		s += Util::format(" %s (#%d) %.3fs @%dfps", label, i, avgFrametime, processFps);
+		s += " Elapsed: " + Util::formatTimespan((int)totalElapseds);
+		if (estimateLeft > 0) {
+			s += " Left: " + Util::formatTimespan((int)estimateLeft);
+		}
 
-	ui.statusBar->showMessage(Util::convertToQString(s));
-	ui.progressBar->setValue((int)(100 * progress));
+		ui.statusBar->showMessage(Util::convertToQString(s));
+		ui.progressBar->setValue((int)(100 * progress));
+	} catch (exception e) {
+		showDialog(Util::getExceptionDetail(e).c_str(), (int)MessageLevel::Error);
+	}
 	statusQueued = false;
 }
 
-void MainWindow::showDialog(const char* message, MessageLevel level) {
-	switch (level) {
-	case MessageLevel::Error:
-		QMessageBox::critical(this, "BIO", message);
-		break;
+void MainWindow::showDialog(const char* message, int level) {
+	try {
+		switch ((MessageLevel)level) {
+		case MessageLevel::Error:
+			QMessageBox::critical(this, "BIO", message);
+			break;
 
-	case MessageLevel::Warning:
-		QMessageBox::warning(this, "BIO", message);
-		break;
+		case MessageLevel::Warning:
+			QMessageBox::warning(this, "BIO", message);
+			break;
 
-	default:
-		QMessageBox::information(this, "BIO", message);
-		break;
+		default:
+			QMessageBox::information(this, "BIO", message);
+			break;
+		}
+	} catch (exception e) {
+		cerr << Util::getExceptionDetail(e) << endl;
 	}
 }
 
 void MainWindow::showText(const char* text, int displayi) {
-	textWindows[displayi].showText(text);
+	try {
+		textWindows[displayi].showText(string(text));
+	} catch (exception e) {
+		showDialog(Util::getExceptionDetail(e).c_str(), (int)MessageLevel::Error);
+	}
 }
 
 bool MainWindow::checkImageProcess() {
@@ -262,12 +293,47 @@ void MainWindow::showImage(Mat* image, int displayi) {
 		return;			// ignore queued events on abort
 	}
 
-	if (displayi < 0 || displayi >= Constants::nDisplays) {
-		displayi = 0;
+	try {
+		if (displayi < 0 || displayi >= Constants::nDisplays) {
+			displayi = 0;
+		}
+		imageWindows[displayi].showImage(image);
+	} catch (exception e) {
+		showDialog(Util::getExceptionDetail(e).c_str(), (int)MessageLevel::Error);
 	}
-
-	imageWindows[displayi].showImage(image);
 	imageQueued = false;
+}
+
+void MainWindow::checkUpdates() {
+	string currentVersion, webVersion;
+	try {
+
+
+		// *** TODO: get current version
+		currentVersion = "1";
+
+
+		webVersion = Util::getUrl(Constants::webFilesUrl + "BIOver");
+		if (webVersion != "") {
+			if (Util::compareVersions(currentVersion, webVersion) > 0) {
+				// newer version found
+				if (QMessageBox::question(this, "BIO", "New version available for download\nGo to web page now?", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+					Util::openWebLink(Constants::webPage);
+				}
+				return;
+			} else {
+				// same (or older) version
+				showDialog("Current version is up to date.");
+				return;
+			}
+		} else {
+			showDialog("Unable to check online version information.");
+		}
+	} catch (...) { }
+}
+
+void MainWindow::showAbout() {
+
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {

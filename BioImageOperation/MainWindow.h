@@ -32,7 +32,6 @@ private:
 	Ui::MainWindow ui;
 	ImageWindow imageWindows[4];
 	TextWindow textWindows[4];
-	TextWindow operationsTextForm;
 	ScriptProcessing scriptProcessing;
 	QTimer* timer;
 	Clock::time_point time;
@@ -64,11 +63,13 @@ public slots:
 	virtual void resetImages() override;
 	virtual void clearStatus() override;
 	virtual void showStatus(int i, int tot = 0, const char* label = "") override;
-	virtual void showDialog(const char* message, MessageLevel level = MessageLevel::Info) override;
+	virtual void showDialog(const char* message, int level = (int)MessageLevel::Info) override;
 	virtual void showText(const char* text, int displayi) override;
 	virtual void showImage(Mat* image, int displayi) override;
 	void timerElapsed();
 
 protected:
+	void checkUpdates();
+	void showAbout();
 	void closeEvent(QCloseEvent* event);
 };

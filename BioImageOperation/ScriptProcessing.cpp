@@ -97,6 +97,8 @@ void ScriptProcessing::registerObserver(Observer* observer) {
 }
 
 bool ScriptProcessing::startProcess(string filepath, string script) {
+	string errorMsg;
+
 	reset();
 	basepath = Util::extractFilePath(filepath);
 
@@ -108,7 +110,9 @@ bool ScriptProcessing::startProcess(string filepath, string script) {
 		//processThread->start();
 		processThread = new std::thread(&ScriptProcessing::processThreadMethod, this);
 	} catch (exception e) {
-		showDialog(Util::getExceptionDetail(e), MessageLevel::Warning);
+		errorMsg = Util::getExceptionDetail(e);
+		cerr << errorMsg << endl;
+		showDialog(errorMsg, MessageLevel::Error);
 		doAbort();
 		return false;
 	}
@@ -518,12 +522,12 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			}
 		}
 		errorMsg += " in\n" + operation->line;
-		cerr << e.what() << endl;
+		cerr << errorMsg << endl;
 		showDialog(errorMsg, MessageLevel::Error);
 		doAbort();
 	} catch (std::exception e) {
 		string errorMsg = Util::getExceptionDetail(e) + " in\n" + operation->line;
-		cerr << e.what() << endl;
+		cerr << errorMsg << endl;
 		showDialog(errorMsg, MessageLevel::Error);
 		doAbort();
 	}
@@ -586,7 +590,12 @@ void ScriptProcessing::showStatus(int i, int tot, string label) {
 }
 
 void ScriptProcessing::showDialog(string message, MessageLevel level) {
-	emit showDialogQt(message.c_str(), level);
+	if (level == MessageLevel::Error) {
+		cerr << message << endl;
+	} else {
+		cout << message << endl;
+	}
+	emit showDialogQt(message.c_str(), (int)level);
 }
 
 void ScriptProcessing::showText(string text, int displayi) {

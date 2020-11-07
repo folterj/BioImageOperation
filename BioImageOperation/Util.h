@@ -22,7 +22,7 @@ using namespace cv;
  * General utilities
  */
 
-class Util
+class Util : public QObject
 {
 public:
 	static bool contains(string src, string target);
@@ -82,4 +82,8 @@ public:
 	static string combinePath(string basepath, string templatePath);
 
 	static QImage matToQImage(cv::Mat const& src);
+
+	static string getUrl(string url);
+	static bool openWebLink(string url);
+	static int compareVersions(string version1, string version2);
 };

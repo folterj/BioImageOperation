@@ -2,6 +2,12 @@
 #include <math.h>
 #include <filesystem>
 #include <fstream>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QEventLoop>
 #include "Util.h"
 
 
@@ -492,4 +498,51 @@ string Util::combinePath(string basepath, string templatePath) {
 QImage Util::matToQImage(cv::Mat const& src) {
 	QImage qimage(src.data, src.cols, src.rows, src.step, QImage::Format_RGB888);
 	return qimage.rgbSwapped();
+}
+
+string Util::getUrl(string url) {
+	string result;
+	try {
+		QNetworkAccessManager manager;
+		QNetworkReply* reply = manager.get(QNetworkRequest(QUrl(convertToQString(url))));
+		QEventLoop loop;
+		connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+		loop.exec();
+		QByteArray bytes = reply->readAll();
+		QString content = QString::fromUtf8(bytes.data(), bytes.size());
+		QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+		if (statusCode.isValid()) {
+			int status = statusCode.toInt();
+		}
+		result = content.toStdString();
+	} catch (...) { }
+	return result;
+}
+
+bool Util::openWebLink(string url) {
+	try {
+		QDesktopServices::openUrl(QUrl(convertToQString(url)));
+		return true;
+	} catch (...) { }
+	return false;
+}
+
+int Util::compareVersions(string version1, string version2) {
+	int comp = 0;
+	vector<string> versions1 = split(version1, ".");
+	vector<string> versions2 = split(version2, ".");
+	int v1, v2;
+
+	for (int i = 0; i < version1.size() && i < versions2.size(); i++) {
+		v1 = stoi(versions1[i]);
+		v2 = stoi(versions2[i]);
+		if (v2 > v1) {
+			comp = 1;
+			break;
+		} else if (v2 < v1) {
+			comp = -1;
+			break;
+		}
+	}
+	return comp;
 }

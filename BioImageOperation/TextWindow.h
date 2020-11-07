@@ -18,5 +18,5 @@ public:
 	~TextWindow();
 	void init(Observer* observer, int title);
 	void updateTitle();
-	void showText(const char* text);
+	void showText(string text);
 };
