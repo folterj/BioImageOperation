@@ -10,9 +10,13 @@
 #include "MainWindow.h"
 #include <QtWidgets/QApplication>
 
+Q_DECLARE_METATYPE(string)
 
-int main(int argc, char *argv[])
-{
+
+int main(int argc, char *argv[]) {
+
+	qRegisterMetaType<string>("string");
+
 	QApplication application(argc, argv);
 	MainWindow window;
 	window.show();

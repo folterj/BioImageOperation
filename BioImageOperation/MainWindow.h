@@ -16,6 +16,7 @@
 #include "Observer.h"
 #include "ImageWindow.h"
 #include "TextWindow.h"
+#include "AboutWindow.h"
 #include "ScriptProcessing.h"
 
 using namespace std;
@@ -32,6 +33,7 @@ private:
 	Ui::MainWindow ui;
 	ImageWindow imageWindows[4];
 	TextWindow textWindows[4];
+	AboutWindow aboutWindow;
 	ScriptProcessing scriptProcessing;
 	QTimer* timer;
 	Clock::time_point time;
@@ -64,9 +66,9 @@ public slots:
 	virtual void resetUI() override;
 	virtual void resetImages() override;
 	virtual void clearStatus() override;
-	virtual void showStatus(int i, int tot = 0, const char* label = "") override;
-	virtual void showDialog(const char* message, int level = (int)MessageLevel::Info) override;
-	virtual void showText(const char* text, int displayi) override;
+	virtual void showStatus(int i, int tot = 0, string label = "") override;
+	virtual void showDialog(string message, int level = (int)MessageLevel::Info) override;
+	virtual void showText(string text, int displayi) override;
 	virtual void showImage(Mat* image, int displayi) override;
 	void timerElapsed();
 

@@ -12,6 +12,7 @@ MOC_DIR += .
 OBJECTS_DIR += debug
 UI_DIR += .
 RCC_DIR += .
+RC_FILE = BioImageOperation.rc
 include(BioImageOperation.pri)
 
 # add open CV

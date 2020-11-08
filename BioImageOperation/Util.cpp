@@ -508,13 +508,15 @@ string Util::getUrl(string url) {
 		QEventLoop loop;
 		connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
 		loop.exec();
-		QByteArray bytes = reply->readAll();
-		QString content = QString::fromUtf8(bytes.data(), bytes.size());
-		QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
-		if (statusCode.isValid()) {
-			int status = statusCode.toInt();
+		if (!reply->error()) {
+			QByteArray bytes = reply->readAll();
+			QString content = QString::fromUtf8(bytes.data(), bytes.size());
+			QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+			if (statusCode.isValid()) {
+				int status = statusCode.toInt();
+			}
+			result = content.toStdString();
 		}
-		result = content.toStdString();
 	} catch (...) { }
 	return result;
 }

@@ -114,6 +114,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AboutWindow.cpp" />
     <ClCompile Include="AccumBuffer.cpp" />
     <ClCompile Include="Argument.cpp" />
     <ClCompile Include="AverageBuffer.cpp" />
@@ -153,6 +154,7 @@
     <ClCompile Include="VideoOutput.cpp" />
     <ClCompile Include="VideoSource.cpp" />
     <QtRcc Include="MainWindow.qrc" />
+    <QtUic Include="AboutWindow.ui" />
     <QtUic Include="ImageWindow.ui" />
     <QtUic Include="MainWindow.ui" />
     <QtMoc Include="MainWindow.h" />
@@ -161,6 +163,7 @@
     <QtUic Include="TextWindow.ui" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="AboutWindow.h" />
     <ClInclude Include="AccumBuffer.h" />
     <ClInclude Include="AverageBuffer.h" />
     <ClInclude Include="Averager.h" />
@@ -183,6 +186,7 @@
     <ClInclude Include="ParamRange.h" />
     <ClInclude Include="PathLink.h" />
     <ClInclude Include="PathNode.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="StatData.h" />
     <QtMoc Include="TextWindow.h" />
     <ClInclude Include="TrackClusterMatch.h" />
@@ -200,6 +204,12 @@
     <ClInclude Include="ScriptOperations.h" />
     <QtMoc Include="ScriptProcessing.h" />
     <ClInclude Include="Util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="BioImageOperation.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="BioImageOperation.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

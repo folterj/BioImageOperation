@@ -100,8 +100,8 @@ signals:
 	void resetUIQt();
 	void resetImagesQt();
 	void clearStatusQt();
-	void showStatusQt(int i, int tot = 0, const char* label = "");
-	void showDialogQt(const char* message, int level = (int)MessageLevel::Info);
-	void showTextQt(const char* text, int displayi);
+	void showStatusQt(int i, int tot = 0, string label = "");
+	void showDialogQt(string message, int level = (int)MessageLevel::Info);
+	void showTextQt(string text, int displayi);
 	void showImageQt(Mat* image, int displayi);
 };

@@ -76,7 +76,7 @@ void MainWindow::openDialog() {
 	string line;
 
 	try {
-		qfilename = QFileDialog::getOpenFileName(this, tr("Load script"));
+		qfilename = QFileDialog::getOpenFileName(this, tr("Load script"), QString(), tr("Bioscript Files (*.bioscript)"));
 		if (qfilename != "") {
 			filepath = qfilename.toStdString();
 			scriptProcessing.doAbort();
@@ -86,7 +86,7 @@ void MainWindow::openDialog() {
 			updateTitle();
 		}
 	} catch (std::exception e) {
-		showDialog(Util::getExceptionDetail(e).c_str());
+		showDialog(Util::getExceptionDetail(e));
 	}
 }
 
@@ -96,13 +96,13 @@ void MainWindow::saveDialog() {
 	int extPos;
 
 	try {
-		qfilename = QFileDialog::getSaveFileName(this, tr("Save script"));
+		qfilename = QFileDialog::getSaveFileName(this, tr("Save script"), QString(), tr("Bioscript Files (*.bioscript)"));
 		if (qfilename != "") {
 			filepath = qfilename.toStdString();
 			save();
 		}
 	} catch (std::exception e) {
-		showDialog(Util::getExceptionDetail(e).c_str());
+		showDialog(Util::getExceptionDetail(e));
 	}
 }
 
@@ -117,7 +117,7 @@ void MainWindow::save() {
 			updateTitle();
 		}
 	} catch (std::exception e) {
-		showDialog(Util::getExceptionDetail(e).c_str());
+		showDialog(Util::getExceptionDetail(e));
 	}
 }
 
@@ -157,7 +157,7 @@ void MainWindow::resetUI() {
 	try {
 		updateUI(false);
 	} catch (exception e) {
-		showDialog(Util::getExceptionDetail(e).c_str(), (int)MessageLevel::Error);
+		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 }
 
@@ -169,7 +169,7 @@ void MainWindow::resetImages() {
 		}
 	*/
 	} catch (exception e) {
-		showDialog(Util::getExceptionDetail(e).c_str(), (int)MessageLevel::Error);
+		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 }
 
@@ -193,7 +193,7 @@ void MainWindow::timerElapsed() {
 			imageWindows[i].updateFps();
 		}
 	} catch (exception e) {
-		showDialog(Util::getExceptionDetail(e).c_str(), (int)MessageLevel::Error);
+		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 }
 
@@ -202,7 +202,7 @@ void MainWindow::clearStatus() {
 		ui.statusBar->clearMessage();
 		ui.progressBar->setValue(0);
 	} catch (exception e) {
-		showDialog(Util::getExceptionDetail(e).c_str(), (int)MessageLevel::Error);
+		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 }
 
@@ -213,7 +213,7 @@ bool MainWindow::checkStatusProcess() {
 	return ok;
 }
 
-void MainWindow::showStatus(int i, int tot, const char* label) {
+void MainWindow::showStatus(int i, int tot, string label) {
 	string s;
 	double progress = 0;
 	Clock::time_point now;
@@ -240,7 +240,7 @@ void MainWindow::showStatus(int i, int tot, const char* label) {
 			estimateLeft = totalElapseds * (1 / progress - 1);
 		}
 
-		s += Util::format(" %s (#%d) %.3fs @%dfps", label, i, avgFrametime, processFps);
+		s += Util::format(" %s (#%d) %.3fs @%dfps", label.c_str(), i, avgFrametime, processFps);
 		s += " Elapsed: " + Util::formatTimespan((int)totalElapseds);
 		if (estimateLeft > 0) {
 			s += " Left: " + Util::formatTimespan((int)estimateLeft);
@@ -249,24 +249,24 @@ void MainWindow::showStatus(int i, int tot, const char* label) {
 		ui.statusBar->showMessage(Util::convertToQString(s));
 		ui.progressBar->setValue((int)(100 * progress));
 	} catch (exception e) {
-		showDialog(Util::getExceptionDetail(e).c_str(), (int)MessageLevel::Error);
+		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 	statusQueued = false;
 }
 
-void MainWindow::showDialog(const char* message, int level) {
+void MainWindow::showDialog(string message, int level) {
 	try {
 		switch ((MessageLevel)level) {
 		case MessageLevel::Error:
-			QMessageBox::critical(this, "BIO", message);
+			QMessageBox::critical(this, tr("BIO"), Util::convertToQString(message));
 			break;
 
 		case MessageLevel::Warning:
-			QMessageBox::warning(this, "BIO", message);
+			QMessageBox::warning(this, tr("BIO"), Util::convertToQString(message));
 			break;
 
 		default:
-			QMessageBox::information(this, "BIO", message);
+			QMessageBox::information(this, tr("BIO"), Util::convertToQString(message));
 			break;
 		}
 	} catch (exception e) {
@@ -280,15 +280,15 @@ bool MainWindow::checkTextProcess() {
 	return ok;
 }
 
-void MainWindow::showText(const char* text, int displayi) {
+void MainWindow::showText(string text, int displayi) {
 	if (!textQueued) {
 		return;			// ignore queued events on abort
 	}
 
 	try {
-		textWindows[displayi].showText(string(text));
+		textWindows[displayi].showText(text);
 	} catch (exception e) {
-		showDialog(Util::getExceptionDetail(e).c_str(), (int)MessageLevel::Error);
+		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 	textQueued = false;
 }
@@ -310,7 +310,7 @@ void MainWindow::showImage(Mat* image, int displayi) {
 		}
 		imageWindows[displayi].showImage(image);
 	} catch (exception e) {
-		showDialog(Util::getExceptionDetail(e).c_str(), (int)MessageLevel::Error);
+		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 	imageQueued = false;
 }
@@ -344,7 +344,7 @@ void MainWindow::checkUpdates() {
 }
 
 void MainWindow::showAbout() {
-
+	aboutWindow.exec();
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {

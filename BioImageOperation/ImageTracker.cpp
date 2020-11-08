@@ -362,7 +362,7 @@ bool ImageTracker::matchTrackCluster(TrackClusterMatch* trackClusterMatch, doubl
 
 		if (debugMode && trackParamsFinalised && !found) {
 			message = "Failed match:\nTrack " + trackClusterMatch->track->toString() + "\nPreferred:\nCluster " + trackClusterMatch->cluster->toString();
-			observer->showDialog(message.c_str());
+			observer->showDialog(message);
 		}
 	}
 

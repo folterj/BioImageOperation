@@ -585,7 +585,7 @@ void ScriptProcessing::clearStatus() {
 
 void ScriptProcessing::showStatus(int i, int tot, string label) {
 	if (observer->checkStatusProcess()) {
-		emit showStatusQt(i, tot, label.c_str());
+		emit showStatusQt(i, tot, label);
 	}
 }
 
@@ -595,7 +595,7 @@ void ScriptProcessing::showDialog(string message, MessageLevel level) {
 	} else {
 		cout << message << endl;
 	}
-	emit showDialogQt(message.c_str(), (int)level);
+	emit showDialogQt(message, (int)level);
 }
 
 void ScriptProcessing::showText(string text, int displayi) {

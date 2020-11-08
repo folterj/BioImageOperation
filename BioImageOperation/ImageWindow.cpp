@@ -96,11 +96,11 @@ void ImageWindow::saveImage() {
 	} catch (cv::Exception e) {
 		// opencv exception
 		if (e.err != "") {
-			observer->showDialog(e.err.c_str());
+			observer->showDialog(e.err);
 		} else {
-			observer->showDialog(e.msg.c_str());
+			observer->showDialog(e.msg);
 		}
 	} catch (std::exception e) {
-		observer->showDialog(Util::getExceptionDetail(e).c_str());
+		observer->showDialog(Util::getExceptionDetail(e));
 	}
 }
