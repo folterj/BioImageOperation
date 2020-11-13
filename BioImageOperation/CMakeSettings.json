@@ -10,18 +10,7 @@
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "variables": [
-        {
-          "name": "Qt5_DIR",
-          "value": "C:/Qt/5.15.0/msvc2019_64/lib/cmake",
-          "type": "PATH"
-        },
-        {
-          "name": "OpenCV_DIR",
-          "value": "C:/opencv/build/x64/vc15/lib",
-          "type": "PATH"
-        }
-      ]
+      "variables": []
     },
     {
       "name": "x64-Release",

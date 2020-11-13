@@ -12,6 +12,7 @@
 #include <QFileDialog>
 #include "Keepalive.h"
 #include "Util.h"
+#include "config.h"
 
 // https://mithatkonar.com/wiki/doku.php/qt/toward_robust_icon_support
 
@@ -72,11 +73,9 @@ void MainWindow::clearInput() {
 
 void MainWindow::openDialog() {
 	QString qfilename;
-	string text = "";
-	string line;
 
 	try {
-		qfilename = QFileDialog::getOpenFileName(this, tr("Load script"), QString(), tr("Bioscript Files (*.bioscript)"));
+		qfilename = QFileDialog::getOpenFileName(this, tr("Load script"), QString(), Util::convertToQString(Constants::scriptFileDialogFilter));
 		if (qfilename != "") {
 			filepath = qfilename.toStdString();
 			scriptProcessing.doAbort();
@@ -92,11 +91,9 @@ void MainWindow::openDialog() {
 
 void MainWindow::saveDialog() {
 	QString qfilename;
-	string extension;
-	int extPos;
 
 	try {
-		qfilename = QFileDialog::getSaveFileName(this, tr("Save script"), QString(), tr("Bioscript Files (*.bioscript)"));
+		qfilename = QFileDialog::getSaveFileName(this, tr("Save script"), QString(), Util::convertToQString(Constants::scriptFileDialogFilter));
 		if (qfilename != "") {
 			filepath = qfilename.toStdString();
 			save();
@@ -318,12 +315,7 @@ void MainWindow::showImage(Mat* image, int displayi) {
 void MainWindow::checkUpdates() {
 	string currentVersion, webVersion;
 	try {
-
-
-		// *** TODO: get current version
-		currentVersion = "1";
-
-
+		currentVersion = PROJECT_VER;
 		webVersion = Util::getUrl(Constants::webFilesUrl + "BIOver");
 		if (webVersion != "") {
 			if (Util::compareVersions(currentVersion, webVersion) > 0) {

@@ -80,28 +80,28 @@ void ScriptOperation::extract(string line) {
 				interval = stoi(part);
 			}
 		}
-		line = Util::trim_copy(line.substr(i + 1));
+		line = Util::trim(line.substr(i + 1));
 	}
 
 	i = line.find("=");
 	i1 = line.find("(");
 	if (i > 0 && i < i1) {
-		asignee = Util::trim_copy(line.substr(0, i));
-		line = Util::trim_copy(line.substr(i + 1));
+		asignee = Util::trim(line.substr(0, i));
+		line = Util::trim(line.substr(i + 1));
 	}
 
 	i1 = line.find("(");	// get index again in shortened line
 	if (i1 > 0) {
-		operation = Util::trim_copy(line.substr(0, i1));
+		operation = Util::trim(line.substr(0, i1));
 		i2 = line.find_last_of(")");
 		if (i2 < 0) {
 			i2 = line.size();
 		}
-		line = Util::trim_copy(line.substr(i1 + 1, i2 - i1 - 1));
+		line = Util::trim(line.substr(i1 + 1, i2 - i1 - 1));
 
 		for (string arg : Util::split(line, ",")) {
-			if (Util::trim_copy(arg) != "") {
-				arguments.push_back(new Argument(Util::trim_copy(arg)));
+			if (Util::trim(arg) != "") {
+				arguments.push_back(new Argument(Util::trim(arg)));
 			}
 		}
 	}
@@ -123,7 +123,7 @@ void ScriptOperation::parseArguments() {
 	string s;
 	bool found;
 
-	if (!requiredArguments.empty() && !optionalArguments.empty()) {
+	if (!requiredArguments.empty() || !optionalArguments.empty()) {
 		// check required arguments
 		for (ArgumentLabel label : requiredArguments) {
 			expectedType = getExpectedArgumentType(label);
@@ -156,6 +156,7 @@ void ScriptOperation::parseArguments() {
 		for (Argument* argument : arguments) {
 			// ignore non-labelled arguments
 			if (argument->argumentLabel != ArgumentLabel::None) {
+				expectedType = getExpectedArgumentType(argument->argumentLabel);
 				found = false;
 				for (ArgumentLabel label : requiredArguments) {
 					if (label == argument->argumentLabel) {
@@ -167,7 +168,12 @@ void ScriptOperation::parseArguments() {
 						found = true;
 					}
 				}
-				if (!found) {
+				if (found) {
+					if (!argument->parseType(expectedType)) {
+						s = "Unexpected value for argument: " + argument->allArgument;
+						throw invalid_argument(s);
+					}
+				} else {
 					throw invalid_argument("Unexpected argument: " + argument->allArgument);
 				}
 			}
@@ -285,31 +291,6 @@ bool ScriptOperation::getArgumentBoolean(ArgumentLabel label) {
 		}
 	}
 	return b;
-}
-
-int ScriptOperation::getClusterDrawMode(ClusterDrawMode defaultArgument) {
-	int clusterDrawMode = 0;
-	int clusterDrawMode0;
-	string fullArg = getArgument(ArgumentLabel::DrawMode);
-	vector<string> args = Util::split(fullArg, vector<string>{"|", "&", "+"}, true);
-	string arg;
-	bool ok = (!args.empty());
-
-	for (string arg0 : args) {
-		arg = Util::trim_copy(arg0);
-		clusterDrawMode0 = Util::getListIndex(ClusterDrawModes, arg);
-		if (clusterDrawMode0 >= 0) {
-			clusterDrawMode |= clusterDrawMode0;
-		} else {
-			ok = false;
-			throw invalid_argument("Value " + arg + " not valid for DrawMode");
-		}
-	}
-
-	if (ok) {
-		return clusterDrawMode;
-	}
-	return (int)defaultArgument;
 }
 
 OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {

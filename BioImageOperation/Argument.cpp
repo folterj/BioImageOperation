@@ -20,8 +20,8 @@ Argument::Argument(string arg) {
 
 	i = arg.find("=");
 	if (i > 0) {
-		value = Util::removeQuotes(Util::trim_copy(arg.substr(i + 1)));
-		arg = Util::trim_copy(arg.substr(0, i));	// label
+		value = Util::removeQuotes(Util::trim(arg.substr(i + 1)));
+		arg = Util::trim(arg.substr(0, i));	// label
 		label = getArgumentLabel(arg);
 		if (label != ArgumentLabel::None) {
 			argumentLabel = getArgumentLabel(arg);
@@ -60,6 +60,7 @@ bool Argument::parseType(ArgumentType argumentType) {
 
 	switch (argumentType) {
 	case ArgumentType::Path:
+	case ArgumentType::Label:
 		ok = true;
 		break;
 
@@ -119,7 +120,7 @@ bool Argument::parseType(ArgumentType argumentType) {
 		break;
 
 	case ArgumentType::DrawMode:
-		valueEnum = Util::getListIndex(ClusterDrawModes, value);
+		valueEnum = parseClusterDrawMode(value);
 		break;
 
 	case ArgumentType::Format:
@@ -142,4 +143,23 @@ bool Argument::parseType(ArgumentType argumentType) {
 		ok = true;
 	}
 	return ok;
+}
+
+int Argument::parseClusterDrawMode(string value) {
+	int clusterDrawMode = 0;
+	int clusterDrawMode0;
+	vector<string> args = Util::split(value, vector<string>{"|", "&", "+"}, true);
+	string arg;
+
+	for (string arg0 : args) {
+		arg = Util::trim(arg0);
+		clusterDrawMode0 = Util::getListIndex(ClusterDrawModes, arg);
+		if (clusterDrawMode0 >= 0) {
+			clusterDrawMode |= (1 << (clusterDrawMode0 - 1));
+		} else {
+			return -1;
+		}
+	}
+
+	return clusterDrawMode;
 }

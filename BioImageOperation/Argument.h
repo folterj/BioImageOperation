@@ -142,4 +142,5 @@ public:
 	Argument(string arg);
 	ArgumentLabel getArgumentLabel(string arg);
 	bool parseType(ArgumentType argumentType);
+	int parseClusterDrawMode(string value);
 };

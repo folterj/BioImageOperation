@@ -16,15 +16,15 @@ bool Util::contains(string src, string target) {
 }
 
 bool Util::contains(vector<string> source, string target) {
-	auto item = find(begin(source), end(source), target);
-	return (item != end(source));
+	return (getListIndex(source, target) >= 0);
 }
 
 int Util::getListIndex(vector<string> source, string target) {
 	int index = -1;
-	auto item = find(begin(source), end(source), target);
-	if (item != end(source)) {
-		index = distance(begin(source), item);
+	for (int i = 0; i < source.size(); i++) {
+		if (toLower(source[i]) == toLower(target)) {
+			index = i;
+		}
 	}
 	return index;
 }
@@ -64,60 +64,52 @@ vector<string> Util::split(const string& s, const vector<string>& delims, bool r
 	return parts;
 }
 
-string Util::toLower(string s) {
-	string s2;
-	transform(s.begin(), s.end(), s2.begin(), [](unsigned char c) { return tolower(c); });
-	return s2;
+string Util::toLower(string& s0) {
+	string s;
+	for (char c : s0) {
+		s += tolower(c);
+	}
+	return s;
 }
 
-string Util::toUpper(string s) {
-	string s2;
-	transform(s.begin(), s.end(), s2.begin(), [](unsigned char c) { return toupper(c); });
-	return s2;
+string Util::toUpper(string& s0) {
+	string s;
+	for (char c : s0) {
+		s += toupper(c);
+	}
+	return s;
 }
 
-string Util::removeQuotes(string s) {
-	string s2;
-	for (char c : s) {
+string Util::removeQuotes(string& s0) {
+	string s;
+	for (char c : s0) {
 		if (c != '\"' && c != '\'') {
-			s2 += c;
+			s += c;
 		}
 	}
-	return s2;
-}
-
-void Util::ltrim(string& s) {
-	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
-		return !std::isspace(ch);
-		}));
-}
-
-void Util::rtrim(string& s) {
-	s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
-		return !std::isspace(ch);
-		}).base(), s.end());
-}
-
-void Util::trim(string& s) {
-	ltrim(s);
-	rtrim(s);
-}
-
-string Util::ltrim_copy(string s) {
-	// *** in-place operation!
-	ltrim(s);
 	return s;
 }
 
-string Util::rtrim_copy(string s) {
-	// *** in-place operation!
-	rtrim(s);
+string Util::ltrim(string& s0) {
+	string s = s0;
+	while (s != "" && isspace(s.front())) {
+		s = s.substr(1);
+	}
 	return s;
 }
 
-string Util::trim_copy(string s) {
-	// *** in-place operation!
-	trim(s);
+string Util::rtrim(string& s0) {
+	string s = s0;
+	while (s != "" && isspace(s.back())) {
+		s = s.substr(0, s.size() - 1);
+	}
+	return s;
+}
+
+string Util::trim(string& s0) {
+	string s = s0;
+	s = ltrim(s);
+	s = rtrim(s);
 	return s;
 }
 

@@ -30,21 +30,12 @@ public:
 	static int getListIndex(vector<string> source, string target);
 	static vector<string> split(const string& s, const string& delim, bool removeEmptyEntries=false);
 	static vector<string> split(const string& s, const vector<string>& delims, bool removeEmptyEntries=false);
-	static string toLower(string s);
-	static string toUpper(string s);
-	static string removeQuotes(string s);
-	// trim from start (in place)
-	static void ltrim(string& s);
-	// trim from end (in place)
-	static void rtrim(string& s);
-	// trim from both ends (in place)
-	static void trim(string& s);
-	// trim from start (copying)
-	static string ltrim_copy(string s);
-	// trim from end (copying)
-	static string rtrim_copy(string s);
-	// trim from both ends (copying)
-	static string trim_copy(string s);
+	static string toLower(string& s0);
+	static string toUpper(string& s0);
+	static string removeQuotes(string& s0);
+	static string ltrim(string& s0);
+	static string rtrim(string& s0);
+	static string trim(string& s0);
 	static string replace(string s, string target, string replacement);
 	static string format(string format, ...);
 	static string formatTimespan(int seconds);

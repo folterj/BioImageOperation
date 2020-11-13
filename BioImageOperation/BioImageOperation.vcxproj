@@ -119,6 +119,7 @@
     <ClCompile Include="Argument.cpp" />
     <ClCompile Include="AverageBuffer.cpp" />
     <ClCompile Include="Averager.cpp" />
+    <ClCompile Include="BioImageOperation.cpp" />
     <ClCompile Include="CaptureSource.cpp" />
     <ClCompile Include="Cluster.cpp" />
     <ClCompile Include="ClusterTrack.cpp" />
@@ -136,6 +137,7 @@
     <ClCompile Include="ImageTrackers.cpp" />
     <ClCompile Include="ImageWindow.cpp" />
     <ClCompile Include="Keepalive.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="NumericPath.cpp" />
     <ClCompile Include="OperationInfo.cpp" />
     <ClCompile Include="OutputStream.cpp" />
@@ -153,24 +155,36 @@
     <ClCompile Include="Util.cpp" />
     <ClCompile Include="VideoOutput.cpp" />
     <ClCompile Include="VideoSource.cpp" />
-    <QtRcc Include="MainWindow.qrc" />
     <QtUic Include="AboutWindow.ui" />
     <QtUic Include="ImageWindow.ui" />
+    <QtUic Include="ImageWindow_QDialog.ui" />
     <QtUic Include="MainWindow.ui" />
-    <QtMoc Include="MainWindow.h" />
-    <ClCompile Include="MainWindow.cpp" />
-    <ClCompile Include="BioImageOperation.cpp" />
     <QtUic Include="TextWindow.ui" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ScriptOperation.h" />
+    <ClInclude Include="ScriptOperations.h" />
+    <ClInclude Include="StatData.h" />
+    <ClInclude Include="TrackClusterMatch.h" />
+    <ClInclude Include="TrackingParams.h" />
+    <ClInclude Include="TrackingStats.h" />
+    <ClInclude Include="Util.h" />
+    <ClInclude Include="VideoOutput.h" />
+    <ClInclude Include="VideoSource.h" />
+    <QtMoc Include="TextWindow.h" />
+    <QtMoc Include="ScriptProcessing.h" />
     <QtMoc Include="AboutWindow.h" />
     <ClInclude Include="AccumBuffer.h" />
+    <ClInclude Include="Argument.h" />
     <ClInclude Include="AverageBuffer.h" />
     <ClInclude Include="Averager.h" />
     <ClInclude Include="CaptureSource.h" />
     <ClInclude Include="Cluster.h" />
     <ClInclude Include="ClusterTrack.h" />
+    <ClInclude Include="ColorScale.h" />
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="FrameOutput.h" />
+    <ClInclude Include="FrameSource.h" />
     <ClInclude Include="ImageItem.h" />
     <ClInclude Include="ImageItemList.h" />
     <ClInclude Include="ImageOperations.h" />
@@ -179,37 +193,33 @@
     <ClInclude Include="ImageSource.h" />
     <ClInclude Include="ImageTracker.h" />
     <ClInclude Include="ImageTrackers.h" />
+    <QtMoc Include="ImageWindow.h" />
     <ClInclude Include="Keepalive.h" />
+    <QtMoc Include="MainWindow.h" />
     <ClInclude Include="NumericPath.h" />
+    <ClInclude Include="Observer.h" />
     <ClInclude Include="OperationInfo.h" />
     <ClInclude Include="OutputStream.h" />
     <ClInclude Include="ParamRange.h" />
     <ClInclude Include="PathLink.h" />
     <ClInclude Include="PathNode.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="StatData.h" />
-    <QtMoc Include="TextWindow.h" />
-    <ClInclude Include="TrackClusterMatch.h" />
-    <ClInclude Include="TrackingParams.h" />
-    <ClInclude Include="TrackingStats.h" />
-    <ClInclude Include="VideoOutput.h" />
-    <ClInclude Include="VideoSource.h" />
-    <QtMoc Include="ImageWindow.h" />
-    <ClInclude Include="Argument.h" />
-    <ClInclude Include="ColorScale.h" />
-    <ClInclude Include="Constants.h" />
-    <ClInclude Include="FrameSource.h" />
-    <ClInclude Include="Observer.h" />
-    <ClInclude Include="ScriptOperation.h" />
-    <ClInclude Include="ScriptOperations.h" />
-    <QtMoc Include="ScriptProcessing.h" />
-    <ClInclude Include="Util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="BioImageOperation.ico" />
+    <Image Include="BioImageOperation.png" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BioImageOperation.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="BioImageOperation.ico" />
+    <Text Include="CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CMakeSettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="MainWindow.qrc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

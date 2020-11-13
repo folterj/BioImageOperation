@@ -38,7 +38,7 @@ void ScriptOperations::extract(string script, int linei0) {
 	clear();
 
 	for (int linei = linei0; linei < lines.size(); linei++) {
-		line = Util::trim_copy(lines[linei]);
+		line = Util::trim(lines[linei]);
 		if (line._Starts_with("{")) {
 			// adds inner instructions for last operation
 			if (operation) {

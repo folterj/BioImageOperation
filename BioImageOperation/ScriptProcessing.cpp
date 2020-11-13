@@ -404,12 +404,12 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::DrawClusters:
-			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->drawClusters(getLabelOrCurrentImage(operation, image, true), newImage, operation->getClusterDrawMode(ClusterDrawMode::ClusterDefault));
+			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->drawClusters(getLabelOrCurrentImage(operation, image, true), newImage, operation->getArgument(ArgumentLabel::DrawMode, (int)ClusterDrawMode::ClusterDefault));
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::DrawTracks:
-			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->drawTracks(getLabelOrCurrentImage(operation, image, true), newImage, operation->getClusterDrawMode(ClusterDrawMode::TracksDefault), (int)sourceFps);
+			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->drawTracks(getLabelOrCurrentImage(operation, image, true), newImage, operation->getArgument(ArgumentLabel::DrawMode, (int)ClusterDrawMode::TracksDefault), (int)sourceFps);
 			newImageSet = true;
 			break;
 
