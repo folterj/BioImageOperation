@@ -13,12 +13,12 @@ http://joostdefolter.info/ant-research
 
 For support and discussion, please use the [Image.sc forum](https://forum.image.sc) and post to the forum with the tag 'BioImageOperation'.
 
-This is a Microsoft Visual Studio 2019 C++ Windows Forms project
+This is a Microsoft Visual Studio 2019 C++ CMake project
 
 Project Requirements
-- OpenCV 4.4.0 (https://opencv.org/)
-- Openh264 1.8.0 library (https://github.com/cisco/openh264)
-- WiX 3 (http://wixtoolset.org)
+- Qt 5 [qt.io](https://www.qt.io)
+- OpenCV 4.4.0 [opencv.org](https://opencv.org)
+- Openh264 1.8.0 library [github.com/cisco/openh264](https://github.com/cisco/openh264)
 - Windows 64-bit
 
 ![BIO screenshot](bio.png)
