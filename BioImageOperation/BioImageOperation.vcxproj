@@ -157,7 +157,6 @@
     <ClCompile Include="VideoSource.cpp" />
     <QtUic Include="AboutWindow.ui" />
     <QtUic Include="ImageWindow.ui" />
-    <QtUic Include="ImageWindow_QDialog.ui" />
     <QtUic Include="MainWindow.ui" />
     <QtUic Include="TextWindow.ui" />
   </ItemGroup>

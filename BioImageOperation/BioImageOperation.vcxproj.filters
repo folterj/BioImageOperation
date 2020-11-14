@@ -262,9 +262,6 @@
     <QtUic Include="ImageWindow.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="ImageWindow_QDialog.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
     <QtUic Include="MainWindow.ui">
       <Filter>Form Files</Filter>
     </QtUic>
