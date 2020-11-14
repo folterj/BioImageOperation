@@ -1,81 +1,63 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
+#include <filesystem>
 #include "OutputStream.h"
 #include "Util.h"
 
-using namespace System::IO;
 
-
-OutputStream::OutputStream()
-{
+OutputStream::OutputStream() {
 }
 
-OutputStream::~OutputStream()
-{
+OutputStream::OutputStream(string filename, bool append) {
+	this->filename = filename;
+	open(filename, std::ios_base::out);
+	isOpen = is_open();
+}
+
+OutputStream::~OutputStream() {
 	closeStream();
 }
 
-void OutputStream::reset()
-{
+void OutputStream::reset() {
 	closeStream();
 }
 
-void OutputStream::init(System::String^ filename, System::String^ header)
-{
+void OutputStream::init(string filename, string header) {
 	bool fileExists;
 
 	this->filename = filename;
 
-	if (!is_open())
-	{
-		fileExists = File::Exists(filename);
+	if (!is_open()) {
+		fileExists = filesystem::exists(filename);
 
-		open(Util::stdString(filename), std::ios_base::out | std::ios_base::app);
+		open(filename, std::ios_base::out | std::ios_base::app);
 
-		if (!fileExists)
-		{
+		if (!fileExists && header != "") {
 			write(header);
 		}
 	}
-
 	isOpen = is_open();
 }
 
-void OutputStream::write(System::String^ output)
-{
-	if (is_open())
-	{
-		(*this) << Util::stdString(output);
-	}
-	else
-	{
+void OutputStream::write(string output) {
+	if (is_open()) {
+		(*this) << output;
+	} else {
 		isOpen = false;
-		throw gcnew System::Exception("Unable to write to file " + filename);
+		throw ios_base::failure("Unable to write to file " + filename);
 	}
 }
 
-void OutputStream::closeStream()
-{
-	if (isOpen)
-	{
-		if (is_open())
-		{
+void OutputStream::closeStream() {
+	if (isOpen) {
+		if (is_open()) {
 			flush();
 			close();
 		}

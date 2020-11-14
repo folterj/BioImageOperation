@@ -1,294 +1,263 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
+#include <fstream>
+#include <iostream>
 #include "ScriptOperation.h"
 #include "ScriptOperations.h"
-#include "Util.h"
+#include "Constants.h"
 #include "ImageSource.h"
 #include "VideoSource.h"
 #include "CaptureSource.h"
 #include "ImageOutput.h"
 #include "VideoOutput.h"
-
-#ifdef _DEBUG
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#define new DEBUG_NEW
-#endif
-
-using namespace System::IO;
+#include "Util.h"
+#include "OutputStream.h"
+#include "config.h"
 
 
-ScriptOperation::ScriptOperation()
-{
+ScriptOperation::ScriptOperation() {
 }
 
-ScriptOperation::ScriptOperation(System::String^ line)
-{
+ScriptOperation::ScriptOperation(string line) {
 	extract(line);
 }
 
-ScriptOperation::~ScriptOperation()
-{
-	if (innerOperations)
-	{
+ScriptOperation::~ScriptOperation() {
+	if (innerOperations) {
 		delete innerOperations;
 	}
 
-	for (int i = 0; i < arguments.size(); i++)
-	{
+	for (int i = 0; i < arguments.size(); i++) {
 		delete arguments.at(i);
 	}
 
-	if (frameSource)
-	{
+	if (frameSource) {
 		delete frameSource;
 	}
 
-	if (frameOutput)
-	{
+	if (frameOutput) {
 		delete frameOutput;
 	}
 }
 
-void ScriptOperation::reset()
-{
-	if (innerOperations)
-	{
+void ScriptOperation::reset() {
+	if (innerOperations) {
 		innerOperations->reset();
 	}
 }
 
-void ScriptOperation::extract(System::String^ line)
-{
-	System::String^ operation;
+void ScriptOperation::extract(string line) {
+	string operation, part;
 	int i, i1, i2;
-	int interval0, offset0;
 
-	this->line = Util::stdString(line);
+	this->line = line;
 
-	i = line->IndexOf(":");
-	i1 = line->IndexOf("-");
-	i2 = line->IndexOf("(");
-	if (i > 0 && (i < i2 || i2 < 0))
-	{
-		if (i1 > 0 && i1 < i)
-		{
+	i = line.find(":");
+	i1 = line.find("-");
+	i2 = line.find("(");
+	if (i > 0 && (i < i2 || i2 < 0)) {
+		if (i1 > 0 && i1 < i) {
 			// interval & offset
-			if (int::TryParse(line->Substring(0, i1), interval0))
-			{
-				interval = interval0;
+			part = line.substr(0, i1);
+			if (Util::isNumeric(part)) {
+				interval = stoi(part);
 			}
 			i1++;
-			if (int::TryParse(line->Substring(i1, i - i1), offset0))
-			{
-				offset = offset0;
+			part = line.substr(i1, i - i1);
+			if (Util::isNumeric(part)) {
+				offset = stoi(part);
+			}
+		} else {
+			part = line.substr(0, i);
+			if (Util::isNumeric(part)) {
+				// interval
+				interval = stoi(part);
 			}
 		}
-		else if (int::TryParse(line->Substring(0, i), interval0))
-		{
-			// interval
-			interval = interval0;
-		}
-		line = line->Substring(i + 1)->Trim();
+		line = Util::trim(line.substr(i + 1));
 	}
 
-	i = line->IndexOf("=");
-	i1 = line->IndexOf("(");
-	if (i > 0 && i < i1)
-	{
-		asignee = Util::stdString(line->Substring(0, i)->Trim());
-		line = line->Substring(i + 1)->Trim();
+	i = line.find("=");
+	i1 = line.find("(");
+	if (i > 0 && i < i1) {
+		asignee = Util::trim(line.substr(0, i));
+		line = Util::trim(line.substr(i + 1));
 	}
 
-	i1 = line->IndexOf("(");	// get index again in shortened line
-	if (i1 > 0)
-	{
-		operation = line->Substring(0, i1)->Trim();
-		i2 = line->LastIndexOf(")");
-		if (i2 < 0)
-		{
-			i2 = line->Length;
+	i1 = line.find("(");	// get index again in shortened line
+	if (i1 > 0) {
+		operation = Util::trim(line.substr(0, i1));
+		i2 = line.find_last_of(")");
+		if (i2 < 0) {
+			i2 = line.size();
 		}
-		line = line->Substring(i1 + 1, i2 - i1 - 1)->Trim();
+		line = Util::trim(line.substr(i1 + 1, i2 - i1 - 1));
 
-		for each(System::String^ arg in line->Split(','))
-		{
-			if (arg->Trim() != "")
-			{
-				arguments.push_back(new Argument(arg->Trim()));
+		for (string arg : Util::split(line, ",")) {
+			if (Util::trim(arg) != "") {
+				arguments.push_back(new Argument(Util::trim(arg)));
 			}
 		}
 	}
 
-	if (Enum::TryParse<ScriptOperationType>(operation, true, operationType))
-	{
-		checkArguments();
-	}
-	else
-	{
-		throw gcnew ArgumentException("Unkown operation: " + operation);
+	if (Util::contains(ScriptOperationTypes, operation)) {
+		operationType = (ScriptOperationType)Util::getListIndex(ScriptOperationTypes, operation);
+		parseArguments();
+	} else {
+		throw invalid_argument("Unkown operation: " + operation);
 	}
 }
 
-void ScriptOperation::checkArguments()
-{
-	OperationInfo^ info = getOperationInfo(operationType);
-	array<ArgumentLabel>^ requiredArguments = info->requiredArguments;
-	array<ArgumentLabel>^ optionalArguments = info->optionalArguments;
+void ScriptOperation::parseArguments() {
+	OperationInfo info = getOperationInfo(operationType);
+	vector<ArgumentLabel> requiredArguments = info.requiredArguments;
+	vector<ArgumentLabel> optionalArguments = info.optionalArguments;
+	Argument* foundArgument;
+	ArgumentType expectedType;
+	string s;
 	bool found;
 
-	if (requiredArguments && optionalArguments)
-	{
+	if (!requiredArguments.empty() || !optionalArguments.empty()) {
 		// check required arguments
-		for each (ArgumentLabel label in requiredArguments)
-		{
+		for (ArgumentLabel label : requiredArguments) {
+			expectedType = getExpectedArgumentType(label);
 			found = false;
-			for each (Argument* argument in arguments)
-			{
-				if (argument->argumentLabel != ArgumentLabel::None)
-				{
-					if (argument->argumentLabel == label)
-					{
+			for (Argument* argument : arguments) {
+				if (argument->argumentLabel != ArgumentLabel::None) {
+					if (argument->argumentLabel == label) {
+						foundArgument = argument;
 						found = true;
 					}
-				}
-				else if (requiredArguments->Length == 1 && arguments.size() == 1)
-				{
-					if (label != ArgumentLabel::Path)
-					{
+				} else if (requiredArguments.size() == 1 && arguments.size() == 1) {
+					if (label != ArgumentLabel::Path) {
 						// exception: if only single required argument and no label used (except for path as this should be found)
+						foundArgument = argument;
 						found = true;
 					}
 				}
 			}
-			if (!found)
-			{
-				throw gcnew ArgumentException("Missing required argument: " + label.ToString());
+			if (found) {
+				if (!foundArgument->parseType(expectedType)) {
+					s = "Unexpected value for argument: " + foundArgument->allArgument;
+					throw invalid_argument(s);
+				}
+			} else {
+				throw invalid_argument("Missing required argument: " + ArgumentLabels[(int)label]);
 			}
 		}
 
 		// check all arguments
-		for each (Argument* argument in arguments)
-		{
+		for (Argument* argument : arguments) {
 			// ignore non-labelled arguments
-			if (argument->argumentLabel != ArgumentLabel::None)
-			{
+			if (argument->argumentLabel != ArgumentLabel::None) {
+				expectedType = getExpectedArgumentType(argument->argumentLabel);
 				found = false;
-				for each (ArgumentLabel label in requiredArguments)
-				{
-					if (label == argument->argumentLabel)
-					{
+				for (ArgumentLabel label : requiredArguments) {
+					if (label == argument->argumentLabel) {
 						found = true;
 					}
 				}
-				for each (ArgumentLabel label in optionalArguments)
-				{
-					if (label == argument->argumentLabel)
-					{
+				for (ArgumentLabel label : optionalArguments) {
+					if (label == argument->argumentLabel) {
 						found = true;
 					}
 				}
-				if (!found)
-				{
-					throw gcnew ArgumentException("Unexpected argument: " + Util::netString(argument->allArgument));
+				if (found) {
+					if (!argument->parseType(expectedType)) {
+						s = "Unexpected value for argument: " + argument->allArgument;
+						throw invalid_argument(s);
+					}
+				} else {
+					throw invalid_argument("Unexpected argument: " + argument->allArgument);
 				}
 			}
 		}
 	}
 }
 
-bool ScriptOperation::hasInnerOperations()
-{
-	if (innerOperations != NULL)
-	{
+bool ScriptOperation::hasInnerOperations() {
+	if (innerOperations != NULL) {
 		return innerOperations->hasOperations();
 	}
 	return false;
 }
 
-ScriptOperation* ScriptOperation::getNextInnerOperation()
-{
+ScriptOperation* ScriptOperation::getNextInnerOperation() {
 	ScriptOperation* innerOperation = NULL;
-	if (hasInnerOperations())
-	{
+	if (hasInnerOperations()) {
 		innerOperation = innerOperations->getCurrentOperation();
 		innerOperations->moveNextOperation();
 	}
 	return innerOperation;
 }
 
-System::String^ ScriptOperation::getArgument(ArgumentLabel label)
-{
-	System::String^ arg = "";
+string ScriptOperation::getArgument(ArgumentLabel label) {
+	string arg = "";
 
-	if (label != ArgumentLabel::None)
-	{
+	if (label != ArgumentLabel::None) {
 		// search for label
-		for each(Argument* argument in arguments)
-		{
-			if (argument->argumentLabel == label)
-			{
-				arg = Util::netString(argument->value);
+		for (Argument* argument : arguments) {
+			if (argument->argumentLabel == label) {
+				arg = argument->value;
 				break;
 			}
 		}
-	}
-	else if (arguments.size() > 0)
-	{
+	} else if (arguments.size() > 0) {
 		// else return first argument
-		arg = Util::netString(arguments.at(0)->value);
+		arg = arguments.at(0)->value;
 	}
-	
 	return arg;
 }
 
-double ScriptOperation::getArgumentNumeric(ArgumentLabel label, bool oneBase)
-{
-	double x = 0;
-	System::String^ arg;
+int ScriptOperation::getArgument(ArgumentLabel label, int defaultArgument) {
+	int argumentValue = -1;
 
-	if (label != ArgumentLabel::None)
-	{
+	if (label != ArgumentLabel::None) {
+		// search for label
+		for (Argument* argument : arguments) {
+			if (argument->argumentLabel == label) {
+				argumentValue = argument->valueEnum;
+				break;
+			}
+		}
+	} else if (arguments.size() > 0) {
+		// else return first argument
+		argumentValue = arguments.at(0)->valueEnum;
+	}
+	if (argumentValue < 0) {
+		argumentValue = defaultArgument;
+	}
+	return argumentValue;
+}
+
+double ScriptOperation::getArgumentNumeric(ArgumentLabel label, bool oneBase) {
+	double x = 0;
+	string arg;
+
+	if (label != ArgumentLabel::None) {
 		// search for label
 		arg = getArgument(label);
 		x = Util::toDouble(arg);
-	}
-	else
-	{
+	} else {
 		// find numeric argument
-		for (int argumenti = 0; argumenti < arguments.size(); argumenti++)
-		{
-			arg = Util::netString(arguments.at(argumenti)->value);
-			if (Util::isNumeric(arg))
-			{
+		for (int argumenti = 0; argumenti < arguments.size(); argumenti++) {
+			arg = arguments.at(argumenti)->value;
+			if (Util::isNumeric(arg)) {
 				x = Util::toDouble(arg);
 				break;
 			}
 		}
 	}
 
-	if (oneBase)
-	{
-		if (x >= 1)
-		{
+	if (oneBase) {
+		if (x >= 1) {
 			x -= 1;
 		}
 	}
@@ -296,37 +265,28 @@ double ScriptOperation::getArgumentNumeric(ArgumentLabel label, bool oneBase)
 	return x;
 }
 
-bool ScriptOperation::getArgumentBoolean(ArgumentLabel label)
-{
+bool ScriptOperation::getArgumentBoolean(ArgumentLabel label) {
 	bool b = false;
-	System::String^ arg;
+	string arg;
 
-	if (label != ArgumentLabel::None)
-	{
+	if (label != ArgumentLabel::None) {
 		// search for label
-		for each(Argument* argument in arguments)
-		{
-			if (argument->argumentLabel == label)
-			{
-				arg = Util::netString(argument->value);
+		for (Argument* argument : arguments) {
+			if (argument->argumentLabel == label) {
+				arg = argument->value;
 				b = true;
-				if (Util::isBoolean(arg))
-				{
-					b = bool::Parse(arg);
+				if (Util::isBoolean(arg)) {
+					b = Util::toBoolean(arg);
 				}
 				break;
 			}
 		}
-	}
-	else
-	{
+	} else {
 		// find boolean argument
-		for (int argumenti = 0; argumenti < arguments.size(); argumenti++)
-		{
-			arg = Util::netString(arguments.at(argumenti)->value);
-			if (Util::isBoolean(arg))
-			{
-				b = bool::Parse(arg);
+		for (int argumenti = 0; argumenti < arguments.size(); argumenti++) {
+			arg = arguments.at(argumenti)->value;
+			if (Util::isBoolean(arg)) {
+				b = Util::toBoolean(arg);
 				break;
 			}
 		}
@@ -334,633 +294,757 @@ bool ScriptOperation::getArgumentBoolean(ArgumentLabel label)
 	return b;
 }
 
-generic<class type> type ScriptOperation::getArgument(ArgumentLabel label, type defaultArgument)
-{
-	System::String^ arg = getArgument(label);
-	ImageColorMode colorMode;
-	Palette palette;
-	AccumMode accumMode;
-	ClusterDrawMode clusterDrawMode;
-	PathDrawMode pathDrawMode;
-	DrawPosition drawPosition;
-	SaveFormat saveFormat;
-	bool ok = false;
+OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
+	vector<ArgumentLabel> requiredArguments;
+	vector<ArgumentLabel> optionalArguments;
+	string description = "";
 
-	if (arg != "")
-	{
-		if (type::typeid == ImageColorMode::typeid)
-		{
-			ok = Enum::TryParse<ImageColorMode>(arg, true, colorMode);
-		}
-		if (type::typeid == Palette::typeid)
-		{
-			ok = Enum::TryParse<Palette>(arg, true, palette);
-		}
-		if (type::typeid == AccumMode::typeid)
-		{
-			ok = Enum::TryParse<AccumMode>(arg, true, accumMode);
-		}
-		if (type::typeid == ClusterDrawMode::typeid)
-		{
-			ok = Enum::TryParse<ClusterDrawMode>(arg, true, clusterDrawMode);
-		}
-		if (type::typeid == PathDrawMode::typeid)
-		{
-			ok = Enum::TryParse<PathDrawMode>(arg, true, pathDrawMode);
-		}
-		if (type::typeid == DrawPosition::typeid)
-		{
-			ok = Enum::TryParse<DrawPosition>(arg, true, drawPosition);
-		}
-		if (type::typeid == SaveFormat::typeid)
-		{
-			ok = Enum::TryParse<SaveFormat>(arg, true, saveFormat);
-		}
-
-		if (!ok)
-		{
-			throw gcnew ArgumentException(System::String::Format("Value {0} not valid for {1}", arg, type::typeid));
-		}
-
-		if (type::typeid == ImageColorMode::typeid)
-		{
-			return (type)colorMode;
-		}
-		if (type::typeid == Palette::typeid)
-		{
-			return (type)palette;
-		}
-		if (type::typeid == AccumMode::typeid)
-		{
-			return (type)accumMode;
-		}
-		if (type::typeid == ClusterDrawMode::typeid)
-		{
-			return (type)clusterDrawMode;
-		}
-		if (type::typeid == PathDrawMode::typeid)
-		{
-			return (type)pathDrawMode;
-		}
-		if (type::typeid == DrawPosition::typeid)
-		{
-			return (type)drawPosition;
-		}
-		if (type::typeid == SaveFormat::typeid)
-		{
-			return (type)saveFormat;
-		}
-	}
-	return defaultArgument;
-}
-
-ClusterDrawMode ScriptOperation::getClusterDrawMode(ClusterDrawMode defaultArgument)
-{
-	int cluterDrawMode = 0;
-	ClusterDrawMode clusterDrawMode0;
-	System::String^ fullArg = getArgument(ArgumentLabel::DrawMode);
-	array<System::String^>^ args = fullArg->Split(gcnew array<System::String^>{"|", "&", "+"}, StringSplitOptions::RemoveEmptyEntries);
-	System::String^ arg;
-	bool ok = (args->Length != 0);
-
-	for each (System::String^ arg0 in args)
-	{
-		arg = arg0->Trim();
-		if (Enum::TryParse<ClusterDrawMode>(arg, true, clusterDrawMode0))
-		{
-			cluterDrawMode |= (int)clusterDrawMode0;
-		}
-		else
-		{
-			ok = false;
-			throw gcnew ArgumentException(System::String::Format("Value {0} not valid for DrawMode", arg));
-		}
-	}
-
-	if (ok)
-	{
-		return (ClusterDrawMode)cluterDrawMode;
-	}
-	return defaultArgument;
-}
-
-OperationInfo^ ScriptOperation::getOperationInfo(ScriptOperationType type)
-{
-	array<ArgumentLabel>^ requiredArguments = nullptr;
-	array<ArgumentLabel>^ optionalArguments = nullptr;
-	System::String^ description = "";
-
-	switch (type)
-	{
+	switch (type) {
 	case ScriptOperationType::SetPath:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = gcnew array<ArgumentLabel> { };
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
+		optionalArguments = vector<ArgumentLabel> { };
 		description = "Set path for relative file paths (by default path of current script file)";
 		break;
-	}
 
 	case ScriptOperationType::CreateImage:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Width, ArgumentLabel::Height, ArgumentLabel::ColorMode, ArgumentLabel::Red, ArgumentLabel::Green, ArgumentLabel::Blue };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Width, ArgumentLabel::Height, ArgumentLabel::ColorMode, ArgumentLabel::Red, ArgumentLabel::Green, ArgumentLabel::Blue };
 		description = "Create a new image";
 		break;
-	}
 
 	case ScriptOperationType::OpenImage:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Start, ArgumentLabel::Length, ArgumentLabel::Interval };
-		description = "Open image file(s) for processing, accepts file name pattern, start/length #";
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Start, ArgumentLabel::Length, ArgumentLabel::Interval };
+		description = "Open image file(s) for processing, accepts file name pattern";
 		break;
-	}
 
 	case ScriptOperationType::OpenVideo:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::API, ArgumentLabel::Start, ArgumentLabel::Length, ArgumentLabel::Interval };
-		description = "Open video file(s) and process frames, accepts file name pattern, start/length frames or time (ffmpeg formats supported) (API: See OpenCV API codes)";
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::API, ArgumentLabel::Start, ArgumentLabel::Length, ArgumentLabel::Interval };
+		description = "Open video file(s) and process frames, accepts file name pattern (ffmpeg formats supported)";
 		break;
-	}
 
 	case ScriptOperationType::OpenCapture:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::API, ArgumentLabel::Path, ArgumentLabel::Source, ArgumentLabel::Width, ArgumentLabel::Height, ArgumentLabel::Interval };
-		description = "Open capturing from video (IP) path or camera source (#) (API: See OpenCV API codes)";
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::API, ArgumentLabel::Path, ArgumentLabel::Source, ArgumentLabel::Width, ArgumentLabel::Height, ArgumentLabel::Interval };
+		description = "Open capturing from video (IP) path or camera source";
 		break;
-	}
 
 	case ScriptOperationType::SaveImage:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Start, ArgumentLabel::Length };
-		description = "Save image to file, start/length frames or time";
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Start, ArgumentLabel::Length };
+		description = "Save image to file";
 		break;
-	}
 
 	case ScriptOperationType::SaveVideo:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Start, ArgumentLabel::Length, ArgumentLabel::Fps, ArgumentLabel::Codec };
-		description = "Create video file and save image to video file, start/length frames or time, using fourcc codec string (supports installed encoders)";
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Start, ArgumentLabel::Length, ArgumentLabel::Fps, ArgumentLabel::Codec };
+		description = "Create video file and save image to video file (supports installed encoders)";
 		break;
-	}
 
 	case ScriptOperationType::ShowImage:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Display };
-		description = "Show image on screen (low priority screen updates) (display: 1 - 4)";
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Display };
+		description = "Show image on screen (low priority screen updates)";
 		break;
-	}
 
 	case ScriptOperationType::StoreImage:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label };
-		optionalArguments = gcnew array<ArgumentLabel> { };
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
+		optionalArguments = vector<ArgumentLabel> { };
 		description = "Store current image in memory";
 		break;
-	}
 
 	case ScriptOperationType::GetImage:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label };
-		optionalArguments = gcnew array<ArgumentLabel> { };
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
+		optionalArguments = vector<ArgumentLabel> { };
 		description = "Get specified stored image from memory";
 		break;
-	}
 
 	case ScriptOperationType::Grayscale:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
 		description = "Convert image to gray scale";
 		break;
-	}
 
 	case ScriptOperationType::Color:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
 		description = "Convert image to color";
 		break;
-	}
 
 	case ScriptOperationType::ColorAlpha:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
 		description = "Convert image to color with alpha channel";
 		break;
-	}
 
 	case ScriptOperationType::GetSaturation:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
 		description = "Extract saturation from image";
 		break;
-	}
 
 	case ScriptOperationType::GetHsValue:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
 		description = "Extract (HSV) Value from image";
 		break;
-	}
 
 	case ScriptOperationType::GetHsLightness:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
 		description = "Extract (HSL) Lightness from image";
 		break;
-	}
 
 	case ScriptOperationType::Scale:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Width, ArgumentLabel::Height };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label };
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Width, ArgumentLabel::Height };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
 		description = "Scale image";
 		break;
-	}
 
 	case ScriptOperationType::Crop:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::X, ArgumentLabel::Y, ArgumentLabel::Width, ArgumentLabel::Height };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label };
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::X, ArgumentLabel::Y, ArgumentLabel::Width, ArgumentLabel::Height };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
 		description = "Crop image";
 		break;
-	}
 
 	case ScriptOperationType::Mask:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label };
-		optionalArguments = gcnew array<ArgumentLabel> { };
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
+		optionalArguments = vector<ArgumentLabel> { };
 		description = "Perform mask on current image";
 		break;
-	}
 
 	case ScriptOperationType::Threshold:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Level };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Level };
 		description = "Convert image to binary using threshold level, or in case not provided using automatic Otsu method";
 		break;
-	}
 
 	case ScriptOperationType::Difference:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label };
-		optionalArguments = gcnew array<ArgumentLabel> { };
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
+		optionalArguments = vector<ArgumentLabel> { };
 		description = "Perform difference of current image and specified image";
 		break;
-	}
 
 	case ScriptOperationType::DifferenceAbs:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label };
-		optionalArguments = gcnew array<ArgumentLabel> { };
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
+		optionalArguments = vector<ArgumentLabel> { };
 		description = "Perform absolute difference of current image and specified image";
 		break;
-	}
 
 	case ScriptOperationType::Add:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label };
-		optionalArguments = gcnew array<ArgumentLabel> { };
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
+		optionalArguments = vector<ArgumentLabel> { };
 		description = "Adds specified image to current image";
 		break;
-	}
 
 	case ScriptOperationType::Multiply:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Factor };
-		optionalArguments = gcnew array<ArgumentLabel> { };
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Factor };
+		optionalArguments = vector<ArgumentLabel> { };
 		description = "Perform multiplication of all color channels by specified factor";
 		break;
-	}
 
 	case ScriptOperationType::Invert:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
 		description = "Invert image";
 		break;
-	}
 
 	case ScriptOperationType::UpdateBackground:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Weight };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Weight };
 		description = "Add image to the adaptive background buffer";
 		break;
-	}
 
 	case ScriptOperationType::UpdateAverage:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Weight };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Weight };
 		description = "Add image to the average buffer";
 		break;
-	}
+
+	case ScriptOperationType::ClearSeries:
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { };
+		description = "Clear image series buffer";
+		break;
 
 	case ScriptOperationType::AddSeries:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Maximum };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Maximum };
 		description = "Add image to image series buffer";
 		break;
-	}
 
 	case ScriptOperationType::GetSeriesMedian:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { };
 		description = "Retrieve median image of image series buffer";
 		break;
-	}
 
 	case ScriptOperationType::AddAccum:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::AccumMode };
-		description = "Add image to the accumulative buffer (AccumMode: Age, Usage)";
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::AccumMode };
+		description = "Add image to the accumulative buffer";
 		break;
-	}
 
 	case ScriptOperationType::GetAccum:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Power, ArgumentLabel::Palette };
-		description = "Retrieve the accumulative buffer and convert to image (Palette: Grayscale, Heat, Rainbow)";
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Power, ArgumentLabel::Palette };
+		description = "Retrieve the accumulative buffer and convert to image";
 		break;
-	}
 
 	case ScriptOperationType::CreateClusters:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::MinArea, ArgumentLabel::MaxArea };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::MinArea, ArgumentLabel::MaxArea };
 		description = "Create clusters; auto calibrate using initial images if no parameters specified";
 		break;
-	}
 
 	case ScriptOperationType::CreateTracks:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::MaxMove, ArgumentLabel::MinActive, ArgumentLabel::MaxInactive };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::MaxMove, ArgumentLabel::MinActive, ArgumentLabel::MaxInactive };
 		description = "Create cluster tracking; auto calibrate using initial images if no parameters specified";
 		break;
-	}
 
 	case ScriptOperationType::CreatePaths:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Distance };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Distance };
 		description = "Create common path usage";
 		break;
-	}
 
 	case ScriptOperationType::DrawClusters:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::DrawMode };
-		description = "Draw clusters (DrawMode: Point|Circle|Box|Angle|Label|Labeln|Fill)";
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::DrawMode };
+		description = "Draw clusters";
 		break;
-	}
 
 	case ScriptOperationType::DrawTracks:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::DrawMode };
-		description = "Draw tracked clusters (DrawMode: Point|Circle|Box|Angle|Label|Labeln|Track|Tracks)";
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::DrawMode };
+		description = "Draw tracked clusters";
 		break;
-	}
 
 	case ScriptOperationType::DrawPaths:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::PathDrawMode, ArgumentLabel::Power, ArgumentLabel::Palette };
-		description = "Draw common paths (PathDrawMode: Age, Usage, Links, LinksMove) (Palette: Grayscale, Heat, Rainbow)";
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::PathDrawMode, ArgumentLabel::Power, ArgumentLabel::Palette };
+		description = "Draw common paths";
 		break;
-	}
 
 	case ScriptOperationType::DrawTrackInfo:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker };
 		description = "Draw tracking stats on image";
 		break;
-	}
 
 	case ScriptOperationType::SaveClusters:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Contour };
-		description = "Save clusters to CSV file (Format: ByTime, ByLabel, Split)";
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Contour };
+		description = "Save clusters to CSV file";
 		break;
-	}
 
 	case ScriptOperationType::SaveTracks:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Contour };
-		description = "Save cluster tracking to CSV file (Format: ByTime, ByLabel, Split)";
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Contour };
+		description = "Save cluster tracking to CSV file";
 		break;
-	}
 
 	case ScriptOperationType::SavePaths:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker };
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker };
 		description = "Save paths to CSV file";
 		break;
-	}
 
 	case ScriptOperationType::ShowTrackInfo:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Display };
-		description = "Show tracking information on screen (Display: 1 - 4)";
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Display };
+		description = "Show tracking information on screen";
 		break;
-	}
 
 	case ScriptOperationType::SaveTrackInfo:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker };
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker };
 		description = "Save tracking information to CSV file";
 		break;
-	}
 
 	case ScriptOperationType::SaveTrackLog:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Tracker };
+		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker };
 		description = "Save tracking log to CSV file";
 		break;
-	}
 
 	case ScriptOperationType::DrawLegend:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Display, ArgumentLabel::Position };
-		description = "Draw legend (Display: 1 - 4 or Position on image: TopLeft, BottomLeft, TopRight, BottomRight)";
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Display, ArgumentLabel::Position };
+		description = "Draw legend";
 		break;
-	}
 
 	case ScriptOperationType::Wait:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { ArgumentLabel::MS };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::MS };
 		description = "Pause execution for a period (1000 ms default)";
 		break;
-	}
 
 	case ScriptOperationType::Debug:
-	{
-		requiredArguments = gcnew array<ArgumentLabel> { };
-		optionalArguments = gcnew array<ArgumentLabel> { };
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { };
 		description = "Debug mode";
 		break;
-	}
 
 	// end of switch
 	}
 
-	return gcnew OperationInfo(requiredArguments, optionalArguments, description);
+	return OperationInfo(requiredArguments, optionalArguments, description);
 }
 
-System::String^ ScriptOperation::getOperationList()
-{
-	System::String^ s;
+ArgumentType ScriptOperation::getExpectedArgumentType(ArgumentLabel argument) {
+	ArgumentType type = ArgumentType::None;
+	switch (argument) {
+	case ArgumentLabel::Path:
+		type = ArgumentType::Path;
+		break;
+
+	case ArgumentLabel::Label:
+		type = ArgumentType::Label;
+		break;
+
+	case ArgumentLabel::Tracker:
+		type = ArgumentType::Tracker;
+		break;
+
+	case ArgumentLabel::Display:
+		type = ArgumentType::Display;
+		break;
+
+	case ArgumentLabel::Contour:
+		type = ArgumentType::Bool;
+		break;
+
+	case ArgumentLabel::Red:
+	case ArgumentLabel::Green:
+	case ArgumentLabel::Blue:
+	case ArgumentLabel::Level:
+	case ArgumentLabel::Weight:
+		type = ArgumentType::Fraction;
+		break;
+
+	case ArgumentLabel::Width:
+	case ArgumentLabel::Height:
+	case ArgumentLabel::X:
+	case ArgumentLabel::Y:
+	case ArgumentLabel::Interval:
+	case ArgumentLabel::MS:
+	case ArgumentLabel::Power:
+	case ArgumentLabel::Source:
+	case ArgumentLabel::API:
+	case ArgumentLabel::Fps:
+	case ArgumentLabel::Factor:
+	case ArgumentLabel::Maximum:
+	case ArgumentLabel::MinArea:
+	case ArgumentLabel::MaxArea:
+	case ArgumentLabel::MaxMove:
+	case ArgumentLabel::MinActive:
+	case ArgumentLabel::MaxInactive:
+	case ArgumentLabel::Distance:
+		type = ArgumentType::Num;
+		break;
+
+	case ArgumentLabel::Start:
+	case ArgumentLabel::Length:
+		type = ArgumentType::TimeFrame;
+		break;
+
+	case ArgumentLabel::Codec:
+		type = ArgumentType::Codec;
+		break;
+
+	case ArgumentLabel::ColorMode:
+		type = ArgumentType::ColorMode;
+		break;
+
+	case ArgumentLabel::AccumMode:
+		type = ArgumentType::AccumMode;
+		break;
+
+	case ArgumentLabel::Palette:
+		type = ArgumentType::Palette;
+		break;
+
+	case ArgumentLabel::DrawMode:
+		type = ArgumentType::DrawMode;
+		break;
+
+	case ArgumentLabel::PathDrawMode:
+		type = ArgumentType::PathDrawMode;
+		break;
+
+	case ArgumentLabel::Format:
+		type = ArgumentType::Format;
+		break;
+
+	case ArgumentLabel::Position:
+		type = ArgumentType::Position;
+		break;
+
+		// end of switch
+	}
+	return type;
+}
+
+string ScriptOperation::getArgumentDescription(ArgumentLabel argument) {
+	string s;
+	switch (argument) {
+	case ArgumentLabel::Path:
+		s = "File path";
+		break;
+
+	case ArgumentLabel::Label:
+		s = "Label id";
+		break;
+
+	case ArgumentLabel::Tracker:
+		s = "Tracker id";
+		break;
+
+	case ArgumentLabel::Display:
+		s = "Display id";
+		break;
+
+	case ArgumentLabel::Contour:
+		s = "Extract contours";
+		break;
+
+	case ArgumentLabel::Red:
+		s = "Red color component";
+		break;
+
+	case ArgumentLabel::Green:
+		s = "Green color component";
+		break;
+
+	case ArgumentLabel::Blue:
+		s = "Blue color component";
+		break;
+
+	case ArgumentLabel::Level:
+		s = "Threshold value";
+		break;
+
+	case ArgumentLabel::Weight:
+		s = "Weight value";
+		break;
+
+	case ArgumentLabel::Width:
+		s = "Width in pixels";
+		break;
+
+	case ArgumentLabel::Height:
+		s = "Height in pixels";
+		break;
+
+	case ArgumentLabel::X:
+		s = "X position in pixels";
+		break;
+
+	case ArgumentLabel::Y:
+		s = "Y position in pixels";
+		break;
+
+	case ArgumentLabel::Interval:
+		s = "Interval in number of frames";
+		break;
+
+	case ArgumentLabel::MS:
+		s = "Time in milliseconds";
+		break;
+
+	case ArgumentLabel::Power:
+		s = "Exponential power of value range (1E-[power] ... 1)";
+		break;
+
+	case ArgumentLabel::Source:
+		s = "Camera source (#)";
+		break;
+
+	case ArgumentLabel::API:
+		s = "OpenCV API code (See OpenCV API codes)";
+		break;
+
+	case ArgumentLabel::Fps:
+		s = "Frames per second";
+		break;
+
+	case ArgumentLabel::Factor:
+		s = "Multiplication factor";
+		break;
+
+	case ArgumentLabel::Maximum:
+		s = "Maximum number of images to keep";
+		break;
+
+	case ArgumentLabel::MinArea:
+		s = "Minimum area in number of pixels";
+		break;
+
+	case ArgumentLabel::MaxArea:
+		s = "Maximum area in number of pixels";
+		break;
+
+	case ArgumentLabel::MaxMove:
+		s = "Maximum movement distance (single frame)";
+		break;
+
+	case ArgumentLabel::MinActive:
+		s = "Minimum number of frames being active before state is active";
+		break;
+
+	case ArgumentLabel::MaxInactive:
+		s = "Maximum number of frames being inactive before state is inactive";
+		break;
+
+	case ArgumentLabel::Distance:
+		s = "Maximum path distance";
+		break;
+
+	case ArgumentLabel::Start:
+		s = "Start";
+		break;
+
+	case ArgumentLabel::Length:
+		s = "Length";
+		break;
+
+	case ArgumentLabel::Codec:
+		s = "Video encoding codec";
+		break;
+
+	case ArgumentLabel::ColorMode:
+		s = "Color mode";
+		break;
+
+	case ArgumentLabel::AccumMode:
+		s = "Accumulation mode";
+		break;
+
+	case ArgumentLabel::Palette:
+		s = "Palette";
+		break;
+
+	case ArgumentLabel::DrawMode:
+		s = "(Combination of) draw mode(s)";
+		break;
+
+	case ArgumentLabel::PathDrawMode:
+		s = "Path draw mode";
+		break;
+
+	case ArgumentLabel::Format:
+		s = "Output format";
+		break;
+
+	case ArgumentLabel::Position:
+		s = "Draw position";
+		break;
+
+		// end of switch
+	}
+	return s;
+}
+
+string ScriptOperation::getArgumentTypeDescription(ArgumentType type) {
+	// valid type values
+	string s;
+	switch (type) {
+	case ArgumentType::Path:
+		s = "\"path\"";
+		break;
+
+	case ArgumentType::Label:
+		s = "string";
+		break;
+
+	case ArgumentType::Tracker:
+		s = "string";
+		break;
+
+	case ArgumentType::Display:
+		s = "number 1 - 4";
+		break;
+
+	case ArgumentType::Bool:
+		s = "true / false";
+		break;
+
+	case ArgumentType::Fraction:
+		s = "numeric value between 0 and 1";
+		break;
+
+	case ArgumentType::Num:
+		s = "numeric value";
+		break;
+
+	case ArgumentType::TimeFrame:
+		s = "time reference as (hours:)minutes:seconds, or frame number";
+		break;
+
+	case ArgumentType::Codec:
+		s = "4 character codec reference (FOURCC)";
+		break;
+
+	case ArgumentType::ColorMode:
+		s = Util::getValueList(ImageColorModes);
+		break;
+
+	case ArgumentType::AccumMode:
+		s = Util::getValueList(AccumModes);
+		break;
+
+	case ArgumentType::Palette:
+		s = Util::getValueList(Palettes);
+		break;
+
+	case ArgumentType::DrawMode:
+		s = Util::getValueList(ClusterDrawModes);
+		break;
+
+	case ArgumentType::PathDrawMode:
+		s = Util::getValueList(PathDrawModes);
+		break;
+
+	case ArgumentType::Format:
+		s = Util::getValueList(SaveFormats);
+		break;
+
+	case ArgumentType::Position:
+		s = Util::getValueList(DrawPositions);
+		break;
+
+		// end of switch
+	}
+	return s;
+}
+
+string ScriptOperation::getArgumentRtfDescription(ArgumentLabel argument) {
+	string s, typeDesc;
+	s += " \\bullet  " + ArgumentLabels[(int)argument];
+	s += ":\\tab " + getArgumentDescription(argument);
+	typeDesc = getArgumentTypeDescription(getExpectedArgumentType(argument));
+	if (typeDesc != "") {
+		s += " {\\cf2 (" + typeDesc + ")}";
+	}
+	s += "\\line\n";
+	return s;
+}
+
+
+string ScriptOperation::getOperationList() {
+	string s, desc;
 	ScriptOperationType type;
-	OperationInfo^ info;
-	array<ArgumentLabel>^ requiredArguments;
-	array<ArgumentLabel>^ optionalArguments;
-	System::String^ description;
+	OperationInfo info;
+	vector<ArgumentLabel> requiredArguments;
+	vector<ArgumentLabel> optionalArguments;
+	string description;
 	bool firstArg;
 
 	// RTF tutorial: http://www.pindari.com/rtf1.html
 
 	s = "{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Consolas;}}\n{\\colortbl;\\red0\\green0\\blue0;\\red127\\green127\\blue127;\\red0\\green0\\blue255;}";
 	s += "\\margl720\\margr720\\margt720\\margb720 \\fs20\n";	// 0.5 inch margins; font size 10
-	s += "\\b BioImageOperation script operations\\b0\\line\n\\line\n";
-
-	for each (int types in Enum::GetValues(ScriptOperationType::typeid))
-	{
+	s += "{\\fs32 \\b Bio Image Operation script operations (v" + string(PROJECT_VER) + " / " + string(PROJECT_DESC) + ")\\b0}\\line\n\\line\n";
+	
+	for (string types : ScriptOperationTypes) {
 		firstArg = true;
-		type = (ScriptOperationType)types;
-
-		if (type != ScriptOperationType::None)
-		{
+		type = (ScriptOperationType)Util::getListIndex(ScriptOperationTypes, types);
+		if (type != ScriptOperationType::None) {
 			info = getOperationInfo(type);
-			requiredArguments = info->requiredArguments;
-			optionalArguments = info->optionalArguments;
-			description = info->description;
+			requiredArguments = info.requiredArguments;
+			optionalArguments = info.optionalArguments;
+			description = info.description;
 
-			s += System::String::Format("\\b {0}\\b0 (", type);
+			s += Util::format("\\b %s\\b0  (", types.c_str());
 
-			if (requiredArguments)
-			{
-				for each (ArgumentLabel arg in requiredArguments)
-				{
-					if (!firstArg)
-					{
-						s += ", ";
-					}
-					s += System::String::Format("{0}", arg);
-					firstArg = false;
+			for (ArgumentLabel arg : requiredArguments) {
+				if (!firstArg) {
+					s += ", ";
 				}
+				s += ArgumentLabels[(int)arg];
+				firstArg = false;
 			}
 
-			if (optionalArguments)
-			{
-				for each (ArgumentLabel arg in optionalArguments)
-				{
-					if (!firstArg)
-					{
-						s += ", ";
-					}
-					s += "{\\cf2 ";
-					s += System::String::Format("{0}", arg);
-					s += "}";
-					firstArg = false;
+			for (ArgumentLabel arg : optionalArguments) {
+				if (!firstArg) {
+					s += ", ";
 				}
+				s += "{\\cf2 ";
+				s += ArgumentLabels[(int)arg];
+				s += "}";
+				firstArg = false;
 			}
 
-			s += ") \\line\n";
-			s += "{\\cf3 \\tab \\bullet " + description + "}\\line\n\\line\n";
+			s += ")\\line\n\\line\n";
+			s += "{\\cf3 " + description + "}\\line\n\\line\n";
+
+			for (ArgumentLabel arg : requiredArguments) {
+				s += getArgumentRtfDescription(arg);
+			}
+			for (ArgumentLabel arg : optionalArguments) {
+				s += getArgumentRtfDescription(arg);
+			}
+
+			s += "\\line\n\\line\n";
 		}
 	}
 	s += "\\line\n";
 	s += "\\b Arguments:\\b0 \\tab Required \\tab {\\cf2 Optional}\\line\n";
 	s += "}";
 
-	s = s->Replace("\n", "\r\n");
-
+	s = Util::replace(s, "\n", "\r\n");
+	
 	return s;
 }
 
-void ScriptOperation::writeOperationList(System::String^ filename)
-{
-	System::String^ s = getOperationList();
-	File::WriteAllText(filename, s);
+void ScriptOperation::writeOperationList(string filename) {
+	string s = getOperationList();
+	OutputStream outputStream(filename);
+	outputStream.write(s);
+	outputStream.closeStream();
 }
 
-bool ScriptOperation::initFrameSource(FrameType frameType, int apiCode, System::String^ basePath, System::String^ templatePath, System::String^ start, System::String^ length, double fps0, int interval)
-{
+bool ScriptOperation::initFrameSource(FrameType frameType, int apiCode, string basepath, string templatePath, string start, string length, double fps0, int interval) {
 	bool ok = true;
 
-	if (!frameSource)
-	{
-		switch (frameType)
-		{
+	if (!frameSource) {
+		switch (frameType) {
 		case FrameType::Image: frameSource = new ImageSource(); break;
 		case FrameType::Video: frameSource = new VideoSource(); break;
 		case FrameType::Capture: frameSource = new CaptureSource(); break;
 		}
-		if (frameSource)
-		{
-			ok = frameSource->init(apiCode, basePath, templatePath, start, length, fps0, interval);
+		if (frameSource) {
+			ok = frameSource->init(apiCode, basepath, templatePath, start, length, fps0, interval);
 		}
 	}
 	return ok;
 }
 
-void ScriptOperation::initFrameOutput(FrameType frameType, System::String^ basePath, System::String^ templatePath, System::String^ defaultExtension, System::String^ start, System::String^ length, double fps, System::String^ codecs)
-{
-	if (!frameOutput)
-	{
-		switch (frameType)
-		{
+void ScriptOperation::initFrameOutput(FrameType frameType, string basepath, string templatePath, string defaultExtension, string start, string length, double fps, string codecs) {
+	if (!frameOutput) {
+		switch (frameType) {
 		case FrameType::Image: frameOutput = new ImageOutput(); break;
 		case FrameType::Video: frameOutput = new VideoOutput(); break;
 		}
-		if (frameOutput)
-		{
-			frameOutput->init(basePath, templatePath, defaultExtension, start, length, fps, codecs);
+		if (frameOutput) {
+			frameOutput->init(basepath, templatePath, defaultExtension, start, length, fps, codecs);
 		}
 	}
 }
 
-void ScriptOperation::close()
-{
-	if (innerOperations)
-	{
+void ScriptOperation::close() {
+	if (innerOperations) {
 		innerOperations->close();
 	}
 
-	if (frameSource)
-	{
+	if (frameSource) {
 		frameSource->close();
 	}
 
-	if (frameOutput)
-	{
+	if (frameOutput) {
 		frameOutput->close();
 	}
 }

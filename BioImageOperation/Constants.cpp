@@ -1,19 +1,10 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
 #include "Constants.h"
@@ -24,14 +15,15 @@ const int Constants::nInfoWindows = 4;
 const int Constants::nTrackers = 4;
 const int Constants::seekModeInterval = 100;
 
-const std::string Constants::webPage = "http://joostdefolter.info";
-const std::string Constants::webFilesUrl = webPage + "/files/";
-const std::string Constants::scriptFileDialogFilter = "BIO Script files (*.bioscript)|*.bioscript|All files (*.*)|*.*";
+const string Constants::webPage = "https://joostdefolter.info";
+const string Constants::webFilesUrl = webPage + "/files/";
+const string Constants::scriptFileDialogFilter = "BIO Script files (*.bioscript)";
+const string Constants::helpDocDialogFilter = "BIO help document (*.rtf)";
 const int Constants::defaultScriptFileDialogFilter = 1;
-const std::string Constants::defaultDataExtension = "csv";
-const std::string Constants::defaultImageExtension = "png";
-const std::string Constants::defaultVideoExtension = "mp4";
-const std::string Constants::defaultVideoCodec = "H264";
+const string Constants::defaultDataExtension = "csv";
+const string Constants::defaultImageExtension = "png";
+const string Constants::defaultVideoExtension = "mp4";
+const string Constants::defaultVideoCodec = "H264";
 
 const int Constants::minPixels = 2;
 const int Constants::maxMergedBlobs = 5;

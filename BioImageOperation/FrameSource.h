@@ -1,27 +1,17 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
 #pragma once
-#pragma unmanaged
-#include "opencv2/opencv.hpp"
-#pragma managed
+#include <string>
+#include <opencv2/opencv.hpp>
 
-using namespace System;
+using namespace std;
 using namespace cv;
 
 
@@ -33,7 +23,7 @@ class FrameSource abstract
 {
 public:
 	virtual void reset() = 0;
-	virtual bool init(int apiCode, System::String^ basePath, System::String^ filePath, System::String^ start = "", System::String^ length = "", double fps0 = 1, int interval = 1) = 0;
+	virtual bool init(int apiCode, string basepath, string filepath, string start = "", string length = "", double fps0 = 1, int interval = 1) = 0;
 	virtual bool getNextImage(Mat* image) = 0;
 	virtual void close() = 0;
 
@@ -42,7 +32,7 @@ public:
 	virtual double getFps() = 0;
 	virtual int getFrameNumber() = 0;
 
-	virtual System::String^ getLabel() = 0;
+	virtual string getLabel() = 0;
 	virtual int getCurrentFrame() = 0;
 	virtual int getTotalFrames() = 0;
 };

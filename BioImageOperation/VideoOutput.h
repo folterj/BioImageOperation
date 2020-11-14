@@ -1,28 +1,15 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
 #pragma once
+#include <opencv2/opencv.hpp>
 #include "FrameOutput.h"
-#include <vcclr.h>
-
-#pragma unmanaged
-#include "opencv2/opencv.hpp"
-#pragma managed
 #include "NumericPath.h"
 
 using namespace cv;
@@ -37,7 +24,7 @@ class VideoOutput : public FrameOutput
 public:
 	VideoWriter videoWriter;
 	bool videoIsOpen = false;
-	gcroot<NumericPath^> outputPath = gcnew NumericPath();
+	NumericPath outputPath;
 	int width = 0;
 	int height = 0;
 	bool isColor = true;
@@ -46,7 +33,7 @@ public:
 
 	VideoOutput();
 	~VideoOutput();
-	void init(System::String^ basePath, System::String^ filePath, System::String^ defaultExtension = "", System::String^ start = "", System::String^ length = "", double fps = 0, System::String^ codecs = "");
+	void init(string basepath, string filepath, string defaultExtension = "", string start = "", string length = "", double fps = 0, string codecs = "");
 	void reset();
 	bool open();
 	void close();

@@ -1,45 +1,25 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
 #include "ImageOperations.h"
 #include "Util.h"
 #include "ColorScale.h"
 
-#ifdef _DEBUG
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#define new DEBUG_NEW
-#endif
 
-
-void ImageOperations::create(Mat* image, int width, int height, ImageColorMode colorMode, double r, double g, double b)
-{
+void ImageOperations::create(Mat* image, int width, int height, ImageColorMode colorMode, double r, double g, double b) {
 	int nchannels = 1;
 
-	if (width == 0 || height == 0)
-	{
-		throw gcnew ArgumentException("Invalid image dimensions");
+	if (width == 0 || height == 0) {
+		throw invalid_argument("Invalid image dimensions");
 	}
 
-	switch (colorMode)
-	{
+	switch (colorMode) {
 	case ImageColorMode::Color: nchannels = 3; break;
 	case ImageColorMode::ColorAlpha: nchannels = 4; break;
 	}
@@ -48,74 +28,51 @@ void ImageOperations::create(Mat* image, int width, int height, ImageColorMode c
 	image->setTo(Scalar(b * 0xFF, g * 0xFF, r * 0xFF));
 }
 
-void ImageOperations::scale(InputArray source, OutputArray dest, int width, int height)
-{
+void ImageOperations::scale(InputArray source, OutputArray dest, int width, int height) {
 	resize(source, dest, cv::Size(width, height));
 }
 
-void ImageOperations::crop(Mat* source, Mat* dest, int x, int y, int width, int height)
-{
+void ImageOperations::crop(Mat* source, Mat* dest, int x, int y, int width, int height) {
 	*dest = (*source)(Rect(x, y, width, height));
 }
 
-void ImageOperations::mask(InputArray source, InputArray mask, OutputArray dest)
-{
+void ImageOperations::mask(InputArray source, InputArray mask, OutputArray dest) {
 	source.copyTo(dest, mask);
 }
 
-void ImageOperations::convertToGrayScale(InputArray source, OutputArray dest)
-{
-	if (source.channels() > 1)
-	{
-		if (source.channels() == 4)
-		{
+void ImageOperations::convertToGrayScale(InputArray source, OutputArray dest) {
+	if (source.channels() > 1) {
+		if (source.channels() == 4) {
 			cvtColor(source, dest, ColorConversionCodes::COLOR_BGRA2GRAY);
-		}
-		else if (source.channels() == 3)
-		{
+		} else if (source.channels() == 3) {
 			cvtColor(source, dest, ColorConversionCodes::COLOR_BGR2GRAY);
 		}
-	}
-	else
-	{
+	} else {
 		source.copyTo(dest);
 	}
 }
 
-void ImageOperations::convertToColor(InputArray source, OutputArray dest)
-{
-	if (source.channels() == 1)
-	{
+void ImageOperations::convertToColor(InputArray source, OutputArray dest) {
+	if (source.channels() == 1) {
 		cvtColor(source, dest, ColorConversionCodes::COLOR_GRAY2BGR);
-	}
-	else if (source.channels() == 4)
-	{
+	} else if (source.channels() == 4) {
 		cvtColor(source, dest, ColorConversionCodes::COLOR_BGRA2BGR);
-	}
-	else
-	{
+	} else {
 		source.copyTo(dest);
 	}
 }
 
-void ImageOperations::convertToColorAlpha(InputArray source, OutputArray dest)
-{
-	if (source.channels() == 1)
-	{
+void ImageOperations::convertToColorAlpha(InputArray source, OutputArray dest) {
+	if (source.channels() == 1) {
 		cvtColor(source, dest, ColorConversionCodes::COLOR_GRAY2BGRA);
-	}
-	else if (source.channels() == 3)
-	{
+	} else if (source.channels() == 3) {
 		cvtColor(source, dest, ColorConversionCodes::COLOR_BGR2BGRA);
-	}
-	else
-	{
+	} else {
 		source.copyTo(dest);
 	}
 }
 
-void ImageOperations::getSaturation(InputArray source, Mat* dest)
-{
+void ImageOperations::getSaturation(InputArray source, Mat* dest) {
 	std::vector<Mat> channels;
 	Mat hsv;
 
@@ -124,8 +81,7 @@ void ImageOperations::getSaturation(InputArray source, Mat* dest)
 	*dest = channels[1];	// saturation channel
 }
 
-void ImageOperations::getHsValue(InputArray source, Mat* dest)
-{
+void ImageOperations::getHsValue(InputArray source, Mat* dest) {
 	std::vector<Mat> channels;
 	Mat hsv;
 
@@ -134,8 +90,7 @@ void ImageOperations::getHsValue(InputArray source, Mat* dest)
 	*dest = channels[2];	// value channel
 }
 
-void ImageOperations::getHsLightness(InputArray source, Mat* dest)
-{
+void ImageOperations::getHsLightness(InputArray source, Mat* dest) {
 	std::vector<Mat> channels;
 	Mat hsv;
 
@@ -144,51 +99,39 @@ void ImageOperations::getHsLightness(InputArray source, Mat* dest)
 	*dest = channels[1];	// lightness channel
 }
 
-void ImageOperations::threshold(InputArray source, OutputArray dest, double thresh)
-{
+void ImageOperations::threshold(InputArray source, OutputArray dest, double thresh) {
 	ThresholdTypes thresholdType;
 
-	if (thresh != 0)
-	{
+	if (thresh != 0) {
 		thresholdType = ThresholdTypes::THRESH_BINARY;
-	}
-	else
-	{
+	} else {
 		thresholdType = ThresholdTypes::THRESH_OTSU;
 	}
 
 	cv::threshold(source, dest, (thresh * 0xFF), 0xFF, thresholdType);
 }
 
-void ImageOperations::difference(InputArray source1, InputArray source2, OutputArray dest, bool abs)
-{
-	if (abs)
-	{
+void ImageOperations::difference(InputArray source1, InputArray source2, OutputArray dest, bool abs) {
+	if (abs) {
 		absdiff(source1, source2, dest);
-	}
-	else
-	{
+	} else {
 		subtract(source1, source2, dest);
 	}
 }
 
-void ImageOperations::add(InputArray source1, InputArray source2, OutputArray dest)
-{
+void ImageOperations::add(InputArray source1, InputArray source2, OutputArray dest) {
 	cv::add(source1, source2, dest);
 }
 
-void ImageOperations::multiply(InputArray source, double factor, OutputArray dest)
-{
+void ImageOperations::multiply(InputArray source, double factor, OutputArray dest) {
 	cv::multiply(source, factor, dest);
 }
 
-void ImageOperations::invert(InputArray source, OutputArray dest)
-{
+void ImageOperations::invert(InputArray source, OutputArray dest) {
 	bitwise_not(source, dest);
 }
 
-void ImageOperations::drawLegend(InputArray source, OutputArray dest, DrawPosition position, double logPower, Palette palette)
-{
+void ImageOperations::drawLegend(InputArray source, OutputArray dest, DrawPosition position, double logPower, Palette palette) {
 	double vwidth = 0.05;
 	double vheight = 0.25;
 	int width = source.cols();
@@ -198,8 +141,7 @@ void ImageOperations::drawLegend(InputArray source, OutputArray dest, DrawPositi
 	int top, left;
 	bool isColor = (source.channels() > 1);
 
-	switch (position)
-	{
+	switch (position) {
 	case DrawPosition::TopLeft: left = 0; top = 0; break;
 	case DrawPosition::BottomLeft: left = width - lwidth; top = height - lheight; break;
 	case DrawPosition::TopRight: left = 0; top = 0; break;
@@ -209,18 +151,14 @@ void ImageOperations::drawLegend(InputArray source, OutputArray dest, DrawPositi
 
 	source.copyTo(dest);
 
-	if (logPower != 0)
-	{
+	if (logPower != 0) {
 		drawColorScale(&dest.getMat(), Rect(left, top, lwidth, lheight), logPower, palette);
-	}
-	else
-	{
+	} else {
 		drawColorSwatches(&dest.getMat(), Rect(left, top, lwidth, lheight));
 	}
 }
 
-void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Palette palette)
-{
+void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Palette palette) {
 	Scalar background = Scalar(0, 0, 0);
 	Scalar infoColor = Scalar(0x7F, 0x7F, 0x7F);
 	BGR color;
@@ -228,8 +166,8 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Pale
 	double fontScale;
 	int thickness;
 	int y, ystart, yend, yrange, xstart, xbar, xline;
-	System::String^ label0 = "10";
-	System::String^ label;
+	string label0 = "10";
+	string label;
 	float val;
 	Size textSize;
 
@@ -237,12 +175,11 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Pale
 	height = rect.height;
 	fontScale = width * 0.004;
 	thickness = (int)fontScale;
-	if (thickness < 1)
-	{
+	if (thickness < 1) {
 		thickness = 1;
 	}
 
-	textSize = getTextSize(Util::stdString(label0), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, thickness, NULL);
+	textSize = getTextSize(label0, HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, thickness, NULL);
 
 	ystart = rect.tl().y + textSize.height;
 	yend = rect.tl().y + height - textSize.height;
@@ -253,36 +190,32 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Pale
 
 	rectangle(*dest, rect.tl(), rect.br(), background, LineTypes::FILLED, LINE_AA);
 
-	for (int y = ystart; y < yend; y++)
-	{
+	for (int y = ystart; y < yend; y++) {
 		val = (float)(y - ystart) / yrange;
-		switch (palette)
-		{
-		case Palette::Grayscale: color = ColorScale::getGrayScale(val); break;
+		switch (palette) {
 		case Palette::Heat: color = ColorScale::getHeatScale(val); break;
 		case Palette::Rainbow: color = ColorScale::getRainbowScale(val); break;
+		default: color = ColorScale::getGrayScale(val); break;
 		}
 
 		line(*dest, Point(xstart, y), Point(xbar, y), Util::bgrtoScalar(color), 1, LINE_AA);
 	}
 
-	for (int i = 0; i <= logPower; i++)
-	{
+	for (int i = 0; i <= logPower; i++) {
 		y = (int)(ystart + i * yrange / logPower);
-		label = System::String::Format(label0, -i);
-		if (i == 0)
-		{
+		label = label0 + to_string(-i);
+
+		if (i == 0) {
 			label += "   (1)";
 		}
-		putText(*dest, Util::stdString(label), Point(xline, (int)(y + textSize.height / 2)), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, infoColor, thickness, LINE_AA);
-		label = System::String::Format("{0}", -i);
-		putText(*dest, Util::stdString(label), Point((int)(xline + textSize.width), y), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, infoColor, thickness, LINE_AA);
+		putText(*dest, label, Point(xline, (int)(y + textSize.height / 2)), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, infoColor, thickness, LINE_AA);
+		label = Util::format("%d", -i);
+		putText(*dest, label, Point((int)(xline + textSize.width), y), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, infoColor, thickness, LINE_AA);
 		line(*dest, Point(xstart, y), Point(xline, y), infoColor, 1, LINE_AA);
 	}
 }
 
-void ImageOperations::drawColorSwatches(Mat* dest, Rect rect)
-{
+void ImageOperations::drawColorSwatches(Mat* dest, Rect rect) {
 	Scalar background = Scalar(0, 0, 0);
 	Scalar infoColor = Scalar(0x7F, 0x7F, 0x7F);
 	Scalar color;
@@ -301,8 +234,7 @@ void ImageOperations::drawColorSwatches(Mat* dest, Rect rect)
 
 	rectangle(*dest, rect.tl(), rect.br(), background, LineTypes::FILLED, LINE_AA);
 
-	for (int i = 0; i < ntotal; i++)
-	{
+	for (int i = 0; i < ntotal; i++) {
 		y1 = (int)(ystart + i * yrange / ntotal) + 1;
 		y2 = (int)(ystart + (i + 1) * yrange / ntotal) - 1;
 		color = Util::getLabelColor(i);

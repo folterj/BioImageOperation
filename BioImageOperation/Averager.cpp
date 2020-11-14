@@ -1,70 +1,51 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
 #include "Averager.h"
 
 
-Averager::Averager()
-{
+Averager::Averager() {
 }
 
-void Averager::reset()
-{
+void Averager::reset() {
 	all = 0;
 	n = 0;
 }
 
-void Averager::addValue(double value)
-{
+void Averager::addValue(double value) {
 	all += value;
 	n++;
 }
 
-void Averager::addOne()
-{
+void Averager::addOne() {
 	all++;
 }
 
-void Averager::addTotal()
-{
+void Averager::addTotal() {
 	n++;
 }
 
-void Averager::addPositive()
-{
+void Averager::addPositive() {
 	all++;
 	n++;
 }
 
-void Averager::addNegative()
-{
+void Averager::addNegative() {
 	n++;
 }
 
-void Averager::setTotal(int total)
-{
+void Averager::setTotal(int total) {
 	n = total;
 }
 
-double Averager::getAverage()
-{
-	if (n != 0)
-	{
+double Averager::getAverage() {
+	if (n != 0) {
 		return all / n;
 	}
 	return 0;

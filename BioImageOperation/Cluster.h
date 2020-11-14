@@ -1,33 +1,21 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
 #pragma once
+#include <opencv2/opencv.hpp>
 #include "ClusterTrack.h"
-#pragma unmanaged
-#include "opencv2/opencv.hpp"
-#pragma managed
 #include "Constants.h"
 
-using namespace System::Collections::Generic;
 using namespace cv;
 
 
-class ClusterTrack;	// forward declaration
+class ClusterTrack;		// forward declaration
 
 
 /*
@@ -64,16 +52,15 @@ public:
 
 	int getLabel();
 	int getFirstLabel();
-	System::String^ getLabels();
-	void draw(Mat* image, ClusterDrawMode drawMode);
+	string getLabels();
+	void draw(Mat* image, int drawMode);
 	void drawPoint(Mat* image, Scalar color);
 	void drawCircle(Mat* image, Scalar color);
 	void drawBox(Mat* image, Scalar color);
 	void drawAngle(Mat* image, Scalar color);
 	void drawFill(Mat* image, Scalar color);
 	std::vector<Point> getContour();
-	System::String^ getCsv(bool writeContour = false);
+	string getCsv(bool writeContour = false);
 	void drawLabel(Mat* image, Scalar color, bool showCount);
-
-	virtual System::String^ ToString();
+	string toString();
 };

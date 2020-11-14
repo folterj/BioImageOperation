@@ -1,129 +1,293 @@
-/*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *****************************************************************************/
-
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <filesystem>
+#include <fstream>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QEventLoop>
 #include "Util.h"
 
-using namespace System;
-using namespace System::Diagnostics;
-using namespace System::Net;
-using namespace System::IO;
-using namespace System::Windows::Forms;
-using namespace Runtime::InteropServices;
 
-
-double Util::toDouble(System::String^ s)
-{
-	if (isNumeric(s))
-	{
-		return double::Parse(s);
-	}
-	return 0;
+bool Util::contains(string src, string target) {
+	return (src.find(target) != string::npos);
 }
 
-bool Util::isNumeric(System::String^ s)
-{
-	double x;
-
-	return double::TryParse(s, x);
+bool Util::contains(vector<string> source, string target) {
+	return (getListIndex(source, target) >= 0);
 }
 
-bool Util::isBoolean(System::String^ s)
-{
-	bool b;
-
-	return bool::TryParse(s, b);
-}
-
-int Util::parseFrameTime(System::String^ s, double fps)
-{
-	int frames = 0;
-	int count;
-
-	if (s->Contains(":"))
-	{
-		// time format
-		count = s->Split(':')->Length - 1;
-		if (count == 1)
-		{
-			s = "0:" + s;
+int Util::getListIndex(vector<string> source, string target) {
+	int index = -1;
+	for (int i = 0; i < source.size(); i++) {
+		if (toLower(source[i]) == toLower(target)) {
+			index = i;
 		}
-		frames = (int)(TimeSpan::Parse(s).TotalSeconds * fps);
 	}
-	else
-	{
-		// frames
-		int::TryParse(s, frames);
+	return index;
+}
+
+string Util::getValueList(vector<string> list) {
+	string s;
+	for (string item : list) {
+		if (s != "") {
+			s += ", ";
+		}
+		s += item;
+	}
+	return s;
+}
+
+vector<string> Util::split(const string& s, const string& delim, bool removeEmptyEntries) {
+	vector<string> parts;
+	int i = 0;
+	int i0 = 0;
+	while (i >= 0) {
+		i = s.find(delim, i0);
+		if (i >= 0) {
+			parts.push_back(s.substr(i0, i - i0));
+			i0 = i + 1;
+		}
+	}
+	parts.push_back(s.substr(i0, s.length() - i0));
+	return parts;
+}
+
+vector<string> Util::split(const string& s, const vector<string>& delims, bool removeEmptyEntries) {
+	vector<string> parts;
+	int i = 0;
+	int i0 = 0;
+	while (i >= 0) {
+		for (string delim : delims) {
+			i = s.find(delim, i0);
+			if (i >= 0) {
+				break;
+			}
+		}
+		if (i >= 0) {
+			parts.push_back(s.substr(i0, i - i0));
+			i0 = i + 1;
+		}
+	}
+	parts.push_back(s.substr(i0, s.length() - i0));
+	return parts;
+}
+
+string Util::toLower(string& s0) {
+	string s;
+	for (char c : s0) {
+		s += tolower(c);
+	}
+	return s;
+}
+
+string Util::toUpper(string& s0) {
+	string s;
+	for (char c : s0) {
+		s += toupper(c);
+	}
+	return s;
+}
+
+string Util::removeQuotes(string& s0) {
+	string s;
+	for (char c : s0) {
+		if (c != '\"' && c != '\'') {
+			s += c;
+		}
+	}
+	return s;
+}
+
+string Util::ltrim(string& s0) {
+	string s = s0;
+	while (s != "" && isspace(s.front())) {
+		s = s.substr(1);
+	}
+	return s;
+}
+
+string Util::rtrim(string& s0) {
+	string s = s0;
+	while (s != "" && isspace(s.back())) {
+		s = s.substr(0, s.size() - 1);
+	}
+	return s;
+}
+
+string Util::trim(string& s0) {
+	string s = s0;
+	s = ltrim(s);
+	s = rtrim(s);
+	return s;
+}
+
+string Util::replace(string s, string target, string replacement) {
+	string output = "";
+	int i = 0;
+	int i0;
+
+	while (i >= 0) {
+		i0 = i;
+		i = s.find(target, i);
+		if (i >= 0) {
+			output += s.substr(i0, i - i0) + replacement;
+			i += target.length();
+		} else {
+			output += s.substr(i0);
+		}
+	}
+	return output;
+}
+
+string Util::format(string format, ...) {
+	const int buflen = 1000;
+	char buffer[buflen];
+	va_list args;
+	va_start(args, format);
+	vsnprintf(buffer, buflen, format.c_str(), args);
+	va_end(args);
+	return string(buffer);
+}
+
+string Util::formatTimespan(int seconds0) {
+	string s;
+	int hours, minutes;
+	int seconds = seconds0;
+	const int buflen = 1000;
+	char buffer[buflen];
+	hours = seconds / 3600;
+	if (hours > 0) {
+		s += to_string(hours) + ":";
+		seconds %= 3600;
+	}
+	minutes = seconds / 60;
+	if (minutes > 0) {
+		s += to_string(minutes) + ":";
+		seconds %= 60;
+	}
+	s += to_string(seconds);
+	return s;
+}
+
+QString Util::convertToQString(string s) {
+	return QString::fromUtf8(s.c_str());
+}
+
+double Util::toDouble(string s) {
+	double d = 0;
+	size_t stodEnd;
+	if (s != "") {
+		d = stod(s, &stodEnd);
+		if (stodEnd != s.size()) {
+			throw invalid_argument("Invalid numeric value: " + s);
+		}
+	}
+	return d;
+}
+
+bool Util::isNumeric(string s) {
+	bool ok = (s != "");
+	int digits = 0;
+	int dots = 0;
+
+	for (char c : s) {
+		if (c == '.') {
+			dots++;
+			if (dots > 1) {
+				ok = false;
+			}
+		} else {
+			if (isdigit(c)) {
+				digits++;
+			} else {
+				ok = false;
+			}
+		}
+	}
+	return ok;
+}
+
+bool Util::toBoolean(string s) {
+	return (toLower(s) == "true");
+}
+
+bool Util::isBoolean(string s) {
+	return (toLower(s) == "true" || toLower(s) == "false");
+}
+
+int Util::parseFrameTime(string s, double fps) {
+	int frames = 0;
+	int totalSeconds = 0;
+
+	if (s != "") {
+		if (Util::contains(s, ":")) {
+			// time format
+			for (string part : split(s, ":")) {
+				totalSeconds *= 60;
+				totalSeconds += toDouble(part);
+			}
+			frames = (int)(totalSeconds * fps);
+		} else {
+			// frames
+			frames = stoi(s);
+		}
 	}
 	return frames;
 }
 
-double Util::calcDistance(double x0, double y0, double x1, double y1)
-{
+string Util::readText(string filename) {
+	ifstream input(filename);
+	ostringstream ss;
+	ss << input.rdbuf();
+	return ss.str();
+}
+
+double Util::calcDistance(double x0, double y0, double x1, double y1) {
 	return calcDistance(x1 - x0, y1 - y0);
 }
 
-double Util::calcDistance(double x, double y)
-{
+double Util::calcDistance(double x, double y) {
 	return sqrt(x * x + y * y);
 }
 
-double Util::getMomentsAngle(Moments* moments)
-{
+double Util::getMomentsAngle(Moments* moments) {
 	return 0.5 * atan2(2 * moments->mu11, moments->mu20 - moments->mu02);
 	//return 0.5 * cv::fastAtan2(2 * moments->mu11, moments->mu20 - moments->mu02);
 }
 
-double Util::calcAngleDif(double angle1, double angle2)
-{
+double Util::calcAngleDif(double angle1, double angle2) {
 	double dangle = angle2 - angle1;
-	while (dangle < -Math::PI) dangle += 2 * Math::PI;
-	while (dangle > Math::PI) dangle -= 2 * Math::PI;
+	while (dangle < -M_PI) dangle += 2 * M_PI;
+	while (dangle > M_PI) dangle -= 2 * M_PI;
 	return dangle;
 }
 
-Scalar Util::getLabelColor(int label0)
-{
+Scalar Util::getLabelColor(int label0) {
 	int label;
 	int ir, ig, ib;
 	double r, g, b;
 
-	if (label0 != 0x10000)
-	{
+	if (label0 != 0x10000) {
 		label = (label0 % 27);  // 0 ... 26 (27 unique colors)
 		ir = label % 3;
 		ig = (label / 3) % 3;
 		ib = (label / 9) % 3;
 
-		r = 0.25f * (1 + ir);
-		g = 0.25f * (1 + ig);
-		b = 0.25f * (1 + ib);
-	}
-	else
-	{
-		r = 0.5f;
-		g = 0.5f;
-		b = 0.5f;
+		r = 0.25 * (ir + 1);
+		g = 0.25 * (ig + 1);
+		b = 0.25 * (ib + 1);
+	} else {
+		r = 0.5;
+		g = 0.5;
+		b = 0.5;
 	}
 	return Scalar(b * 0xFF, g * 0xFF, r * 0xFF);
 }
 
-Scalar Util::getHeatScale(double scale)
-{
+Scalar Util::getHeatScale(double scale) {
 	double r = 0;
 	double g = 0;
 	double b = 0;
@@ -132,11 +296,10 @@ Scalar Util::getHeatScale(double scale)
 	int intScale;
 	double floatScale;
 
-	colScale = (float)scale * 4;
+	colScale = scale * 4;
 	intScale = (int)colScale;
 	floatScale = colScale - intScale;
-	switch (intScale)
-	{
+	switch (intScale) {
 	case 0:
 		// white - yellow
 		r = 1;
@@ -166,8 +329,7 @@ Scalar Util::getHeatScale(double scale)
 	return Scalar((unsigned char)(f * r * 0xFF), (unsigned char)(f * g * 0xFF), (unsigned char)(f * b * 0xFF));
 }
 
-Scalar Util::getRainbowScale(double scale)
-{
+Scalar Util::getRainbowScale(double scale) {
 	double r = 0;
 	double g = 0;
 	double b = 0;
@@ -176,11 +338,10 @@ Scalar Util::getRainbowScale(double scale)
 	int intScale;
 	double floatScale;
 
-	colScale = (float)scale * 6;
+	colScale = scale * 6;
 	intScale = (int)colScale;
 	floatScale = colScale - intScale;
-	switch (intScale)
-	{
+	switch (intScale) {
 	case 0:
 		// red - yellow
 		r = 1 - floatScale;
@@ -222,132 +383,97 @@ Scalar Util::getRainbowScale(double scale)
 	return Scalar((unsigned char)(f * r * 0xFF), (unsigned char)(f * g * 0xFF), (unsigned char)(f * b * 0xFF));
 }
 
-Scalar Util::bgrtoScalar(BGR bgr)
-{
+Scalar Util::bgrtoScalar(BGR bgr) {
 	return Scalar(bgr.b, bgr.g, bgr.r);
 }
 
-std::string Util::stdString(System::String^ s)
-{
-	const char* cstr = (const char*)(Marshal::StringToHGlobalAnsi(s)).ToPointer();
-	std::string s2 = cstr;
-	Marshal::FreeHGlobal(IntPtr((void*)cstr));
-	return s2;
-}
-
-System::String^ Util::netString(std::string s)
-{
-	return gcnew System::String(s.c_str());
-}
-
-std::vector<std::string> Util::stdStringVector(array<System::String^>^ list)
-{
-	std::vector<std::string> vec;
-
-	for each (System::String^ s in list)
-	{
-		vec.push_back(stdString(s));
-	}
-	return vec;
-}
-
-System::String^ Util::getExceptionDetail(System::Exception^ e)
-{
-	System::String^ s = e->Message;
-	System::Exception^ innerException = e->InnerException;
-
-	if (innerException)
-	{
-		s += " - " + getExceptionDetail(innerException);
-	}
+string Util::getExceptionDetail(exception e, int level) {
+	string s = e.what();
+	string inner;
+	try {
+		std::rethrow_if_nested(e);
+	} catch (exception e) {
+		inner = getExceptionDetail(e, level + 1);		// recursive
+		if (inner != "") {
+			s += " - " + inner;
+		}
+	} catch (...) { }
 	return s;
 }
 
-bool Util::isValidImage(Mat* image)
-{
-	if (image)
-	{
+bool Util::isValidImage(Mat* image) {
+	if (image) {
 		return (!image->empty() && image->dims == 2);
 	}
 	return false;
 }
 
-System::String^ Util::getCodecString(int codec)
-{
-	System::String^ codecs = "";
-	
-	if (codec > 0)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			codecs += (Char)(codec & 0xFF);
+string Util::getCodecString(int codec) {
+	string codecs = "";
+
+	if (codec > 0) {
+		for (int i = 0; i < 4; i++) {
+			codecs += (char)(codec & 0xFF);
 			codec /= 0x100;
 		}
-	}
-	else
-	{
+	} else {
 		codecs = "";
 	}
 	return codecs;
 }
 
-Mat Util::loadImage(System::String^ fileName)
-{
-	return imread(stdString(fileName), ImreadModes::IMREAD_UNCHANGED);
+Mat Util::loadImage(string filename) {
+	return imread(filename, ImreadModes::IMREAD_UNCHANGED);
 }
 
-void Util::saveImage(System::String^ fileName, Mat* image)
-{
-	imwrite(stdString(fileName), *image);
+void Util::saveImage(string filename, Mat* image) {
+	imwrite(filename, *image);
 }
 
+vector<string> Util::getImageFilenames(string searchPath) {
+	vector<string> filenames;
+	string filename;
+	string path = extractFilePath(searchPath);
+	string pattern = extractFileName(searchPath);
 
-
-array<System::String^>^ Util::getImageFileNames(System::String^ searchPath)
-{
-	System::String^ path = extractFilePath(searchPath);
-	System::String^ pattern = extractFileName(searchPath);
-	array<System::String^>^ fileNames = Directory::GetFiles(path, pattern);
-	Array::Sort(fileNames);
-	return fileNames;
-}
-
-System::String^ Util::extractFilePath(System::String^ path)
-{
-	System::String^ filePath = "";
-	array<System::String^>^ parts = path->Split('\\');
-	for (int i = 0; i < parts->Length - 1; i++)
-	{
-		filePath += parts[i];
-		filePath += "\\";
+	for (const auto& entry : filesystem::directory_iterator(path)) {
+		filename = entry.path().string();
+		if (extractFileName(filename)._Starts_with(pattern)) {
+			filenames.push_back(filename);
+		}
 	}
-	return filePath;
+	sort(filenames.begin(), filenames.end());
+	return filenames;
 }
 
-System::String^ Util::extractTitle(System::String^ path)
-{
+string Util::extractFilePath(string path) {
+	string filepath = "";
+	vector<string> parts = split(path, vector<string>{"\\", "/"});
+	for (int i = 0; i < (int)parts.size() - 1; i++) {
+		filepath += parts[i];
+		filepath += "\\";
+	}
+	return filepath;
+}
+
+string Util::extractTitle(string path) {
 	return extractFileTitle(extractFileName(path));
 }
 
-System::String^ Util::extractFileName(System::String^ path)
-{
-	System::String^ fileName = path;
-	array<System::String^>^ parts = path->Split('\\');
-	if (parts->Length > 1)
-	{
-		fileName = parts[parts->Length - 1];
+string Util::extractFileName(string path) {
+	string filename = path;
+	vector<string> parts = split(path, vector<string>{"\\", "/"});
+	if (parts.size() > 1) {
+		filename = parts[parts.size() - 1];
 	}
-	return fileName;
+	return filename;
 }
 
-System::String^ Util::extractFileTitle(System::String^ fileName)
-{
-	System::String^ fileTitle = "";
-	array<System::String^>^ parts = fileName->Split('.');
-	for (int i = 0; i < parts->Length - 1; i++)
-	{
-		if (i > 0)
-		{
+string Util::extractFileTitle(string filename) {
+	string fileTitle = "";
+	vector<string> parts = split(filename, ".");
+	for (int i = 0; i < parts.size() - 1; i++) {
+		if (i > 0) {
 			fileTitle += ".";
 		}
 		fileTitle += parts[i];
@@ -355,83 +481,70 @@ System::String^ Util::extractFileTitle(System::String^ fileName)
 	return fileTitle;
 }
 
-System::String^ Util::extractFileExtension(System::String^ fileName)
-{
-	System::String^ fileExtension = fileName;
-	array<System::String^>^ parts = fileExtension->Split('.');
-	if (parts->Length > 1)
-	{
-		fileExtension = parts[parts->Length - 1];
+string Util::extractFileExtension(string filename) {
+	string fileExtension = filename;
+	vector<string> parts = split(fileExtension, ".");
+	if (parts.size() > 1) {
+		fileExtension = parts[parts.size() - 1];
 	}
 	return fileExtension;
 }
 
-System::String^ Util::combinePath(System::String^ basePath, System::String^ templatePath)
-{
-	if (basePath == "" || templatePath->Contains(":"))
-	{
+string Util::combinePath(string basepath, string templatePath) {
+	if (basepath == "" || Util::contains(templatePath, ":")) {
 		return templatePath;
-	}
-	else
-	{
-		return Path::Combine(basePath, templatePath);
+	} else {
+		return (filesystem::path(basepath) / filesystem::path(templatePath)).string();
 	}
 }
 
-System::String^ Util::getUrl(System::String^ url)
-{
-	System::String^ content = "";
-
-	WebRequest^ request = WebRequest::Create(url);
-	request->UseDefaultCredentials = true;
-	request->Timeout = 30000;	// takes max approx 2.5 seconds
-	((HttpWebRequest^)request)->Accept = "*/*";
-	((HttpWebRequest^)request)->UserAgent = "compatible";	// essential!
-	WebResponse^ response = request->GetResponse();
-	Stream^ responseStream = response->GetResponseStream();
-	StreamReader^ reader = gcnew StreamReader(responseStream);
-	content = reader->ReadToEnd();
-	reader->Close();
-	responseStream->Close();
-	response->Close();
-
-	return content;
+QImage Util::matToQImage(cv::Mat const& src) {
+	QImage qimage(src.data, src.cols, src.rows, src.step, QImage::Format_RGB888);
+	return qimage.rgbSwapped();
 }
 
-bool Util::openWebLink(System::String^ link)
-{
-	try
-	{
-		Process::Start(link);
+string Util::getUrl(string url) {
+	string result;
+	try {
+		QNetworkAccessManager manager;
+		QNetworkReply* reply = manager.get(QNetworkRequest(QUrl(convertToQString(url))));
+		QEventLoop loop;
+		connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+		loop.exec();
+		if (!reply->error()) {
+			QByteArray bytes = reply->readAll();
+			QString content = QString::fromUtf8(bytes.data(), bytes.size());
+			QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+			if (statusCode.isValid()) {
+				int status = statusCode.toInt();
+			}
+			result = content.toStdString();
+		}
+	} catch (...) { }
+	return result;
+}
+
+bool Util::openWebLink(string url) {
+	try {
+		QDesktopServices::openUrl(QUrl(convertToQString(url)));
 		return true;
-	}
-	catch (System::Exception^ e)
-	{
-		Clipboard::SetText(link);
-		MessageBox::Show("Error: " + e->Message + "\nPlease use your preferred browser to navigate to this link manually\n(This link has been copied to the clipboard - Select Paste in your browser address bar)", "BIO Update");
-	}
+	} catch (...) { }
 	return false;
 }
 
-int Util::compareVersions(System::String^ version1, System::String^ version2)
-{
+int Util::compareVersions(string version1, string version2) {
 	int comp = 0;
-	array<System::String^>^ versions1 = version1->Split('.');
-	array<System::String^>^ versions2 = version2->Split('.');
+	vector<string> versions1 = split(version1, ".");
+	vector<string> versions2 = split(version2, ".");
 	int v1, v2;
 
-	for (int i = 0; i < version1->Length && i < versions2->Length; i++)
-	{
-		int::TryParse(versions1[i], v1);
-		int::TryParse(versions2[i], v2);
-
-		if (v2 > v1)
-		{
+	for (int i = 0; i < version1.size() && i < versions2.size(); i++) {
+		v1 = stoi(versions1[i]);
+		v2 = stoi(versions2[i]);
+		if (v2 > v1) {
 			comp = 1;
 			break;
-		}
-		else if (v2 < v1)
-		{
+		} else if (v2 < v1) {
 			comp = -1;
 			break;
 		}

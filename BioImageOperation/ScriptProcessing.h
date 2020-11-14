@@ -1,24 +1,15 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
 #pragma once
-
-#include <vcclr.h>
+#include <thread>
+#include <QObject>
 #include "Observer.h"
 #include "Constants.h"
 #include "ScriptOperations.h"
@@ -28,24 +19,20 @@
 #include "AverageBuffer.h"
 #include "ImageSeries.h"
 #include "AccumBuffer.h"
-#pragma unmanaged
-#include "opencv2/opencv.hpp"
-#pragma managed
-
-using namespace System;
-using namespace System::Threading;
-using namespace cv;
 
 
 /*
  * Main processing of the operations recevied from the script
  */
 
-public ref class ScriptProcessing
+class ScriptProcessing : public QObject
 {
+	Q_OBJECT
+
 public:
-	Observer^ observer;
-	Thread^ processThread;
+	Observer* observer;
+	std::thread* processThread;
+	//QThread* processThread;
 	ScriptOperations* scriptOperations = new ScriptOperations();
 	ImageItemList* imageList = new ImageItemList();
 	AverageBuffer* backgroundBuffer = new AverageBuffer();
@@ -55,7 +42,7 @@ public:
 	ImageTrackers* imageTrackers = new ImageTrackers();
 	Mat* dummyImage = new Mat();
 
-	System::String^ basePath;
+	string basepath;
 	int sourceWidth = 0;
 	int sourceHeight = 0;
 	double sourceFps = 0;
@@ -65,15 +52,9 @@ public:
 	bool abort = false;
 	bool debugMode = false;
 
-	/*
-	 * Initialisation
-	 */
-	ScriptProcessing(Observer^ observer);
-
-	/*
-	 * Destructor
-	 */
+	ScriptProcessing();
 	~ScriptProcessing();
+	void registerObserver(Observer* observer);
 
 	/*
 	 * Reset class properties when (re)starting script processing
@@ -83,7 +64,7 @@ public:
 	/*
 	 * Start processing in separate thread
 	 */
-	bool startProcess(System::String^ filePath, System::String^ script);
+	bool startProcess(string filepath, string script);
 	void processThreadMethod();
 
 	/*
@@ -104,5 +85,21 @@ public:
 	/*
 	 * Abort thread, attempt closing output streams to prevent data loss
 	 */
-	void doAbort(bool tryKill);
+	void doAbort();
+
+	// 'Internal' functions encapsulating Qt signal emits
+	void resetUI();
+	void clearStatus();
+	void showStatus(int i, int tot = 0, string label = "");
+	void showText(string text, int displayi);
+	void showImage(Mat* image, int displayi);
+	void showDialog(string message, MessageLevel level = MessageLevel::Info);
+
+signals:
+	void resetUIQt();
+	void clearStatusQt();
+	void showStatusQt(int i, int tot = 0, string label = "");
+	void showDialogQt(string message, int level = (int)MessageLevel::Info);
+	void showTextQt(string text, int displayi);
+	void showImageQt(Mat* image, int displayi);
 };

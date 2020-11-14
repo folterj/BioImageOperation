@@ -1,52 +1,35 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
 #pragma once
 #include <vector>
-#pragma unmanaged
-#include "opencv2/opencv.hpp"
-#pragma managed
+#include <opencv2/opencv.hpp>
 #include "Constants.h"
 #include "Argument.h"
 #include "OperationInfo.h"
 #include "FrameSource.h"
 #include "FrameOutput.h"
 
-using namespace System;
 using namespace cv;
 
 
 class ScriptOperations;	// forward declaration
 
 
-/*
- * Holds script parameters of a single operation
- * Also holds and checks parameters for each operation and is used to dynamically construct script instructions
- */
-
 class ScriptOperation
 {
 public:
 	ScriptOperations* innerOperations = NULL;
 	ScriptOperationType operationType = ScriptOperationType::None;
-	std::vector<Argument*> arguments;
-	std::string line;
-	std::string asignee;
+	vector<Argument*> arguments;
+	string line;
+	string asignee;
 	int lineStart = 0;
 	int lineEnd = 0;
 	int interval = 1;
@@ -59,23 +42,26 @@ public:
 	Mat* imageRef = NULL;
 
 	ScriptOperation();
-	ScriptOperation(System::String^ line);
+	ScriptOperation(string line);
 	~ScriptOperation();
 	void reset();
-	void extract(System::String^ line);
-	void checkArguments();
+	void extract(string line);
+	void parseArguments();
 	bool hasInnerOperations();
 	ScriptOperation* getNextInnerOperation();
-	System::String^ getArgument(ArgumentLabel label = ArgumentLabel::None);
+	string getArgument(ArgumentLabel label = ArgumentLabel::None);
+	int getArgument(ArgumentLabel label, int defaultArgument);
 	double getArgumentNumeric(ArgumentLabel label = ArgumentLabel::None, bool oneBase = false);
 	bool getArgumentBoolean(ArgumentLabel label = ArgumentLabel::None);
-	generic<class type> type getArgument(ArgumentLabel label, type defaultArgument);
-	ClusterDrawMode getClusterDrawMode(ClusterDrawMode defaultArgument);
-	static OperationInfo^ getOperationInfo(ScriptOperationType type);
-	static System::String^ getOperationList();
-	static void writeOperationList(System::String^ filename);
+	static OperationInfo getOperationInfo(ScriptOperationType type);
+	static ArgumentType getExpectedArgumentType(ArgumentLabel argument);
+	static string getArgumentDescription(ArgumentLabel argument);
+	static string getArgumentTypeDescription(ArgumentType type);
+	static string getArgumentRtfDescription(ArgumentLabel argument);
+	static string getOperationList();
+	static void writeOperationList(string filename);
 
-	bool initFrameSource(FrameType frameType, int apiCode, System::String^ basePath, System::String^ templatePath, System::String^ start = "", System::String^ length = "", double fps0 = 1, int interval = 1);
-	void initFrameOutput(FrameType frameType, System::String^ basePath, System::String^ templatePath, System::String^ defaultExtension = "", System::String^ start = "", System::String^ length = "", double fps = 0, System::String^ codecs = "");
+	bool initFrameSource(FrameType frameType, int apiCode, string basepath, string templatePath, string start = "", string length = "", double fps0 = 1, int interval = 1);
+	void initFrameOutput(FrameType frameType, string basepath, string templatePath, string defaultExtension = "", string start = "", string length = "", double fps = 0, string codecs = "");
 	void close();
 };

@@ -1,56 +1,46 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
 #include "ImageSeries.h"
 #include "ImageOperations.h"
 
 
-ImageSeries::ImageSeries()
-{
+ImageSeries::ImageSeries() {
 }
 
-ImageSeries::~ImageSeries()
-{
+ImageSeries::~ImageSeries() {
 }
 
-void ImageSeries::reset()
-{
+void ImageSeries::reset() {
 	images.clear();
+	width = 0;
+	height = 0;
 }
 
-void ImageSeries::addImage(Mat* image, int bufferSize)
-{
-	width = image->cols;
-	height = image->rows;
+void ImageSeries::addImage(Mat* image, int bufferSize) {
+	if (width == 0 || height == 0) {
+		width = image->cols;
+		height = image->rows;
+	} else if (image->cols != width || image->rows != height) {
+		throw invalid_argument("Image size does not match current image series");
+	}
 
-	if (bufferSize != 0)
-	{
+	if (bufferSize != 0) {
 		// remove oldest image(s)
-		while (images.size() >= bufferSize)
-		{
+		while (images.size() >= bufferSize) {
 			images.pop_front();
 		}
 	}
 	images.push_back(image->clone());
 }
 
-bool ImageSeries::getMedian(OutputArray dest, Observer^ observer)
-{
+bool ImageSeries::getMedian(OutputArray dest, Observer* observer) {
 	Mat image;
 	unsigned char* outData;
 	unsigned char* inData;
@@ -65,10 +55,8 @@ bool ImageSeries::getMedian(OutputArray dest, Observer^ observer)
 	}
 
 	// Currently only works for GrayScale
-	for (int i = 0; i < n; i++)
-	{
-		if (images[i].channels() > 1)
-		{
+	for (int i = 0; i < n; i++) {
+		if (images[i].channels() > 1) {
 			ImageOperations::convertToGrayScale(images[i], images[i]);
 		}
 	}
@@ -77,32 +65,25 @@ bool ImageSeries::getMedian(OutputArray dest, Observer^ observer)
 	image = dest.getMat();
 	outData = (unsigned char*)image.data;
 
-	for (int y = 0; y < height; y++)
-	{
-		for (int x = 0; x < width; x++)
-		{
+	for (int y = 0; y < height; y++) {
+		for (int x = 0; x < width; x++) {
 			pixeli = y * width + x;
-			for (int i = 0; i < n; i++)
-			{
+			for (int i = 0; i < n; i++) {
 				inData = images[i].data;
 				pixelBuffer[i] = inData[pixeli]; // * slow
 			}
 			std::sort(pixelBuffer.begin(), pixelBuffer.end()); // * very slow
 			m = n / 2;
-			if (n % 2 != 0)
-			{
+			if (n % 2 != 0) {
 				// odd number: single middle element
 				median = pixelBuffer[m];
-			}
-			else
-			{
+			} else {
 				// even number: two middle elements
 				median = (pixelBuffer[m] + pixelBuffer[m - 1]) / 2;
 			}
 			outData[y * width + x] = median;
 		}
-		if (observer)
-		{
+		if (observer) {
 			observer->showStatus(y, height);
 		}
 	}

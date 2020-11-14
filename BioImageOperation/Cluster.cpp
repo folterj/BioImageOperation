@@ -1,19 +1,10 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
 #include "Cluster.h"
@@ -21,8 +12,7 @@
 #include "Util.h"
 
 
-Cluster::Cluster(double x, double y, double area, double angle, Rect box, Moments* moments, Mat* clusterImage)
-{
+Cluster::Cluster(double x, double y, double area, double angle, Rect box, Moments* moments, Mat* clusterImage) {
 	this->area = area;
 	this->x = x;
 	this->y = y;
@@ -33,106 +23,83 @@ Cluster::Cluster(double x, double y, double area, double angle, Rect box, Moment
 	rad = sqrt(area);
 }
 
-void Cluster::unAssign()
-{
+void Cluster::unAssign() {
 	assignedTracks.clear();
 }
 
-bool Cluster::isAssignable(double trackedArea)
-{
+bool Cluster::isAssignable(double trackedArea) {
 	int n = (int)assignedTracks.size();
 	double totalArea;
 
-	if (n == 0)
-	{
+	if (n == 0) {
 		return true;
 	}
 
 	totalArea = trackedArea;
-	for (ClusterTrack* track : assignedTracks)
-	{
+	for (ClusterTrack* track : assignedTracks) {
 		totalArea += track->area;
 	}
 	return (totalArea * 0.75 < area && n < Constants::maxMergedBlobs);
 }
 
-void Cluster::assign(ClusterTrack* track)
-{
+void Cluster::assign(ClusterTrack* track) {
 	assignedTracks.push_back(track);
 }
 
-bool Cluster::isAssigned()
-{
+bool Cluster::isAssigned() {
 	return (assignedTracks.size() != 0);
 }
 
-double Cluster::calcDistance(ClusterTrack* track)
-{
+double Cluster::calcDistance(ClusterTrack* track) {
 	return Util::calcDistance(track->estimateX, track->estimateY, x, y);
 }
 
-double Cluster::calcAreaDif(ClusterTrack* track)
-{
-	return Math::Abs(area - track->area);
+double Cluster::calcAreaDif(ClusterTrack* track) {
+	return abs(area - track->area);
 }
 
-bool Cluster::isOverlap(ClusterTrack* track)
-{
+bool Cluster::isOverlap(ClusterTrack* track) {
 	return (calcDistance(track) - (2 * rad - track->rad) <= 0);
 }
 
-bool Cluster::inRange(ClusterTrack* track, double distance, double maxMoveDistance)
-{
-	if (maxMoveDistance <= 0)
-	{
+bool Cluster::inRange(ClusterTrack* track, double distance, double maxMoveDistance) {
+	if (maxMoveDistance <= 0) {
 		return true;
 	}
 
-	if (track->isMerged)
-	{
+	if (track->isMerged) {
 		// allow for greater move distance after being merged
 		return distance - 2 * rad <= 2 * maxMoveDistance;
-	}
-	else
-	{
+	} else {
 		return distance - (2 * rad - track->rad) <= maxMoveDistance;
 	}
 }
 
-int Cluster::getLabel()
-{
+int Cluster::getLabel() {
 	int label0 = 0;
 
-	if (assignedTracks.size() == 1)
-	{
+	if (assignedTracks.size() == 1) {
 		label0 = assignedTracks[0]->label;
-	}
-	else if (assignedTracks.size() > 1)
-	{
+	} else if (assignedTracks.size() > 1) {
 		label0 = 0x10000;
 	}
 	return label0;
 }
 
-int Cluster::getFirstLabel()
-{
+int Cluster::getFirstLabel() {
 	int label0 = -1;
 
-	if (!assignedTracks.empty())
-	{
+	if (!assignedTracks.empty()) {
 		label0 = assignedTracks[0]->label;
 	}
 	return label0;
 }
 
-System::String^ Cluster::getLabels()
-{
-	System::String^ labels = "";
+string Cluster::getLabels() {
+	string labels = "";
 
-	for (ClusterTrack* track : assignedTracks)
-	{
-		if (labels != "")
-		{
+	for (ClusterTrack* track : assignedTracks) {
+		if (labels != "") {
 			labels += ",";
 		}
 		labels += track->label;
@@ -140,64 +107,52 @@ System::String^ Cluster::getLabels()
 	return labels;
 }
 
-void Cluster::draw(Mat* image, ClusterDrawMode drawMode)
-{
+void Cluster::draw(Mat* image, int drawMode) {
 	Scalar color = Util::getLabelColor(getLabel());
 	Scalar labelColor = Scalar(0x80, 0x80, 0x80);
 
-	if ((drawMode & ClusterDrawMode::Point) != ClusterDrawMode::None)
-	{
+	if ((drawMode & (int)ClusterDrawMode::Point) != 0) {
 		drawPoint(image, color);
 	}
-	if ((drawMode & ClusterDrawMode::Circle) != ClusterDrawMode::None)
-	{
+	if ((drawMode & (int)ClusterDrawMode::Circle) != 0) {
 		drawCircle(image, color);
 	}
-	if ((drawMode & ClusterDrawMode::Box) != ClusterDrawMode::None)
-	{
+	if ((drawMode & (int)ClusterDrawMode::Box) != 0) {
 		drawBox(image, color);
 	}
-	if ((drawMode & ClusterDrawMode::Angle) != ClusterDrawMode::None)
-	{
+	if ((drawMode & (int)ClusterDrawMode::Angle) != 0) {
 		drawAngle(image, color);
 	}
-	if ((drawMode & ClusterDrawMode::Label) != ClusterDrawMode::None)
-	{
+	if ((drawMode & (int)ClusterDrawMode::Label) != 0) {
 		drawLabel(image, labelColor, false);
 	}
-	if ((drawMode & ClusterDrawMode::Labeln) != ClusterDrawMode::None)
-	{
+	if ((drawMode & (int)ClusterDrawMode::Labeln) != 0) {
 		drawLabel(image, labelColor, true);
 	}
-	if ((drawMode & ClusterDrawMode::Fill) != ClusterDrawMode::None)
-	{
+	if ((drawMode & (int)ClusterDrawMode::Fill) != 0) {
 		drawFill(image, color);
 	}
 }
 
-void Cluster::drawPoint(Mat* image, Scalar color)
-{
+void Cluster::drawPoint(Mat* image, Scalar color) {
 	cv::Point point((int)x, (int)y);
 
 	drawMarker(*image, point, color, MARKER_CROSS, 2, 1, LINE_AA);
 }
 
-void Cluster::drawCircle(Mat* image, Scalar color)
-{
+void Cluster::drawCircle(Mat* image, Scalar color) {
 	cv::Point point((int)x, (int)y);
 
 	circle(*image, point, (int)rad, color, 1, LINE_AA);
 }
 
-void Cluster::drawBox(Mat* image, Scalar color)
-{
+void Cluster::drawBox(Mat* image, Scalar color) {
 	Rect rect((int)(x - rad), (int)(y - rad), (int)(rad * 2), (int)(rad * 2));
 
 	rectangle(*image, rect, color, 1, LINE_AA);
 }
 
-void Cluster::drawAngle(Mat* image, Scalar color)
-{
+void Cluster::drawAngle(Mat* image, Scalar color) {
 	int x0 = (int)(x - rad * cos(angle));
 	int y0 = (int)(y - rad * sin(angle));
 	int x1 = (int)(x + rad * cos(angle));
@@ -206,28 +161,22 @@ void Cluster::drawAngle(Mat* image, Scalar color)
 	line(*image, cv::Point(x0, y0), cv::Point(x1, y1), color, 1, LINE_AA);
 }
 
-void Cluster::drawLabel(Mat* image, Scalar color, bool showCount)
-{
+void Cluster::drawLabel(Mat* image, Scalar color, bool showCount) {
 	cv::Point point((int)x, (int)y);
-	System::String^ labelx;
+	string labelx;
 
-	if (showCount)
-	{
-		labelx = area.ToString();
+	if (showCount) {
+		labelx = to_string(area);
 		point.y = (int)(y + rad);
-	}
-	else
-	{
+	} else {
 		labelx = getLabels();
 	}
-	
-	putText(*image, Util::stdString(labelx), point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, LINE_AA);
+
+	putText(*image, labelx, point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, LINE_AA);
 }
 
-void Cluster::drawFill(Mat* image, Scalar color)
-{
-	if (Util::isValidImage(&clusterImage))
-	{
+void Cluster::drawFill(Mat* image, Scalar color) {
+	if (Util::isValidImage(&clusterImage)) {
 		Mat clusterImage2(clusterImage.size(), image->type());
 		clusterImage2.setTo(0);
 		clusterImage2.setTo(color, clusterImage);			// use image as mask to convert to color
@@ -236,22 +185,19 @@ void Cluster::drawFill(Mat* image, Scalar color)
 	}
 }
 
-std::vector<Point> Cluster::getContour()
-{
+std::vector<Point> Cluster::getContour() {
 	std::vector<Point> contour;
 	std::vector<std::vector<Point>> contours;
 	findContours(clusterImage, contours, RetrievalModes::RETR_EXTERNAL, ContourApproximationModes::CHAIN_APPROX_NONE);
-	for (Point point : contours[0])
-	{
+	for (Point point : contours[0]) {
 		contour.push_back(box.tl() + point);
 	}
 	return contour;
 }
 
-System::String^ Cluster::getCsv(bool writeContour)
-{
+string Cluster::getCsv(bool writeContour) {
 	// https://www.learnopencv.com/blob-detection-using-opencv-python-c/
-	System::String^ s = System::String::Format("{0},{1},{2},{3},{4},{5}", getFirstLabel(), area, rad, angle, x, y);
+	string s = format("%d,%f,%f,%f,%f,%f", getFirstLabel(), area, rad, angle, x, y);
 	/*
 	if (assignedTracks.size() == 1)
 	{
@@ -305,18 +251,15 @@ System::String^ Cluster::getCsv(bool writeContour)
 	}
 	*/
 
-	if (writeContour)
-	{
+	if (writeContour) {
 		s += ",";
-		for (Point point : getContour())
-		{
-			s += System::String::Format("{0} {1} ", point.x, point.y);
+		for (Point point : getContour()) {
+			s += Util::format("%d %d ", point.x, point.y);
 		}
 	}
 	return s;
 }
 
-System::String^ Cluster::ToString()
-{
-	return System::String::Format("Label:{0} Area:{1:F1} Radius:{2:F1} Angle:{3:F1} X:{4:F1} Y:{5:F1}", getLabels(), area, rad, angle, x, y);
+string Cluster::toString() {
+	return Util::format("Label:%s Area:%.1f Radius:%.1f Angle:%.1f X:%.1f Y:%.1f", getLabels().c_str(), area, rad, angle, x, y);
 }

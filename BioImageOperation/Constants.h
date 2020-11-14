@@ -1,32 +1,24 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
 #pragma once
-
 #include <string>
 #include <vector>
+
+using namespace std;
 
 
 /*
  * Constants and general types/enums
  */
 
-public enum class ScriptOperationType
+enum class ScriptOperationType
 {
 	None,
 	SetPath,
@@ -58,10 +50,10 @@ public enum class ScriptOperationType
 	Add,
 	Multiply,
 	Invert,
-	RollingBall,
 
 	UpdateBackground,
 	UpdateAverage,
+	ClearSeries,
 	AddSeries,
 	GetSeriesMedian,
 	AddAccum,
@@ -87,32 +79,124 @@ public enum class ScriptOperationType
 	Debug,
 };
 
+const vector<string> ScriptOperationTypes =
+{
+	"None",
+	"SetPath",
 
-public enum class SaveFormat
+	"CreateImage",
+	"OpenImage",
+	"OpenVideo",
+	"OpenCapture",
+	"SaveImage",
+	"SaveVideo",
+	"ShowImage",
+
+	"StoreImage",
+	"GetImage",
+
+	"Grayscale",
+	"Color",
+	"ColorAlpha",
+	"GetSaturation",
+	"GetHsValue",
+	"GetHsLightness",
+
+	"Scale",
+	"Crop",
+	"Mask",
+	"Threshold",
+	"Difference",
+	"DifferenceAbs",
+	"Add",
+	"Multiply",
+	"Invert",
+
+	"UpdateBackground",
+	"UpdateAverage",
+	"ClearSeries",
+	"AddSeries",
+	"GetSeriesMedian",
+	"AddAccum",
+	"GetAccum",
+
+	"CreateClusters",
+	"CreateTracks",
+	"CreatePaths",
+	"DrawClusters",
+	"DrawTracks",
+	"DrawPaths",
+	"SaveClusters",
+	"SaveTracks",
+	"SavePaths",
+
+	"ShowTrackInfo",
+	"DrawTrackInfo",
+	"SaveTrackInfo",
+	"SaveTrackLog",
+	"DrawLegend",
+
+	"Wait",
+	"Debug"
+};
+
+enum class MessageLevel
+{
+	Info,
+	Warning,
+	Error
+};
+
+enum class FrameType
+{
+	Image,
+	Video,
+	Capture
+};
+
+enum class SaveFormat
 {
 	ByTime,
 	ByLabel,
 	Split
 };
 
+const vector<string> SaveFormats =
+{
+	"ByTime",
+	"ByLabel",
+	"Split"
+};
 
-public enum class ImageColorMode
+enum class ImageColorMode
 {
 	GrayScale,
 	Color,
 	ColorAlpha
 };
 
+const vector<string> ImageColorModes =
+{
+	"GrayScale",
+	"Color",
+	"ColorAlpha"
+};
 
-public enum class Palette
+enum class Palette
 {
 	Grayscale,
 	Heat,
-	Rainbow,
+	Rainbow
 };
 
+const vector<string> Palettes =
+{
+	"GrayScale",
+	"Heat",
+	"Rainbow"
+};
 
-public enum class ClusterDrawMode : int
+enum class ClusterDrawMode : int
 {
 	None = 0,
 	Point = 0x01,
@@ -125,42 +209,72 @@ public enum class ClusterDrawMode : int
 	Tracks = 0x80,
 	Fill = 0x100,
 	ClusterDefault = Fill,
-	TracksDefault = Tracks,
+	TracksDefault = Tracks
 };
 
+const vector<string> ClusterDrawModes =
+{
+	"None",
+	"Point",
+	"Circle",
+	"Box",
+	"Angle",
+	"Label",
+	"Labeln",
+	"Track",
+	"Tracks",
+	"Fill",
+	"ClusterDefault",
+	"TracksDefault"
+};
 
-public enum class AccumMode
+enum class AccumMode
 {
 	Age,
 	Usage
 };
 
+const vector<string> AccumModes =
+{
+	"Age",
+	"Usage"
+};
 
-public enum class PathDrawMode
+enum class PathDrawMode
 {
 	Age,
 	Usage,
 	Usage2,
 	Links,
-	LinksMove,
+	LinksMove
 };
 
-public enum class FrameType
+const vector<string> PathDrawModes =
 {
-	Image,
-	Video,
-	Capture
+	"Age",
+	"Usage",
+	"Usage2",
+	"Links",
+	"LinksMove"
 };
 
-public enum class DrawPosition
+enum class DrawPosition
 {
 	Full,
 	TopLeft,
 	BottomLeft,
 	TopRight,
-	BottomRight,
+	BottomRight
 };
 
+const vector<string> DrawPositions =
+{
+	"Full",
+	"TopLeft",
+	"BottomLeft",
+	"TopRight",
+	"BottomRight"
+};
 
 class Constants
 {
@@ -171,14 +285,15 @@ public:
 	static const int nTrackers;
 	static const int seekModeInterval;
 
-	static const std::string webPage;
-	static const std::string webFilesUrl;
-	static const std::string scriptFileDialogFilter;
+	static const string webPage;
+	static const string webFilesUrl;
+	static const string scriptFileDialogFilter;
+	static const string helpDocDialogFilter;
 	static const int defaultScriptFileDialogFilter;
-	static const std::string defaultDataExtension;
-	static const std::string defaultImageExtension;
-	static const std::string defaultVideoExtension;
-	static const std::string defaultVideoCodec;
+	static const string defaultDataExtension;
+	static const string defaultImageExtension;
+	static const string defaultVideoExtension;
+	static const string defaultVideoCodec;
 
 	static const int minPixels;
 	static const int maxMergedBlobs;

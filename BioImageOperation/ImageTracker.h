@@ -1,22 +1,15 @@
 /*****************************************************************************
- * Bio Image Operation
- * Copyright (C) 2013-2018 Joost de Folter <folterj@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
 #pragma once
+#include <opencv2/opencv.hpp>
+#include "Observer.h"
 #include "Cluster.h"
 #include "ClusterTrack.h"
 #include "TrackClusterMatch.h"
@@ -27,13 +20,8 @@
 #include "TrackingStats.h"
 #include "Cluster.h"
 #include "OutputStream.h"
-#include <vcclr.h>
-#pragma unmanaged
-#include "opencv2/opencv.hpp"
-#pragma managed
 
-using namespace System;
-using namespace System::Windows::Forms;
+using namespace std;
 using namespace cv;
 
 
@@ -44,13 +32,14 @@ using namespace cv;
 class ImageTracker
 {
 public:
-	gcroot<System::String^> trackerId = "";
-	gcroot<System::String^> basePath = "";
-	std::vector<std::vector<cv::Point>> contours;
-	std::vector<Cluster*> clusters;
-	std::vector<ClusterTrack*> clusterTracks;
-	std::vector<PathNode*> pathNodes;
-	std::vector<PathLink*> pathLinks;
+	Observer* observer;
+	string trackerId = "";
+	string basePath = "";
+	vector<vector<Point>> contours;
+	vector<Cluster*> clusters;
+	vector<ClusterTrack*> clusterTracks;
+	vector<PathNode*> pathNodes;
+	vector<PathLink*> pathLinks;
 	int nextTrackLabel = 0;
 	int nextPathLabel = 0;
 
@@ -59,7 +48,7 @@ public:
 	bool countPositionSet = false;
 	double pathDistance = Constants::minPathDistance;
 	int pathAge = 0;
-	cv::Point countPosition;
+	Point countPosition;
 	OutputStream clusterStream, trackStream, pathStream, trackInfoStream, trackLogStream;
 	Mat clusterLabelImage, clusterRoiImage;
 	Mat1i clusterStats;
@@ -76,12 +65,12 @@ public:
 	/*
 	 * Constructor for testing
 	 */
-	ImageTracker();
+	ImageTracker(Observer* observer);
 
 	/*
 	 * Main constructor
 	 */
-	ImageTracker(System::String^ trackerId);
+	ImageTracker(Observer* observer, string trackerId);
 
 	/*
 	 * Destructor
@@ -103,12 +92,12 @@ public:
 	/*
 	 * Create clusters from image entry point
 	 */
-	bool createClusters(Mat* image, double areaMin, double areaMax, System::String^ basePath, bool debugMode);
+	bool createClusters(Mat* image, double areaMin, double areaMax, string basePath, bool debugMode);
 
 	/*
 	 * Create tracks entry point
 	 */
-	void createTracks(double maxMove, int minActive, int maxInactive, System::String^ basePath);
+	void createTracks(double maxMove, int minActive, int maxInactive, string basePath);
 
 	/*
 	 * Create paths entry point
@@ -149,24 +138,24 @@ public:
 	/*
 	 * Drawing routines
 	 */
-	void drawClusters(Mat* source, Mat* dest, ClusterDrawMode drawMode);
-	void drawTracks(Mat* source, Mat* dest, ClusterDrawMode drawMode, int ntracks);
+	void drawClusters(Mat* source, Mat* dest, int drawMode);
+	void drawTracks(Mat* source, Mat* dest, int drawMode, int ntracks);
 	void drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, float power, Palette palette);
 	void drawTrackInfo(Mat* source, Mat* dest);
 
 	/*
 	 * Return tracking information to show in text Form
 	 */
-	System::String^ getInfo();
+	string getInfo();
 
 	/*
 	 * Save routines
 	 */
-	void saveClusters(System::String^ fileName, int frame, double time, SaveFormat byLabel, bool saveContour);
-	void saveTracks(System::String^ fileName, int frame, double time, SaveFormat byLabel, bool saveContour);
-	void savePaths(System::String^ fileName, int frame, double time);
-	void saveTrackInfo(System::String^ fileName, int frame, double time);
-	void initLogClusterTrack(System::String^ fileName);
+	void saveClusters(string fileName, int frame, double time, SaveFormat byLabel, bool saveContour);
+	void saveTracks(string fileName, int frame, double time, SaveFormat byLabel, bool saveContour);
+	void savePaths(string fileName, int frame, double time);
+	void saveTrackInfo(string fileName, int frame, double time);
+	void initLogClusterTrack(string fileName);
 	Cluster* findTrackedCluster(ClusterTrack* track);
 	void logClusterTrack(ClusterTrack* clusterTrack);
 
