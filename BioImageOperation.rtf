@@ -1,150 +1,404 @@
 {\rtf1\ansi\deff0 {\fonttbl {\f0 Consolas;}}
 {\colortbl;\red0\green0\blue0;\red127\green127\blue127;\red0\green0\blue255;}\margl720\margr720\margt720\margb720 \fs20
-\b BioImageOperation script operations\b0\line
+{\fs32 \b Bio Image Operation script operations (v1.6.440.1 / 2020-11-14)\b0}\line
 \line
-\b SetPath\b0 (Path) \line
-{\cf3 \tab \bullet Set path for relative file paths (by default path of current script file)}\line
+\b SetPath\b0  (Path)\line
 \line
-\b CreateImage\b0 ({\cf2 Width}, {\cf2 Height}, {\cf2 ColorMode}, {\cf2 Red}, {\cf2 Green}, {\cf2 Blue}) \line
-{\cf3 \tab \bullet Create a new image}\line
+{\cf3 Set path for relative file paths (by default path of current script file)}\line
 \line
-\b OpenImage\b0 (Path, {\cf2 Start}, {\cf2 Length}, {\cf2 Interval}) \line
-{\cf3 \tab \bullet Open image file(s) for processing, accepts file name pattern, start/length #}\line
+ \bullet  Path:\tab File path {\cf2 ("path")}\line
 \line
-\b OpenVideo\b0 (Path, {\cf2 API}, {\cf2 Start}, {\cf2 Length}, {\cf2 Interval}) \line
-{\cf3 \tab \bullet Open video file(s) and process frames, accepts file name pattern, start/length frames or time (ffmpeg formats supported) (API: See OpenCV API codes)}\line
 \line
-\b OpenCapture\b0 ({\cf2 API}, {\cf2 Path}, {\cf2 Source}, {\cf2 Width}, {\cf2 Height}, {\cf2 Interval}) \line
-{\cf3 \tab \bullet Open capturing from video (IP) path or camera source (#) (API: See OpenCV API codes)}\line
+\b CreateImage\b0  ({\cf2 Width}, {\cf2 Height}, {\cf2 ColorMode}, {\cf2 Red}, {\cf2 Green}, {\cf2 Blue})\line
 \line
-\b SaveImage\b0 (Path, {\cf2 Label}, {\cf2 Start}, {\cf2 Length}) \line
-{\cf3 \tab \bullet Save image to file, start/length frames or time}\line
+{\cf3 Create a new image}\line
 \line
-\b SaveVideo\b0 (Path, {\cf2 Label}, {\cf2 Start}, {\cf2 Length}, {\cf2 Fps}, {\cf2 Codec}) \line
-{\cf3 \tab \bullet Create video file and save image to video file, start/length frames or time, using fourcc codec string (supports installed encoders)}\line
+ \bullet  Width:\tab Width in pixels {\cf2 (numeric value)}\line
+ \bullet  Height:\tab Height in pixels {\cf2 (numeric value)}\line
+ \bullet  ColorMode:\tab Color mode {\cf2 (GrayScale, Color, ColorAlpha)}\line
+ \bullet  Red:\tab Red color component {\cf2 (numeric value between 0 and 1)}\line
+ \bullet  Green:\tab Green color component {\cf2 (numeric value between 0 and 1)}\line
+ \bullet  Blue:\tab Blue color component {\cf2 (numeric value between 0 and 1)}\line
 \line
-\b ShowImage\b0 ({\cf2 Label}, {\cf2 Display}) \line
-{\cf3 \tab \bullet Show image on screen (low priority screen updates) (display: 1 - 4)}\line
 \line
-\b StoreImage\b0 (Label) \line
-{\cf3 \tab \bullet Store current image in memory}\line
+\b OpenImage\b0  (Path, {\cf2 Start}, {\cf2 Length}, {\cf2 Interval})\line
 \line
-\b GetImage\b0 (Label) \line
-{\cf3 \tab \bullet Get specified stored image from memory}\line
+{\cf3 Open image file(s) for processing, accepts file name pattern}\line
 \line
-\b Grayscale\b0 ({\cf2 Label}) \line
-{\cf3 \tab \bullet Convert image to gray scale}\line
+ \bullet  Path:\tab File path {\cf2 ("path")}\line
+ \bullet  Start:\tab Start {\cf2 (time reference as (hours:)minutes:seconds, or frame number)}\line
+ \bullet  Length:\tab Length {\cf2 (time reference as (hours:)minutes:seconds, or frame number)}\line
+ \bullet  Interval:\tab Interval in number of frames {\cf2 (numeric value)}\line
 \line
-\b Color\b0 ({\cf2 Label}) \line
-{\cf3 \tab \bullet Convert image to color}\line
 \line
-\b ColorAlpha\b0 ({\cf2 Label}) \line
-{\cf3 \tab \bullet Convert image to color with alpha channel}\line
+\b OpenVideo\b0  (Path, {\cf2 API}, {\cf2 Start}, {\cf2 Length}, {\cf2 Interval})\line
 \line
-\b GetSaturation\b0 ({\cf2 Label}) \line
-{\cf3 \tab \bullet Extract saturation from image}\line
+{\cf3 Open video file(s) and process frames, accepts file name pattern (ffmpeg formats supported)}\line
 \line
-\b GetHsValue\b0 ({\cf2 Label}) \line
-{\cf3 \tab \bullet Extract (HSV) Value from image}\line
+ \bullet  Path:\tab File path {\cf2 ("path")}\line
+ \bullet  API:\tab OpenCV API code (See OpenCV API codes) {\cf2 (numeric value)}\line
+ \bullet  Start:\tab Start {\cf2 (time reference as (hours:)minutes:seconds, or frame number)}\line
+ \bullet  Length:\tab Length {\cf2 (time reference as (hours:)minutes:seconds, or frame number)}\line
+ \bullet  Interval:\tab Interval in number of frames {\cf2 (numeric value)}\line
 \line
-\b GetHsLightness\b0 ({\cf2 Label}) \line
-{\cf3 \tab \bullet Extract (HSL) Lightness from image}\line
 \line
-\b Scale\b0 (Width, Height, {\cf2 Label}) \line
-{\cf3 \tab \bullet Scale image}\line
+\b OpenCapture\b0  ({\cf2 API}, {\cf2 Path}, {\cf2 Source}, {\cf2 Width}, {\cf2 Height}, {\cf2 Interval})\line
 \line
-\b Crop\b0 (X, Y, Width, Height, {\cf2 Label}) \line
-{\cf3 \tab \bullet Crop image}\line
+{\cf3 Open capturing from video (IP) path or camera source}\line
 \line
-\b Mask\b0 (Label) \line
-{\cf3 \tab \bullet Perform mask on current image}\line
+ \bullet  API:\tab OpenCV API code (See OpenCV API codes) {\cf2 (numeric value)}\line
+ \bullet  Path:\tab File path {\cf2 ("path")}\line
+ \bullet  Source:\tab Camera source (#) {\cf2 (numeric value)}\line
+ \bullet  Width:\tab Width in pixels {\cf2 (numeric value)}\line
+ \bullet  Height:\tab Height in pixels {\cf2 (numeric value)}\line
+ \bullet  Interval:\tab Interval in number of frames {\cf2 (numeric value)}\line
 \line
-\b Threshold\b0 ({\cf2 Label}, {\cf2 Level}) \line
-{\cf3 \tab \bullet Convert image to binary using threshold level, or in case not provided using automatic Otsu method}\line
 \line
-\b Difference\b0 (Label) \line
-{\cf3 \tab \bullet Perform difference of current image and specified image}\line
+\b SaveImage\b0  (Path, {\cf2 Label}, {\cf2 Start}, {\cf2 Length})\line
 \line
-\b DifferenceAbs\b0 (Label) \line
-{\cf3 \tab \bullet Perform absolute difference of current image and specified image}\line
+{\cf3 Save image to file}\line
 \line
-\b Add\b0 (Label) \line
-{\cf3 \tab \bullet Adds specified image to current image}\line
+ \bullet  Path:\tab File path {\cf2 ("path")}\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+ \bullet  Start:\tab Start {\cf2 (time reference as (hours:)minutes:seconds, or frame number)}\line
+ \bullet  Length:\tab Length {\cf2 (time reference as (hours:)minutes:seconds, or frame number)}\line
 \line
-\b Multiply\b0 (Factor) \line
-{\cf3 \tab \bullet Perform multiplication of all color channels by specified factor}\line
 \line
-\b Invert\b0 ({\cf2 Label}) \line
-{\cf3 \tab \bullet Invert image}\line
+\b SaveVideo\b0  (Path, {\cf2 Label}, {\cf2 Start}, {\cf2 Length}, {\cf2 Fps}, {\cf2 Codec})\line
 \line
-\b UpdateBackground\b0 ({\cf2 Label}, {\cf2 Weight}) \line
-{\cf3 \tab \bullet Add image to the adaptive background buffer}\line
+{\cf3 Create video file and save image to video file (supports installed encoders)}\line
 \line
-\b UpdateAverage\b0 ({\cf2 Label}, {\cf2 Weight}) \line
-{\cf3 \tab \bullet Add image to the average buffer}\line
+ \bullet  Path:\tab File path {\cf2 ("path")}\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+ \bullet  Start:\tab Start {\cf2 (time reference as (hours:)minutes:seconds, or frame number)}\line
+ \bullet  Length:\tab Length {\cf2 (time reference as (hours:)minutes:seconds, or frame number)}\line
+ \bullet  Fps:\tab Frames per second {\cf2 (numeric value)}\line
+ \bullet  Codec:\tab Video encoding codec {\cf2 (4 character codec reference (FOURCC))}\line
 \line
-\b ClearSeries\b0 () \line
-{\cf3 \tab \bullet Clear image series buffer}\line
 \line
-\b AddSeries\b0 ({\cf2 Label}, {\cf2 Maximum}) \line
-{\cf3 \tab \bullet Add image to image series buffer}\line
+\b ShowImage\b0  ({\cf2 Label}, {\cf2 Display})\line
 \line
-\b GetSeriesMedian\b0 () \line
-{\cf3 \tab \bullet Retrieve median image of image series buffer}\line
+{\cf3 Show image on screen (low priority screen updates)}\line
 \line
-\b AddAccum\b0 ({\cf2 Label}, {\cf2 AccumMode}) \line
-{\cf3 \tab \bullet Add image to the accumulative buffer (AccumMode: Age, Usage)}\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+ \bullet  Display:\tab Display id {\cf2 (number 1 - 4)}\line
 \line
-\b GetAccum\b0 ({\cf2 Power}, {\cf2 Palette}) \line
-{\cf3 \tab \bullet Retrieve the accumulative buffer and convert to image (Palette: Grayscale, Heat, Rainbow)}\line
 \line
-\b CreateClusters\b0 ({\cf2 Tracker}, {\cf2 MinArea}, {\cf2 MaxArea}) \line
-{\cf3 \tab \bullet Create clusters; auto calibrate using initial images if no parameters specified}\line
+\b StoreImage\b0  (Label)\line
 \line
-\b CreateTracks\b0 ({\cf2 Tracker}, {\cf2 MaxMove}, {\cf2 MinActive}, {\cf2 MaxInactive}) \line
-{\cf3 \tab \bullet Create cluster tracking; auto calibrate using initial images if no parameters specified}\line
+{\cf3 Store current image in memory}\line
 \line
-\b CreatePaths\b0 ({\cf2 Tracker}, {\cf2 Distance}) \line
-{\cf3 \tab \bullet Create common path usage}\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
 \line
-\b DrawClusters\b0 ({\cf2 Label}, {\cf2 Tracker}, {\cf2 DrawMode}) \line
-{\cf3 \tab \bullet Draw clusters (DrawMode: Point|Circle|Box|Angle|Label|Labeln|Fill)}\line
 \line
-\b DrawTracks\b0 ({\cf2 Label}, {\cf2 Tracker}, {\cf2 DrawMode}) \line
-{\cf3 \tab \bullet Draw tracked clusters (DrawMode: Point|Circle|Box|Angle|Label|Labeln|Track|Tracks)}\line
+\b GetImage\b0  (Label)\line
 \line
-\b DrawPaths\b0 ({\cf2 Label}, {\cf2 Tracker}, {\cf2 PathDrawMode}, {\cf2 Power}, {\cf2 Palette}) \line
-{\cf3 \tab \bullet Draw common paths (PathDrawMode: Age, Usage, Links, LinksMove) (Palette: Grayscale, Heat, Rainbow)}\line
+{\cf3 Get specified stored image from memory}\line
 \line
-\b SaveClusters\b0 (Path, {\cf2 Tracker}, {\cf2 Format}, {\cf2 Contour}) \line
-{\cf3 \tab \bullet Save clusters to CSV file (Format: ByTime, ByLabel, Split)}\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
 \line
-\b SaveTracks\b0 (Path, {\cf2 Tracker}, {\cf2 Format}, {\cf2 Contour}) \line
-{\cf3 \tab \bullet Save cluster tracking to CSV file (Format: ByTime, ByLabel, Split)}\line
 \line
-\b SavePaths\b0 (Path, {\cf2 Tracker}) \line
-{\cf3 \tab \bullet Save paths to CSV file}\line
+\b Grayscale\b0  ({\cf2 Label})\line
 \line
-\b ShowTrackInfo\b0 ({\cf2 Tracker}, {\cf2 Display}) \line
-{\cf3 \tab \bullet Show tracking information on screen (Display: 1 - 4)}\line
+{\cf3 Convert image to gray scale}\line
 \line
-\b DrawTrackInfo\b0 ({\cf2 Label}, {\cf2 Tracker}) \line
-{\cf3 \tab \bullet Draw tracking stats on image}\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
 \line
-\b SaveTrackInfo\b0 (Path, {\cf2 Tracker}) \line
-{\cf3 \tab \bullet Save tracking information to CSV file}\line
 \line
-\b SaveTrackLog\b0 (Path, {\cf2 Tracker}) \line
-{\cf3 \tab \bullet Save tracking log to CSV file}\line
+\b Color\b0  ({\cf2 Label})\line
 \line
-\b DrawLegend\b0 ({\cf2 Label}, {\cf2 Display}, {\cf2 Position}) \line
-{\cf3 \tab \bullet Draw legend (Display: 1 - 4 or Position on image: TopLeft, BottomLeft, TopRight, BottomRight)}\line
+{\cf3 Convert image to color}\line
 \line
-\b Wait\b0 ({\cf2 MS}) \line
-{\cf3 \tab \bullet Pause execution for a period (1000 ms default)}\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
 \line
-\b Debug\b0 () \line
-{\cf3 \tab \bullet Debug mode}\line
+\line
+\b ColorAlpha\b0  ({\cf2 Label})\line
+\line
+{\cf3 Convert image to color with alpha channel}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+\line
+\line
+\b GetSaturation\b0  ({\cf2 Label})\line
+\line
+{\cf3 Extract saturation from image}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+\line
+\line
+\b GetHsValue\b0  ({\cf2 Label})\line
+\line
+{\cf3 Extract (HSV) Value from image}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+\line
+\line
+\b GetHsLightness\b0  ({\cf2 Label})\line
+\line
+{\cf3 Extract (HSL) Lightness from image}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+\line
+\line
+\b Scale\b0  (Width, Height, {\cf2 Label})\line
+\line
+{\cf3 Scale image}\line
+\line
+ \bullet  Width:\tab Width in pixels {\cf2 (numeric value)}\line
+ \bullet  Height:\tab Height in pixels {\cf2 (numeric value)}\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+\line
+\line
+\b Crop\b0  (X, Y, Width, Height, {\cf2 Label})\line
+\line
+{\cf3 Crop image}\line
+\line
+ \bullet  X:\tab X position in pixels {\cf2 (numeric value)}\line
+ \bullet  Y:\tab Y position in pixels {\cf2 (numeric value)}\line
+ \bullet  Width:\tab Width in pixels {\cf2 (numeric value)}\line
+ \bullet  Height:\tab Height in pixels {\cf2 (numeric value)}\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+\line
+\line
+\b Mask\b0  (Label)\line
+\line
+{\cf3 Perform mask on current image}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+\line
+\line
+\b Threshold\b0  ({\cf2 Label}, {\cf2 Level})\line
+\line
+{\cf3 Convert image to binary using threshold level, or in case not provided using automatic Otsu method}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+ \bullet  Level:\tab Threshold value {\cf2 (numeric value between 0 and 1)}\line
+\line
+\line
+\b Difference\b0  (Label)\line
+\line
+{\cf3 Perform difference of current image and specified image}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+\line
+\line
+\b DifferenceAbs\b0  (Label)\line
+\line
+{\cf3 Perform absolute difference of current image and specified image}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+\line
+\line
+\b Add\b0  (Label)\line
+\line
+{\cf3 Adds specified image to current image}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+\line
+\line
+\b Multiply\b0  (Factor)\line
+\line
+{\cf3 Perform multiplication of all color channels by specified factor}\line
+\line
+ \bullet  Factor:\tab Multiplication factor {\cf2 (numeric value)}\line
+\line
+\line
+\b Invert\b0  ({\cf2 Label})\line
+\line
+{\cf3 Invert image}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+\line
+\line
+\b UpdateBackground\b0  ({\cf2 Label}, {\cf2 Weight})\line
+\line
+{\cf3 Add image to the adaptive background buffer}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+ \bullet  Weight:\tab Weight value {\cf2 (numeric value between 0 and 1)}\line
+\line
+\line
+\b UpdateAverage\b0  ({\cf2 Label}, {\cf2 Weight})\line
+\line
+{\cf3 Add image to the average buffer}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+ \bullet  Weight:\tab Weight value {\cf2 (numeric value between 0 and 1)}\line
+\line
+\line
+\b ClearSeries\b0  ()\line
+\line
+{\cf3 Clear image series buffer}\line
+\line
+\line
+\line
+\b AddSeries\b0  ({\cf2 Label}, {\cf2 Maximum})\line
+\line
+{\cf3 Add image to image series buffer}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+ \bullet  Maximum:\tab Maximum number of images to keep {\cf2 (numeric value)}\line
+\line
+\line
+\b GetSeriesMedian\b0  ()\line
+\line
+{\cf3 Retrieve median image of image series buffer}\line
+\line
+\line
+\line
+\b AddAccum\b0  ({\cf2 Label}, {\cf2 AccumMode})\line
+\line
+{\cf3 Add image to the accumulative buffer}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+ \bullet  AccumMode:\tab Accumulation mode {\cf2 (Age, Usage)}\line
+\line
+\line
+\b GetAccum\b0  ({\cf2 Power}, {\cf2 Palette})\line
+\line
+{\cf3 Retrieve the accumulative buffer and convert to image}\line
+\line
+ \bullet  Power:\tab Exponential power of value range (1E-[power] ... 1) {\cf2 (numeric value)}\line
+ \bullet  Palette:\tab Palette {\cf2 (GrayScale, Heat, Rainbow)}\line
+\line
+\line
+\b CreateClusters\b0  ({\cf2 Tracker}, {\cf2 MinArea}, {\cf2 MaxArea})\line
+\line
+{\cf3 Create clusters; auto calibrate using initial images if no parameters specified}\line
+\line
+ \bullet  Tracker:\tab Tracker id {\cf2 (string)}\line
+ \bullet  MinArea:\tab Minimum area in number of pixels {\cf2 (numeric value)}\line
+ \bullet  MaxArea:\tab Maximum area in number of pixels {\cf2 (numeric value)}\line
+\line
+\line
+\b CreateTracks\b0  ({\cf2 Tracker}, {\cf2 MaxMove}, {\cf2 MinActive}, {\cf2 MaxInactive})\line
+\line
+{\cf3 Create cluster tracking; auto calibrate using initial images if no parameters specified}\line
+\line
+ \bullet  Tracker:\tab Tracker id {\cf2 (string)}\line
+ \bullet  MaxMove:\tab Maximum movement distance (single frame) {\cf2 (numeric value)}\line
+ \bullet  MinActive:\tab Minimum number of frames being active before state is active {\cf2 (numeric value)}\line
+ \bullet  MaxInactive:\tab Maximum number of frames being inactive before state is inactive {\cf2 (numeric value)}\line
+\line
+\line
+\b CreatePaths\b0  ({\cf2 Tracker}, {\cf2 Distance})\line
+\line
+{\cf3 Create common path usage}\line
+\line
+ \bullet  Tracker:\tab Tracker id {\cf2 (string)}\line
+ \bullet  Distance:\tab Maximum path distance {\cf2 (numeric value)}\line
+\line
+\line
+\b DrawClusters\b0  ({\cf2 Label}, {\cf2 Tracker}, {\cf2 DrawMode})\line
+\line
+{\cf3 Draw clusters}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+ \bullet  Tracker:\tab Tracker id {\cf2 (string)}\line
+ \bullet  DrawMode:\tab (Combination of) draw mode(s) {\cf2 (None, Point, Circle, Box, Angle, Label, Labeln, Track, Tracks, Fill, ClusterDefault, TracksDefault)}\line
+\line
+\line
+\b DrawTracks\b0  ({\cf2 Label}, {\cf2 Tracker}, {\cf2 DrawMode})\line
+\line
+{\cf3 Draw tracked clusters}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+ \bullet  Tracker:\tab Tracker id {\cf2 (string)}\line
+ \bullet  DrawMode:\tab (Combination of) draw mode(s) {\cf2 (None, Point, Circle, Box, Angle, Label, Labeln, Track, Tracks, Fill, ClusterDefault, TracksDefault)}\line
+\line
+\line
+\b DrawPaths\b0  ({\cf2 Label}, {\cf2 Tracker}, {\cf2 PathDrawMode}, {\cf2 Power}, {\cf2 Palette})\line
+\line
+{\cf3 Draw common paths}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+ \bullet  Tracker:\tab Tracker id {\cf2 (string)}\line
+ \bullet  PathDrawMode:\tab Path draw mode {\cf2 (Age, Usage, Usage2, Links, LinksMove)}\line
+ \bullet  Power:\tab Exponential power of value range (1E-[power] ... 1) {\cf2 (numeric value)}\line
+ \bullet  Palette:\tab Palette {\cf2 (GrayScale, Heat, Rainbow)}\line
+\line
+\line
+\b SaveClusters\b0  (Path, {\cf2 Tracker}, {\cf2 Format}, {\cf2 Contour})\line
+\line
+{\cf3 Save clusters to CSV file}\line
+\line
+ \bullet  Path:\tab File path {\cf2 ("path")}\line
+ \bullet  Tracker:\tab Tracker id {\cf2 (string)}\line
+ \bullet  Format:\tab Output format {\cf2 (ByTime, ByLabel, Split)}\line
+ \bullet  Contour:\tab Extract contours {\cf2 (true / false)}\line
+\line
+\line
+\b SaveTracks\b0  (Path, {\cf2 Tracker}, {\cf2 Format}, {\cf2 Contour})\line
+\line
+{\cf3 Save cluster tracking to CSV file}\line
+\line
+ \bullet  Path:\tab File path {\cf2 ("path")}\line
+ \bullet  Tracker:\tab Tracker id {\cf2 (string)}\line
+ \bullet  Format:\tab Output format {\cf2 (ByTime, ByLabel, Split)}\line
+ \bullet  Contour:\tab Extract contours {\cf2 (true / false)}\line
+\line
+\line
+\b SavePaths\b0  (Path, {\cf2 Tracker})\line
+\line
+{\cf3 Save paths to CSV file}\line
+\line
+ \bullet  Path:\tab File path {\cf2 ("path")}\line
+ \bullet  Tracker:\tab Tracker id {\cf2 (string)}\line
+\line
+\line
+\b ShowTrackInfo\b0  ({\cf2 Tracker}, {\cf2 Display})\line
+\line
+{\cf3 Show tracking information on screen}\line
+\line
+ \bullet  Tracker:\tab Tracker id {\cf2 (string)}\line
+ \bullet  Display:\tab Display id {\cf2 (number 1 - 4)}\line
+\line
+\line
+\b DrawTrackInfo\b0  ({\cf2 Label}, {\cf2 Tracker})\line
+\line
+{\cf3 Draw tracking stats on image}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+ \bullet  Tracker:\tab Tracker id {\cf2 (string)}\line
+\line
+\line
+\b SaveTrackInfo\b0  (Path, {\cf2 Tracker})\line
+\line
+{\cf3 Save tracking information to CSV file}\line
+\line
+ \bullet  Path:\tab File path {\cf2 ("path")}\line
+ \bullet  Tracker:\tab Tracker id {\cf2 (string)}\line
+\line
+\line
+\b SaveTrackLog\b0  (Path, {\cf2 Tracker})\line
+\line
+{\cf3 Save tracking log to CSV file}\line
+\line
+ \bullet  Path:\tab File path {\cf2 ("path")}\line
+ \bullet  Tracker:\tab Tracker id {\cf2 (string)}\line
+\line
+\line
+\b DrawLegend\b0  ({\cf2 Label}, {\cf2 Display}, {\cf2 Position})\line
+\line
+{\cf3 Draw legend}\line
+\line
+ \bullet  Label:\tab Label id {\cf2 (string)}\line
+ \bullet  Display:\tab Display id {\cf2 (number 1 - 4)}\line
+ \bullet  Position:\tab Draw position {\cf2 (Full, TopLeft, BottomLeft, TopRight, BottomRight)}\line
+\line
+\line
+\b Wait\b0  ({\cf2 MS})\line
+\line
+{\cf3 Pause execution for a period (1000 ms default)}\line
+\line
+ \bullet  MS:\tab Time in milliseconds {\cf2 (numeric value)}\line
+\line
+\line
+\b Debug\b0  ()\line
+\line
+{\cf3 Debug mode}\line
+\line
+\line
 \line
 \line
 \b Arguments:\b0 \tab Required \tab {\cf2 Optional}\line

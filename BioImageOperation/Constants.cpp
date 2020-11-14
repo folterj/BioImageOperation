@@ -18,6 +18,7 @@ const int Constants::seekModeInterval = 100;
 const string Constants::webPage = "https://joostdefolter.info";
 const string Constants::webFilesUrl = webPage + "/files/";
 const string Constants::scriptFileDialogFilter = "BIO Script files (*.bioscript)";
+const string Constants::helpDocDialogFilter = "BIO help document (*.rtf)";
 const int Constants::defaultScriptFileDialogFilter = 1;
 const string Constants::defaultDataExtension = "csv";
 const string Constants::defaultImageExtension = "png";

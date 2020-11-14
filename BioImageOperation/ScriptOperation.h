@@ -55,6 +55,9 @@ public:
 	bool getArgumentBoolean(ArgumentLabel label = ArgumentLabel::None);
 	static OperationInfo getOperationInfo(ScriptOperationType type);
 	static ArgumentType getExpectedArgumentType(ArgumentLabel argument);
+	static string getArgumentDescription(ArgumentLabel argument);
+	static string getArgumentTypeDescription(ArgumentType type);
+	static string getArgumentRtfDescription(ArgumentLabel argument);
 	static string getOperationList();
 	static void writeOperationList(string filename);
 

@@ -64,7 +64,6 @@ public:
 
 public slots:
 	virtual void resetUI() override;
-	virtual void resetImages() override;
 	virtual void clearStatus() override;
 	virtual void showStatus(int i, int tot = 0, string label = "") override;
 	virtual void showDialog(string message, int level = (int)MessageLevel::Info) override;
@@ -74,6 +73,7 @@ public slots:
 
 protected:
 	void checkUpdates();
+	void generateHelpDoc();
 	void showAbout();
 	void closeEvent(QCloseEvent* event);
 };

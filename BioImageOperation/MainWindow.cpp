@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(ui.actionSave_As, &QAction::triggered, this, &MainWindow::saveDialog);
 	connect(ui.actionExit, &QAction::triggered, this, &QWidget::close);
 	connect(ui.actionCheck_for_Updates, &QAction::triggered, this, &MainWindow::checkUpdates);
+	connect(ui.actionGenerate_help_doc, &QAction::triggered, this, &MainWindow::generateHelpDoc);
 	connect(ui.actionAbout, &QAction::triggered, this, &MainWindow::showAbout);
 
 	connect(ui.scriptTextEdit, &QPlainTextEdit::textChanged, this, &MainWindow::textChanged);
@@ -153,18 +154,6 @@ void MainWindow::updateUI(bool start) {
 void MainWindow::resetUI() {
 	try {
 		updateUI(false);
-	} catch (exception e) {
-		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
-	}
-}
-
-void MainWindow::resetImages() {
-	try {
-	/*
-		for (int i = 0; i < Constants::nDisplays; i++) {
-			imageWindows[i].reset();
-		}
-	*/
 	} catch (exception e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
@@ -333,6 +322,19 @@ void MainWindow::checkUpdates() {
 			showDialog("Unable to check online version information.");
 		}
 	} catch (...) { }
+}
+
+void MainWindow::generateHelpDoc() {
+	QString qfilename;
+
+	try {
+		qfilename = QFileDialog::getSaveFileName(this, tr("Save script"), QString(), Util::convertToQString(Constants::helpDocDialogFilter));
+		if (qfilename != "") {
+			ScriptOperation::writeOperationList(qfilename.toStdString());
+		}
+	} catch (std::exception e) {
+		showDialog(Util::getExceptionDetail(e));
+	}	
 }
 
 void MainWindow::showAbout() {

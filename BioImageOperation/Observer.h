@@ -23,7 +23,6 @@ class Observer abstract
 {
 public:
 	virtual void resetUI() = 0;
-	virtual void resetImages() = 0;
 	virtual void resetProgressTimer() = 0;
 	virtual void clearStatus() = 0;
 	virtual bool checkStatusProcess() = 0;

@@ -318,7 +318,7 @@
     <None Include="CMakeSettings.json" />
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="MainWindow.qrc">
+    <QtRcc Include="BioImageOperation.qrc">
       <Filter>Resources</Filter>
     </QtRcc>
   </ItemGroup>

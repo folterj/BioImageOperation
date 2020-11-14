@@ -28,6 +28,7 @@ public:
 	static bool contains(string src, string target);
 	static bool contains(vector<string> source, string target);
 	static int getListIndex(vector<string> source, string target);
+	static string getValueList(vector<string> list);
 	static vector<string> split(const string& s, const string& delim, bool removeEmptyEntries=false);
 	static vector<string> split(const string& s, const vector<string>& delims, bool removeEmptyEntries=false);
 	static string toLower(string& s0);

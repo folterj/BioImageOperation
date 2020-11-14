@@ -89,7 +89,6 @@ public:
 
 	// 'Internal' functions encapsulating Qt signal emits
 	void resetUI();
-	void resetImages();
 	void clearStatus();
 	void showStatus(int i, int tot = 0, string label = "");
 	void showText(string text, int displayi);
@@ -98,7 +97,6 @@ public:
 
 signals:
 	void resetUIQt();
-	void resetImagesQt();
 	void clearStatusQt();
 	void showStatusQt(int i, int tot = 0, string label = "");
 	void showDialogQt(string message, int level = (int)MessageLevel::Info);

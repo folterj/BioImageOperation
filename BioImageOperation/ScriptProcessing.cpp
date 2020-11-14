@@ -81,14 +81,12 @@ void ScriptProcessing::reset() {
 	accumBuffer->reset();
 
 	imageTrackers->reset();
-	resetImages();
 }
 
 void ScriptProcessing::registerObserver(Observer* observer) {
 	this->observer = observer;
 
 	connect(this, &ScriptProcessing::resetUIQt, (MainWindow*)observer, &MainWindow::resetUI);
-	connect(this, &ScriptProcessing::resetImagesQt, (MainWindow*)observer, &MainWindow::resetImages);
 	connect(this, &ScriptProcessing::clearStatusQt, (MainWindow*)observer, &MainWindow::clearStatus);
 	connect(this, &ScriptProcessing::showStatusQt, (MainWindow*)observer, &MainWindow::showStatus);
 	connect(this, &ScriptProcessing::showDialogQt, (MainWindow*)observer, &MainWindow::showDialog);
@@ -562,6 +560,7 @@ double ScriptProcessing::getTime(int frame) {
 
 void ScriptProcessing::doAbort() {
 	abort = true;
+	this_thread::sleep_for(100ms);
 
 	imageTrackers->close();
 	scriptOperations->close();
@@ -573,10 +572,6 @@ void ScriptProcessing::doAbort() {
 
 void ScriptProcessing::resetUI() {
 	emit resetUIQt();
-}
-
-void ScriptProcessing::resetImages() {
-	emit resetImagesQt();
 }
 
 void ScriptProcessing::clearStatus() {

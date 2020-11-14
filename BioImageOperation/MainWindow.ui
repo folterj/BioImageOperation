@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
+    <width>400</width>
     <height>400</height>
    </rect>
   </property>
@@ -17,8 +17,8 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QPlainTextEdit" name="scriptTextEdit">
-      <property name="tabStopWidth">
-       <number>20</number>
+      <property name="tabStopDistance">
+       <double>20.000000000000000</double>
       </property>
      </widget>
     </item>
@@ -75,7 +75,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>600</width>
+     <width>400</width>
      <height>21</height>
     </rect>
    </property>
@@ -91,21 +91,16 @@
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuView">
-    <property name="title">
-     <string>View</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
     <addaction name="actionCheck_for_Updates"/>
+    <addaction name="actionGenerate_help_doc"/>
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -163,7 +158,13 @@
     <string>About</string>
    </property>
   </action>
+  <action name="actionGenerate_help_doc">
+   <property name="text">
+    <string>Generate help doc</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <resources/>
  <connections/>
 </ui>

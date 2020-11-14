@@ -20,7 +20,7 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "C:/Qt/5.15.0/msvc2019_64/lib/cmake", "C:/opencv/build/x64/vc15/lib")
+list(APPEND CMAKE_PREFIX_PATH "C:/Qt/5.15.0/msvc2019_64/lib/cmake" "C:/opencv/build/x64/vc15/lib")
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt5 COMPONENTS Core REQUIRED)

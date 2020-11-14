@@ -29,6 +29,17 @@ int Util::getListIndex(vector<string> source, string target) {
 	return index;
 }
 
+string Util::getValueList(vector<string> list) {
+	string s;
+	for (string item : list) {
+		if (s != "") {
+			s += ", ";
+		}
+		s += item;
+	}
+	return s;
+}
+
 vector<string> Util::split(const string& s, const string& delim, bool removeEmptyEntries) {
 	vector<string> parts;
 	int i = 0;

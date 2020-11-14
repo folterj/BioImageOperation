@@ -19,6 +19,7 @@
 #include "VideoOutput.h"
 #include "Util.h"
 #include "OutputStream.h"
+#include "config.h"
 
 
 ScriptOperation::ScriptOperation() {
@@ -314,37 +315,37 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 	case ScriptOperationType::OpenImage:
 		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Start, ArgumentLabel::Length, ArgumentLabel::Interval };
-		description = "Open image file(s) for processing, accepts file name pattern, start/length #";
+		description = "Open image file(s) for processing, accepts file name pattern";
 		break;
 
 	case ScriptOperationType::OpenVideo:
 		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::API, ArgumentLabel::Start, ArgumentLabel::Length, ArgumentLabel::Interval };
-		description = "Open video file(s) and process frames, accepts file name pattern, start/length frames or time (ffmpeg formats supported) (API: See OpenCV API codes)";
+		description = "Open video file(s) and process frames, accepts file name pattern (ffmpeg formats supported)";
 		break;
 
 	case ScriptOperationType::OpenCapture:
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::API, ArgumentLabel::Path, ArgumentLabel::Source, ArgumentLabel::Width, ArgumentLabel::Height, ArgumentLabel::Interval };
-		description = "Open capturing from video (IP) path or camera source (#) (API: See OpenCV API codes)";
+		description = "Open capturing from video (IP) path or camera source";
 		break;
 
 	case ScriptOperationType::SaveImage:
 		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Start, ArgumentLabel::Length };
-		description = "Save image to file, start/length frames or time";
+		description = "Save image to file";
 		break;
 
 	case ScriptOperationType::SaveVideo:
 		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Start, ArgumentLabel::Length, ArgumentLabel::Fps, ArgumentLabel::Codec };
-		description = "Create video file and save image to video file, start/length frames or time, using fourcc codec string (supports installed encoders)";
+		description = "Create video file and save image to video file (supports installed encoders)";
 		break;
 
 	case ScriptOperationType::ShowImage:
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Display };
-		description = "Show image on screen (low priority screen updates) (display: 1 - 4)";
+		description = "Show image on screen (low priority screen updates)";
 		break;
 
 	case ScriptOperationType::StoreImage:
@@ -482,13 +483,13 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 	case ScriptOperationType::AddAccum:
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::AccumMode };
-		description = "Add image to the accumulative buffer (AccumMode: Age, Usage)";
+		description = "Add image to the accumulative buffer";
 		break;
 
 	case ScriptOperationType::GetAccum:
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Power, ArgumentLabel::Palette };
-		description = "Retrieve the accumulative buffer and convert to image (Palette: Grayscale, Heat, Rainbow)";
+		description = "Retrieve the accumulative buffer and convert to image";
 		break;
 
 	case ScriptOperationType::CreateClusters:
@@ -512,19 +513,19 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 	case ScriptOperationType::DrawClusters:
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::DrawMode };
-		description = "Draw clusters (DrawMode: Point|Circle|Box|Angle|Label|Labeln|Fill)";
+		description = "Draw clusters";
 		break;
 
 	case ScriptOperationType::DrawTracks:
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::DrawMode };
-		description = "Draw tracked clusters (DrawMode: Point|Circle|Box|Angle|Label|Labeln|Track|Tracks)";
+		description = "Draw tracked clusters";
 		break;
 
 	case ScriptOperationType::DrawPaths:
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::PathDrawMode, ArgumentLabel::Power, ArgumentLabel::Palette };
-		description = "Draw common paths (PathDrawMode: Age, Usage, Links, LinksMove) (Palette: Grayscale, Heat, Rainbow)";
+		description = "Draw common paths";
 		break;
 
 	case ScriptOperationType::DrawTrackInfo:
@@ -536,13 +537,13 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 	case ScriptOperationType::SaveClusters:
 		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Contour };
-		description = "Save clusters to CSV file (Format: ByTime/ByLabel, Split)";
+		description = "Save clusters to CSV file";
 		break;
 
 	case ScriptOperationType::SaveTracks:
 		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Contour };
-		description = "Save cluster tracking to CSV file (Format: ByTime/ByLabel, Split)";
+		description = "Save cluster tracking to CSV file";
 		break;
 
 	case ScriptOperationType::SavePaths:
@@ -554,7 +555,7 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 	case ScriptOperationType::ShowTrackInfo:
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Display };
-		description = "Show tracking information on screen (Display: 1 - 4)";
+		description = "Show tracking information on screen";
 		break;
 
 	case ScriptOperationType::SaveTrackInfo:
@@ -572,7 +573,7 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 	case ScriptOperationType::DrawLegend:
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Display, ArgumentLabel::Position };
-		description = "Draw legend (Display: 1 - 4 or Position on image: TopLeft, BottomLeft, TopRight, BottomRight)";
+		description = "Draw legend";
 		break;
 
 	case ScriptOperationType::Wait:
@@ -687,8 +688,254 @@ ArgumentType ScriptOperation::getExpectedArgumentType(ArgumentLabel argument) {
 	return type;
 }
 
-string ScriptOperation::getOperationList() {
+string ScriptOperation::getArgumentDescription(ArgumentLabel argument) {
 	string s;
+	switch (argument) {
+	case ArgumentLabel::Path:
+		s = "File path";
+		break;
+
+	case ArgumentLabel::Label:
+		s = "Label id";
+		break;
+
+	case ArgumentLabel::Tracker:
+		s = "Tracker id";
+		break;
+
+	case ArgumentLabel::Display:
+		s = "Display id";
+		break;
+
+	case ArgumentLabel::Contour:
+		s = "Extract contours";
+		break;
+
+	case ArgumentLabel::Red:
+		s = "Red color component";
+		break;
+
+	case ArgumentLabel::Green:
+		s = "Green color component";
+		break;
+
+	case ArgumentLabel::Blue:
+		s = "Blue color component";
+		break;
+
+	case ArgumentLabel::Level:
+		s = "Threshold value";
+		break;
+
+	case ArgumentLabel::Weight:
+		s = "Weight value";
+		break;
+
+	case ArgumentLabel::Width:
+		s = "Width in pixels";
+		break;
+
+	case ArgumentLabel::Height:
+		s = "Height in pixels";
+		break;
+
+	case ArgumentLabel::X:
+		s = "X position in pixels";
+		break;
+
+	case ArgumentLabel::Y:
+		s = "Y position in pixels";
+		break;
+
+	case ArgumentLabel::Interval:
+		s = "Interval in number of frames";
+		break;
+
+	case ArgumentLabel::MS:
+		s = "Time in milliseconds";
+		break;
+
+	case ArgumentLabel::Power:
+		s = "Exponential power of value range (1E-[power] ... 1)";
+		break;
+
+	case ArgumentLabel::Source:
+		s = "Camera source (#)";
+		break;
+
+	case ArgumentLabel::API:
+		s = "OpenCV API code (See OpenCV API codes)";
+		break;
+
+	case ArgumentLabel::Fps:
+		s = "Frames per second";
+		break;
+
+	case ArgumentLabel::Factor:
+		s = "Multiplication factor";
+		break;
+
+	case ArgumentLabel::Maximum:
+		s = "Maximum number of images to keep";
+		break;
+
+	case ArgumentLabel::MinArea:
+		s = "Minimum area in number of pixels";
+		break;
+
+	case ArgumentLabel::MaxArea:
+		s = "Maximum area in number of pixels";
+		break;
+
+	case ArgumentLabel::MaxMove:
+		s = "Maximum movement distance (single frame)";
+		break;
+
+	case ArgumentLabel::MinActive:
+		s = "Minimum number of frames being active before state is active";
+		break;
+
+	case ArgumentLabel::MaxInactive:
+		s = "Maximum number of frames being inactive before state is inactive";
+		break;
+
+	case ArgumentLabel::Distance:
+		s = "Maximum path distance";
+		break;
+
+	case ArgumentLabel::Start:
+		s = "Start";
+		break;
+
+	case ArgumentLabel::Length:
+		s = "Length";
+		break;
+
+	case ArgumentLabel::Codec:
+		s = "Video encoding codec";
+		break;
+
+	case ArgumentLabel::ColorMode:
+		s = "Color mode";
+		break;
+
+	case ArgumentLabel::AccumMode:
+		s = "Accumulation mode";
+		break;
+
+	case ArgumentLabel::Palette:
+		s = "Palette";
+		break;
+
+	case ArgumentLabel::DrawMode:
+		s = "(Combination of) draw mode(s)";
+		break;
+
+	case ArgumentLabel::PathDrawMode:
+		s = "Path draw mode";
+		break;
+
+	case ArgumentLabel::Format:
+		s = "Output format";
+		break;
+
+	case ArgumentLabel::Position:
+		s = "Draw position";
+		break;
+
+		// end of switch
+	}
+	return s;
+}
+
+string ScriptOperation::getArgumentTypeDescription(ArgumentType type) {
+	// valid type values
+	string s;
+	switch (type) {
+	case ArgumentType::Path:
+		s = "\"path\"";
+		break;
+
+	case ArgumentType::Label:
+		s = "string";
+		break;
+
+	case ArgumentType::Tracker:
+		s = "string";
+		break;
+
+	case ArgumentType::Display:
+		s = "number 1 - 4";
+		break;
+
+	case ArgumentType::Bool:
+		s = "true / false";
+		break;
+
+	case ArgumentType::Fraction:
+		s = "numeric value between 0 and 1";
+		break;
+
+	case ArgumentType::Num:
+		s = "numeric value";
+		break;
+
+	case ArgumentType::TimeFrame:
+		s = "time reference as (hours:)minutes:seconds, or frame number";
+		break;
+
+	case ArgumentType::Codec:
+		s = "4 character codec reference (FOURCC)";
+		break;
+
+	case ArgumentType::ColorMode:
+		s = Util::getValueList(ImageColorModes);
+		break;
+
+	case ArgumentType::AccumMode:
+		s = Util::getValueList(AccumModes);
+		break;
+
+	case ArgumentType::Palette:
+		s = Util::getValueList(Palettes);
+		break;
+
+	case ArgumentType::DrawMode:
+		s = Util::getValueList(ClusterDrawModes);
+		break;
+
+	case ArgumentType::PathDrawMode:
+		s = Util::getValueList(PathDrawModes);
+		break;
+
+	case ArgumentType::Format:
+		s = Util::getValueList(SaveFormats);
+		break;
+
+	case ArgumentType::Position:
+		s = Util::getValueList(DrawPositions);
+		break;
+
+		// end of switch
+	}
+	return s;
+}
+
+string ScriptOperation::getArgumentRtfDescription(ArgumentLabel argument) {
+	string s, typeDesc;
+	s += " \\bullet  " + ArgumentLabels[(int)argument];
+	s += ":\\tab " + getArgumentDescription(argument);
+	typeDesc = getArgumentTypeDescription(getExpectedArgumentType(argument));
+	if (typeDesc != "") {
+		s += " {\\cf2 (" + typeDesc + ")}";
+	}
+	s += "\\line\n";
+	return s;
+}
+
+
+string ScriptOperation::getOperationList() {
+	string s, desc;
 	ScriptOperationType type;
 	OperationInfo info;
 	vector<ArgumentLabel> requiredArguments;
@@ -700,7 +947,7 @@ string ScriptOperation::getOperationList() {
 
 	s = "{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Consolas;}}\n{\\colortbl;\\red0\\green0\\blue0;\\red127\\green127\\blue127;\\red0\\green0\\blue255;}";
 	s += "\\margl720\\margr720\\margt720\\margb720 \\fs20\n";	// 0.5 inch margins; font size 10
-	s += "\\b BioImageOperation script operations\\b0\\line\n\\line\n";
+	s += "{\\fs32 \\b Bio Image Operation script operations (v" + string(PROJECT_VER) + " / " + string(PROJECT_DESC) + ")\\b0}\\line\n\\line\n";
 	
 	for (string types : ScriptOperationTypes) {
 		firstArg = true;
@@ -711,7 +958,7 @@ string ScriptOperation::getOperationList() {
 			optionalArguments = info.optionalArguments;
 			description = info.description;
 
-			s += Util::format("\\b %s\\b0 (", types.c_str());
+			s += Util::format("\\b %s\\b0  (", types.c_str());
 
 			for (ArgumentLabel arg : requiredArguments) {
 				if (!firstArg) {
@@ -731,8 +978,17 @@ string ScriptOperation::getOperationList() {
 				firstArg = false;
 			}
 
-			s += ") \\line\n";
-			s += "{\\cf3 \\tab \\bullet " + description + "}\\line\n\\line\n";
+			s += ")\\line\n\\line\n";
+			s += "{\\cf3 " + description + "}\\line\n\\line\n";
+
+			for (ArgumentLabel arg : requiredArguments) {
+				s += getArgumentRtfDescription(arg);
+			}
+			for (ArgumentLabel arg : optionalArguments) {
+				s += getArgumentRtfDescription(arg);
+			}
+
+			s += "\\line\n\\line\n";
 		}
 	}
 	s += "\\line\n";
