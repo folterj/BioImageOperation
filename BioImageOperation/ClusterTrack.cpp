@@ -197,11 +197,11 @@ string ClusterTrack::getCsv(Cluster* cluster, bool writeContour) {
 	string s = format("%d,%f,%f,%f,%f,%f", label, area, rad, orientation, x, y);
 	if (writeContour) {
 		s += ",";
-		if (cluster)
-		{
-			for (Point point : cluster->getContour())
-			{
-				s += System::String::Format("{0} {1} ", point.x, point.y);
+		if (cluster) {
+			if (cluster->assignedTracks.size() == 1) {
+				for (Point point : cluster->getContour()) {
+					s += Util::format("%d %d ", point.x, point.y);
+				}
 			}
 		}
 	}
