@@ -9,7 +9,7 @@ The solution balancing both the need for research purposes and flexibility requi
 The tool uses the widely used OpenCV for many of it's image operations, with an efficient tracking algorithm allowing real time processing.
 
 See joostdefolter.info for more info
-http://joostdefolter.info/ant-research
+[joostdefolter.info/ant-research](http://joostdefolter.info/ant-research)
 
 For support and discussion, please use the [Image.sc forum](https://forum.image.sc) and post to the forum with the tag 'BioImageOperation'.
 
