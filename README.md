@@ -13,7 +13,7 @@ See joostdefolter.info for more info
 
 For support and discussion, please use the [Image.sc forum](https://forum.image.sc) and post to the forum with the tag 'BioImageOperation'.
 
-This is a Microsoft Visual Studio 2019 C++ CMake project
+This is a Microsoft Visual Studio 2019 / C++ CMake project
 
 Project Requirements
 - Qt 5 ([qt.io](https://www.qt.io))
