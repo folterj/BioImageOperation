@@ -14,12 +14,11 @@ For support and discussion, please use the [Image.sc forum](https://forum.image.
 
 This is a Microsoft Visual Studio 2019 / C++ CMake project
 
-The MSVS project can either be opened as a regular Visual Studio project opening the solution file, or as a CMake project by opening the BioImageOperation folder as a folder (using 'Open a local folder' option).
+The project can either be opened as a Visual Studio project opening the solution file, or as a CMake project by opening the BioImageOperation folder.
 
 Project Requirements
 - Qt 5 ([qt.io](https://www.qt.io))
 - OpenCV 4.4.0 ([opencv.org](https://opencv.org))
 - Openh264 1.8.0 library ([github.com/cisco/openh264](https://github.com/cisco/openh264))
-- Windows 64-bit
 
 ![BIO screenshot](bio.png)
