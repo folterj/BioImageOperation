@@ -226,6 +226,8 @@ bool ImageTracker::findClusters(Mat* image) {
 				clusterMoments = moments(clusterRoiImage2, true);
 				// get angle
 				angle = Util::getMomentsAngle(&clusterMoments);
+			} else {
+				angle = 0;
 			}
 			x = clusterCentroids(label, 0);
 			y = clusterCentroids(label, 1);
@@ -612,9 +614,9 @@ void ImageTracker::drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, floa
 			}
 
 			switch (palette) {
-			case Palette::Grayscale: color = ColorScale::getGrayScale(colScale); break;
 			case Palette::Heat: color = ColorScale::getHeatScale(colScale); break;
 			case Palette::Rainbow: color = ColorScale::getRainbowScale(colScale); break;
+			default: color = ColorScale::getGrayScale(colScale); break;
 			}
 
 			link->draw(dest, Util::bgrtoScalar(color), maxUsage, animate);
@@ -625,6 +627,7 @@ void ImageTracker::drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, floa
 			case PathDrawMode::Age: scale = (float)(1.0 / node->lastUse); break;	// *** same as 1f / (total - lastuse), with lastuse only assigned to once without need to increment continuously?
 			case PathDrawMode::Usage: scale = (float)node->getAccumUsage(); break;
 			case PathDrawMode::Usage2: scale = (float)node->getAccumUsage2(pathAge); break;
+			default: scale = 1; break;
 			}
 			// 	colScale: 0...1
 			colScale = -log10(scale) / power;		// log: 1(E0) ... 1E-[power]
@@ -637,9 +640,9 @@ void ImageTracker::drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, floa
 			}
 
 			switch (palette) {
-			case Palette::Grayscale: color = ColorScale::getGrayScale(colScale); break;
 			case Palette::Heat: color = ColorScale::getHeatScale(colScale); break;
 			case Palette::Rainbow: color = ColorScale::getRainbowScale(colScale); break;
+			default: color = ColorScale::getGrayScale(colScale); break;
 			}
 
 			node->draw(dest, Util::bgrtoScalar(color));
