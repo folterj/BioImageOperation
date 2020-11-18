@@ -41,10 +41,18 @@ set(RESOURCE_FILES
   BioImageOperation.rc
 )
 
+if (WIN32)
+add_executable(${PROJECT_NAME}
+    WIN32
+	${BIO_SRC}
+    ${RESOURCE_FILES}
+)
+else()
 add_executable(${PROJECT_NAME}
 	${BIO_SRC}
     ${RESOURCE_FILES}
 )
+endif()
 
 qt5_add_resources(RESOURCE_FILES ${RESOURCE})
 
@@ -54,3 +62,13 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Gui)
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Network)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenCV_LIBS})
+
+
+set(CPACK_GENERATOR WIX)
+SET(CPACK_WIX_ROOT "C:/Program Files (x86)/WiX Toolset v3.11" CACHE PATH "")
+SET(CPACK_WIX_UPGRADE_GUID  "EDE41139-C8E6-4D98-AE85-E669F8CA6D48")
+include(CPack)
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION programs COMPONENT applications)
+include(InstallRequiredSystemLibraries)
+install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION programs COMPONENT   applications)
+install(DIRECTORY ${QT_INSTALLED_PATH}/plugins/platforms DESTINATION programs COMPONENT applications)

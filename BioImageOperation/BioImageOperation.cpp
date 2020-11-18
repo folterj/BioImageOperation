@@ -14,6 +14,7 @@
 
 #include "MainWindow.h"
 #include <QtWidgets/QApplication>
+#include "config.h"
 
 Q_DECLARE_METATYPE(string)
 
@@ -23,6 +24,9 @@ int main(int argc, char *argv[]) {
 	qRegisterMetaType<string>("string");
 
 	QApplication application(argc, argv);
+	application.setApplicationName(PROJECT_NAME);
+	application.setApplicationVersion(PROJECT_VER);
+	application.setOrganizationDomain(PROJECT_URL);
 	MainWindow window;
 	window.show();
 	return application.exec();

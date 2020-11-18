@@ -10,6 +10,7 @@
 #pragma once
 #include <chrono>
 #include <QMainWindow>
+#include <QSettings>
 #include <QTimer>
 #include "ui_MainWindow.h"
 #include <opencv2/opencv.hpp>
@@ -30,6 +31,7 @@ class MainWindow : public QMainWindow, public Observer
 	Q_OBJECT
 
 private:
+	QSettings bioSettings;
 	Ui::MainWindow ui;
 	ImageWindow imageWindows[4];
 	TextWindow textWindows[4];

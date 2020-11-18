@@ -17,6 +17,8 @@
 // https://mithatkonar.com/wiki/doku.php/qt/toward_robust_icon_support
 
 
+const QString DEFAULT_DIR_KEY("default_dir");
+
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent) {
 
@@ -76,8 +78,9 @@ void MainWindow::openDialog() {
 	QString qfilename;
 
 	try {
-		qfilename = QFileDialog::getOpenFileName(this, tr("Load script"), QString(), Util::convertToQString(Constants::scriptFileDialogFilter));
+		qfilename = QFileDialog::getOpenFileName(this, tr("Load script"), bioSettings.value(DEFAULT_DIR_KEY).toString(), Util::convertToQString(Constants::scriptFileDialogFilter));
 		if (qfilename != "") {
+			bioSettings.setValue(DEFAULT_DIR_KEY, QVariant(qfilename));
 			filepath = qfilename.toStdString();
 			scriptProcessing.doAbort();
 			clearInput();
@@ -94,8 +97,9 @@ void MainWindow::saveDialog() {
 	QString qfilename;
 
 	try {
-		qfilename = QFileDialog::getSaveFileName(this, tr("Save script"), QString(), Util::convertToQString(Constants::scriptFileDialogFilter));
+		qfilename = QFileDialog::getSaveFileName(this, tr("Save script"), bioSettings.value(DEFAULT_DIR_KEY).toString(), Util::convertToQString(Constants::scriptFileDialogFilter));
 		if (qfilename != "") {
+			bioSettings.setValue(DEFAULT_DIR_KEY, QVariant(qfilename));
 			filepath = qfilename.toStdString();
 			save();
 		}
