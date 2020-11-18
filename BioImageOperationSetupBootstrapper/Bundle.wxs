@@ -5,7 +5,7 @@
 		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
 			<bal:WixStandardBootstrapperApplication
 				  LicenseFile="gpl-3.0.rtf"
-				  LogoFile="$(var.BioImageOperation.ProjectDir)\BioImageOperation.png"
+				  LogoFile="$(var.BioImageOperation.ProjectDir)\BioImageOperation.ico"
 				  SuppressRepair="yes"
 				  xmlns:bal="http://schemas.microsoft.com/wix/BalExtension" />
 		</BootstrapperApplicationRef>
