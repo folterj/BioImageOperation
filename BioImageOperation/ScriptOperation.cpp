@@ -921,87 +921,155 @@ string ScriptOperation::getArgumentTypeDescription(ArgumentType type) {
 	return s;
 }
 
-string ScriptOperation::getArgumentRtfDescription(ArgumentLabel argument) {
+string ScriptOperation::getArgumentFullDescription(bool rtfFormat, ArgumentLabel argument) {
 	string s, typeDesc;
-	s += " \\bullet  " + ArgumentLabels[(int)argument];
-	s += ":\\tab " + getArgumentDescription(argument);
+	if (rtfFormat) {
+		s += " \\bullet  ";
+	} else {
+		s += "\t";
+	}
+	s += ArgumentLabels[(int)argument];
+	if (rtfFormat) {
+		s += ":\\tab ";
+	} else {
+		s += ":\t ";
+	}
+	s += getArgumentDescription(argument);
 	typeDesc = getArgumentTypeDescription(getExpectedArgumentType(argument));
 	if (typeDesc != "") {
-		s += " {\\cf2 (" + typeDesc + ")}";
+		if (rtfFormat) {
+			s += " {\\cf2 (" + typeDesc + ")}";
+		} else {
+			s += " (" + typeDesc + ")";
+		}
 	}
-	s += "\\line\n";
+	if (rtfFormat) {
+		s += "\\line\n";
+	} else {
+		s += "\n";
+	}
 	return s;
 }
 
-
-string ScriptOperation::getOperationList() {
+string ScriptOperation::getOperationDescription(bool rtfFormat, string operation) {
 	string s, desc;
-	ScriptOperationType type;
 	OperationInfo info;
 	vector<ArgumentLabel> requiredArguments;
 	vector<ArgumentLabel> optionalArguments;
-	string description;
-	bool firstArg;
+	bool firstArg = true;
+
+	ScriptOperationType type = (ScriptOperationType)Util::getListIndex(ScriptOperationTypes, operation);
+	if (type != ScriptOperationType::None) {
+		info = getOperationInfo(type);
+		requiredArguments = info.requiredArguments;
+		optionalArguments = info.optionalArguments;
+		desc = info.description;
+
+		if (rtfFormat) {
+			s += Util::format("\\b %s\\b0  (", operation.c_str());
+		} else {
+			s += operation + " (";
+		}
+
+		for (ArgumentLabel arg : requiredArguments) {
+			if (!firstArg) {
+				s += ", ";
+			}
+			s += ArgumentLabels[(int)arg];
+			firstArg = false;
+		}
+
+		for (ArgumentLabel arg : optionalArguments) {
+			if (!firstArg) {
+				s += ", ";
+			}
+			if (rtfFormat) {
+				s += "{\\cf2 ";
+			} else {
+				s += "(";
+			}
+			s += ArgumentLabels[(int)arg];
+			if (rtfFormat) {
+				s += "}";
+			} else {
+				s += ")";
+			}
+			firstArg = false;
+		}
+
+		if (rtfFormat) {
+			s += ")\\line\n\\line\n";
+			s += "{\\cf3 " + desc + "}\\line\n\\line\n";
+		} else {
+			s += ")\n" + desc + "\n";
+		}
+
+		for (ArgumentLabel arg : requiredArguments) {
+			s += getArgumentFullDescription(rtfFormat, arg);
+		}
+		for (ArgumentLabel arg : optionalArguments) {
+			s += getArgumentFullDescription(rtfFormat, arg);
+		}
+	}
+	return s;
+}
+
+string ScriptOperation::getOperationList(bool rtfFormat, string operation) {
+	string s, desc;
+	OperationInfo info;
+	vector<ArgumentLabel> requiredArguments;
+	vector<ArgumentLabel> optionalArguments;
 
 	// RTF tutorial: http://www.pindari.com/rtf1.html
 
-	s = "{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Consolas;}}\n{\\colortbl;\\red0\\green0\\blue0;\\red127\\green127\\blue127;\\red0\\green0\\blue255;}";
-	s += "\\margl720\\margr720\\margt720\\margb720 \\fs20\n";	// 0.5 inch margins; font size 10
-	s += "{\\fs32 \\b Bio Image Operation script operations (v" + string(PROJECT_VER) + " / " + string(PROJECT_DESC) + ")\\b0}\\line\n\\line\n";
-	
-	for (string types : ScriptOperationTypes) {
-		firstArg = true;
-		type = (ScriptOperationType)Util::getListIndex(ScriptOperationTypes, types);
-		if (type != ScriptOperationType::None) {
-			info = getOperationInfo(type);
-			requiredArguments = info.requiredArguments;
-			optionalArguments = info.optionalArguments;
-			description = info.description;
+	if (rtfFormat) {
+		s = "{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Consolas;}}\n{\\colortbl;\\red0\\green0\\blue0;\\red127\\green127\\blue127;\\red0\\green0\\blue255;}";
+		s += "\\margl720\\margr720\\margt720\\margb720 \\fs20\n";	// 0.5 inch margins; font size 10
+		s += "{\\fs32 \\b Bio Image Operation script operations (v" + string(PROJECT_VER) + " / " + string(PROJECT_DESC) + ")\\b0}\\line\n\\line\n";
+	}
 
-			s += Util::format("\\b %s\\b0  (", types.c_str());
-
-			for (ArgumentLabel arg : requiredArguments) {
-				if (!firstArg) {
-					s += ", ";
-				}
-				s += ArgumentLabels[(int)arg];
-				firstArg = false;
+	if (operation != "") {
+		if (Util::contains(ScriptOperationTypes, operation)) {
+			s += getOperationDescription(rtfFormat, operation);
+		} else {
+			return "Unkown operation: " + operation;
+		}
+	} else {
+		for (string operation : ScriptOperationTypes) {
+			s += getOperationDescription(rtfFormat, operation);
+			if (rtfFormat) {
+				s += "\\line\n\\line\n";
+			} else {
+				s += "\n";
 			}
-
-			for (ArgumentLabel arg : optionalArguments) {
-				if (!firstArg) {
-					s += ", ";
-				}
-				s += "{\\cf2 ";
-				s += ArgumentLabels[(int)arg];
-				s += "}";
-				firstArg = false;
-			}
-
-			s += ")\\line\n\\line\n";
-			s += "{\\cf3 " + description + "}\\line\n\\line\n";
-
-			for (ArgumentLabel arg : requiredArguments) {
-				s += getArgumentRtfDescription(arg);
-			}
-			for (ArgumentLabel arg : optionalArguments) {
-				s += getArgumentRtfDescription(arg);
-			}
-
-			s += "\\line\n\\line\n";
 		}
 	}
-	s += "\\line\n";
-	s += "\\b Arguments:\\b0 \\tab Required \\tab {\\cf2 Optional}\\line\n";
-	s += "}";
+	if (rtfFormat) {
+		s += "\\line\n";
+		s += "\\b Arguments:\\b0 \\tab Required \\tab {\\cf2 Optional}\\line\n";
+		s += "}";
+	} else {
+		s += "\n";
+		s += "Arguments: Required (Optional)\n";
+	}
 
 	s = Util::replace(s, "\n", "\r\n");
 	
 	return s;
 }
 
+string ScriptOperation::getOperationListSimple() {
+	string s;
+	for (string operation : ScriptOperationTypes) {
+		if (operation != "None") {
+			s += operation + "\n";
+		}
+	}
+	return s;
+}
+
 void ScriptOperation::writeOperationList(string filename) {
-	string s = getOperationList();
+	string s = getOperationList(true);
 	OutputStream outputStream(filename);
 	outputStream.write(s);
 	outputStream.closeStream();

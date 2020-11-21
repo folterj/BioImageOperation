@@ -239,8 +239,9 @@ int Util::parseFrameTime(string s, double fps) {
 }
 
 string Util::readText(string filename) {
-	ifstream input(filename);
 	ostringstream ss;
+	ifstream input(filename);
+	input.exceptions(ifstream::failbit);
 	ss << input.rdbuf();
 	return ss.str();
 }

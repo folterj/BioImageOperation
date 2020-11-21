@@ -147,6 +147,13 @@ enum class MessageLevel
 	Error
 };
 
+const vector<string> MessageLevels =
+{
+	"Info",
+	"Warning",
+	"Error"
+};
+
 enum class FrameType
 {
 	Image,

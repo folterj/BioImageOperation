@@ -57,8 +57,10 @@ public:
 	static ArgumentType getExpectedArgumentType(ArgumentLabel argument);
 	static string getArgumentDescription(ArgumentLabel argument);
 	static string getArgumentTypeDescription(ArgumentType type);
-	static string getArgumentRtfDescription(ArgumentLabel argument);
-	static string getOperationList();
+	static string getArgumentFullDescription(bool rtfFormat, ArgumentLabel argument);
+	static string getOperationDescription(bool rtfFormat, string operation);
+	static string getOperationList(bool rtfFormat, string operation="");
+	static string getOperationListSimple();
 	static void writeOperationList(string filename);
 
 	bool initFrameSource(FrameType frameType, int apiCode, string basepath, string templatePath, string start = "", string length = "", double fps0 = 1, int interval = 1);

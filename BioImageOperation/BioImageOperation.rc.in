@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,6,440,2
- PRODUCTVERSION 1,6,440,2
+ FILEVERSION @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,@PROJECT_VERSION_TWEAK@
+ PRODUCTVERSION @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,@PROJECT_VERSION_TWEAK@
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -68,13 +68,13 @@ BEGIN
         BLOCK "080904b0"
         BEGIN
             VALUE "CompanyName", "Joost de Folter"
-            VALUE "FileDescription", "https://joostdefolter.info"
-            VALUE "FileVersion", "1.6.440.2"
-            VALUE "InternalName", "BioImageOperation"
-            VALUE "LegalCopyright", "2020-11-21"
-            VALUE "OriginalFilename", "BioImageOperation"
-            VALUE "ProductName", "BioImageOperation"
-            VALUE "ProductVersion", "1.6.440.2"
+            VALUE "FileDescription", "@PROJECT_HOMEPAGE_URL@"
+            VALUE "FileVersion", "@PROJECT_VERSION@"
+            VALUE "InternalName", "@PROJECT_NAME@"
+            VALUE "LegalCopyright", "@PROJECT_DESCRIPTION@"
+            VALUE "OriginalFilename", "@PROJECT_NAME@"
+            VALUE "ProductName", "@PROJECT_NAME@"
+            VALUE "ProductVersion", "@PROJECT_VERSION@"
         END
     END
     BLOCK "VarFileInfo"

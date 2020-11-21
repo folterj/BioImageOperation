@@ -7,10 +7,12 @@
  * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
+#include <filesystem>
 #include "ScriptProcessing.h"
 #include "MainWindow.h"
 #include "ImageOperations.h"
 #include "NumericPath.h"
+#include "TextObserver.h"
 #include "Constants.h"
 #include "Util.h"
 
@@ -18,8 +20,6 @@
 ScriptProcessing::ScriptProcessing() {
 	// initialise static lookup tables
 	ColorScale::init();
-
-	//ScriptOperation::writeOperationList("D:\\BioImageOperation.rtf");
 }
 
 ScriptProcessing::~ScriptProcessing() {
@@ -94,23 +94,47 @@ void ScriptProcessing::registerObserver(Observer* observer) {
 	connect(this, &ScriptProcessing::showImageQt, (MainWindow*)observer, &MainWindow::showImage);
 }
 
-bool ScriptProcessing::startProcess(string filepath, string script) {
-	string errorMsg;
+bool ScriptProcessing::startProcessNoGui(string scriptFilename) {
+	TextObserver observer;
+	string script;
 
+	this->observer = &observer;
+	this->qtGui = false;
+
+	reset();
+	if (!filesystem::exists(scriptFilename)) {
+		showDialog("Script file not found: " + scriptFilename, MessageLevel::Error);
+		return false;
+	}
+
+	basepath = Util::extractFilePath(scriptFilename);
+	if (basepath == "") {
+		basepath = filesystem::current_path().string();
+	}
+
+	try {
+		script = Util::readText(scriptFilename);
+		scriptOperations->extract(script, 0);
+		this->observer->resetProgressTimer();
+		processThreadMethod();
+	} catch (exception e) {
+		showDialog(Util::getExceptionDetail(e), MessageLevel::Error);
+		doAbort();
+		return false;
+	}
+	return true;
+}
+
+bool ScriptProcessing::startProcess(string filepath, string script) {
 	reset();
 	basepath = Util::extractFilePath(filepath);
 
 	try {
 		scriptOperations->extract(script, 0);
 		observer->resetProgressTimer();
-
-		//processThread = QThread::create(&ScriptProcessing::processThreadMethod, this);
-		//processThread->start();
 		processThread = new std::thread(&ScriptProcessing::processThreadMethod, this);
 	} catch (exception e) {
-		errorMsg = Util::getExceptionDetail(e);
-		cerr << errorMsg << endl;
-		showDialog(errorMsg, MessageLevel::Error);
+		showDialog(Util::getExceptionDetail(e), MessageLevel::Error);
 		doAbort();
 		return false;
 	}
@@ -571,36 +595,60 @@ void ScriptProcessing::doAbort() {
 }
 
 void ScriptProcessing::resetUI() {
-	emit resetUIQt();
+	if (qtGui) {
+		emit resetUIQt();
+	} else {
+		observer->resetUI();
+	}
 }
 
 void ScriptProcessing::clearStatus() {
-	emit clearStatusQt();
+	if (qtGui) {
+		emit clearStatusQt();
+	} else {
+		observer->clearStatus();
+	}
 }
 
 void ScriptProcessing::showStatus(int i, int tot, string label) {
 	if (observer->checkStatusProcess()) {
-		emit showStatusQt(i, tot, label);
+		if (qtGui) {
+			emit showStatusQt(i, tot, label);
+		} else {
+			observer->showStatus(i, tot, label);
+		}
 	}
 }
 
 void ScriptProcessing::showDialog(string message, MessageLevel level) {
-	if (level == MessageLevel::Error) {
-		cerr << message << endl;
+	if (qtGui) {
+		if (level == MessageLevel::Error) {
+			cerr << message << endl;
+		} else {
+			cout << message << endl;
+		}
+		emit showDialogQt(message, (int)level);
 	} else {
-		cout << message << endl;
+		observer->showDialog(message, (int)level);
 	}
-	emit showDialogQt(message, (int)level);
 }
 
 void ScriptProcessing::showText(string text, int displayi) {
 	if (observer->checkTextProcess()) {
-		emit showTextQt(text.c_str(), displayi);
+		if (qtGui) {
+			emit showTextQt(text.c_str(), displayi);
+		} else {
+			observer->showDialog(text, displayi);
+		}
 	}
 }
 
 void ScriptProcessing::showImage(Mat* image, int displayi) {
 	if (observer->checkImageProcess()) {
-		emit showImageQt(image, displayi);
+		if (qtGui) {
+			emit showImageQt(image, displayi);
+		} else {
+			observer->showImage(image, displayi);
+		}
 	}
 }

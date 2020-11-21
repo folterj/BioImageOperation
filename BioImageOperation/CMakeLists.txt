@@ -2,11 +2,16 @@ cmake_minimum_required(VERSION 3.1.0)
 
 string(TIMESTAMP NOW "%Y-%m-%d")
 
-project (BioImageOperation VERSION "1.6.440.1" DESCRIPTION ${NOW} HOMEPAGE_URL "https://joostdefolter.info")
+project (BioImageOperation VERSION "1.6.440.2" DESCRIPTION ${NOW} HOMEPAGE_URL "https://joostdefolter.info")
 
 configure_file (
     "${PROJECT_SOURCE_DIR}/config.h.in"
     "${PROJECT_SOURCE_DIR}/config.h"
+)
+
+configure_file (
+    "${PROJECT_SOURCE_DIR}/BioImageOperation.rc.in"
+    "${PROJECT_SOURCE_DIR}/BioImageOperation.rc"
 )
 
 set(CMAKE_CXX_STANDARD 17)
@@ -41,18 +46,10 @@ set(RESOURCE_FILES
   BioImageOperation.rc
 )
 
-if (WIN32)
-add_executable(${PROJECT_NAME}
-    WIN32
-	${BIO_SRC}
-    ${RESOURCE_FILES}
-)
-else()
 add_executable(${PROJECT_NAME}
 	${BIO_SRC}
     ${RESOURCE_FILES}
 )
-endif()
 
 qt5_add_resources(RESOURCE_FILES ${RESOURCE})
 

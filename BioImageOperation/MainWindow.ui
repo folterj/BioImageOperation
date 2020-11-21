@@ -99,6 +99,7 @@
     <addaction name="actionGenerate_help_doc"/>
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
+    <addaction name="actionAbout_Qt"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
@@ -155,12 +156,17 @@
   </action>
   <action name="actionAbout">
    <property name="text">
-    <string>About</string>
+    <string>About BIO</string>
    </property>
   </action>
   <action name="actionGenerate_help_doc">
    <property name="text">
     <string>Generate help doc</string>
+   </property>
+  </action>
+  <action name="actionAbout_Qt">
+   <property name="text">
+    <string>About Qt</string>
    </property>
   </action>
  </widget>

@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(ui.actionCheck_for_Updates, &QAction::triggered, this, &MainWindow::checkUpdates);
 	connect(ui.actionGenerate_help_doc, &QAction::triggered, this, &MainWindow::generateHelpDoc);
 	connect(ui.actionAbout, &QAction::triggered, this, &MainWindow::showAbout);
+	connect(ui.actionAbout_Qt, &QAction::triggered, this, &MainWindow::showAboutQt);
 
 	connect(ui.scriptTextEdit, &QPlainTextEdit::textChanged, this, &MainWindow::textChanged);
 
@@ -88,8 +89,8 @@ void MainWindow::openDialog() {
 			fileModified = false;
 			updateTitle();
 		}
-	} catch (std::exception e) {
-		showDialog(Util::getExceptionDetail(e));
+	} catch (exception e) {
+		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 }
 
@@ -103,8 +104,8 @@ void MainWindow::saveDialog() {
 			filepath = qfilename.toStdString();
 			save();
 		}
-	} catch (std::exception e) {
-		showDialog(Util::getExceptionDetail(e));
+	} catch (exception e) {
+		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 }
 
@@ -118,7 +119,7 @@ void MainWindow::save() {
 			fileModified = false;
 			updateTitle();
 		}
-	} catch (std::exception e) {
+	} catch (exception e) {
 		showDialog(Util::getExceptionDetail(e));
 	}
 }
@@ -209,8 +210,8 @@ void MainWindow::showStatus(int i, int tot, string label) {
 	Clock::time_point now;
 	chrono::duration<double> totalElapsed;
 	double totalElapseds;
-	double avgFrametime;
 	double estimateLeft = 0;
+	double avgFrametime;
 
 	if (!statusQueued) {
 		return;			// ignore queued events on abort
@@ -224,7 +225,7 @@ void MainWindow::showStatus(int i, int tot, string label) {
 
 		if (tot > 0) {
 			progress = (double)i / tot;
-			s += Util::format("%.2f", progress);
+			s += Util::format("%.1f%%", 100 * progress);
 		}
 		if (progress > 0) {
 			estimateLeft = totalElapseds * (1 / progress - 1);
@@ -245,18 +246,19 @@ void MainWindow::showStatus(int i, int tot, string label) {
 }
 
 void MainWindow::showDialog(string message, int level) {
+	QString title = tr("BIO");
 	try {
 		switch ((MessageLevel)level) {
 		case MessageLevel::Error:
-			QMessageBox::critical(this, tr("BIO"), Util::convertToQString(message));
+			QMessageBox::critical(this, title, Util::convertToQString(message));
 			break;
 
 		case MessageLevel::Warning:
-			QMessageBox::warning(this, tr("BIO"), Util::convertToQString(message));
+			QMessageBox::warning(this, title, Util::convertToQString(message));
 			break;
 
 		default:
-			QMessageBox::information(this, tr("BIO"), Util::convertToQString(message));
+			QMessageBox::information(this, title, Util::convertToQString(message));
 			break;
 		}
 	} catch (exception e) {
@@ -345,8 +347,13 @@ void MainWindow::showAbout() {
 	aboutWindow.exec();
 }
 
+void MainWindow::showAboutQt() {
+	QMessageBox::aboutQt(this);
+}
+
 void MainWindow::closeEvent(QCloseEvent* event) {
+	// when main window is closed: ensure to close everything
+	scriptProcessing.doAbort();
 	askSaveChanges();
-	// when main window is closed: close all child windows
-	exit(0);
+	QApplication::quit();
 }

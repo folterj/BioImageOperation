@@ -32,7 +32,6 @@ class ScriptProcessing : public QObject
 public:
 	Observer* observer;
 	std::thread* processThread;
-	//QThread* processThread;
 	ScriptOperations* scriptOperations = new ScriptOperations();
 	ImageItemList* imageList = new ImageItemList();
 	AverageBuffer* backgroundBuffer = new AverageBuffer();
@@ -51,6 +50,7 @@ public:
 	Palette logPalette;
 	bool abort = false;
 	bool debugMode = false;
+	bool qtGui = true;
 
 	ScriptProcessing();
 	~ScriptProcessing();
@@ -64,6 +64,7 @@ public:
 	/*
 	 * Start processing in separate thread
 	 */
+	bool startProcessNoGui(string scriptFilename);
 	bool startProcess(string filepath, string script);
 	void processThreadMethod();
 

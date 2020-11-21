@@ -96,7 +96,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -109,7 +109,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -148,6 +148,7 @@
     <ClCompile Include="ScriptOperations.cpp" />
     <ClCompile Include="ScriptProcessing.cpp" />
     <ClCompile Include="StatData.cpp" />
+    <ClCompile Include="TextObserver.cpp" />
     <ClCompile Include="TextWindow.cpp" />
     <ClCompile Include="TrackClusterMatch.cpp" />
     <ClCompile Include="TrackingParams.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="ScriptOperation.h" />
     <ClInclude Include="ScriptOperations.h" />
     <ClInclude Include="StatData.h" />
+    <ClInclude Include="TextObserver.h" />
     <ClInclude Include="TrackClusterMatch.h" />
     <ClInclude Include="TrackingParams.h" />
     <ClInclude Include="TrackingStats.h" />
