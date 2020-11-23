@@ -40,4 +40,5 @@ public:
 	void updateTitle();
 	void showImage(Mat* image);
 	void saveImage();
+	virtual void resizeEvent(QResizeEvent* event) override;
 };

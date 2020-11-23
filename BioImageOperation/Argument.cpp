@@ -96,7 +96,7 @@ bool Argument::parseType(ArgumentType argumentType) {
 		ok = Util::isNumeric(value);
 		if (ok) {
 			x = stoi(value);
-			ok = (x >= 0 && x < Constants::nDisplays);
+			ok = (x > 0 && x <= Constants::nDisplays);
 		}
 		break;
 

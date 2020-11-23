@@ -56,6 +56,7 @@ void ImageWindow::updateTitle() {
 }
 
 void ImageWindow::showImage(Mat* image) {
+	bool needResize = (image->cols != swidth || image->rows != sheight);
 	if (isHidden()) {
 		show();
 	}
@@ -66,7 +67,9 @@ void ImageWindow::showImage(Mat* image) {
 
 	pixmap.setPixmap(QPixmap::fromImage(Util::matToQImage(*image)));
 	pixmap.setTransformationMode(Qt::TransformationMode::SmoothTransformation);
-	ui.graphicsView->fitInView(&pixmap, Qt::AspectRatioMode::KeepAspectRatio); // do this @ window resize only?
+	if (needResize) {
+		resizeEvent(NULL);
+	}
 	ui.graphicsView->repaint();
 
 	displayCount++;
@@ -103,4 +106,8 @@ void ImageWindow::saveImage() {
 	} catch (std::exception e) {
 		observer->showDialog(Util::getExceptionDetail(e));
 	}
+}
+
+void ImageWindow::resizeEvent(QResizeEvent* event) {
+	ui.graphicsView->fitInView(&pixmap, Qt::AspectRatioMode::KeepAspectRatio);
 }

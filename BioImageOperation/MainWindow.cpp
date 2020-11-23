@@ -49,11 +49,11 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(ui.abortButton, &QAbstractButton::clicked, &scriptProcessing, &ScriptProcessing::doAbort);
 
 	for (int i = 0; i < Constants::nDisplays; i++) {
-		imageWindows[i].init(this, i);
+		imageWindows[i].init(this, i + 1);
 	}
 
 	for (int i = 0; i < Constants::nDisplays; i++) {
-		textWindows[i].init(this, i);
+		textWindows[i].init(this, i + 1);
 	}
 
 	scriptProcessing.registerObserver(this);
@@ -179,8 +179,10 @@ void MainWindow::resetProgressTimer() {
 	processCount = 0;
 	processFps = 0;
 	statusQueued = false;
-	textQueued = false;
-	imageQueued = false;
+	for (int i = 0; i < Constants::nDisplays; i++) {
+		textQueued[i] = false;
+		imageQueued[i] = false;
+	}
 }
 
 void MainWindow::timerElapsed() {
@@ -276,14 +278,14 @@ void MainWindow::showDialog(string message, int level) {
 	}
 }
 
-bool MainWindow::checkTextProcess() {
-	bool ok = !textQueued;
-	textQueued = true;
+bool MainWindow::checkTextProcess(int displayi) {
+	bool ok = !textQueued[displayi];
+	textQueued[displayi] = true;
 	return ok;
 }
 
 void MainWindow::showText(string text, int displayi) {
-	if (!textQueued) {
+	if (!textQueued[displayi]) {
 		return;			// ignore queued events on abort
 	}
 
@@ -292,29 +294,26 @@ void MainWindow::showText(string text, int displayi) {
 	} catch (exception e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
-	textQueued = false;
+	textQueued[displayi] = false;
 }
 
-bool MainWindow::checkImageProcess() {
-	bool ok = !imageQueued;
-	imageQueued = true;
+bool MainWindow::checkImageProcess(int displayi) {
+	bool ok = !imageQueued[displayi];
+	imageQueued[displayi] = true;
 	return ok;
 }
 
 void MainWindow::showImage(Mat* image, int displayi) {
-	if (!imageQueued) {
+	if (!imageQueued[displayi]) {
 		return;			// ignore queued events on abort
 	}
 
 	try {
-		if (displayi < 0 || displayi >= Constants::nDisplays) {
-			displayi = 0;
-		}
 		imageWindows[displayi].showImage(image);
 	} catch (exception e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
-	imageQueued = false;
+	imageQueued[displayi] = false;
 }
 
 void MainWindow::checkUpdates() {

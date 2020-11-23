@@ -2,6 +2,7 @@
 #include <math.h>
 #include <filesystem>
 #include <fstream>
+#include <regex>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -436,10 +437,17 @@ vector<string> Util::getImageFilenames(string searchPath) {
 	string filename;
 	string path = extractFilePath(searchPath);
 	string pattern = extractFileName(searchPath);
+	regex rx;
+
+	// very basic * ? pattern matching using regex
+	pattern = replace(pattern, ".", "\\.");
+	pattern = replace(pattern, "?", ".");
+	pattern = replace(pattern, "*", ".*");
+	rx = regex(pattern);
 
 	for (const auto& entry : filesystem::directory_iterator(path)) {
 		filename = entry.path().string();
-		if (extractFileName(filename)._Starts_with(pattern)) {
+		if (regex_match(extractFileName(filename), rx)) {
 			filenames.push_back(filename);
 		}
 	}
@@ -499,9 +507,14 @@ string Util::combinePath(string basepath, string templatePath) {
 	}
 }
 
-QImage Util::matToQImage(cv::Mat const& src) {
-	QImage qimage(src.data, src.cols, src.rows, src.step, QImage::Format_RGB888);
-	return qimage.rgbSwapped();
+QImage Util::matToQImage(cv::Mat const& source) {
+	if (source.channels() == 1) {
+		QImage qimage(source.data, source.cols, source.rows, source.step, QImage::Format_Grayscale8);
+		return qimage;
+	} else {
+		QImage qimage(source.data, source.cols, source.rows, source.step, QImage::Format_RGB888);
+		return qimage.rgbSwapped();
+	}
 }
 
 string Util::getUrl(string url) {

@@ -20,11 +20,11 @@ bool TextObserver::checkStatusProcess() {
 	return true;
 }
 
-bool TextObserver::checkTextProcess() {
+bool TextObserver::checkTextProcess(int displayi) {
 	return true;
 }
 
-bool TextObserver::checkImageProcess() {
+bool TextObserver::checkImageProcess(int displayi) {
 	return true;
 }
 

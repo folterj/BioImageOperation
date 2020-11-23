@@ -26,8 +26,8 @@ private:
 public:
 	virtual void resetProgressTimer() override;
 	virtual bool checkStatusProcess() override;
-	virtual bool checkTextProcess() override;
-	virtual bool checkImageProcess() override;
+	virtual bool checkTextProcess(int displayi) override;
+	virtual bool checkImageProcess(int displayi) override;
 	virtual void resetUI() override;
 	virtual void clearStatus() override;
 	virtual void showStatus(int i, int tot = 0, string label = "") override;

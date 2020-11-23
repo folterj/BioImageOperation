@@ -102,7 +102,7 @@ string Cluster::getLabels() {
 		if (labels != "") {
 			labels += ",";
 		}
-		labels += track->label;
+		labels += to_string(track->label);
 	}
 	return labels;
 }
