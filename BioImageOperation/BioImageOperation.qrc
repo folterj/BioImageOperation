@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/BioImageOperation">
         <file>BioImageOperation.png</file>
+        <file>JetBrainsMono-Regular.ttf</file>
     </qresource>
 </RCC>

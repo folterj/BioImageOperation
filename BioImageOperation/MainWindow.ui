@@ -17,8 +17,13 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QPlainTextEdit" name="scriptTextEdit">
+      <property name="font">
+       <font>
+        <family>Courier</family>
+       </font>
+      </property>
       <property name="tabStopDistance">
-       <double>20.000000000000000</double>
+       <double>16.000000000000000</double>
       </property>
      </widget>
     </item>

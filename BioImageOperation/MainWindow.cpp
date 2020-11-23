@@ -22,7 +22,17 @@ const QString DEFAULT_DIR_KEY("default_dir");
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent) {
 
+	QFont font;
+	int fontId = QFontDatabase::addApplicationFont(":/BioImageOperation/JetBrainsMono-Regular.ttf");
+	if (fontId >= 0) {
+		QString family = QFontDatabase::applicationFontFamilies(fontId).at(0);
+		font = QFont(family);
+	} else {
+		font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+	}
 	ui.setupUi(this);
+	ui.scriptTextEdit->setFont(font);
+
 	connect(ui.actionNew, &QAction::triggered, this, &MainWindow::clearInput);
 	connect(ui.actionOpen, &QAction::triggered, this, &MainWindow::openDialog);
 	connect(ui.actionSave, &QAction::triggered, this, &MainWindow::save);
