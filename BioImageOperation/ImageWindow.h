@@ -10,6 +10,8 @@
 #pragma once
 #include <QMainWindow>
 #include <QGraphicsPixmapItem>
+#include <QContextMenuEvent>
+#include <QResizeEvent>
 #include "ui_ImageWindow.h"
 #include <opencv2/opencv.hpp>
 #include "Observer.h"
@@ -42,4 +44,5 @@ public:
 	void showImage(Mat* image, string reference = "");
 	void saveImage();
 	virtual void resizeEvent(QResizeEvent* event) override;
+	virtual void contextMenuEvent(QContextMenuEvent* event) override;
 };

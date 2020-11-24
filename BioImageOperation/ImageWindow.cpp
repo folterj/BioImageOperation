@@ -9,6 +9,8 @@
 
 #include "ImageWindow.h"
 #include <QFileDialog>
+#include <QMenu>
+#include <QStyle>
 #include "Constants.h"
 #include "Util.h"
 
@@ -113,4 +115,10 @@ void ImageWindow::saveImage() {
 
 void ImageWindow::resizeEvent(QResizeEvent* event) {
 	ui.graphicsView->fitInView(&pixmap, Qt::AspectRatioMode::KeepAspectRatio);
+}
+
+void ImageWindow::contextMenuEvent(QContextMenuEvent* event) {
+	QMenu menu(this);
+	menu.addAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("Save"), this, &ImageWindow::saveImage);
+	menu.exec(event->globalPos());
 }

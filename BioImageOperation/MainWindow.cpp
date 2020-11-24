@@ -10,11 +10,10 @@
 #include "MainWindow.h"
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QStyle>
 #include "Keepalive.h"
 #include "Util.h"
 #include "config.h"
-
-// https://mithatkonar.com/wiki/doku.php/qt/toward_robust_icon_support
 
 
 const QString DEFAULT_DIR_KEY("default_dir");
@@ -32,6 +31,16 @@ MainWindow::MainWindow(QWidget* parent)
 	}
 	ui.setupUi(this);
 	ui.scriptTextEdit->setFont(font);
+
+	ui.actionOpen->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+	ui.actionSave->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
+	ui.actionSave_As->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
+	ui.actionCheck_for_Updates->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
+	ui.actionHelp->setIcon(style()->standardIcon(QStyle::SP_DialogHelpButton));
+	ui.actionAbout->setIcon(style()->standardIcon(QStyle::SP_MessageBoxQuestion));
+
+	ui.processButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+	ui.abortButton->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
 
 	connect(ui.actionNew, &QAction::triggered, this, &MainWindow::clearInput);
 	connect(ui.actionOpen, &QAction::triggered, this, &MainWindow::openDialog);
@@ -59,7 +68,7 @@ MainWindow::MainWindow(QWidget* parent)
 	scriptProcessing.registerObserver(this);
 
 	timer = new QTimer(this);
-	connect(timer, SIGNAL(timeout()), this, SLOT(timerElapsed()));
+	connect(timer, &QTimer::timeout, this, &MainWindow::timerElapsed);
 	timer->start(1s);
 }
 
