@@ -26,6 +26,7 @@ private:
 	QGraphicsPixmapItem pixmap;
 	Observer* observer;
 	Mat* image;
+	string reference;
 	int title;
 	int swidth = 0;
 	int sheight = 0;
@@ -38,7 +39,7 @@ public:
 	void init(Observer* observer, int title);
 	void updateFps();
 	void updateTitle();
-	void showImage(Mat* image);
+	void showImage(Mat* image, string reference = "");
 	void saveImage();
 	virtual void resizeEvent(QResizeEvent* event) override;
 };

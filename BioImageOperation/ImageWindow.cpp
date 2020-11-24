@@ -45,7 +45,9 @@ void ImageWindow::updateFps() {
 
 void ImageWindow::updateTitle() {
 	string s = Util::format("BIO Image %d", title);
-
+	if (reference != "") {
+		s += " (" + reference + ")";
+	}
 	if (swidth != 0 && sheight != 0) {
 		s += Util::format(" %dx%d", swidth, sheight);
 	}
@@ -55,7 +57,7 @@ void ImageWindow::updateTitle() {
 	setWindowTitle(Util::convertToQString(s));
 }
 
-void ImageWindow::showImage(Mat* image) {
+void ImageWindow::showImage(Mat* image, string reference) {
 	bool needResize = (image->cols != swidth || image->rows != sheight);
 	if (isHidden()) {
 		show();
@@ -64,6 +66,7 @@ void ImageWindow::showImage(Mat* image) {
 	swidth = image->cols;
 	sheight = image->rows;
 	this->image = image;
+	this->reference = reference;
 
 	pixmap.setPixmap(QPixmap::fromImage(Util::matToQImage(*image)));
 	pixmap.setTransformationMode(Qt::TransformationMode::SmoothTransformation);

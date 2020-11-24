@@ -89,9 +89,9 @@ void ScriptProcessing::registerObserver(Observer* observer) {
 	connect(this, &ScriptProcessing::resetUIQt, (MainWindow*)observer, &MainWindow::resetUI);
 	connect(this, &ScriptProcessing::clearStatusQt, (MainWindow*)observer, &MainWindow::clearStatus);
 	connect(this, &ScriptProcessing::showStatusQt, (MainWindow*)observer, &MainWindow::showStatus);
-	connect(this, &ScriptProcessing::showDialogQt, (MainWindow*)observer, &MainWindow::showDialog);
 	connect(this, &ScriptProcessing::showTextQt, (MainWindow*)observer, &MainWindow::showText);
 	connect(this, &ScriptProcessing::showImageQt, (MainWindow*)observer, &MainWindow::showImage);
+	connect(this, &ScriptProcessing::showDialogQt, (MainWindow*)observer, &MainWindow::showDialog);
 }
 
 bool ScriptProcessing::startProcessNoGui(string scriptFilename) {
@@ -194,6 +194,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 	newImage = &operation->image;						// newImage is pointer to current operation image
 
 	NumericPath outputPath;
+	ImageTracker* imageTracker;
 	string source;
 	int width, height;
 	int displayi;
@@ -216,7 +217,12 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				width = sourceWidth;
 				height = sourceHeight;
 			}
-			ImageOperations::create(newImage, width, height, (ImageColorMode)operation->getArgument(ArgumentLabel::ColorMode, (int)ImageColorMode::Color), operation->getArgumentNumeric(ArgumentLabel::Red), operation->getArgumentNumeric(ArgumentLabel::Green), operation->getArgumentNumeric(ArgumentLabel::Blue));
+			ImageOperations::create(newImage, width, height,
+									(ImageColorMode)operation->getArgument(ArgumentLabel::ColorMode,
+									(int)ImageColorMode::Color),
+									operation->getArgumentNumeric(ArgumentLabel::Red),
+									operation->getArgumentNumeric(ArgumentLabel::Green),
+									operation->getArgumentNumeric(ArgumentLabel::Blue));
 			sourceWidth = width;
 			sourceHeight = height;
 			sourceFrameNumber = 0;
@@ -224,7 +230,12 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::OpenImage:
-			operation->initFrameSource(FrameType::Image, 0, basepath, operation->getArgument(ArgumentLabel::Path), operation->getArgument(ArgumentLabel::Start), operation->getArgument(ArgumentLabel::Length), sourceFps, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
+			operation->initFrameSource(FrameType::Image, 0, basepath,
+										operation->getArgument(ArgumentLabel::Path),
+										operation->getArgument(ArgumentLabel::Start),
+										operation->getArgument(ArgumentLabel::Length),
+										sourceFps,
+										(int)operation->getArgumentNumeric(ArgumentLabel::Interval));
 			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage)) {
 				showStatus(operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames());
@@ -236,7 +247,12 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::OpenVideo:
-			operation->initFrameSource(FrameType::Video, (int)operation->getArgumentNumeric(ArgumentLabel::API), basepath, operation->getArgument(ArgumentLabel::Path), operation->getArgument(ArgumentLabel::Start), operation->getArgument(ArgumentLabel::Length), 0, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
+			operation->initFrameSource(FrameType::Video,
+										(int)operation->getArgumentNumeric(ArgumentLabel::API), basepath,
+										operation->getArgument(ArgumentLabel::Path),
+										operation->getArgument(ArgumentLabel::Start),
+										operation->getArgument(ArgumentLabel::Length), 0,
+										(int)operation->getArgumentNumeric(ArgumentLabel::Interval));
 			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage)) {
 				showStatus(operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames(), operation->frameSource->getLabel());
@@ -256,7 +272,10 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			if (source != "") {
 				source = to_string(operation->getArgumentNumeric());
 			}
-			operation->initFrameSource(FrameType::Capture, (int)operation->getArgumentNumeric(ArgumentLabel::API), basepath, source, "", "", 0, (int)operation->getArgumentNumeric(ArgumentLabel::Interval));
+			operation->initFrameSource(FrameType::Capture,
+										(int)operation->getArgumentNumeric(ArgumentLabel::API),
+										basepath, source, "", "", 0,
+										(int)operation->getArgumentNumeric(ArgumentLabel::Interval));
 			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage)) {
 				showStatus(operation->frameSource->getCurrentFrame());
@@ -271,7 +290,10 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::SaveImage:
-			operation->initFrameOutput(FrameType::Image, basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultImageExtension, operation->getArgument(ArgumentLabel::Start), operation->getArgument(ArgumentLabel::Length), sourceFps);
+			operation->initFrameOutput(FrameType::Image, basepath,
+										operation->getArgument(ArgumentLabel::Path), Constants::defaultImageExtension,
+										operation->getArgument(ArgumentLabel::Start),
+										operation->getArgument(ArgumentLabel::Length), sourceFps);
 			operation->frameOutput->writeImage(getLabelOrCurrentImage(operation, image, true));
 			break;
 
@@ -280,14 +302,20 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			if (fps == 0) {
 				fps = sourceFps;
 			}
-			operation->initFrameOutput(FrameType::Video, basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultVideoExtension, operation->getArgument(ArgumentLabel::Start), operation->getArgument(ArgumentLabel::Length), fps, operation->getArgument(ArgumentLabel::Codec));
+			operation->initFrameOutput(FrameType::Video, basepath,
+										operation->getArgument(ArgumentLabel::Path), Constants::defaultVideoExtension,
+										operation->getArgument(ArgumentLabel::Start),
+										operation->getArgument(ArgumentLabel::Length), fps,
+										operation->getArgument(ArgumentLabel::Codec));
 			operation->frameOutput->writeImage(getLabelOrCurrentImage(operation, image, true));
 			break;
 
 		case ScriptOperationType::ShowImage:
 			refImage = getLabelOrCurrentImage(operation, image, false);
 			if (Util::isValidImage(refImage)) {
-				showImage(refImage, (int)operation->getArgumentNumeric(ArgumentLabel::None, true));
+				showImage(refImage,
+							(int)operation->getArgumentNumeric(ArgumentLabel::None, true),
+							"#" + to_string(count));
 			}
 			break;
 
@@ -302,14 +330,17 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::Scale:
 			ImageOperations::scale(*getLabelOrCurrentImage(operation, image, false), *newImage,
-				(int)operation->getArgumentNumeric(ArgumentLabel::Width), (int)operation->getArgumentNumeric(ArgumentLabel::Height));
+									(int)operation->getArgumentNumeric(ArgumentLabel::Width),
+									(int)operation->getArgumentNumeric(ArgumentLabel::Height));
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::Crop:
 			ImageOperations::crop(getLabelOrCurrentImage(operation, image, false), newImage,
-				(int)operation->getArgumentNumeric(ArgumentLabel::X), (int)operation->getArgumentNumeric(ArgumentLabel::Y),
-				(int)operation->getArgumentNumeric(ArgumentLabel::Width), (int)operation->getArgumentNumeric(ArgumentLabel::Height));
+									(int)operation->getArgumentNumeric(ArgumentLabel::X),
+									(int)operation->getArgumentNumeric(ArgumentLabel::Y),
+									(int)operation->getArgumentNumeric(ArgumentLabel::Width),
+									(int)operation->getArgumentNumeric(ArgumentLabel::Height));
 			newImageSet = true;
 			break;
 
@@ -414,67 +445,93 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::CreateClusters:
-			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker), true)->createClusters(image, operation->getArgumentNumeric(ArgumentLabel::MinArea), operation->getArgumentNumeric(ArgumentLabel::MaxArea), basepath, debugMode);
+			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker), true);
+			imageTracker->createClusters(image, operation->getArgumentNumeric(ArgumentLabel::MinArea),
+										operation->getArgumentNumeric(ArgumentLabel::MaxArea), basepath, debugMode);
 			break;
 
 		case ScriptOperationType::CreateTracks:
-			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->createTracks(operation->getArgumentNumeric(ArgumentLabel::MaxMove), (int)operation->getArgumentNumeric(ArgumentLabel::MinActive), (int)operation->getArgumentNumeric(ArgumentLabel::MaxInactive), basepath);
+			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker->createTracks(operation->getArgumentNumeric(ArgumentLabel::MaxMove),
+										(int)operation->getArgumentNumeric(ArgumentLabel::MinActive),
+										(int)operation->getArgumentNumeric(ArgumentLabel::MaxInactive), basepath);
 			break;
 
 		case ScriptOperationType::CreatePaths:
-			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->createPaths(operation->getArgumentNumeric(ArgumentLabel::Distance));
+			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker->createPaths(operation->getArgumentNumeric(ArgumentLabel::Distance));
 			break;
 
 		case ScriptOperationType::DrawClusters:
-			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->drawClusters(getLabelOrCurrentImage(operation, image, true), newImage, operation->getArgument(ArgumentLabel::DrawMode, (int)ClusterDrawMode::ClusterDefault));
+			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker->drawClusters(getLabelOrCurrentImage(operation, image, true), newImage,
+										operation->getArgument(ArgumentLabel::DrawMode,
+										(int)ClusterDrawMode::ClusterDefault));
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::DrawTracks:
-			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->drawTracks(getLabelOrCurrentImage(operation, image, true), newImage, operation->getArgument(ArgumentLabel::DrawMode, (int)ClusterDrawMode::TracksDefault), (int)sourceFps);
+			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker->drawTracks(getLabelOrCurrentImage(operation, image, true), newImage,
+										operation->getArgument(ArgumentLabel::DrawMode,
+										(int)ClusterDrawMode::TracksDefault), (int)sourceFps);
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::DrawPaths:
 			logPower = operation->getArgumentNumeric();
 			logPalette = (Palette)operation->getArgument(ArgumentLabel::Palette, (int)Palette::Grayscale);
-			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->drawPaths(getLabelOrCurrentImage(operation, image, true), newImage,
+			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker->drawPaths(getLabelOrCurrentImage(operation, image, true), newImage,
 				(PathDrawMode)operation->getArgument(ArgumentLabel::PathDrawMode, (int)PathDrawMode::Age), (float)logPower, logPalette);
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::ShowTrackInfo:
-			showText(imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->getInfo(), (int)operation->getArgumentNumeric(ArgumentLabel::Display, true));
+			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
+			showText(imageTracker->getInfo(),
+					(int)operation->getArgumentNumeric(ArgumentLabel::Display, true),
+					"#" + to_string(count));
 			break;
 
 		case ScriptOperationType::DrawTrackInfo:
-			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->drawTrackInfo(getLabelOrCurrentImage(operation, image, true), newImage);
+			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker->drawTrackInfo(getLabelOrCurrentImage(operation, image, true), newImage);
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::SaveClusters:
 			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultDataExtension);
-			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->saveClusters(outputPath.createFilePath(frame), frame, getTime(frame), (SaveFormat)operation->getArgument(ArgumentLabel::Format, (int)SaveFormat::ByTime), operation->getArgumentBoolean(ArgumentLabel::Contour));
+			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker->saveClusters(outputPath.createFilePath(frame), frame, getTime(frame),
+										(SaveFormat)operation->getArgument(ArgumentLabel::Format, (int)SaveFormat::ByTime),
+										operation->getArgumentBoolean(ArgumentLabel::Contour));
 			break;
 
 		case ScriptOperationType::SaveTracks:
 			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultDataExtension);
-			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->saveTracks(outputPath.createFilePath(frame), frame, getTime(frame), (SaveFormat)operation->getArgument(ArgumentLabel::Format, (int)SaveFormat::ByTime), operation->getArgumentBoolean(ArgumentLabel::Contour));
+			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker->saveTracks(outputPath.createFilePath(frame), frame, getTime(frame),
+										(SaveFormat)operation->getArgument(ArgumentLabel::Format, (int)SaveFormat::ByTime),
+										operation->getArgumentBoolean(ArgumentLabel::Contour));
 			break;
 
 		case ScriptOperationType::SavePaths:
 			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultDataExtension);
-			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->savePaths(outputPath.createFilePath(frame), frame, getTime(frame));
+			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker->savePaths(outputPath.createFilePath(frame), frame, getTime(frame));
 			break;
 
 		case ScriptOperationType::SaveTrackInfo:
 			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultDataExtension);
-			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->saveTrackInfo(outputPath.createFilePath(frame), frame, getTime(frame));
+			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker->saveTrackInfo(outputPath.createFilePath(frame), frame, getTime(frame));
 			break;
 
 		case ScriptOperationType::SaveTrackLog:
 			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultDataExtension);
-			imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker))->initLogClusterTrack(outputPath.createFilePath(count));
+			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker->initLogClusterTrack(outputPath.createFilePath(count));
 			break;
 
 		case ScriptOperationType::DrawLegend:
@@ -486,7 +543,9 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				showImage(newImage, displayi - 1);		// manual one-base correction
 			} else {
 				// draw on image
-				ImageOperations::drawLegend(*getLabelOrCurrentImage(operation, image, true), *newImage, (DrawPosition)operation->getArgument(ArgumentLabel::Position, (int)DrawPosition::BottomRight), logPower, logPalette);
+				ImageOperations::drawLegend(*getLabelOrCurrentImage(operation, image, true), *newImage,
+											(DrawPosition)operation->getArgument(ArgumentLabel::Position, (int)DrawPosition::BottomRight),
+											logPower, logPalette);
 				newImageSet = true;
 			}
 			break;
@@ -503,6 +562,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			debugMode = true;
 			break;
 
+			// end of switch
 		}
 
 		if (operation->hasInnerOperations()) {
@@ -524,16 +584,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			}
 		}
 	} catch (cv::Exception e) {
-		string errorMsg;
-#ifdef _DEBUG
-		errorMsg = e.msg;
-#else
-		if (e.err != "") {
-			errorMsg = e.err;
-		} else {
-			errorMsg = e.msg;
-		}
-#endif
+		string errorMsg = e.what();
 		if (Util::contains(errorMsg, "==")) {
 			// adding more user friendly messages:
 			if (Util::contains(errorMsg, "CV_MAT_TYPE")) {
@@ -541,6 +592,9 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			}
 			if (Util::contains(errorMsg, "CV_MAT_CN")) {
 				errorMsg += " (Image color channels don't match)";
+			}
+			if (Util::contains(errorMsg, "channels()")) {
+				errorMsg += " (Incorrect number of image color channels)";
 			}
 		}
 		errorMsg += " in\n" + operation->line;
@@ -620,6 +674,26 @@ void ScriptProcessing::showStatus(int i, int tot, string label) {
 	}
 }
 
+void ScriptProcessing::showText(string text, int displayi, string reference) {
+	if (observer->checkTextProcess(displayi)) {
+		if (qtGui) {
+			emit showTextQt(text.c_str(), displayi, reference);
+		} else {
+			observer->showDialog(text, displayi);
+		}
+	}
+}
+
+void ScriptProcessing::showImage(Mat* image, int displayi, string reference) {
+	if (observer->checkImageProcess(displayi)) {
+		if (qtGui) {
+			emit showImageQt(image, displayi, reference);
+		} else {
+			observer->showImage(image, displayi, reference);
+		}
+	}
+}
+
 void ScriptProcessing::showDialog(string message, MessageLevel level) {
 	if (qtGui) {
 		if (level == MessageLevel::Error) {
@@ -630,25 +704,5 @@ void ScriptProcessing::showDialog(string message, MessageLevel level) {
 		emit showDialogQt(message, (int)level);
 	} else {
 		observer->showDialog(message, (int)level);
-	}
-}
-
-void ScriptProcessing::showText(string text, int displayi) {
-	if (observer->checkTextProcess(displayi)) {
-		if (qtGui) {
-			emit showTextQt(text.c_str(), displayi);
-		} else {
-			observer->showDialog(text, displayi);
-		}
-	}
-}
-
-void ScriptProcessing::showImage(Mat* image, int displayi) {
-	if (observer->checkImageProcess(displayi)) {
-		if (qtGui) {
-			emit showImageQt(image, displayi);
-		} else {
-			observer->showImage(image, displayi);
-		}
 	}
 }

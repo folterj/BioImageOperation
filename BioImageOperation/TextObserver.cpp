@@ -74,9 +74,9 @@ void TextObserver::showDialog(string message, int level) {
 	cout << MessageLevels[level] + " " + message << endl;
 }
 
-void TextObserver::showText(string text, int displayi) {
-	cout << Util::format("[%d] %s", displayi, text.c_str()) << endl;
+void TextObserver::showText(string text, int displayi, string reference) {
+	cout << Util::format("[%d] (%s) %s", displayi, reference.c_str(), text.c_str()) << endl;
 }
 
-void TextObserver::showImage(Mat* image, int displayi) {
+void TextObserver::showImage(Mat* image, int displayi, string reference) {
 }

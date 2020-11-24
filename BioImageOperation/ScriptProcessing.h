@@ -92,15 +92,15 @@ public:
 	void resetUI();
 	void clearStatus();
 	void showStatus(int i, int tot = 0, string label = "");
-	void showText(string text, int displayi);
-	void showImage(Mat* image, int displayi);
+	void showText(string text, int displayi, string reference = "");
+	void showImage(Mat* image, int displayi, string reference = "");
 	void showDialog(string message, MessageLevel level = MessageLevel::Info);
 
 signals:
 	void resetUIQt();
 	void clearStatusQt();
 	void showStatusQt(int i, int tot = 0, string label = "");
+	void showTextQt(string text, int displayi, string reference = "");
+	void showImageQt(Mat* image, int displayi, string reference = "");
 	void showDialogQt(string message, int level = (int)MessageLevel::Info);
-	void showTextQt(string text, int displayi);
-	void showImageQt(Mat* image, int displayi);
 };

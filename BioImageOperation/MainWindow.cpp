@@ -284,13 +284,13 @@ bool MainWindow::checkTextProcess(int displayi) {
 	return ok;
 }
 
-void MainWindow::showText(string text, int displayi) {
+void MainWindow::showText(string text, int displayi, string reference) {
 	if (!textQueued[displayi]) {
 		return;			// ignore queued events on abort
 	}
 
 	try {
-		textWindows[displayi].showText(text);
+		textWindows[displayi].showText(text, reference);
 	} catch (exception e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
@@ -303,13 +303,13 @@ bool MainWindow::checkImageProcess(int displayi) {
 	return ok;
 }
 
-void MainWindow::showImage(Mat* image, int displayi) {
+void MainWindow::showImage(Mat* image, int displayi, string reference) {
 	if (!imageQueued[displayi]) {
 		return;			// ignore queued events on abort
 	}
 
 	try {
-		imageWindows[displayi].showImage(image);
+		imageWindows[displayi].showImage(image, reference);
 	} catch (exception e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}

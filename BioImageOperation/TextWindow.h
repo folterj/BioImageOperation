@@ -19,6 +19,7 @@ class TextWindow : public QMainWindow {
 private:
 	Ui::TextWindow ui;
 	Observer* observer;
+	string reference;
 	int title;
 
 public:
@@ -26,5 +27,5 @@ public:
 	~TextWindow();
 	void init(Observer* observer, int title);
 	void updateTitle();
-	void showText(string text);
+	void showText(string text, string reference = "");
 };

@@ -29,7 +29,7 @@ public:
 	virtual void showStatus(int i, int tot = 0, string label = "") = 0;
 	virtual void showDialog(string message, int level = (int)MessageLevel::Info) = 0;
 	virtual bool checkTextProcess(int displayi) = 0;
-	virtual void showText(string text, int displayi) = 0;
+	virtual void showText(string text, int displayi, string reference = "") = 0;
 	virtual bool checkImageProcess(int displayi) = 0;
-	virtual void showImage(Mat* image, int displayi) = 0;
+	virtual void showImage(Mat* image, int displayi, string reference = "") = 0;
 };

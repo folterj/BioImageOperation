@@ -27,12 +27,17 @@ void TextWindow::init(Observer* observer, int title) {
 
 void TextWindow::updateTitle() {
 	string s = Util::format("BIO info %d", title);
+	if (reference != "") {
+		s += " (" + reference + ")";
+	}
 	setWindowTitle(Util::convertToQString(s));
 }
 
-void TextWindow::showText(string text) {
+void TextWindow::showText(string text, string reference) {
 	if (isHidden()) {
 		show();
 	}
+	this->reference = reference;
 	ui.textEdit->setPlainText(Util::convertToQString(text));
+	updateTitle();
 }

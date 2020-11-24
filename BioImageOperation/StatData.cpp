@@ -222,13 +222,12 @@ ParamRange StatData::getParamRange() {
 }
 
 void StatData::saveData(string filename) {
-	OutputStream outStream;
+	OutputStream outStream(filename);
 	string s = "";
 
 	for (double x : data) {
 		s += Util::format("%f\n", x);
 	}
 
-	outStream.init(filename);
 	outStream.write(s);
 }

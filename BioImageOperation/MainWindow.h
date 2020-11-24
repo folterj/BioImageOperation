@@ -69,8 +69,8 @@ public slots:
 	virtual void clearStatus() override;
 	virtual void showStatus(int i, int tot = 0, string label = "") override;
 	virtual void showDialog(string message, int level = (int)MessageLevel::Info) override;
-	virtual void showText(string text, int displayi) override;
-	virtual void showImage(Mat* image, int displayi) override;
+	virtual void showText(string text, int displayi, string reference = "") override;
+	virtual void showImage(Mat* image, int displayi, string reference = "") override;
 	void timerElapsed();
 
 protected:
