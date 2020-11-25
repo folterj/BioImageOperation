@@ -61,6 +61,7 @@ bool Argument::parseType(ArgumentType argumentType) {
 	switch (argumentType) {
 	case ArgumentType::Path:
 	case ArgumentType::Label:
+	case ArgumentType::Tracker:
 		ok = true;
 		break;
 

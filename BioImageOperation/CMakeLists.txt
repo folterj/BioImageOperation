@@ -1,8 +1,11 @@
+# CMakeList.txt : CMake project for CMakeProjectTest, include source and define
+# project specific logic here.
+#
 cmake_minimum_required(VERSION 3.1.0)
 
-string(TIMESTAMP NOW "%Y-%m-%d")
+string (TIMESTAMP NOW "%Y-%m-%d")
 
-project (BioImageOperation VERSION "1.6.440.4" DESCRIPTION ${NOW} HOMEPAGE_URL "https://joostdefolter.info")
+project (BioImageOperation VERSION "1.6.440.5" DESCRIPTION ${NOW} HOMEPAGE_URL "https://joostdefolter.info")
 
 configure_file (
     "${PROJECT_SOURCE_DIR}/config.h.in"
