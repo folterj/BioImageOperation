@@ -14,7 +14,7 @@ This is a Microsoft Visual Studio 2019 / C++ CMake project
 
 The project can either be opened as a Visual Studio project opening the solution file, or as a CMake project by opening the BioImageOperation root folder.
 
-Requirements
+## Requirements
 - CMake ([cmake.org](https://cmake.org/)) / Visual Studio ([visualstudio.microsoft.com](https://visualstudio.microsoft.com/))
 - Qt 5 ([qt.io](https://www.qt.io))
 - OpenCV 4.4.0 ([opencv.org](https://opencv.org))
@@ -64,24 +64,107 @@ OpenVideo("ants_in_concrete.mov")
 {
   GrayScale()
   DifferenceAbs(background)
+  
   ShowImage()
 }
 ```
 
-With a varying background (changing light intensity, movement etc), a dynamic background image should be used. The frequency and weight of this update should be carefully tuned for best results.
+### Background alternative
+With a varying background (changing light intensity, movement etc), a dynamic background image can be used for better results. The frequency and weight of this update should be carefully tuned for best results.
 ```javascript
 OpenVideo("ants_in_concrete.mov")
 {
   GrayScale()
   5:background = UpdateBackground(weight=0.05)
   DifferenceAbs(background)
+  
   ShowImage()
 }
 ```
 
 ### 4.	Threshold
+The threshold function is used for two reasons. This will produce a binary image for cluster detection. The threshold value should be tuned for best results. Alternatively using the threshold function without value will use the Otsu method. However, setting a value normally gives better results.
+```javascript
+OpenVideo("ants_in_concrete.mov")
+{
+  GrayScale()
+  5:background = UpdateBackground(weight=0.05)
+  DifferenceAbs(background)
+  Threshold(0.1)
+  
+  ShowImage()
+}
+```
+
 ### 5.	Detection
+Cluster detection is performed on binary images. This operation will generate a Tracker. When this operation is used without parameters, these are automatically defined using a basic statistical algorithm. The resulting parameters can be shown using `ShowTrackInfo()`.
+```javascript
+OpenVideo("ants_in_concrete.mov")
+{
+  GrayScale()
+  5:background = UpdateBackground(weight=0.05)
+  DifferenceAbs(background)
+  Threshold(0.1)
+  
+  CreateClusters()
+  
+  ShowTrackInfo()
+  ShowImage()
+}
+```
+
+These parameters can then be used in the corresponding operation. Suggested parameters should normally be tuned for best results, by visualising the detected clusters.
+```javascript
+OpenVideo("ants_in_concrete.mov")
+{
+  Grayscale()
+  5:background = UpdateBackground(weight=0.05)
+  DifferenceAbs(background)
+  Threshold(0.1)
+  
+  CreateClusters(MinArea=80, MaxArea=1000)
+  
+  DrawClusters()
+  ShowImage()
+}
+```
+
 ### 6.	Tracking
+Tracking is performed on an existing Tracker, which is created in the CreateClusters operation. When this operation is used without parameters, these are automatically defined using a basic statistical algorithm.
+```javascript
+OpenVideo("ants_in_concrete.mov")
+{
+  Grayscale()
+  5:background = UpdateBackground(weight=0.05)
+  DifferenceAbs(background)
+  Threshold(0.1)
+	
+  CreateClusters(MinArea=80, MaxArea=1000)
+  CreateTracks()
+  
+  ShowTrackInfo()
+  ShowImage()
+}
+```
+
+These parameters can again be used in the corresponding operation. Suggested parameters should normally be tuned for best results, by visualising tracking. Tracks can be drawn on the current binary image, but to enable colors, a color image should be used. The current image can be converted to a color image.
+```javascript
+OpenVideo("ants_in_concrete.mov")
+{
+  Grayscale()
+  5:background = UpdateBackground(weight=0.05)
+  DifferenceAbs(background)
+  Threshold(0.1)
+	
+  CreateClusters(MinArea=80, MaxArea=1000)
+  CreateTracks(maxMove=20, minActive=3, maxInactive=3)
+  
+  Color()
+  DrawTracks()
+  ShowImage()
+}
+```
+
 ### 7.	Visualisation
 ### 8.	Output
 
