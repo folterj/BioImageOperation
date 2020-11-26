@@ -53,9 +53,9 @@ public:
 	void updateTitle();
 	void clearInput();
 	void openDialog();
-	void saveDialog();
-	void save();
-	void askSaveChanges();
+	bool saveDialog();
+	bool save();
+	bool askSaveChanges();
 	void textChanged();
 	void process();
 	void updateUI(bool start);

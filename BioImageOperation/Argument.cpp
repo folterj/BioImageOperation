@@ -82,7 +82,7 @@ bool Argument::parseType(ArgumentType argumentType) {
 			parts = Util::split(value, ":");
 			for (string part : parts) {
 				if (part != "") {
-					ok = Util::isNumeric(value);
+					ok = Util::isNumeric(part);
 					if (!ok) {
 						break;
 					}

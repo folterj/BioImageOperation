@@ -397,15 +397,15 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 		break;
 
 	case ScriptOperationType::Scale:
-		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Width, ArgumentLabel::Height };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
-		description = "Scale image";
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Width, ArgumentLabel::Height, ArgumentLabel::Label };
+		description = "Scale image (in pixels, or values between 0 and 1)";
 		break;
 
 	case ScriptOperationType::Crop:
-		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::X, ArgumentLabel::Y, ArgumentLabel::Width, ArgumentLabel::Height };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
-		description = "Crop image";
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::X, ArgumentLabel::Y, ArgumentLabel::Width, ArgumentLabel::Height, ArgumentLabel::Label };
+		description = "Crop image (in pixels, or values between 0 and 1)";
 		break;
 
 	case ScriptOperationType::Mask:
@@ -418,6 +418,18 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Level };
 		description = "Convert image to binary using threshold level, or in case not provided using automatic Otsu method";
+		break;
+
+	case ScriptOperationType::Erode:
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Radius };
+		description = "Apply erode filter (default 3x3 pixels)";
+		break;
+
+	case ScriptOperationType::Dilate:
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Radius };
+		description = "Apply dilate filter (default 3x3 pixels)";
 		break;
 
 	case ScriptOperationType::Difference:
@@ -643,6 +655,7 @@ ArgumentType ScriptOperation::getExpectedArgumentType(ArgumentLabel argument) {
 	case ArgumentLabel::MinActive:
 	case ArgumentLabel::MaxInactive:
 	case ArgumentLabel::Distance:
+	case ArgumentLabel::Radius:
 		type = ArgumentType::Num;
 		break;
 
@@ -801,6 +814,10 @@ string ScriptOperation::getArgumentDescription(ArgumentLabel argument) {
 
 	case ArgumentLabel::Distance:
 		s = "Maximum path distance";
+		break;
+
+	case ArgumentLabel::Radius:
+		s = "Radius in pixels";
 		break;
 
 	case ArgumentLabel::Start:

@@ -330,17 +330,17 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::Scale:
 			ImageOperations::scale(*getLabelOrCurrentImage(operation, image, false), *newImage,
-									(int)operation->getArgumentNumeric(ArgumentLabel::Width),
-									(int)operation->getArgumentNumeric(ArgumentLabel::Height));
+									operation->getArgumentNumeric(ArgumentLabel::Width),
+									operation->getArgumentNumeric(ArgumentLabel::Height));
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::Crop:
 			ImageOperations::crop(getLabelOrCurrentImage(operation, image, false), newImage,
-									(int)operation->getArgumentNumeric(ArgumentLabel::X),
-									(int)operation->getArgumentNumeric(ArgumentLabel::Y),
-									(int)operation->getArgumentNumeric(ArgumentLabel::Width),
-									(int)operation->getArgumentNumeric(ArgumentLabel::Height));
+									operation->getArgumentNumeric(ArgumentLabel::Width),
+									operation->getArgumentNumeric(ArgumentLabel::Height),
+									operation->getArgumentNumeric(ArgumentLabel::X),
+									operation->getArgumentNumeric(ArgumentLabel::Y));
 			newImageSet = true;
 			break;
 
@@ -381,6 +381,16 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::Threshold:
 			ImageOperations::threshold(*getLabelOrCurrentImage(operation, image, false), *newImage, operation->getArgumentNumeric());
+			newImageSet = true;
+			break;
+
+		case ScriptOperationType::Erode:
+			ImageOperations::erode(*getLabelOrCurrentImage(operation, image, false), *newImage, (int)operation->getArgumentNumeric());
+			newImageSet = true;
+			break;
+
+		case ScriptOperationType::Dilate:
+			ImageOperations::dilate(*getLabelOrCurrentImage(operation, image, false), *newImage, (int)operation->getArgumentNumeric());
 			newImageSet = true;
 			break;
 
@@ -598,12 +608,10 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			}
 		}
 		errorMsg += " in\n" + operation->line;
-		cerr << errorMsg << endl;
 		showDialog(errorMsg, MessageLevel::Error);
 		doAbort();
 	} catch (std::exception e) {
 		string errorMsg = Util::getExceptionDetail(e) + " in\n" + operation->line;
-		cerr << errorMsg << endl;
 		showDialog(errorMsg, MessageLevel::Error);
 		doAbort();
 	}

@@ -29,10 +29,12 @@ public:
 	static void getHsValue(InputArray source, Mat* dest);
 	static void getHsLightness(InputArray source, Mat* dest);
 
-	static void scale(InputArray source, OutputArray dest, int width, int height);
-	static void crop(Mat* source, Mat* dest, int x, int y, int width, int height);
+	static void scale(InputArray source, OutputArray dest, double width = 0, double height = 0);
+	static void crop(Mat* source, Mat* dest, double width = 0, double height = 0, double x = 0, double y = 0);
 	static void mask(InputArray source, InputArray mask, OutputArray dest);
 	static void threshold(InputArray source, OutputArray dest, double thresh = 0);
+	static void erode(InputArray source, OutputArray dest, int radius = 0);
+	static void dilate(InputArray source, OutputArray dest, int radius = 0);
 	static void difference(InputArray source1, InputArray source2, OutputArray dest, bool abs = false);
 	static void add(InputArray source1, InputArray source2, OutputArray dest);
 	static void multiply(InputArray source, double factor, OutputArray dest);

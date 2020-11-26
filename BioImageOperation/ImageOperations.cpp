@@ -28,11 +28,41 @@ void ImageOperations::create(Mat* image, int width, int height, ImageColorMode c
 	image->setTo(Scalar(b * 0xFF, g * 0xFF, r * 0xFF));
 }
 
-void ImageOperations::scale(InputArray source, OutputArray dest, int width, int height) {
+void ImageOperations::scale(InputArray source, OutputArray dest, double width, double height) {
+	int swidth = source.cols();
+	int sheight = source.rows();
+
+	if (width < 1 && height < 1) {
+		width *= swidth;
+		height *= sheight;
+	}
+	if (width == 0 && height == 0) {
+		width = swidth;
+		height = sheight;
+	} else if (width == 0 && height != 0) {
+		width = swidth * height / sheight;
+	} else if (height == 0 && width != 0) {
+		height = sheight * width / swidth;
+	}
 	resize(source, dest, cv::Size(width, height));
 }
 
-void ImageOperations::crop(Mat* source, Mat* dest, int x, int y, int width, int height) {
+void ImageOperations::crop(Mat* source, Mat* dest, double width, double height, double x, double y) {
+	int swidth = source->cols;
+	int sheight = source->rows;
+
+	if (width < 1 && height < 1 && x < 1 && y < 1) {
+		width *= swidth;
+		height *= sheight;
+		x *= swidth;
+		y *= sheight;
+	}
+	if (width == 0) {
+		width = swidth - x;
+	}
+	if (height == 0) {
+		height = sheight - y;
+	}
 	*dest = (*source)(Rect(x, y, width, height));
 }
 
@@ -102,13 +132,28 @@ void ImageOperations::getHsLightness(InputArray source, Mat* dest) {
 void ImageOperations::threshold(InputArray source, OutputArray dest, double thresh) {
 	ThresholdTypes thresholdType;
 
-	if (thresh != 0) {
+	if (thresh > 0) {
 		thresholdType = ThresholdTypes::THRESH_BINARY;
 	} else {
 		thresholdType = ThresholdTypes::THRESH_OTSU;
 	}
-
 	cv::threshold(source, dest, (thresh * 0xFF), 0xFF, thresholdType);
+}
+
+void ImageOperations::erode(InputArray source, OutputArray dest, int radius) {
+	Mat mat;
+	int size = 1 + radius * 2;
+
+	mat = getStructuringElement(MorphShapes::MORPH_ELLIPSE, Size(size, size));
+	cv::erode(source, dest, mat);
+}
+
+void ImageOperations::dilate(InputArray source, OutputArray dest, int radius) {
+	Mat mat;
+	int size = 1 + radius * 2;
+
+	mat = getStructuringElement(MorphShapes::MORPH_ELLIPSE, Size(size, size));
+	cv::dilate(source, dest, mat);
 }
 
 void ImageOperations::difference(InputArray source1, InputArray source2, OutputArray dest, bool abs) {

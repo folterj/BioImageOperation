@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget* parent)
 	ui.processButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 	ui.abortButton->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
 
-	connect(ui.actionNew, &QAction::triggered, this, &MainWindow::clearInput);
+	connect(ui.actionClear, &QAction::triggered, this, &MainWindow::clearInput);
 	connect(ui.actionOpen, &QAction::triggered, this, &MainWindow::openDialog);
 	connect(ui.actionSave, &QAction::triggered, this, &MainWindow::save);
 	connect(ui.actionSave_As, &QAction::triggered, this, &MainWindow::saveDialog);
@@ -82,38 +82,45 @@ void MainWindow::updateTitle() {
 	string fileTitle = Util::extractTitle(filepath);
 	if (fileTitle != "") {
 		title += " - " + fileTitle;
-		if (fileModified) {
-			title += "*";
-		}
+	}
+	if (fileModified) {
+		title += "*";
 	}
 	setWindowTitle(Util::convertToQString(title));
 }
 
 void MainWindow::clearInput() {
-	ui.scriptTextEdit->clear();
-	fileModified = false;
+	if (askSaveChanges()) {
+		ui.scriptTextEdit->clear();
+		filepath = "";
+		fileModified = false;
+		updateTitle();
+	}
 }
 
 void MainWindow::openDialog() {
 	QString qfilename;
 
-	try {
-		qfilename = QFileDialog::getOpenFileName(this, tr("Load script"), bioSettings.value(DEFAULT_DIR_KEY).toString(), Util::convertToQString(Constants::scriptFileDialogFilter));
-		if (qfilename != "") {
-			bioSettings.setValue(DEFAULT_DIR_KEY, QVariant(qfilename));
-			filepath = qfilename.toStdString();
-			scriptProcessing.doAbort();
-			clearInput();
-			ui.scriptTextEdit->setPlainText(Util::convertToQString(Util::readText(filepath)));
-			fileModified = false;
-			updateTitle();
+	if (askSaveChanges()) {
+		try {
+			qfilename = QFileDialog::getOpenFileName(this, tr("Load script"), bioSettings.value(DEFAULT_DIR_KEY).toString(), Util::convertToQString(Constants::scriptFileDialogFilter));
+			if (qfilename != "") {
+				fileModified = false;
+				clearInput();
+				bioSettings.setValue(DEFAULT_DIR_KEY, QVariant(qfilename));
+				filepath = qfilename.toStdString();
+				scriptProcessing.doAbort();
+				ui.scriptTextEdit->setPlainText(Util::convertToQString(Util::readText(filepath)));
+				fileModified = false;
+				updateTitle();
+			}
+		} catch (exception e) {
+			showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 		}
-	} catch (exception e) {
-		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 }
 
-void MainWindow::saveDialog() {
+bool MainWindow::saveDialog() {
 	QString qfilename;
 
 	try {
@@ -121,34 +128,47 @@ void MainWindow::saveDialog() {
 		if (qfilename != "") {
 			bioSettings.setValue(DEFAULT_DIR_KEY, QVariant(qfilename));
 			filepath = qfilename.toStdString();
-			save();
+			return save();
 		}
 	} catch (exception e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
+	return false;
 }
 
-void MainWindow::save() {
-	try {
-		OutputStream output(filepath);
-		output.write(ui.scriptTextEdit->toPlainText().toStdString());
-		output.closeStream();
+bool MainWindow::save() {
+	if (filepath == "") {
+		return saveDialog();
+	} else {
+		try {
+			OutputStream output(filepath);
+			output.write(ui.scriptTextEdit->toPlainText().toStdString());
+			output.closeStream();
 
-		if (fileModified) {
-			fileModified = false;
-			updateTitle();
+			if (fileModified) {
+				fileModified = false;
+				updateTitle();
+			}
+		} catch (exception e) {
+			showDialog(Util::getExceptionDetail(e));
+			return false;
 		}
-	} catch (exception e) {
-		showDialog(Util::getExceptionDetail(e));
 	}
+	return true;
 }
 
-void MainWindow::askSaveChanges() {
+bool MainWindow::askSaveChanges() {
+	QMessageBox::StandardButton response;
 	if (fileModified) {
-		if (QMessageBox::question(this, "File modified", "Save changes?", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
-			save();
+		response = QMessageBox::question(this, "File modified", "Save changes?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+		if (response == QMessageBox::Yes) {
+			return save();
+		}
+		if (response == QMessageBox::Cancel) {
+			return false;
 		}
 	}
+	return true;
 }
 
 void MainWindow::textChanged() {
@@ -372,6 +392,9 @@ void MainWindow::showAboutQt() {
 void MainWindow::closeEvent(QCloseEvent* event) {
 	// when main window is closed: ensure to close everything
 	scriptProcessing.doAbort();
-	askSaveChanges();
-	QApplication::quit();
+	if (askSaveChanges()) {
+		QApplication::quit();
+	} else {
+		event->setAccepted(false);
+	}
 }
