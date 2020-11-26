@@ -97,7 +97,7 @@ OpenVideo("ants_in_concrete.mov")
 ```
 
 ### 5.	Detection
-Cluster detection is performed on binary images. This operation will generate a Tracker. When this operation is used without parameters, these are automatically defined using a basic statistical algorithm. The resulting parameters can be shown using `ShowTrackInfo()`.
+Cluster detection is performed on binary images. This operation will generate a Tracker. Multiple Trackers can be defined and used, by using the Tracker=... operation argument. When this operation is used without parameters, the default Tracker is used and parameters are automatically defined using a basic statistical algorithm. The resulting parameters can be shown using `ShowTrackInfo()`.
 ```javascript
 OpenVideo("ants_in_concrete.mov")
 {
@@ -166,9 +166,46 @@ OpenVideo("ants_in_concrete.mov")
 ```
 
 ### 7.	Visualisation
+As visualisation is an important element of providing insight, many options are available for this. This simple example shows the original image is used to draw tracks on.
+```javascript
+OpenVideo("ants_in_concrete.mov")
+{
+  StoreImage(original)
+  Grayscale()
+  5:background = UpdateBackground(weight=0.05)
+  DifferenceAbs(background)
+  Threshold(0.1)
+  
+  CreateClusters(MinArea=80, MaxArea=1000)
+  CreateTracks(maxMove=20, minActive=3, maxInactive=3)
+  
+  GetImage(original)
+  DrawTracks(DrawMode=Tracks|Angle|Label)
+  ShowImage()
+}
+```
+
 ### 8.	Output
+Like for sourcing images, many options are available for storing output as well. SaveVideo by default stores in h264 video encoding format. Note that the output operation is placed inside the source loop (OpenVideo). In this case, each image will be added as a new frame to the output video file.
+```javascript
+OpenVideo("ants_in_concrete.mov")
+{
+  StoreImage(original)
+  Grayscale()
+  5:background = UpdateBackground(weight=0.05)
+  DifferenceAbs(background)
+  Threshold(0.1)
+	
+  CreateClusters(MinArea=80, MaxArea=1000)
+  CreateTracks(maxMove=20, minActive=3, maxInactive=3)
+  
+  GetImage(original)
+  DrawTracks(DrawMode=Tracks|Angle|Label)
+  ShowImage()
 
-
+  SaveVideo("tracking.mp4")
+}
+```
 
 ## Links
 
