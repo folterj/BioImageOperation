@@ -48,7 +48,7 @@ bool ImageSeries::getMedian(OutputArray dest, Observer* observer) {
 	int m;
 	unsigned char median;
 	int n = (int)images.size();
-	std::vector<unsigned char> pixelBuffer(n);
+	vector<unsigned char> pixelBuffer(n);
 
 	if (n == 0) {
 		return false;
@@ -72,7 +72,7 @@ bool ImageSeries::getMedian(OutputArray dest, Observer* observer) {
 				inData = images[i].data;
 				pixelBuffer[i] = inData[pixeli]; // * slow
 			}
-			std::sort(pixelBuffer.begin(), pixelBuffer.end()); // * very slow
+			sort(pixelBuffer.begin(), pixelBuffer.end()); // * very slow
 			m = n / 2;
 			if (n % 2 != 0) {
 				// odd number: single middle element

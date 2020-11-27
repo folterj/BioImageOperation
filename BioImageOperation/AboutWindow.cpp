@@ -10,6 +10,7 @@
 #include "AboutWindow.h"
 #include <QDialogButtonBox>
 #include <string>
+#include <opencv2/opencv.hpp>
 #include "Util.h"
 #include "config.h"
 
@@ -17,9 +18,10 @@ using namespace std;
 
 
 AboutWindow::AboutWindow(QWidget *parent)
-	: QDialog(parent) {
+	: QDialog(parent) {	
 	string html = string(PROJECT_NAME) + "<br><br>"
 				+ "Version " + string(PROJECT_VER) + "<br><br>"
+				+ "(OpenCV Version " + cv::getVersionString() + ")<br><br>"
 				+ string(PROJECT_DESC) + "<br><br>"
 				+ "<a href=" + string(PROJECT_URL) + ">" + string(PROJECT_URL) + "</a>";
 	ui.setupUi(this);

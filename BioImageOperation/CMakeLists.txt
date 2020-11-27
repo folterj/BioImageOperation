@@ -29,6 +29,7 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "C:/Qt/5.15.0/msvc2019_64/lib/cmake" "C:/opencv/build/x64/vc15/lib")
+set(OpenCV_BIN "C:/opencv/build/x64/vc15/bin")
 
 find_package(Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
@@ -62,6 +63,45 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Gui)
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Network)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenCV_LIBS})
+
+
+
+get_target_property(_qmake_executable Qt5::qmake IMPORTED_LOCATION)
+get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
+
+find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
+if(WIN32 AND NOT WINDEPLOYQT_EXECUTABLE)
+    message(FATAL_ERROR "windeployqt not found")
+endif()
+
+find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${_qt_bin_dir}")
+if(APPLE AND NOT MACDEPLOYQT_EXECUTABLE)
+    message(FATAL_ERROR "macdeployqt not found")
+endif()
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E
+        env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}"
+            "$<TARGET_FILE:${PROJECT_NAME}>"
+    COMMENT "Running windeployqt..."
+)
+
+if(APPLE)
+    add_custom_command(TARGET ${target} POST_BUILD
+        COMMAND "${MACDEPLOYQT_EXECUTABLE}"
+            \"$<TARGET_FILE_DIR:${target}>/../..\"
+            -always-overwrite
+        COMMENT "Running windeployqt..."
+    )
+endif()
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_world440.dll" ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_world440d.dll" ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_videoio_ffmpeg440_64.dll" ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Copying OpenCV dlls..."
+)
+
 
 
 set(CPACK_GENERATOR WIX)
