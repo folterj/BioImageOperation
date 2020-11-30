@@ -41,7 +41,14 @@ string Util::getValueList(vector<string> list) {
 	return s;
 }
 
-vector<string> Util::split(const string& s, const string& delim, bool removeEmptyEntries) {
+bool Util::startsWith(string src, string start) {
+	if (src.length() >= start.length()) {
+		return (src.substr(0, start.length()) == start);
+	}
+	return false;
+}
+
+vector<string> Util::split(const string s, const string delim, bool removeEmptyEntries) {
 	vector<string> parts;
 	int i = 0;
 	int i0 = 0;
@@ -56,7 +63,7 @@ vector<string> Util::split(const string& s, const string& delim, bool removeEmpt
 	return parts;
 }
 
-vector<string> Util::split(const string& s, const vector<string>& delims, bool removeEmptyEntries) {
+vector<string> Util::split(const string s, const vector<string> delims, bool removeEmptyEntries) {
 	vector<string> parts;
 	int i = 0;
 	int i0 = 0;
@@ -76,7 +83,7 @@ vector<string> Util::split(const string& s, const vector<string>& delims, bool r
 	return parts;
 }
 
-string Util::toLower(string& s0) {
+string Util::toLower(string s0) {
 	string s;
 	for (char c : s0) {
 		s += tolower(c);
@@ -84,7 +91,7 @@ string Util::toLower(string& s0) {
 	return s;
 }
 
-string Util::toUpper(string& s0) {
+string Util::toUpper(string s0) {
 	string s;
 	for (char c : s0) {
 		s += toupper(c);
@@ -92,7 +99,7 @@ string Util::toUpper(string& s0) {
 	return s;
 }
 
-string Util::removeQuotes(string& s0) {
+string Util::removeQuotes(string s0) {
 	string s;
 	for (char c : s0) {
 		if (c != '\"' && c != '\'') {
@@ -102,7 +109,7 @@ string Util::removeQuotes(string& s0) {
 	return s;
 }
 
-string Util::ltrim(string& s0) {
+string Util::ltrim(string s0) {
 	string s = s0;
 	while (s != "" && isspace(s.front())) {
 		s = s.substr(1);
@@ -110,7 +117,7 @@ string Util::ltrim(string& s0) {
 	return s;
 }
 
-string Util::rtrim(string& s0) {
+string Util::rtrim(string s0) {
 	string s = s0;
 	while (s != "" && isspace(s.back())) {
 		s = s.substr(0, s.size() - 1);
@@ -118,7 +125,7 @@ string Util::rtrim(string& s0) {
 	return s;
 }
 
-string Util::trim(string& s0) {
+string Util::trim(string s0) {
 	string s = s0;
 	s = ltrim(s);
 	s = rtrim(s);

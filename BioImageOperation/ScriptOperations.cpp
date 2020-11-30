@@ -39,14 +39,14 @@ void ScriptOperations::extract(string script, int linei0) {
 
 	for (int linei = linei0; linei < lines.size(); linei++) {
 		line = Util::trim(lines[linei]);
-		if (line._Starts_with("{")) {
+		if (Util::startsWith(line, "{")) {
 			// adds inner instructions for last operation
 			if (operation) {
 				operation->innerOperations = new ScriptOperations();
 				operation->innerOperations->extract(script, linei + 1);
 				skipping = true;
 			}
-		} else if (line._Starts_with("}")) {
+		} else if (Util::startsWith(line, "}")) {
 			if (skipping) {
 				if (operation) {
 					operation->lineEnd = linei;
@@ -55,7 +55,7 @@ void ScriptOperations::extract(string script, int linei0) {
 			} else {
 				return;
 			}
-		} else if (!skipping && line != "" && !line._Starts_with("//") && !line._Starts_with("#")) {
+		} else if (!skipping && line != "" && !Util::startsWith(line, "//") && !Util::startsWith(line, "#")) {
 			try {
 				operation = new ScriptOperation();
 				operation->extract(line);

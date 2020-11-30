@@ -84,7 +84,7 @@ bool NumericPath::setOutputPath(string basepath, string templatePath, string def
 		extension = templatePath.substr(extPos);
 		numpos = extPos - 1;
 	} else {
-		if (!defaultExtension._Starts_with(".")) {
+		if (!Util::startsWith(defaultExtension, ".")) {
 			defaultExtension = "." + defaultExtension;
 		}
 		extension = defaultExtension;

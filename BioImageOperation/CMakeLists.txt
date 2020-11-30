@@ -1,7 +1,7 @@
 # CMakeList.txt : CMake project for CMakeProjectTest, include source and define
 # project specific logic here.
 #
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.10)
 
 string (TIMESTAMP NOW "%Y-%m-%d")
 
@@ -17,6 +17,7 @@ configure_file (
     "${PROJECT_SOURCE_DIR}/BioImageOperation.rc"
 )
 
+#set(CMAKE_CXX_FLAGS "-std=c++17")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 

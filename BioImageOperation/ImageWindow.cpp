@@ -94,7 +94,7 @@ void ImageWindow::saveImage() {
 			extPos = filename.rfind(".");
 			if (extPos < 0) {
 				extension = Constants::defaultImageExtension;
-				if (!extension._Starts_with(".")) {
+				if (!Util::startsWith(extension, ".")) {
 					extension = "." + extension;
 				}
 				filename += extension;

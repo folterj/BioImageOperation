@@ -16,6 +16,7 @@
 #include "config.h"
 #include "ScriptProcessing.h"
 #include "MainWindow.h"
+#include "Util.h"
 
 Q_DECLARE_METATYPE(string)
 
@@ -23,7 +24,7 @@ Q_DECLARE_METATYPE(string)
 int main(int argc, char *argv[]) {
 	bool hasGui = (argc <= 1);
 	bool showUsage = false;
-	string arg, arg2;
+	string arg, arg2, min_arg;
 
 	try {
 		qRegisterMetaType<string>("string");
@@ -39,8 +40,9 @@ int main(int argc, char *argv[]) {
 		} else {
 			arg = argv[1];
 			cout << PROJECT_NAME << " version " << PROJECT_VER << " / " << PROJECT_DESC << "\n" << PROJECT_URL << "\n" << endl;
-			if (arg._Starts_with("-")) {
-				if (arg == "-help" || arg == "--help") {
+			if (Util::startsWith(arg, "-")) {
+				min_arg = Util::replace(Util::replace(arg, "--", "-"), "-", "");
+				if (min_arg == "help") {
 					if (argc > 2) {
 						arg2 = argv[2];
 						if (arg2 == "list") {
@@ -53,7 +55,7 @@ int main(int argc, char *argv[]) {
 					} else {
 						showUsage = true;
 					}
-				} else {
+				} else if (min_arg != "version") {
 					cout << "Invalid switch: " << arg << endl;
 					showUsage = true;
 				}
