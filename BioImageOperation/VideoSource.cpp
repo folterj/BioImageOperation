@@ -181,6 +181,10 @@ bool VideoSource::getNextImage(Mat* image) {
 		do {
 			frameOk = nextFrame();
 			if (!frameOk) {
+				if (framei < videoNframes - 1) {
+					string msg = "Unexpected end of source at #" + to_string(framei) + " instead of expected #" + to_string(videoNframes);
+					cout << msg << endl;
+				}
 				break;
 			}
 			framei++;

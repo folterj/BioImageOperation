@@ -144,11 +144,8 @@ bool MainWindow::save() {
 			OutputStream output(filepath);
 			output.write(ui.scriptTextEdit->toPlainText().toStdString());
 			output.closeStream();
-
-			if (fileModified) {
-				fileModified = false;
-				updateTitle();
-			}
+			fileModified = false;
+			updateTitle();
 		} catch (exception e) {
 			showDialog(Util::getExceptionDetail(e));
 			return false;

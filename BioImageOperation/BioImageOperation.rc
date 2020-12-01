@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "https://joostdefolter.info"
             VALUE "FileVersion", "1.6.440.5"
             VALUE "InternalName", "BioImageOperation"
-            VALUE "LegalCopyright", "2020-11-30"
+            VALUE "LegalCopyright", "2020-12-01"
             VALUE "OriginalFilename", "BioImageOperation"
             VALUE "ProductName", "BioImageOperation"
             VALUE "ProductVersion", "1.6.440.5"
