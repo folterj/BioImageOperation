@@ -20,7 +20,7 @@ The project can either be opened as a Visual Studio project opening the solution
 - OpenCV 4.4.0 ([opencv.org](https://opencv.org))
 - Openh264 1.8.0 library ([github.com/cisco/openh264](https://github.com/cisco/openh264))
 
-# Windows project setup / installation
+### Windows project setup / installation
 - OpenCV
 - Qt 5 (with MSVC option)
 - Wix 3
