@@ -1,5 +1,33 @@
 # BioImageOperation
 
+## Introduction
+
+BIO is a next generation image processing tool focusing on biological applications, balancing ease of use with desired flexibility required for research. This tool has been developed in collaboration with biologists, using extensive captured images. The solution balancing both the need for research purposes and flexibility required for this, and desired ease of use is realised in a script-based user interface. The tool uses the widely used OpenCV for many of its image operations, with an efficient tracking algorithm allowing real time processing.
+
+![BIO screenshot](bio.png)
+
+## Quick start
+
+BIO is operated using a scripting interface. Script files can be loaded and saved in the user interface.
+BIO can also be executed from the command line like: BioImageOperation /path/to/script.bioscript
+See Help & Links below for links to example scripts.
+
+The starting operations for source images are:
+- CreateImage	-   Create a blank image
+- OpenImage	-   Open a single or series of images (any ffmpeg format)
+- OpenVideo	-   Open a single or series of video files (any ffmpeg video format)
+- OpenCapture	-   Open capturing from video (IP) path or camera source (#)
+Series of images or videos should be labelled with a numeric format, wild-card pattern can be used (i.e. OpenImage(“image*.tif”) will read for example image0000.tif, image0001.tif, etc.)
+
+General rules:
+- Operations have an optional assignment e.g.: a = Grayscale()
+- Any operation is on the current image, unless a source image label is used
+- Any operation will replace the current image, unless an assignment is used
+- A line can only support one operation (with an optional assignment)
+- Use // for comments
+- Preceding an operation with a number (x:Operation()) will only execute the operation once every x images
+- Preceding an operation with 2 numbers (x-y:Operation()) will only execute the operation once every x images, on offset y
+
 ## Scripting step by step guide
 
 ### 1.	Sourcing
@@ -188,3 +216,14 @@ OpenVideo("ants_in_concrete.mov")
   SaveVideo("tracking.mp4")
 }
 ```
+
+## Links
+
+- Script help in BioImageOperationScript document or command line: BioImageOperation -help
+- [Script Manual](BioImageOperation%20script.md)
+- Source code and script examples: github.com/folterj/BioImageOperation
+- Binaries and version history: [joostdefolter.info](http://joostdefolter.info/ant-research)
+- Discussion & Support at the community forum at [Image.sc forum](https://forum.image.sc) using the tag BioImageOperation
+- Qt: ([qt.io](https://www.qt.io))
+- OpenCV: ([opencv.org](https://opencv.org))
+- Openh264: ([github.com/cisco/openh264](https://github.com/cisco/openh264))
