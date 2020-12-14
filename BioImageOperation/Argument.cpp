@@ -102,8 +102,10 @@ bool Argument::parseType(ArgumentType argumentType) {
 		break;
 
 	case ArgumentType::Bool:
-		// no value is valid (interpreted as true)
-		if (value != "") {
+		if (value == allArgument) {
+			// no value is valid (interpreted as true)
+			ok = true;
+		} else {
 			ok = Util::isBoolean(value);
 		}
 		break;

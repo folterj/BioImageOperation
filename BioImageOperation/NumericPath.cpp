@@ -124,7 +124,7 @@ string NumericPath::currentFilePath() {
 
 string NumericPath::createFilePath(int i) {
 	string path = "";
-	string format, nums;
+	string format;
 
 	if (input) {
 		if (i < totaln) {
@@ -135,7 +135,7 @@ string NumericPath::createFilePath(int i) {
 		int num = offset + i;
 		if (numlen > 0) {
 			format = "%0" + to_string(numlen) + "d";
-			nums = Util::format(format, num);
+			path += Util::format(format, num);
 		}
 		path += extension;
 	}

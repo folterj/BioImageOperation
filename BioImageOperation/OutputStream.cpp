@@ -33,7 +33,10 @@ void OutputStream::reset() {
 void OutputStream::init(string filename, string header) {
 	bool fileExists;
 
-	this->filename = filename;
+	if (filename != this->filename) {
+		closeStream();
+		this->filename = filename;
+	}
 
 	if (!is_open()) {
 		fileExists = filesystem::exists(filename);

@@ -111,6 +111,9 @@ void Cluster::draw(Mat* image, int drawMode) {
 	Scalar color = Util::getLabelColor(getLabel());
 	Scalar labelColor = Scalar(0x80, 0x80, 0x80);
 
+	if ((drawMode & (int)ClusterDrawMode::Fill) != 0) {
+		drawFill(image, color);
+	}
 	if ((drawMode & (int)ClusterDrawMode::Point) != 0) {
 		drawPoint(image, color);
 	}
@@ -128,9 +131,6 @@ void Cluster::draw(Mat* image, int drawMode) {
 	}
 	if ((drawMode & (int)ClusterDrawMode::Labeln) != 0) {
 		drawLabel(image, labelColor, true);
-	}
-	if ((drawMode & (int)ClusterDrawMode::Fill) != 0) {
-		drawFill(image, color);
 	}
 }
 
