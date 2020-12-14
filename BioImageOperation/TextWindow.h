@@ -25,7 +25,7 @@ private:
 public:
 	TextWindow(QWidget *parent = Q_NULLPTR);
 	~TextWindow();
-	void init(Observer* observer, int title);
+	void init(Observer* observer, int title = 0);
 	void updateTitle();
 	void showText(string text, string reference = "");
 };

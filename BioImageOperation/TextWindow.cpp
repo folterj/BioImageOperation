@@ -26,7 +26,12 @@ void TextWindow::init(Observer* observer, int title) {
 }
 
 void TextWindow::updateTitle() {
-	string s = Util::format("BIO info %d", title);
+	string s;
+	if (title > 0) {
+		s = Util::format("BIO info %d", title);
+	} else {
+		s = "BIO";
+	}
 	if (reference != "") {
 		s += " (" + reference + ")";
 	}

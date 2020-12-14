@@ -261,7 +261,6 @@ double ScriptOperation::getArgumentNumeric(ArgumentLabel label, bool oneBase) {
 			x -= 1;
 		}
 	}
-
 	return x;
 }
 
@@ -938,37 +937,18 @@ string ScriptOperation::getArgumentTypeDescription(ArgumentType type) {
 	return s;
 }
 
-string ScriptOperation::getArgumentFullDescription(bool rtfFormat, ArgumentLabel argument) {
+string ScriptOperation::getArgumentFullDescription(ArgumentLabel argument) {
 	string s, typeDesc;
-	if (rtfFormat) {
-		s += " \\bullet  ";
-	} else {
-		s += "\t";
-	}
-	s += ArgumentLabels[(int)argument];
-	if (rtfFormat) {
-		s += ":\\tab ";
-	} else {
-		s += ":\t ";
-	}
-	s += getArgumentDescription(argument);
+	s += " - " + ArgumentLabels[(int)argument] + ":\t " + getArgumentDescription(argument);
 	typeDesc = getArgumentTypeDescription(getExpectedArgumentType(argument));
 	if (typeDesc != "") {
-		if (rtfFormat) {
-			s += " {\\cf2 (" + typeDesc + ")}";
-		} else {
-			s += " (" + typeDesc + ")";
-		}
+		s += " (" + typeDesc + ")";
 	}
-	if (rtfFormat) {
-		s += "\\line\n";
-	} else {
-		s += "\n";
-	}
+	s += "\n";
 	return s;
 }
 
-string ScriptOperation::getOperationDescription(bool rtfFormat, string operation) {
+string ScriptOperation::getOperationDescription(bool richFormat, string operation) {
 	string s, desc;
 	OperationInfo info;
 	vector<ArgumentLabel> requiredArguments;
@@ -982,17 +962,22 @@ string ScriptOperation::getOperationDescription(bool rtfFormat, string operation
 		optionalArguments = info.optionalArguments;
 		desc = info.description;
 
-		if (rtfFormat) {
-			s += Util::format("\\b %s\\b0  (", operation.c_str());
+		if (richFormat) {
+			s += "**" + operation + "**";
 		} else {
-			s += operation + " (";
+			s += operation;
 		}
+		s += " (";
 
 		for (ArgumentLabel arg : requiredArguments) {
 			if (!firstArg) {
 				s += ", ";
 			}
-			s += ArgumentLabels[(int)arg];
+			if (richFormat) {
+				s += "**" + ArgumentLabels[(int)arg] + "**";
+			} else {
+				s += ArgumentLabels[(int)arg] + "*";
+			}
 			firstArg = false;
 		}
 
@@ -1000,77 +985,63 @@ string ScriptOperation::getOperationDescription(bool rtfFormat, string operation
 			if (!firstArg) {
 				s += ", ";
 			}
-			if (rtfFormat) {
-				s += "{\\cf2 ";
-			} else {
-				s += "(";
-			}
 			s += ArgumentLabels[(int)arg];
-			if (rtfFormat) {
-				s += "}";
-			} else {
-				s += ")";
-			}
 			firstArg = false;
 		}
-
-		if (rtfFormat) {
-			s += ")\\line\n\\line\n";
-			s += "{\\cf3 " + desc + "}\\line\n\\line\n";
-		} else {
-			s += ")\n" + desc + "\n";
+		
+		s += ")\n";
+		if (richFormat) {
+			s += "\n";
+		}
+		s += desc + "\n";
+		if (richFormat) {
+			s += "\n";
 		}
 
 		for (ArgumentLabel arg : requiredArguments) {
-			s += getArgumentFullDescription(rtfFormat, arg);
+			s += getArgumentFullDescription(arg);
 		}
 		for (ArgumentLabel arg : optionalArguments) {
-			s += getArgumentFullDescription(rtfFormat, arg);
+			s += getArgumentFullDescription(arg);
+		}
+		if (richFormat) {
+			s += "\n";
 		}
 	}
 	return s;
 }
 
-string ScriptOperation::getOperationList(bool rtfFormat, string operation) {
+string ScriptOperation::getOperationList(bool richFormat, string operation) {
 	string s, desc;
 	OperationInfo info;
 	vector<ArgumentLabel> requiredArguments;
 	vector<ArgumentLabel> optionalArguments;
 
-	// RTF tutorial: http://www.pindari.com/rtf1.html
-
-	if (rtfFormat) {
-		s = "{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Consolas;}}\n{\\colortbl;\\red0\\green0\\blue0;\\red127\\green127\\blue127;\\red0\\green0\\blue255;}";
-		s += "\\margl720\\margr720\\margt720\\margb720 \\fs20\n";	// 0.5 inch margins; font size 10
-		s += "{\\fs32 \\b Bio Image Operation script operations (v" + string(PROJECT_VER) + " / " + string(PROJECT_DESC) + ")\\b0}\\line\n\\line\n";
+	if (richFormat) {
+		s = "# Bio Image Operation script operations (v" + string(PROJECT_VER) + " / " + string(PROJECT_DESC) + ")\n\n";
 	}
 
 	if (operation != "") {
 		if (Util::contains(ScriptOperationTypes, operation)) {
-			s += getOperationDescription(rtfFormat, operation);
+			s += getOperationDescription(richFormat, operation);
 		} else {
 			return "Unkown operation: " + operation;
 		}
 	} else {
 		for (string operation : ScriptOperationTypes) {
-			s += getOperationDescription(rtfFormat, operation);
-			if (rtfFormat) {
-				s += "\\line\n\\line\n";
-			} else {
-				s += "\n";
-			}
+			s += getOperationDescription(richFormat, operation);
+			s += "\n";
 		}
 	}
-	if (rtfFormat) {
-		s += "\\line\n";
-		s += "\\b Arguments:\\b0 \\tab Required \\tab {\\cf2 Optional}\\line\n";
-		s += "}";
+	s += "\n";
+	if (richFormat) {
+		s += "**Arguments:** **Required** Optional";
 	} else {
-		s += "\n";
-		s += "Arguments: Required (Optional)\n";
+		s += "Arguments:  Required*  Optional";
 	}
+	s += "\n";
 
-	s = Util::replace(s, "\n", "\r\n");
+	//s = Util::replace(s, "\n", "\r\n");
 	
 	return s;
 }
@@ -1083,13 +1054,6 @@ string ScriptOperation::getOperationListSimple() {
 		}
 	}
 	return s;
-}
-
-void ScriptOperation::writeOperationList(string filename) {
-	string s = getOperationList(true);
-	OutputStream outputStream(filename);
-	outputStream.write(s);
-	outputStream.closeStream();
 }
 
 bool ScriptOperation::initFrameSource(FrameType frameType, int apiCode, string basepath, string templatePath, string start, string length, double fps0, int interval) {

@@ -35,6 +35,7 @@ private:
 	Ui::MainWindow ui;
 	ImageWindow imageWindows[4];
 	TextWindow textWindows[4];
+	TextWindow scriptHelpWindow;
 	AboutWindow aboutWindow;
 	ScriptProcessing scriptProcessing;
 	QTimer* timer;
@@ -75,7 +76,8 @@ public slots:
 
 protected:
 	void checkUpdates();
-	void generateHelpDoc();
+	void showScriptHelp();
+	void saveScriptHelp();
 	void showAbout();
 	void showAboutQt();
 	void closeEvent(QCloseEvent* event);

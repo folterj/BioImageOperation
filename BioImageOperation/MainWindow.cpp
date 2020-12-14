@@ -34,8 +34,8 @@ MainWindow::MainWindow(QWidget* parent)
 
 	ui.actionOpen->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
 	ui.actionSave->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
-	ui.actionSave_As->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
-	ui.actionCheck_for_Updates->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
+	ui.actionSaveAs->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
+	ui.actionCheckForUpdates->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
 	ui.actionHelp->setIcon(style()->standardIcon(QStyle::SP_DialogHelpButton));
 	ui.actionAbout->setIcon(style()->standardIcon(QStyle::SP_MessageBoxQuestion));
 
@@ -45,12 +45,13 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(ui.actionClear, &QAction::triggered, this, &MainWindow::clearInput);
 	connect(ui.actionOpen, &QAction::triggered, this, &MainWindow::openDialog);
 	connect(ui.actionSave, &QAction::triggered, this, &MainWindow::save);
-	connect(ui.actionSave_As, &QAction::triggered, this, &MainWindow::saveDialog);
+	connect(ui.actionSaveAs, &QAction::triggered, this, &MainWindow::saveDialog);
 	connect(ui.actionExit, &QAction::triggered, this, &QWidget::close);
-	connect(ui.actionCheck_for_Updates, &QAction::triggered, this, &MainWindow::checkUpdates);
-	connect(ui.actionGenerate_help_doc, &QAction::triggered, this, &MainWindow::generateHelpDoc);
+	connect(ui.actionScriptHelp, &QAction::triggered, this, &MainWindow::showScriptHelp);
+	connect(ui.actionSaveScriptHelp, &QAction::triggered, this, &MainWindow::saveScriptHelp);
 	connect(ui.actionAbout, &QAction::triggered, this, &MainWindow::showAbout);
-	connect(ui.actionAbout_Qt, &QAction::triggered, this, &MainWindow::showAboutQt);
+	connect(ui.actionCheckForUpdates, &QAction::triggered, this, &MainWindow::checkUpdates);
+	connect(ui.actionAboutQt, &QAction::triggered, this, &MainWindow::showAboutQt);
 
 	connect(ui.scriptTextEdit, &QPlainTextEdit::textChanged, this, &MainWindow::textChanged);
 
@@ -64,6 +65,8 @@ MainWindow::MainWindow(QWidget* parent)
 	for (int i = 0; i < Constants::nDisplays; i++) {
 		textWindows[i].init(this, i + 1);
 	}
+
+	scriptHelpWindow.init(this);
 
 	scriptProcessing.registerObserver(this);
 
@@ -365,13 +368,18 @@ void MainWindow::checkUpdates() {
 	} catch (...) { }
 }
 
-void MainWindow::generateHelpDoc() {
-	QString qfilename;
+void MainWindow::showScriptHelp() {
+	scriptHelpWindow.showText(ScriptOperation::getOperationList(false));
+}
 
+void MainWindow::saveScriptHelp() {
+	QString qfilename;
 	try {
-		qfilename = QFileDialog::getSaveFileName(this, tr("Save script"), QString(), Util::convertToQString(Constants::helpDocDialogFilter));
+		qfilename = QFileDialog::getSaveFileName(this, tr("Save script help"), QString(), Util::convertToQString(Constants::scriptHelpDialogFilter));
 		if (qfilename != "") {
-			ScriptOperation::writeOperationList(qfilename.toStdString());
+			OutputStream outputStream(qfilename.toStdString());
+			outputStream.write(ScriptOperation::getOperationList(true));
+			outputStream.closeStream();
 		}
 	} catch (std::exception e) {
 		showDialog(Util::getExceptionDetail(e));

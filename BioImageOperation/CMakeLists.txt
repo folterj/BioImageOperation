@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10)
 
 string (TIMESTAMP NOW "%Y-%m-%d")
 
-project (BioImageOperation VERSION "1.6.440.5" DESCRIPTION ${NOW} HOMEPAGE_URL "https://joostdefolter.info")
+project (BioImageOperation VERSION "1.6.440.6" DESCRIPTION ${NOW} HOMEPAGE_URL "https://joostdefolter.info")
 
 configure_file (
     "${PROJECT_SOURCE_DIR}/config.h.in"
@@ -29,7 +29,7 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "C:/Qt/5.15.0/msvc2019_64/lib/cmake" "C:/opencv/build/x64/vc15/lib")
+list(APPEND CMAKE_PREFIX_PATH "C:/Qt/5.15.2/msvc2019_64/lib/cmake" "C:/opencv/build/x64/vc15/lib")
 set(OpenCV_BIN "C:/opencv/build/x64/vc15/bin")
 
 find_package(Qt5 COMPONENTS Core REQUIRED)

@@ -299,7 +299,7 @@ public:
 	static const string webPage;
 	static const string webFilesUrl;
 	static const string scriptFileDialogFilter;
-	static const string helpDocDialogFilter;
+	static const string scriptHelpDialogFilter;
 	static const int defaultScriptFileDialogFilter;
 	static const string defaultDataExtension;
 	static const string defaultImageExtension;
