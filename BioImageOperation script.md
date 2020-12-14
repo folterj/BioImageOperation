@@ -1,4 +1,4 @@
-# Bio Image Operation script operations (v1.6.440.5 / 2020-12-01)
+# Bio Image Operation script operations (v1.6.440.6 / 2020-12-14)
 
 
 **SetPath** (**Path**)
