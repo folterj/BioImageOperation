@@ -219,7 +219,7 @@ OpenVideo("ants_in_concrete.mov")
 
 ## Links
 
-- Script help in BioImageOperationScript document or command line: BioImageOperation -help
+- Command line script/help: BioImageOperation -help
 - [Script Manual](BioImageOperation%20script.md)
 - Source code and script examples: github.com/folterj/BioImageOperation
 - Binaries and version history: [joostdefolter.info](http://joostdefolter.info/ant-research)
