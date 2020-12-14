@@ -51,31 +51,31 @@
 			</Component>
       
       <Component Id="Qt5CoreComp" Win64="yes">
-        <File Id="Qt5Core" Name="Qt5Core.dll" Source="C:\Qt\5.15.0\msvc2019_64\bin\Qt5Core.dll" />
+        <File Id="Qt5Core" Name="Qt5Core.dll" Source="C:\Qt\5.15.2\msvc2019_64\bin\Qt5Core.dll" />
       </Component>
       <Component Id="Qt5WidgetsComp" Win64="yes">
-        <File Id="Qt5Widgets" Name="Qt5Widgets.dll" Source="C:\Qt\5.15.0\msvc2019_64\bin\Qt5Widgets.dll" />
+        <File Id="Qt5Widgets" Name="Qt5Widgets.dll" Source="C:\Qt\5.15.2\msvc2019_64\bin\Qt5Widgets.dll" />
       </Component>
       <Component Id="Qt5GuiComp" Win64="yes">
-        <File Id="Qt5Gui" Name="Qt5Gui.dll" Source="C:\Qt\5.15.0\msvc2019_64\bin\Qt5Gui.dll" />
+        <File Id="Qt5Gui" Name="Qt5Gui.dll" Source="C:\Qt\5.15.2\msvc2019_64\bin\Qt5Gui.dll" />
       </Component>
       <Component Id="Qt5NetworkComp" Win64="yes">
-        <File Id="Qt5Network" Name="Qt5Network.dll" Source="C:\Qt\5.15.0\msvc2019_64\bin\Qt5Network.dll" />
+        <File Id="Qt5Network" Name="Qt5Network.dll" Source="C:\Qt\5.15.2\msvc2019_64\bin\Qt5Network.dll" />
       </Component>
       <Component Id="Qt5SvgComp" Win64="yes">
-        <File Id="Qt5Svg" Name="Qt5Svg.dll" Source="C:\Qt\5.15.0\msvc2019_64\bin\Qt5Svg.dll" />
+        <File Id="Qt5Svg" Name="Qt5Svg.dll" Source="C:\Qt\5.15.2\msvc2019_64\bin\Qt5Svg.dll" />
       </Component>
     </ComponentGroup>
       
     <ComponentGroup Id="ProductComponents2" Directory="PlatformsFolder">
       <Component Id="Qt5PlatformComp" Win64="yes">
-        <File Id="Qt5Platform" Name="qwindows.dll" Source="C:\Qt\5.15.0\msvc2019_64\plugins\platforms\qwindows.dll" />
+        <File Id="Qt5Platform" Name="qwindows.dll" Source="C:\Qt\5.15.2\msvc2019_64\plugins\platforms\qwindows.dll" />
       </Component>
     </ComponentGroup>
     
     <ComponentGroup Id="ProductComponents3" Directory="StylesFolder">
       <Component Id="Qt5StylesComp" Win64="yes">
-        <File Id="Qt5Style" Name="qwindowsvistastyle.dll" Source="C:\Qt\5.15.0\msvc2019_64\plugins\styles\qwindowsvistastyle.dll" />
+        <File Id="Qt5Style" Name="qwindowsvistastyle.dll" Source="C:\Qt\5.15.2\msvc2019_64\plugins\styles\qwindowsvistastyle.dll" />
       </Component>
     </ComponentGroup>
 		<Property Id="ARPPRODUCTICON" Value="BioIcon.exe" />
