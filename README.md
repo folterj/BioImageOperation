@@ -31,9 +31,11 @@ The project can either be opened as a Visual Studio project opening the solution
 
 ## Links
 
-[User Manual](BioImageOperation%20manual.pdf)
+[User Manual](BioImageOperation%20manual.md)
 
-[Script Manual](BioImageOperation%20script.pdf)
+[Script Manual](BioImageOperation%20script.md)
+
+[Step-by-step guide](step-by-step-guide.md)
 
 See [joostdefolter.info](http://joostdefolter.info/ant-research) for more info and binaries
 
