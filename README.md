@@ -35,8 +35,6 @@ The project can either be opened as a Visual Studio project opening the solution
 
 [Script Manual](BioImageOperation%20script.md)
 
-[Scripting step-by-step guide](step-by-step-guide.md)
-
 See [joostdefolter.info](http://joostdefolter.info/ant-research) for more info and binaries
 
 For support and discussion, please use the [Image.sc forum](https://forum.image.sc) and post to the forum with the tag 'BioImageOperation'.
