@@ -48,7 +48,7 @@ public:
 	double calcDistance(ClusterTrack* track);
 	double calcAreaDif(ClusterTrack* track);
 	bool isOverlap(ClusterTrack* track);
-	bool inRange(ClusterTrack* track, double distance, double maxMoveDistance);
+	double getRangeFactor(ClusterTrack* track, double distance, double maxMoveDistance);
 
 	int getLabel();
 	int getFirstLabel();

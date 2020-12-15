@@ -62,17 +62,22 @@ bool Cluster::isOverlap(ClusterTrack* track) {
 	return (calcDistance(track) - (2 * rad - track->rad) <= 0);
 }
 
-bool Cluster::inRange(ClusterTrack* track, double distance, double maxMoveDistance) {
-	if (maxMoveDistance <= 0) {
-		return true;
-	}
+double Cluster::getRangeFactor(ClusterTrack* track, double distance, double maxMoveDistance) {
+	double rangeFactor = 1;
 
-	if (track->isMerged) {
-		// allow for greater move distance after being merged
-		return distance - 2 * rad <= 2 * maxMoveDistance;
-	} else {
-		return distance - (2 * rad - track->rad) <= maxMoveDistance;
+	if (maxMoveDistance != 0) {
+		if (track->isMerged) {
+			// allow for greater move distance after being merged
+			distance -= (2 * rad);
+		} else {
+			distance -= (2 * rad - track->rad);
+		}
+		if (distance < 0) {
+			distance = 0;
+		}
+		rangeFactor = 1 - distance / maxMoveDistance;
 	}
+	return rangeFactor;
 }
 
 int Cluster::getLabel() {
@@ -135,13 +140,13 @@ void Cluster::draw(Mat* image, int drawMode) {
 }
 
 void Cluster::drawPoint(Mat* image, Scalar color) {
-	cv::Point point((int)x, (int)y);
+	Point point((int)x, (int)y);
 
 	drawMarker(*image, point, color, MARKER_CROSS, 2, 1, LINE_AA);
 }
 
 void Cluster::drawCircle(Mat* image, Scalar color) {
-	cv::Point point((int)x, (int)y);
+	Point point((int)x, (int)y);
 
 	circle(*image, point, (int)rad, color, 1, LINE_AA);
 }
@@ -158,15 +163,15 @@ void Cluster::drawAngle(Mat* image, Scalar color) {
 	int x1 = (int)(x + rad * cos(angle));
 	int y1 = (int)(y + rad * sin(angle));
 
-	line(*image, cv::Point(x0, y0), cv::Point(x1, y1), color, 1, LINE_AA);
+	line(*image, Point(x0, y0), Point(x1, y1), color, 1, LINE_AA);
 }
 
 void Cluster::drawLabel(Mat* image, Scalar color, bool showCount) {
-	cv::Point point((int)x, (int)y);
+	Point point((int)x, (int)y);
 	string labelx;
 
 	if (showCount) {
-		labelx = to_string(area);
+		labelx = Util::format("%.0f", area);
 		point.y = (int)(y + rad);
 	} else {
 		labelx = getLabels();
@@ -186,8 +191,8 @@ void Cluster::drawFill(Mat* image, Scalar color) {
 }
 
 std::vector<Point> Cluster::getContour() {
-	std::vector<Point> contour;
-	std::vector<std::vector<Point>> contours;
+	vector<Point> contour;
+	vector<vector<Point>> contours;
 	findContours(clusterImage, contours, RetrievalModes::RETR_EXTERNAL, ContourApproximationModes::CHAIN_APPROX_NONE);
 	for (Point point : contours[0]) {
 		contour.push_back(box.tl() + point);

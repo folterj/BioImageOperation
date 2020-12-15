@@ -133,13 +133,13 @@ void ClusterTrack::draw(Mat* image, int drawMode, int ntracks) {
 }
 
 void ClusterTrack::drawPoint(Mat* image, Scalar color) {
-	cv::Point point((int)x, (int)y);
+	Point point((int)x, (int)y);
 
 	drawMarker(*image, point, color, MARKER_CROSS, 2, 1, LINE_AA);
 }
 
 void ClusterTrack::drawCircle(Mat* image, Scalar color) {
-	cv::Point point((int)x, (int)y);
+	Point point((int)x, (int)y);
 
 	circle(*image, point, (int)rad, color, 1, LINE_AA);
 }
@@ -156,15 +156,15 @@ void ClusterTrack::drawAngle(Mat* image, Scalar color) {
 	int x1 = (int)(x + 2 * rad * cos(orientation));
 	int y1 = (int)(y + 2 * rad * sin(orientation));
 
-	arrowedLine(*image, cv::Point(x0, y0), cv::Point(x1, y1), color, 1, LINE_AA);
+	arrowedLine(*image, Point(x0, y0), Point(x1, y1), color, 1, LINE_AA);
 }
 
 void ClusterTrack::drawLabel(Mat* image, Scalar color, bool showCount) {
-	cv::Point point((int)x, (int)y);
+	Point point((int)x, (int)y);
 	string labelx;
 
 	if (showCount) {
-		labelx = to_string(area);
+		labelx = Util::format("%.0f", area);
 		point.y = (int)(y + rad);
 	} else {
 		labelx = to_string(label);
@@ -174,7 +174,7 @@ void ClusterTrack::drawLabel(Mat* image, Scalar color, bool showCount) {
 }
 
 void ClusterTrack::drawTracks(Mat* image, Scalar color, int ntracks) {
-	cv::Point point0, point1;
+	Point point0, point1;
 	bool init = false;
 	int n = 0;
 
@@ -191,7 +191,7 @@ void ClusterTrack::drawTracks(Mat* image, Scalar color, int ntracks) {
 }
 
 string ClusterTrack::getCsv(Cluster* cluster, bool writeContour) {
-	std::vector<std::vector<Point>> contours;
+	vector<vector<Point>> contours;
 	Point absPoint;
 
 	string s = format("%d,%f,%f,%f,%f,%f", label, area, rad, orientation, x, y);

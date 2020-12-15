@@ -242,7 +242,8 @@ bool ImageTracker::findClusters(Mat* image) {
  */
 
 void ImageTracker::matchClusterTracks() {
-	vector<TrackClusterMatch*> trackClusterMatches;
+	vector<TrackClusterMatch*> trackClusterMatches, mergedTrackClusterMatches;
+	vector<ClusterTrack*> mergedClusterTracks;
 	TrackClusterMatch* trackClusterMatch = NULL;
 	ClusterTrack* track;
 	int maxArea = (int)trackingParams.area.getMax();
@@ -259,15 +260,25 @@ void ImageTracker::matchClusterTracks() {
 	trackClusterMatches.reserve(clusterTracks.size());
 	// for each track find nearest cluster
 	for (ClusterTrack* clusterTrack : clusterTracks) {
-		trackClusterMatch = findTrackClusterMatch(clusterTrack, maxMove);
-		if (trackClusterMatch) {
-			trackClusterMatches.push_back(trackClusterMatch);
+		if (clusterTrack->isMerged) {
+			mergedClusterTracks.push_back(clusterTrack);
+		} else {
+			trackClusterMatch = findTrackClusterMatch(clusterTrack, maxMove);
+			if (trackClusterMatch) {
+				trackClusterMatches.push_back(trackClusterMatch);
+			}
 		}
 	}
 
 	// sort surest matches first
 	sort(trackClusterMatches.begin(), trackClusterMatches.end(),
 		[](TrackClusterMatch const* a, TrackClusterMatch const* b) { return a->matchFactor > b->matchFactor; });
+
+	// process the filtered out (previously) merged clusters
+	if (!mergedClusterTracks.empty()) {
+		mergedTrackClusterMatches = matchMergedClusterTracks(mergedClusterTracks);
+		trackClusterMatches.insert(trackClusterMatches.end(), mergedTrackClusterMatches.begin(), mergedTrackClusterMatches.end());
+	}
 
 	// to not over-assign clusters
 	for (Cluster* cluster : clusters) {
@@ -306,25 +317,55 @@ void ImageTracker::matchClusterTracks() {
 	}
 }
 
+vector<TrackClusterMatch*> ImageTracker::matchMergedClusterTracks(vector<ClusterTrack*> clusterTracks) {
+	vector<TrackClusterMatch*> trackClusterMatches;
+	vector<TrackClusterMatch*> bestMatches;
+	TrackClusterMatch* trackClusterMatch;
+	double maxMove = trackingParams.maxMove.getMax();
+	double totalScore;
+	double bestScore = -1;
+
+	sort(clusterTracks.begin(), clusterTracks.end());
+
+	do {
+		trackClusterMatches.clear();
+		totalScore = 0;
+		for (ClusterTrack* clusterTrack : clusterTracks) {
+			trackClusterMatch = findTrackClusterMatch(clusterTrack, maxMove);
+			if (trackClusterMatch) {
+				trackClusterMatches.push_back(trackClusterMatch);
+				trackClusterMatch->assign();
+				totalScore += trackClusterMatch->matchFactor;
+			}
+		}
+		if (totalScore > bestScore) {
+			bestScore = totalScore;
+			bestMatches = trackClusterMatches;
+		}
+		for (Cluster* cluster : clusters) {
+			cluster->unAssign();
+		}
+	} while (next_permutation(clusterTracks.begin(), clusterTracks.end()));
+
+	return bestMatches;
+}
+
 TrackClusterMatch* ImageTracker::findTrackClusterMatch(ClusterTrack* track, double maxMoveDistance) {
 	TrackClusterMatch* trackClusterMatch = new TrackClusterMatch(track);
 	Cluster* bestCluster = NULL;
 	double matchFactor;
-	double distFactor, distance;
+	double rangeFactor, distance;
 	double areaFactor, areaDif;
 	bool found = false;
 
 	for (Cluster* cluster : clusters) {
 		if (cluster->isAssignable(track->area)) {
 			distance = cluster->calcDistance(track);
-			if (cluster->inRange(track, distance, maxMoveDistance)) {
-				distFactor = 1 - distance / maxMoveDistance;
-				if (distFactor < 0) {
-					distFactor = 0;
-				}
+			rangeFactor = cluster->getRangeFactor(track, distance, maxMoveDistance);
+			if (rangeFactor > 0) {
 				areaDif = cluster->calcAreaDif(track);
-				areaFactor = 1 - areaDif / cluster->area;
-				matchFactor = distFactor * areaFactor;
+				areaFactor = 1 - pow(areaDif / cluster->area, 2);
+				matchFactor = rangeFactor * areaFactor;
 				if (matchFactor > trackClusterMatch->matchFactor || !found) {
 					// smallest distance
 					trackClusterMatch->cluster = cluster;
@@ -357,7 +398,7 @@ bool ImageTracker::matchTrackCluster(TrackClusterMatch* trackClusterMatch, doubl
 	} else {
 		// alternative best cluster
 		trackClusterMatch2 = findTrackClusterMatch(track, maxMoveDistance);
-		if (trackClusterMatch2 != NULL) {
+		if (trackClusterMatch2) {
 			trackClusterMatch = trackClusterMatch2;
 			found = true;
 		}

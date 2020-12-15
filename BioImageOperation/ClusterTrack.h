@@ -54,7 +54,7 @@ public:
 	
 	PathNode* lastPathNode = NULL;
 
-	std::vector<Point2d> points;
+	vector<Point2d> points;
 
 
 	ClusterTrack(int label);

@@ -153,7 +153,7 @@ void ScriptOperation::parseArguments() {
 
 	for (ArgumentLabel label : requiredArguments) {
 		argument = getNextArgument(label);
-		if (argument != NULL) {
+		if (argument) {
 			if (argument->argumentLabel == ArgumentLabel::None) {
 				argument->argumentLabel = label;
 			}
@@ -165,7 +165,7 @@ void ScriptOperation::parseArguments() {
 
 	for (ArgumentLabel label : optionalArguments) {
 		argument = getNextArgument(label);
-		if (argument != NULL) {
+		if (argument) {
 			if (argument->argumentLabel == ArgumentLabel::None) {
 				argument->argumentLabel = label;
 			}

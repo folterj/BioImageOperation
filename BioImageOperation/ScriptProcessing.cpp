@@ -457,14 +457,16 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		case ScriptOperationType::CreateClusters:
 			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker), true);
 			imageTracker->createClusters(image, operation->getArgumentNumeric(ArgumentLabel::MinArea),
-										operation->getArgumentNumeric(ArgumentLabel::MaxArea), basepath, debugMode);
+										operation->getArgumentNumeric(ArgumentLabel::MaxArea),
+										basepath, debugMode);
 			break;
 
 		case ScriptOperationType::CreateTracks:
 			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->createTracks(operation->getArgumentNumeric(ArgumentLabel::MaxMove),
 										(int)operation->getArgumentNumeric(ArgumentLabel::MinActive),
-										(int)operation->getArgumentNumeric(ArgumentLabel::MaxInactive), basepath);
+										(int)operation->getArgumentNumeric(ArgumentLabel::MaxInactive),
+										basepath);
 			break;
 
 		case ScriptOperationType::CreatePaths:
@@ -475,16 +477,15 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		case ScriptOperationType::DrawClusters:
 			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->drawClusters(getLabelOrCurrentImage(operation, image), newImage,
-										operation->getArgument(ArgumentLabel::DrawMode,
-										(int)ClusterDrawMode::ClusterDefault));
+										operation->getArgument(ArgumentLabel::DrawMode, (int)ClusterDrawMode::ClusterDefault));
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::DrawTracks:
 			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->drawTracks(getLabelOrCurrentImage(operation, image), newImage,
-										operation->getArgument(ArgumentLabel::DrawMode,
-										(int)ClusterDrawMode::TracksDefault), (int)sourceFps);
+										operation->getArgument(ArgumentLabel::DrawMode, (int)ClusterDrawMode::TracksDefault),
+										(int)sourceFps);
 			newImageSet = true;
 			break;
 
@@ -493,7 +494,8 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			logPalette = (Palette)operation->getArgument(ArgumentLabel::Palette, (int)Palette::Grayscale);
 			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->drawPaths(getLabelOrCurrentImage(operation, image), newImage,
-				(PathDrawMode)operation->getArgument(ArgumentLabel::PathDrawMode, (int)PathDrawMode::Age), (float)logPower, logPalette);
+									(PathDrawMode)operation->getArgument(ArgumentLabel::PathDrawMode, (int)PathDrawMode::Age),
+									(float)logPower, logPalette);
 			newImageSet = true;
 			break;
 

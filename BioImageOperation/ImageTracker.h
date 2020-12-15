@@ -114,6 +114,7 @@ public:
 	 */
 	void matchClusterTracks();
 	TrackClusterMatch* findTrackClusterMatch(ClusterTrack* track, double maxMoveDistance);
+	vector<TrackClusterMatch*> matchMergedClusterTracks(vector<ClusterTrack*> clusterTracks);
 	bool matchTrackCluster(TrackClusterMatch* trackClusterMatch, double maxMoveDistance, double& distance);
 	void pruneTracks();
 
