@@ -139,7 +139,7 @@ public:
 	ArgumentLabel argumentLabel = ArgumentLabel::None;
 	string value = "";
 	int valueEnum = -1;
-	bool required = false;
+	bool used = false;
 
 	Argument(string arg);
 	ArgumentLabel getArgumentLabel(string arg);

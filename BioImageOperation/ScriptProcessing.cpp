@@ -294,7 +294,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 										operation->getArgument(ArgumentLabel::Path), Constants::defaultImageExtension,
 										operation->getArgument(ArgumentLabel::Start),
 										operation->getArgument(ArgumentLabel::Length), sourceFps);
-			operation->frameOutput->writeImage(getLabelOrCurrentImage(operation, image, true));
+			operation->frameOutput->writeImage(getLabelOrCurrentImage(operation, image));
 			break;
 
 		case ScriptOperationType::SaveVideo:
@@ -307,11 +307,11 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 										operation->getArgument(ArgumentLabel::Start),
 										operation->getArgument(ArgumentLabel::Length), fps,
 										operation->getArgument(ArgumentLabel::Codec));
-			operation->frameOutput->writeImage(getLabelOrCurrentImage(operation, image, true));
+			operation->frameOutput->writeImage(getLabelOrCurrentImage(operation, image));
 			break;
 
 		case ScriptOperationType::ShowImage:
-			refImage = getLabelOrCurrentImage(operation, image, false);
+			refImage = getLabelOrCurrentImage(operation, image);
 			if (Util::isValidImage(refImage)) {
 				showImage(refImage,
 							(int)operation->getArgumentNumeric(ArgumentLabel::None, true),
@@ -329,14 +329,14 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::Scale:
-			ImageOperations::scale(*getLabelOrCurrentImage(operation, image, false), *newImage,
+			ImageOperations::scale(*getLabelOrCurrentImage(operation, image), *newImage,
 									operation->getArgumentNumeric(ArgumentLabel::Width),
 									operation->getArgumentNumeric(ArgumentLabel::Height));
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::Crop:
-			ImageOperations::crop(getLabelOrCurrentImage(operation, image, false), newImage,
+			ImageOperations::crop(getLabelOrCurrentImage(operation, image), newImage,
 									operation->getArgumentNumeric(ArgumentLabel::Width),
 									operation->getArgumentNumeric(ArgumentLabel::Height),
 									operation->getArgumentNumeric(ArgumentLabel::X),
@@ -350,47 +350,47 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::Grayscale:
-			ImageOperations::convertToGrayScale(*getLabelOrCurrentImage(operation, image, false), *newImage);
+			ImageOperations::convertToGrayScale(*getLabelOrCurrentImage(operation, image), *newImage);
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::Color:
-			ImageOperations::convertToColor(*getLabelOrCurrentImage(operation, image, false), *newImage);
+			ImageOperations::convertToColor(*getLabelOrCurrentImage(operation, image), *newImage);
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::ColorAlpha:
-			ImageOperations::convertToColorAlpha(*getLabelOrCurrentImage(operation, image, false), *newImage);
+			ImageOperations::convertToColorAlpha(*getLabelOrCurrentImage(operation, image), *newImage);
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::GetSaturation:
-			ImageOperations::getSaturation(*getLabelOrCurrentImage(operation, image, false), newImage);
+			ImageOperations::getSaturation(*getLabelOrCurrentImage(operation, image), newImage);
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::GetHsValue:
-			ImageOperations::getHsValue(*getLabelOrCurrentImage(operation, image, false), newImage);
+			ImageOperations::getHsValue(*getLabelOrCurrentImage(operation, image), newImage);
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::GetHsLightness:
-			ImageOperations::getHsLightness(*getLabelOrCurrentImage(operation, image, false), newImage);
+			ImageOperations::getHsLightness(*getLabelOrCurrentImage(operation, image), newImage);
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::Threshold:
-			ImageOperations::threshold(*getLabelOrCurrentImage(operation, image, false), *newImage, operation->getArgumentNumeric());
+			ImageOperations::threshold(*getLabelOrCurrentImage(operation, image), *newImage, operation->getArgumentNumeric());
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::Erode:
-			ImageOperations::erode(*getLabelOrCurrentImage(operation, image, false), *newImage, (int)operation->getArgumentNumeric());
+			ImageOperations::erode(*getLabelOrCurrentImage(operation, image), *newImage, (int)operation->getArgumentNumeric());
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::Dilate:
-			ImageOperations::dilate(*getLabelOrCurrentImage(operation, image, false), *newImage, (int)operation->getArgumentNumeric());
+			ImageOperations::dilate(*getLabelOrCurrentImage(operation, image), *newImage, (int)operation->getArgumentNumeric());
 			newImageSet = true;
 			break;
 
@@ -410,23 +410,23 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::Multiply:
-			ImageOperations::multiply(*getLabelOrCurrentImage(operation, image, false), operation->getArgumentNumeric(), *newImage);
+			ImageOperations::multiply(*getLabelOrCurrentImage(operation, image), operation->getArgumentNumeric(), *newImage);
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::Invert:
-			ImageOperations::invert(*getLabelOrCurrentImage(operation, image, false), *newImage);
+			ImageOperations::invert(*getLabelOrCurrentImage(operation, image), *newImage);
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::UpdateBackground:
-			backgroundBuffer->addImage(getLabelOrCurrentImage(operation, image, true), operation->getArgumentNumeric());
+			backgroundBuffer->addImage(getLabelOrCurrentImage(operation, image), operation->getArgumentNumeric());
 			backgroundBuffer->getImage(newImage);
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::UpdateAverage:
-			averageBuffer->addImage(getLabelOrCurrentImage(operation, image, true), operation->getArgumentNumeric());
+			averageBuffer->addImage(getLabelOrCurrentImage(operation, image), operation->getArgumentNumeric());
 			averageBuffer->getImage(newImage);
 			newImageSet = true;
 			break;
@@ -436,7 +436,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::AddSeries:
-			imageSeries->addImage(getLabelOrCurrentImage(operation, image, true), (int)operation->getArgumentNumeric());
+			imageSeries->addImage(getLabelOrCurrentImage(operation, image), (int)operation->getArgumentNumeric());
 			break;
 
 		case ScriptOperationType::GetSeriesMedian:
@@ -444,7 +444,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::AddAccum:
-			accumBuffer->addImage(getLabelOrCurrentImage(operation, image, true), (AccumMode)operation->getArgument(ArgumentLabel::AccumMode, (int)AccumMode::Age));
+			accumBuffer->addImage(getLabelOrCurrentImage(operation, image), (AccumMode)operation->getArgument(ArgumentLabel::AccumMode, (int)AccumMode::Age));
 			break;
 
 		case ScriptOperationType::GetAccum:
@@ -474,7 +474,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::DrawClusters:
 			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
-			imageTracker->drawClusters(getLabelOrCurrentImage(operation, image, true), newImage,
+			imageTracker->drawClusters(getLabelOrCurrentImage(operation, image), newImage,
 										operation->getArgument(ArgumentLabel::DrawMode,
 										(int)ClusterDrawMode::ClusterDefault));
 			newImageSet = true;
@@ -482,7 +482,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::DrawTracks:
 			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
-			imageTracker->drawTracks(getLabelOrCurrentImage(operation, image, true), newImage,
+			imageTracker->drawTracks(getLabelOrCurrentImage(operation, image), newImage,
 										operation->getArgument(ArgumentLabel::DrawMode,
 										(int)ClusterDrawMode::TracksDefault), (int)sourceFps);
 			newImageSet = true;
@@ -492,7 +492,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			logPower = operation->getArgumentNumeric();
 			logPalette = (Palette)operation->getArgument(ArgumentLabel::Palette, (int)Palette::Grayscale);
 			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
-			imageTracker->drawPaths(getLabelOrCurrentImage(operation, image, true), newImage,
+			imageTracker->drawPaths(getLabelOrCurrentImage(operation, image), newImage,
 				(PathDrawMode)operation->getArgument(ArgumentLabel::PathDrawMode, (int)PathDrawMode::Age), (float)logPower, logPalette);
 			newImageSet = true;
 			break;
@@ -506,7 +506,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::DrawTrackInfo:
 			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
-			imageTracker->drawTrackInfo(getLabelOrCurrentImage(operation, image, true), newImage);
+			imageTracker->drawTrackInfo(getLabelOrCurrentImage(operation, image), newImage);
 			newImageSet = true;
 			break;
 
@@ -553,7 +553,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				showImage(newImage, displayi - 1);		// manual one-base correction
 			} else {
 				// draw on image
-				ImageOperations::drawLegend(*getLabelOrCurrentImage(operation, image, true), *newImage,
+				ImageOperations::drawLegend(*getLabelOrCurrentImage(operation, image), *newImage,
 											(DrawPosition)operation->getArgument(ArgumentLabel::Position, (int)DrawPosition::BottomRight),
 											logPower, logPalette);
 				newImageSet = true;
@@ -618,15 +618,9 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 	return done;
 }
 
-Mat* ScriptProcessing::getLabelOrCurrentImage(ScriptOperation* operation, Mat* currentImage, bool explicitArgument) {
+Mat* ScriptProcessing::getLabelOrCurrentImage(ScriptOperation* operation, Mat* currentImage) {
 	Mat* image;
-	string label;
-
-	if (explicitArgument) {
-		label = operation->getArgument(ArgumentLabel::Label);
-	} else {
-		label = operation->getArgument();
-	}
+	string label = operation->getArgument(ArgumentLabel::Label);
 	image = imageList->getImage(label, false);
 	if (!Util::isValidImage(image)) {
 		image = currentImage;

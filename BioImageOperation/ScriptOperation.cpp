@@ -115,69 +115,72 @@ void ScriptOperation::extract(string line) {
 	}
 }
 
+void ScriptOperation::resetNextArgument() {
+	argumentPos = 0;
+	positionalMode = true;
+}
+
+Argument* ScriptOperation::getNextArgument(ArgumentLabel label) {
+	Argument* argument;
+	
+	if (positionalMode && argumentPos < arguments.size()) {
+		argument = arguments[argumentPos];
+		if (label == ArgumentLabel::None || argument->argumentLabel == ArgumentLabel::None || argument->argumentLabel == label) {
+			argumentPos++;
+			return argument;
+		}
+	}
+
+	positionalMode = false;
+
+	for (Argument* argument : arguments) {
+		if (argument->argumentLabel == label) {
+			return argument;
+		}
+	}
+
+	return NULL;
+}
+
 void ScriptOperation::parseArguments() {
 	OperationInfo info = getOperationInfo(operationType);
 	vector<ArgumentLabel> requiredArguments = info.requiredArguments;
 	vector<ArgumentLabel> optionalArguments = info.optionalArguments;
-	Argument* foundArgument;
+	Argument* argument;
 	ArgumentType expectedType;
-	string s;
-	bool found;
+	
+	resetNextArgument();
 
-	if (!requiredArguments.empty() || !optionalArguments.empty()) {
-		// check required arguments
-		for (ArgumentLabel label : requiredArguments) {
-			expectedType = getExpectedArgumentType(label);
-			found = false;
-			for (Argument* argument : arguments) {
-				if (argument->argumentLabel != ArgumentLabel::None) {
-					if (argument->argumentLabel == label) {
-						foundArgument = argument;
-						found = true;
-					}
-				} else if (requiredArguments.size() == 1 && arguments.size() == 1) {
-					if (label != ArgumentLabel::Path) {
-						// exception: if only single required argument and no label used (except for path as this should be found)
-						foundArgument = argument;
-						found = true;
-					}
-				}
+	for (ArgumentLabel label : requiredArguments) {
+		argument = getNextArgument(label);
+		if (argument != NULL) {
+			if (argument->argumentLabel == ArgumentLabel::None) {
+				argument->argumentLabel = label;
 			}
-			if (found) {
-				if (!foundArgument->parseType(expectedType)) {
-					s = "Unexpected value for argument: " + foundArgument->allArgument;
-					throw invalid_argument(s);
-				}
-			} else {
-				throw invalid_argument("Missing required argument: " + ArgumentLabels[(int)label]);
-			}
+			argument->used = true;
+		} else {
+			throw invalid_argument("Missing required argument: " + ArgumentLabels[(int)label]);
 		}
+	}
 
-		// check all arguments
-		for (Argument* argument : arguments) {
-			// ignore non-labelled arguments
-			if (argument->argumentLabel != ArgumentLabel::None) {
-				expectedType = getExpectedArgumentType(argument->argumentLabel);
-				found = false;
-				for (ArgumentLabel label : requiredArguments) {
-					if (label == argument->argumentLabel) {
-						found = true;
-					}
-				}
-				for (ArgumentLabel label : optionalArguments) {
-					if (label == argument->argumentLabel) {
-						found = true;
-					}
-				}
-				if (found) {
-					if (!argument->parseType(expectedType)) {
-						s = "Unexpected value for argument: " + argument->allArgument;
-						throw invalid_argument(s);
-					}
-				} else {
-					throw invalid_argument("Unexpected argument: " + argument->allArgument);
-				}
+	for (ArgumentLabel label : optionalArguments) {
+		argument = getNextArgument(label);
+		if (argument != NULL) {
+			if (argument->argumentLabel == ArgumentLabel::None) {
+				argument->argumentLabel = label;
 			}
+			argument->used = true;
+		}
+	}
+
+	for (Argument* argument : arguments) {
+		if (argument->used) {
+			expectedType = getExpectedArgumentType(argument->argumentLabel);
+			if (!argument->parseType(expectedType)) {
+				throw invalid_argument("Unexpected value for argument: " + argument->allArgument);
+			}
+		} else {
+			throw invalid_argument("Unexpected argument: " + argument->allArgument);
 		}
 	}
 }
