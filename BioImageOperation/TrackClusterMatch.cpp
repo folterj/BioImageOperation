@@ -10,8 +10,13 @@
 #include "TrackClusterMatch.h"
 
 
-TrackClusterMatch::TrackClusterMatch(ClusterTrack* track) {
+TrackClusterMatch::TrackClusterMatch(ClusterTrack* track, Cluster* cluster, double distance, double rangeFactor) {
 	this->track = track;
+	this->cluster = cluster;
+	this->distance = distance;
+	areaDif = cluster->calcAreaDif(track);
+	double areaFactor = 1 - pow(areaDif / cluster->area, 2);
+	matchFactor = rangeFactor * areaFactor;
 }
 
 void TrackClusterMatch::assign() {

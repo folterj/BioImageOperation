@@ -24,6 +24,6 @@ public:
 	double distance = 0;
 	double areaDif = 0;
 
-	TrackClusterMatch(ClusterTrack* track);
+	TrackClusterMatch(ClusterTrack* track, Cluster* cluster, double distance, double rangeFactor);
 	void assign();
 };

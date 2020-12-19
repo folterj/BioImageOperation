@@ -103,7 +103,7 @@ void ImageOperations::convertToColorAlpha(InputArray source, OutputArray dest) {
 }
 
 void ImageOperations::getSaturation(InputArray source, Mat* dest) {
-	std::vector<Mat> channels;
+	vector<Mat> channels;
 	Mat hsv;
 
 	cvtColor(source, hsv, ColorConversionCodes::COLOR_BGR2HSV);
@@ -112,7 +112,7 @@ void ImageOperations::getSaturation(InputArray source, Mat* dest) {
 }
 
 void ImageOperations::getHsValue(InputArray source, Mat* dest) {
-	std::vector<Mat> channels;
+	vector<Mat> channels;
 	Mat hsv;
 
 	cvtColor(source, hsv, ColorConversionCodes::COLOR_BGR2HSV);
@@ -121,7 +121,7 @@ void ImageOperations::getHsValue(InputArray source, Mat* dest) {
 }
 
 void ImageOperations::getHsLightness(InputArray source, Mat* dest) {
-	std::vector<Mat> channels;
+	vector<Mat> channels;
 	Mat hsv;
 
 	cvtColor(source, hsv, ColorConversionCodes::COLOR_BGR2HLS);

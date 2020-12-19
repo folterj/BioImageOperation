@@ -23,7 +23,7 @@
 using namespace std;
 using namespace cv;
 
-typedef std::chrono::high_resolution_clock Clock;
+typedef chrono::high_resolution_clock Clock;
 
 
 class MainWindow : public QMainWindow, public Observer

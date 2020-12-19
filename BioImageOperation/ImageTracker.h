@@ -113,8 +113,8 @@ public:
 	 * Create tracks
 	 */
 	void matchClusterTracks();
-	TrackClusterMatch* findTrackClusterMatch(ClusterTrack* track, double maxMoveDistance);
-	vector<TrackClusterMatch*> matchMergedClusterTracks(vector<ClusterTrack*> clusterTracks);
+	void matchClusterTracks_Hungarian();
+	vector<TrackClusterMatch*> calcTrackClusterMatches(ClusterTrack* track, double maxMoveDistance);
 	bool matchTrackCluster(TrackClusterMatch* trackClusterMatch, double maxMoveDistance, double& distance);
 	void pruneTracks();
 
