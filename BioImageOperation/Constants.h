@@ -291,10 +291,8 @@ class Constants
 {
 public:
 	static const int statBins = 20;
-	static const int nDisplays;
-	static const int nInfoWindows;
-	static const int nTrackers;
-	static const int seekModeInterval;
+	static const int nDisplays = 4;
+	static const int nTextWindows = 4;
 
 	static const string webPage;
 	static const string webFilesUrl;
@@ -306,6 +304,7 @@ public:
 	static const string defaultVideoExtension;
 	static const string defaultVideoCodec;
 
+	static const int seekModeInterval;
 	static const int minPixels;
 	static const int maxMergedBlobs;
 	static const int minPathDistance;

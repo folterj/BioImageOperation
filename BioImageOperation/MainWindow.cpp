@@ -32,6 +32,8 @@ MainWindow::MainWindow(QWidget* parent)
 	ui.setupUi(this);
 	ui.scriptTextEdit->setFont(font);
 
+	debugWindow.setFont(font);
+
 	ui.actionOpen->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
 	ui.actionSave->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
 	ui.actionSaveAs->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
@@ -75,6 +77,7 @@ MainWindow::MainWindow(QWidget* parent)
 	}
 
 	scriptHelpWindow.init(this);
+	debugWindow.init(this);
 
 	scriptProcessing.registerObserver(this);
 
@@ -327,7 +330,11 @@ void MainWindow::showTextQt(string text, int displayi, string reference) {
 	}
 
 	try {
-		textWindows[displayi].showText(text, reference);
+		if (displayi >= Constants::nTextWindows) {
+			debugWindow.showText(text, reference);
+		} else {
+			textWindows[displayi].showText(text, reference);
+		}
 	} catch (exception e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}

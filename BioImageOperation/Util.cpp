@@ -182,6 +182,18 @@ string Util::formatTimespan(int seconds0) {
 	return s;
 }
 
+string Util::formatThousands(int x) {
+	string s;
+	while (x != 0) {
+		if (s != "") {
+			s = "'" + s;
+		}
+		s = to_string(x % 1000) + s;
+		x /= 1000;
+	}
+	return s;
+}
+
 QString Util::convertToQString(string s) {
 	return QString::fromUtf8(s.c_str());
 }

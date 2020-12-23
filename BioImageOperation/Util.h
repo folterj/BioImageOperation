@@ -41,6 +41,7 @@ public:
 	static string replace(string s, string target, string replacement);
 	static string format(string format, ...);
 	static string formatTimespan(int seconds);
+	static string formatThousands(int x);
 	static QString convertToQString(string s);
 
 	static double toDouble(string s);

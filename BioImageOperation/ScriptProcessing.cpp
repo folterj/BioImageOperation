@@ -569,7 +569,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::Debug:
 			debugMode = true;
-			showText(scriptOperations->getDebug(), 0);
+			showText(scriptOperations->getDebug(), Constants::nTextWindows);
 			break;
 
 			// end of switch

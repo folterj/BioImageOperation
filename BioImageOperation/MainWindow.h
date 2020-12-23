@@ -31,9 +31,8 @@ class MainWindow : public QMainWindow, public Observer
 private:
 	QSettings bioSettings;
 	Ui::MainWindow ui;
-	ImageWindow imageWindows[4];
-	TextWindow textWindows[4];
-	TextWindow scriptHelpWindow;
+	ImageWindow imageWindows[Constants::nDisplays];
+	TextWindow textWindows[Constants::nTextWindows], scriptHelpWindow, debugWindow;
 	AboutWindow aboutWindow;
 	ScriptProcessing scriptProcessing;
 	QTimer* timer;
@@ -41,8 +40,8 @@ private:
 	string filepath;
 	bool fileModified = false;
 	bool statusQueued = false;
-	bool textQueued[4] = { false, false, false, false };
-	bool imageQueued[4] = { false, false, false, false };
+	bool textQueued[Constants::nTextWindows + 1] = { false, false, false, false, false };
+	bool imageQueued[Constants::nDisplays] = { false, false, false, false };
 	int processCount = 0;
 	int processFps = 0;
 

@@ -1106,7 +1106,17 @@ void ScriptOperation::initFrameOutput(FrameType frameType, string basepath, stri
 }
 
 string ScriptOperation::getDebug() {
-	string s = line + "\t\t" + Util::format("%.6f", getDuration()) + "\n";
+	string s = line;
+	double duration = getDuration();
+	if (duration > 0) {
+		string times = Util::formatThousands(round(duration * 1000000));
+		int i = 48 - line.length() - times.length();
+		if (i < 1) {
+			i = 1;
+		}
+		s += string(i, ' ') + times + " us";
+	}
+	s += "\n";
 	if (hasInnerOperations()) {
 		s += innerOperations->getDebug();
 	}
