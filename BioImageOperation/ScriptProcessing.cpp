@@ -85,13 +85,6 @@ void ScriptProcessing::reset() {
 
 void ScriptProcessing::registerObserver(Observer* observer) {
 	this->observer = observer;
-
-	connect(this, &ScriptProcessing::resetUIQt, (MainWindow*)observer, &MainWindow::resetUI);
-	connect(this, &ScriptProcessing::clearStatusQt, (MainWindow*)observer, &MainWindow::clearStatus);
-	connect(this, &ScriptProcessing::showStatusQt, (MainWindow*)observer, &MainWindow::showStatus);
-	connect(this, &ScriptProcessing::showTextQt, (MainWindow*)observer, &MainWindow::showText);
-	connect(this, &ScriptProcessing::showImageQt, (MainWindow*)observer, &MainWindow::showImage);
-	connect(this, &ScriptProcessing::showDialogQt, (MainWindow*)observer, &MainWindow::showDialog);
 }
 
 bool ScriptProcessing::startProcessNoGui(string scriptFilename) {
@@ -157,6 +150,9 @@ void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOpe
 			operation->reset();
 			operationFinished = processOperation(operation, prevOperation);
 			if (operationFinished) {
+				if (debugMode) {
+					operation->finish();
+				}
 				operations->moveNextOperation();
 			}
 			prevOperation = operation;
@@ -168,6 +164,7 @@ void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOpe
 
 bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperation* prevOperation) {
 	int count = operation->count;
+	string errorMsg;
 
 	operation->count++;
 
@@ -572,6 +569,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::Debug:
 			debugMode = true;
+			showText(scriptOperations->getDebug(), 0);
 			break;
 
 			// end of switch
@@ -596,7 +594,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			}
 		}
 	} catch (cv::Exception e) {
-		string errorMsg = e.what();
+		errorMsg = e.what();
 		if (Util::contains(errorMsg, "==")) {
 			// adding more user friendly messages:
 			if (Util::contains(errorMsg, "CV_MAT_TYPE")) {
@@ -613,7 +611,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		showDialog(errorMsg, MessageLevel::Error);
 		doAbort();
 	} catch (std::exception e) {
-		string errorMsg = Util::getExceptionDetail(e) + " in\n" + operation->line;
+		errorMsg = Util::getExceptionDetail(e) + " in\n" + operation->line;
 		showDialog(errorMsg, MessageLevel::Error);
 		doAbort();
 	}
@@ -653,60 +651,31 @@ void ScriptProcessing::doAbort() {
 }
 
 void ScriptProcessing::resetUI() {
-	if (qtGui) {
-		emit resetUIQt();
-	} else {
-		observer->resetUI();
-	}
+	observer->resetUI();
 }
 
 void ScriptProcessing::clearStatus() {
-	if (qtGui) {
-		emit clearStatusQt();
-	} else {
-		observer->clearStatus();
-	}
+	observer->clearStatus();
 }
 
 void ScriptProcessing::showStatus(int i, int tot, string label) {
 	if (observer->checkStatusProcess()) {
-		if (qtGui) {
-			emit showStatusQt(i, tot, label);
-		} else {
-			observer->showStatus(i, tot, label);
-		}
+		observer->showStatus(i, tot, label);
 	}
 }
 
 void ScriptProcessing::showText(string text, int displayi, string reference) {
 	if (observer->checkTextProcess(displayi)) {
-		if (qtGui) {
-			emit showTextQt(text.c_str(), displayi, reference);
-		} else {
-			observer->showDialog(text, displayi);
-		}
+		observer->showText(text, displayi, reference);
 	}
 }
 
 void ScriptProcessing::showImage(Mat* image, int displayi, string reference) {
 	if (observer->checkImageProcess(displayi)) {
-		if (qtGui) {
-			emit showImageQt(image, displayi, reference);
-		} else {
-			observer->showImage(image, displayi, reference);
-		}
+		observer->showImage(image, displayi, reference);
 	}
 }
 
 void ScriptProcessing::showDialog(string message, MessageLevel level) {
-	if (qtGui) {
-		if (level == MessageLevel::Error) {
-			cerr << message << endl;
-		} else {
-			cout << message << endl;
-		}
-		emit showDialogQt(message, (int)level);
-	} else {
-		observer->showDialog(message, (int)level);
-	}
+	observer->showDialog(message, (int)level);
 }

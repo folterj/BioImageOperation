@@ -243,6 +243,12 @@
     <ClInclude Include="TextObserver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptProcessing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="AboutWindow.h">
@@ -252,9 +258,6 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="MainWindow.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="ScriptProcessing.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="TextWindow.h">

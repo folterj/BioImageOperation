@@ -20,6 +20,7 @@
 #include "Util.h"
 #include "OutputStream.h"
 #include "config.h"
+#include "Types.h"
 
 
 ScriptOperation::ScriptOperation() {
@@ -51,6 +52,23 @@ void ScriptOperation::reset() {
 	if (innerOperations) {
 		innerOperations->reset();
 	}
+	start = Clock::now();
+}
+
+void ScriptOperation::finish() {
+	chrono::duration<double> totalElapsed = Clock::now() - start;
+	timeElapseds += totalElapsed.count();
+	countElapsed++;
+}
+
+double ScriptOperation::getDuration() {
+	double duration = 0;
+	if (countElapsed != 0) {
+		duration = timeElapseds / countElapsed;
+		timeElapseds = 0;
+		countElapsed = 0;
+	}
+	return duration;
 }
 
 void ScriptOperation::extract(string line) {
@@ -1085,6 +1103,14 @@ void ScriptOperation::initFrameOutput(FrameType frameType, string basepath, stri
 			frameOutput->init(basepath, templatePath, defaultExtension, start, length, fps, codecs);
 		}
 	}
+}
+
+string ScriptOperation::getDebug() {
+	string s = line + "\t\t" + Util::format("%.6f", getDuration()) + "\n";
+	if (hasInnerOperations()) {
+		s += innerOperations->getDebug();
+	}
+	return s;
 }
 
 void ScriptOperation::close() {

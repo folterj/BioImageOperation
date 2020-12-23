@@ -173,10 +173,12 @@ string Util::formatTimespan(int seconds0) {
 	}
 	minutes = seconds / 60;
 	if (minutes > 0) {
-		s += to_string(minutes) + ":";
+		s += Util::format("%2d", minutes) + ":";
 		seconds %= 60;
+	} else {
+		s += "0:";
 	}
-	s += to_string(seconds);
+	s += Util::format("%2d", minutes, seconds);
 	return s;
 }
 

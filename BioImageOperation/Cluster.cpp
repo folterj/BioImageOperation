@@ -37,7 +37,9 @@ bool Cluster::isAssignable(double trackedArea) {
 
 	totalArea = trackedArea;
 	for (ClusterTrack* track : assignedTracks) {
-		totalArea += track->area;
+		if (track) {
+			totalArea += track->area;
+		}
 	}
 	return (totalArea * 0.75 < area && n < Constants::maxMergedBlobs);
 }

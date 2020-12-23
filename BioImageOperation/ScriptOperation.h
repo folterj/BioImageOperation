@@ -15,6 +15,7 @@
 #include "OperationInfo.h"
 #include "FrameSource.h"
 #include "FrameOutput.h"
+#include "Types.h"
 
 using namespace cv;
 
@@ -42,11 +43,16 @@ public:
 	FrameOutput* frameOutput = NULL;
 	Mat image;
 	Mat* imageRef = NULL;
+	Clock::time_point start;
+	double timeElapseds = 0;
+	int countElapsed = 0;
 
 	ScriptOperation();
 	ScriptOperation(string line);
 	~ScriptOperation();
 	void reset();
+	void finish();
+	double getDuration();
 	void extract(string line);
 	void parseArguments();
 	bool hasInnerOperations();
@@ -66,6 +72,7 @@ public:
 
 	bool initFrameSource(FrameType frameType, int apiCode, string basepath, string templatePath, string start = "", string length = "", double fps0 = 1, int interval = 1);
 	void initFrameOutput(FrameType frameType, string basepath, string templatePath, string defaultExtension = "", string start = "", string length = "", double fps = 0, string codecs = "");
+	string getDebug();
 	void close();
 
 private:

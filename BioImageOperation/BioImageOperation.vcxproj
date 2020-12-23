@@ -169,11 +169,12 @@
     <ClInclude Include="TrackClusterMatch.h" />
     <ClInclude Include="TrackingParams.h" />
     <ClInclude Include="TrackingStats.h" />
+    <ClInclude Include="Types.h" />
     <ClInclude Include="Util.h" />
     <ClInclude Include="VideoOutput.h" />
     <ClInclude Include="VideoSource.h" />
     <QtMoc Include="TextWindow.h" />
-    <QtMoc Include="ScriptProcessing.h" />
+    <ClInclude Include="ScriptProcessing.h" />
     <QtMoc Include="AboutWindow.h" />
     <ClInclude Include="AccumBuffer.h" />
     <ClInclude Include="Argument.h" />

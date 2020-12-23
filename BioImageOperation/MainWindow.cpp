@@ -58,6 +58,14 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(ui.processButton, &QAbstractButton::clicked, this, &MainWindow::process);
 	connect(ui.abortButton, &QAbstractButton::clicked, &scriptProcessing, &ScriptProcessing::doAbort);
 
+	connect(this, &MainWindow::resetUI, this, &MainWindow::resetUIQt);
+	connect(this, &MainWindow::clearStatus, this, &MainWindow::clearStatusQt);
+	connect(this, &MainWindow::showStatus, this, &MainWindow::showStatusQt);
+	connect(this, &MainWindow::showText, this, &MainWindow::showTextQt);
+	connect(this, &MainWindow::showImage, this, &MainWindow::showImageQt);
+	connect(this, &MainWindow::showDialog, this, &MainWindow::showDialogQt);
+
+
 	for (int i = 0; i < Constants::nDisplays; i++) {
 		imageWindows[i].init(this, i + 1);
 	}
@@ -195,7 +203,7 @@ void MainWindow::updateUI(bool start) {
 	}
 }
 
-void MainWindow::resetUI() {
+void MainWindow::resetUIQt() {
 	try {
 		updateUI(false);
 	} catch (exception e) {
@@ -229,7 +237,7 @@ void MainWindow::timerElapsed() {
 	}
 }
 
-void MainWindow::clearStatus() {
+void MainWindow::clearStatusQt() {
 	try {
 		ui.statusBar->clearMessage();
 		ui.progressBar->setValue(0);
@@ -245,7 +253,7 @@ bool MainWindow::checkStatusProcess() {
 	return ok;
 }
 
-void MainWindow::showStatus(int i, int tot, string label) {
+void MainWindow::showStatusQt(int i, int tot, string label) {
 	string s;
 	double progress = 0;
 	Clock::time_point now;
@@ -286,7 +294,7 @@ void MainWindow::showStatus(int i, int tot, string label) {
 	statusQueued = false;
 }
 
-void MainWindow::showDialog(string message, int level) {
+void MainWindow::showDialogQt(string message, int level) {
 	QString title = tr("BIO");
 	try {
 		switch ((MessageLevel)level) {
@@ -313,7 +321,7 @@ bool MainWindow::checkTextProcess(int displayi) {
 	return ok;
 }
 
-void MainWindow::showText(string text, int displayi, string reference) {
+void MainWindow::showTextQt(string text, int displayi, string reference) {
 	if (!textQueued[displayi]) {
 		return;			// ignore queued events on abort
 	}
@@ -332,7 +340,7 @@ bool MainWindow::checkImageProcess(int displayi) {
 	return ok;
 }
 
-void MainWindow::showImage(Mat* image, int displayi, string reference) {
+void MainWindow::showImageQt(Mat* image, int displayi, string reference) {
 	if (!imageQueued[displayi]) {
 		return;			// ignore queued events on abort
 	}

@@ -86,6 +86,14 @@ bool ScriptOperations::moveNextOperation() {
 	return (currentOperationi < size());
 }
 
+string ScriptOperations::getDebug() {
+	string s;
+	for (ScriptOperation* operation : *this) {
+		s += operation->getDebug();
+	}
+	return s;
+}
+
 void ScriptOperations::close() {
 	for (int i = 0; i < size(); i++) {
 		at(i)->close();

@@ -33,5 +33,6 @@ public:
 	bool hasOperations();
 	ScriptOperation* getCurrentOperation();
 	bool moveNextOperation();
+	string getDebug();
 	void close();
 };

@@ -8,7 +8,6 @@
  *****************************************************************************/
 
 #pragma once
-#include <chrono>
 #include <QMainWindow>
 #include <QSettings>
 #include <QTimer>
@@ -19,11 +18,10 @@
 #include "TextWindow.h"
 #include "AboutWindow.h"
 #include "ScriptProcessing.h"
+#include "Types.h"
 
 using namespace std;
 using namespace cv;
-
-typedef chrono::high_resolution_clock Clock;
 
 
 class MainWindow : public QMainWindow, public Observer
@@ -60,19 +58,27 @@ public:
 	void textChanged();
 	void process();
 	void updateUI(bool start);
+	void timerElapsed();
 	virtual void resetProgressTimer() override;
 	virtual bool checkStatusProcess() override;
 	virtual bool checkTextProcess(int displayi) override;
 	virtual bool checkImageProcess(int displayi) override;
 
+signals:
+	void resetUI();
+	void clearStatus();
+	void showStatus(int i, int tot = 0, string label = "");
+	void showDialog(string message, int level = (int)MessageLevel::Info);
+	void showText(string text, int displayi, string reference = "");
+	void showImage(Mat* image, int displayi, string reference = "");
+
 public slots:
-	virtual void resetUI() override;
-	virtual void clearStatus() override;
-	virtual void showStatus(int i, int tot = 0, string label = "") override;
-	virtual void showDialog(string message, int level = (int)MessageLevel::Info) override;
-	virtual void showText(string text, int displayi, string reference = "") override;
-	virtual void showImage(Mat* image, int displayi, string reference = "") override;
-	void timerElapsed();
+	void resetUIQt();
+	void clearStatusQt();
+	void showStatusQt(int i, int tot = 0, string label = "");
+	void showDialogQt(string message, int level = (int)MessageLevel::Info);
+	void showTextQt(string text, int displayi, string reference = "");
+	void showImageQt(Mat* image, int displayi, string reference = "");
 
 protected:
 	void checkUpdates();
