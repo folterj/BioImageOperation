@@ -18,20 +18,55 @@ ClusterTrack::ClusterTrack(int label) {
 }
 
 void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistance, bool positionPrediction) {
-	double lastOrientation = orientation;
-	double orientationGuess;
-	double angle, angleInv, angleDif, angleDifInv;
-	double newx, newy;
+	double orientationGuess, slowMoveDist;
+	double angleInv, angleDif, angleDifInv;
+	double newx, newy, dx0, dy0, dist0, dangle;
 	int ntracks = (int)cluster->assignedTracks.size();
+	bool wasMerged = isMerged;
 
 	isMerged = (ntracks > 1);
 
-	newx = cluster->x;
-	newy = cluster->y;
-	angle = cluster->angle;
+	if (isMerged) {
+		// move towards merged centre
+		slowMoveDist = maxMoveDistance * 0.1;
+		dx0 = cluster->x - x;
+		dy0 = cluster->y - y;
+		dist0 = Util::calcDistance(dx0, dy0);
+		if (dist0 > cluster->rad * 0.5) {
+			// track position should always stay inside merged cluster
+			x += dx0 * 0.5;
+			y += dy0 * 0.5;
+		}
+		if (dist0 > slowMoveDist) {
+			dx0 *= slowMoveDist / dist0;
+			dy0 *= slowMoveDist / dist0;
+			dist0 = slowMoveDist;
+		}
+		if (dist > slowMoveDist) {
+			dx *= slowMoveDist / dist;
+			dy *= slowMoveDist / dist;
+			dist = slowMoveDist;
+		}
+		// movement towards centre
+		dx = (dx * 0.9 + dx0 * 0.1);
+		dy = (dy * 0.9 + dy0 * 0.1);
+		dist = Util::calcDistance(dx, dy);
+		newx = x + dx;
+		newy = y + dy;
+		estimateX = newx + dx;
+		estimateY = newy + dy;
 
-	if (!isNew) {
+		dangle = Util::calcShortAngleDif(angle, cluster->angle);
+		angle += dangle * 0.01;
+	} else if (isNew) {
+		newx = cluster->x;
+		newy = cluster->y;
+		estimateX = newx;
+		estimateY = newy;
+	} else {
 		// not new; can use position history
+		newx = cluster->x;
+		newy = cluster->y;
 		dx = newx - x;
 		dy = newy - y;
 		dist = Util::calcDistance(dx, dy);
@@ -42,18 +77,18 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 			maxdist = dist;
 		}
 
-		orientationGuess = atan2(dy, dx);
-		angleInv = (cluster->angle + M_PI);
-		angleDif = Util::calcAngleDif(angle, orientationGuess);
-		angleDifInv = Util::calcAngleDif(angleInv, orientationGuess);
-		if (dist > 0.1 * maxMoveDistance) {
-			// if significant step: orientation from angle
-			orientInvertAngle = (abs(angleDifInv) < abs(angleDif));
+		if (abs(angle) > 45 && abs(cluster->angle) > 45 && angle * cluster->angle < 0) {
+			// angle 'swapped sign'
+			forwardDist = -forwardDist;
 		}
-		if (orientInvertAngle) {
-			orientation = angleInv;
+		angle = cluster->angle;
+		orientationGuess = Util::calcAngle(dy, dx);
+		angleDif = Util::calcAngleDif(angle, orientationGuess);
+		angleDifInv = Util::calcAngleDif(angle + 180, orientationGuess);
+		if (abs(angleDif) < abs(angleDifInv)) {
+			forwardDist += dist;
 		} else {
-			orientation = angle;
+			forwardDist -= dist;
 		}
 
 		if (dist < maxMoveDistance && positionPrediction) {
@@ -64,16 +99,18 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 			estimateX = newx;
 			estimateY = newy;
 		}
-	} else {
-		estimateX = newx;
-		estimateY = newy;
+	}
+
+	if (forwardDist >= 0) {
 		orientation = angle;
+	} else {
+		orientation = angle + 180;
 	}
 
 	if ((ntracks == 1 || area == 0) && cluster->area < maxArea) {
 		// only assign area if single track
 		area = cluster->area;
-		rad = sqrt(area);
+		rad = cluster->rad;
 	}
 
 	x = newx;
@@ -81,6 +118,7 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 
 	points.push_back(Point2d(x, y));
 
+	lastClusterRad = cluster->rad;
 	isNew = false;
 	activeCount++;
 	inactiveCount = 0;
@@ -115,12 +153,6 @@ void ClusterTrack::draw(Mat* image, int drawMode, int ntracks) {
 	if ((drawMode & (int)ClusterDrawMode::Angle) != 0) {
 		drawAngle(image, color);
 	}
-	if ((drawMode & (int)ClusterDrawMode::Label) != 0) {
-		drawLabel(image, labelColor, false);
-	}
-	if ((drawMode & (int)ClusterDrawMode::Labeln) != 0) {
-		drawLabel(image, labelColor, true);
-	}
 	if ((drawMode & (int)ClusterDrawMode::Tracks) != 0) {
 		if (ntracks == 0) {
 			ntracks = 10;
@@ -130,47 +162,38 @@ void ClusterTrack::draw(Mat* image, int drawMode, int ntracks) {
 	if ((drawMode & (int)ClusterDrawMode::Track) != 0) {
 		drawTracks(image, color, 1);
 	}
+	drawLabel(image, labelColor, drawMode);
 }
 
 void ClusterTrack::drawPoint(Mat* image, Scalar color) {
 	Point point((int)x, (int)y);
-
-	drawMarker(*image, point, color, MARKER_CROSS, 2, 1, LINE_AA);
+	int thickness = rad / 4;
+	if (thickness < 1) {
+		thickness = 1;
+	}
+	drawMarker(*image, point, color, MarkerTypes::MARKER_CROSS, 1, thickness, LineTypes::LINE_AA);
 }
 
 void ClusterTrack::drawCircle(Mat* image, Scalar color) {
 	Point point((int)x, (int)y);
 
-	circle(*image, point, (int)rad, color, 1, LINE_AA);
+	circle(*image, point, (int)rad, color, 1, LineTypes::LINE_AA);
 }
 
 void ClusterTrack::drawBox(Mat* image, Scalar color) {
 	Rect rect((int)(x - rad), (int)(y - rad), (int)(rad * 2), (int)(rad * 2));
 
-	rectangle(*image, rect, color, 1, LINE_AA);
+	rectangle(*image, rect, color, 1, LineTypes::LINE_AA);
 }
 
 void ClusterTrack::drawAngle(Mat* image, Scalar color) {
-	int x0 = (int)(x - rad * cos(orientation));
-	int y0 = (int)(y - rad * sin(orientation));
-	int x1 = (int)(x + 2 * rad * cos(orientation));
-	int y1 = (int)(y + 2 * rad * sin(orientation));
+	double radOrientation = Util::degreesToRadians(orientation);
+	int x0 = (int)(x - rad * cos(radOrientation));
+	int y0 = (int)(y - rad * sin(radOrientation));
+	int x1 = (int)(x + 2 * rad * cos(radOrientation));
+	int y1 = (int)(y + 2 * rad * sin(radOrientation));
 
-	arrowedLine(*image, Point(x0, y0), Point(x1, y1), color, 1, LINE_AA);
-}
-
-void ClusterTrack::drawLabel(Mat* image, Scalar color, bool showCount) {
-	Point point((int)x, (int)y);
-	string labelx;
-
-	if (showCount) {
-		labelx = Util::format("%.0f", area);
-		point.y = (int)(y + rad);
-	} else {
-		labelx = to_string(label);
-	}
-
-	putText(*image, labelx, point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, LINE_AA);
+	arrowedLine(*image, Point(x0, y0), Point(x1, y1), color, 1, LineTypes::LINE_AA);
 }
 
 void ClusterTrack::drawTracks(Mat* image, Scalar color, int ntracks) {
@@ -182,11 +205,31 @@ void ClusterTrack::drawTracks(Mat* image, Scalar color, int ntracks) {
 		point1.x = (int)points[i].x;
 		point1.y = (int)points[i].y;
 		if (init) {
-			line(*image, point0, point1, color, 1, LINE_AA);
+			line(*image, point0, point1, color, 1, LineTypes::LINE_AA);
 		}
 		point0 = point1;
 		init = true;
 		n++;
+	}
+}
+
+void ClusterTrack::drawLabel(Mat* image, Scalar color, int drawMode) {
+	HersheyFonts fontFace = HersheyFonts::FONT_HERSHEY_SIMPLEX;
+	double fontScale = 0.5;
+	Point point((int)(x + rad), (int)(y + rad));
+	Size size;
+
+	if ((drawMode & (int)ClusterDrawMode::Label) != 0) {
+		size = Util::drawText(image, to_string(label), point, fontFace, fontScale, color);
+		point.y += size.height * 1.5;
+	}
+	if ((drawMode & (int)ClusterDrawMode::LabelArea) != 0) {
+		size = Util::drawText(image, Util::format("%.0f", area), point, fontFace, fontScale, color);
+		point.y += size.height * 1.5;
+	}
+	if ((drawMode & (int)ClusterDrawMode::LabelAngle) != 0) {
+		size = Util::drawText(image, Util::format("%.0f", angle), point, fontFace, fontScale, color);
+		point.y += size.height * 1.5;
 	}
 }
 

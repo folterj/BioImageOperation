@@ -31,20 +31,22 @@ public:
 
 	double x = 0;
 	double y = 0;
-	double orientation = 0;
-
-	bool orientInvertAngle = false;
+	double estimateX = 0;
+	double estimateY = 0;
 	double area = 0;
 	double rad = 0;
+	double angle = 0;
+	double orientation = 0;
+	bool orientInvertAngle = false;
+
 	double dx = 0;
 	double dy = 0;
 	double dist = 0;
 	double totdist = 0;
 	double avgdist = 0;
 	double maxdist = 0;
-
-	double estimateX = 0;
-	double estimateY = 0;
+	double lastClusterRad = 0;
+	double forwardDist = 0;
 
 	bool isNew = true;
 	bool assigned = true;
@@ -69,8 +71,8 @@ public:
 	void drawCircle(Mat* image, Scalar color);
 	void drawBox(Mat* image, Scalar color);
 	void drawAngle(Mat* image, Scalar color);
-	void drawLabel(Mat* image, Scalar color, bool showCount);
 	void drawTracks(Mat* image, Scalar color, int ntracks = 1);
+	void drawLabel(Mat* image, Scalar color, int drawMode);
 	string getCsv(Cluster* cluster, bool writeContour = false);
 	string toString();
 };

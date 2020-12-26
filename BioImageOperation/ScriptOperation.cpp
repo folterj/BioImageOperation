@@ -61,16 +61,6 @@ void ScriptOperation::finish() {
 	countElapsed++;
 }
 
-double ScriptOperation::getDuration() {
-	double duration = 0;
-	if (countElapsed != 0) {
-		duration = timeElapseds / countElapsed;
-		timeElapseds = 0;
-		countElapsed = 0;
-	}
-	return duration;
-}
-
 void ScriptOperation::extract(string line) {
 	string operation, part;
 	int i, i1, i2;
@@ -1105,20 +1095,30 @@ void ScriptOperation::initFrameOutput(FrameType frameType, string basepath, stri
 	}
 }
 
-string ScriptOperation::getDebug() {
-	string s = line;
+double ScriptOperation::getDuration() {
+	double duration = 0;
+	if (countElapsed != 0) {
+		duration = timeElapseds / countElapsed;
+		timeElapseds = 0;
+		countElapsed = 0;
+	}
+	return duration;
+}
+
+string ScriptOperation::getDebug(int level) {
+	string s = string(level * 2, ' ') + line;
 	double duration = getDuration();
 	if (duration > 0) {
 		string times = Util::formatThousands(round(duration * 1000000));
-		int i = 48 - line.length() - times.length();
+		int i = 48 - s.length() - times.length();
 		if (i < 1) {
 			i = 1;
 		}
-		s += string(i, ' ') + times + " us";
+		s += string(i, ' ') + times;
 	}
 	s += "\n";
 	if (hasInnerOperations()) {
-		s += innerOperations->getDebug();
+		s += innerOperations->getDebug(level + 1);
 	}
 	return s;
 }

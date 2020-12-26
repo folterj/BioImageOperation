@@ -25,21 +25,20 @@ class ClusterTrack;		// forward declaration
 class Cluster
 {
 public:
-	std::vector<ClusterTrack*> assignedTracks;
-	Moments moments;
-	Mat clusterImage;
+	vector<ClusterTrack*> assignedTracks;
 
 	double x = 0;
 	double y = 0;
-
-	Rect box;
-
 	double area = 0;
+	double rad = 0;
 	double angle = 0;
 
-	double rad = 0;
+	Rect box;
+	Moments moments;
+	Mat clusterImage;
 
-	Cluster(double x, double y, double area, double angle, Rect box, Moments* moments, Mat* clusterImage);
+
+	Cluster(double x, double y, double area, Rect box, Moments* moments, Mat* clusterImage);
 	void unAssign();
 	bool isAssignable(double trackedArea);
 	void assign(ClusterTrack* track);
@@ -47,8 +46,10 @@ public:
 
 	double calcDistance(ClusterTrack* track);
 	double calcAreaDif(ClusterTrack* track);
-	bool isOverlap(ClusterTrack* track);
+	double calcAngleDif(ClusterTrack* track);
 	double getRangeFactor(ClusterTrack* track, double distance, double maxMoveDistance);
+	double calcAreaFactor(ClusterTrack* track, double areaDif);
+	double calcAngleFactor(ClusterTrack* track, double angleDif);
 
 	int getLabel();
 	int getFirstLabel();
@@ -59,8 +60,8 @@ public:
 	void drawBox(Mat* image, Scalar color);
 	void drawAngle(Mat* image, Scalar color);
 	void drawFill(Mat* image, Scalar color);
-	std::vector<Point> getContour();
+	void drawLabel(Mat* image, Scalar color, int drawMode);
+	vector<Point> getContour();
 	string getCsv(bool writeContour = false);
-	void drawLabel(Mat* image, Scalar color, bool showCount);
 	string toString();
 };

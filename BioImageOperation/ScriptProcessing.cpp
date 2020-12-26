@@ -149,10 +149,10 @@ void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOpe
 		if (operation) {
 			operation->reset();
 			operationFinished = processOperation(operation, prevOperation);
+			if (debugMode) {
+				operation->finish();
+			}
 			if (operationFinished) {
-				if (debugMode) {
-					operation->finish();
-				}
 				operations->moveNextOperation();
 			}
 			prevOperation = operation;
@@ -569,7 +569,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::Debug:
 			debugMode = true;
-			showText(scriptOperations->getDebug(), Constants::nTextWindows);
+			showText(scriptOperations->getDebug(0), Constants::nTextWindows);
 			break;
 
 			// end of switch

@@ -1,3 +1,12 @@
+/*****************************************************************************
+ * Bio Image Operation (BIO)
+ * Copyright (C) 2013-2020 Joost de Folter <folterj@gmail.com>
+ * and the BIO developers.
+ * This software is licensed under the terms of the GPL3 License.
+ * See LICENSE.md in the project root folder for more information.
+ * https://github.com/folterj/BioImageOperation
+ *****************************************************************************/
+
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <filesystem>
@@ -183,13 +192,17 @@ string Util::formatTimespan(int seconds0) {
 }
 
 string Util::formatThousands(int x) {
-	string s;
+	string s, ns;
 	while (x != 0) {
 		if (s != "") {
 			s = "'" + s;
 		}
-		s = to_string(x % 1000) + s;
+		ns = to_string(x % 1000);
+		s = ns + s;
 		x /= 1000;
+		if (x != 0) {
+			s = string(3 - ns.length(), '0') + s;
+		}
 	}
 	return s;
 }
@@ -276,15 +289,64 @@ double Util::calcDistance(double x, double y) {
 	return sqrt(x * x + y * y);
 }
 
-double Util::getMomentsAngle(Moments* moments) {
-	return 0.5 * atan2(2 * moments->mu11, moments->mu20 - moments->mu02);
-	//return 0.5 * cv::fastAtan2(2 * moments->mu11, moments->mu20 - moments->mu02);
+double Util::radiansToDegrees(double radAngle) {
+	return radAngle / M_PI * 180;
+}
+
+double Util::degreesToRadians(double degreeAngle) {
+	return degreeAngle / 180 * M_PI;
+}
+
+double Util::calcAngle(double dy, double dx) {
+	// returns value between -180 and 180
+	return radiansToDegrees(atan2(dy, dx));
+}
+
+// https://en.wikipedia.org/wiki/Image_moment
+// http://raphael.candelier.fr/?blog=Image%20Moments
+
+double Util::calcMomentsAngle(Moments* moments) {
+	// returns value between -90 and 90
+	double mu11 = moments->mu11;
+	double mu20 = moments->mu20;
+	double mu02 = moments->mu02;
+	return radiansToDegrees(0.5 * atan2(2 * mu11, mu20 - mu02));
+}
+
+double Util::calcMomentsMajorRadius(Moments* moments) {
+	double mu11 = moments->mu11 / moments->m00;
+	double mu20 = moments->mu20 / moments->m00;
+	double mu02 = moments->mu02 / moments->m00;
+	double mu2dif = mu20 - mu02;
+	double mu2sum = mu20 + mu02;
+	return sqrt(2 * (mu2sum + sqrt(mu2dif * mu2dif + 4 * mu11 * mu11)));
+}
+
+double Util::calcMomentsMinorRadius(Moments* moments) {
+	double mu11 = moments->mu11 / moments->m00;
+	double mu20 = moments->mu20 / moments->m00;
+	double mu02 = moments->mu02 / moments->m00;
+	double mu2dif = mu20 - mu02;
+	double mu2sum = mu20 + mu02;
+	return sqrt(2 * (mu2sum - sqrt(mu2dif * mu2dif + 4 * mu11 * mu11)));
 }
 
 double Util::calcAngleDif(double angle1, double angle2) {
+	// for value between -180 and 180
+	// returns value between -180 and 180
+	// https://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles
 	double dangle = angle2 - angle1;
-	while (dangle < -M_PI) dangle += 2 * M_PI;
-	while (dangle > M_PI) dangle -= 2 * M_PI;
+	while (dangle < -180) dangle += 360;
+	while (dangle > 180) dangle -= 360;
+	return dangle;
+}
+
+double Util::calcShortAngleDif(double angle1, double angle2) {
+	// for value between -90 and 90
+	// returns value between -90 and 90
+	double dangle = angle2 - angle1;
+	while (dangle < -90) dangle += 180;
+	while (dangle > 90) dangle -= 180;
 	return dangle;
 }
 
@@ -303,9 +365,9 @@ Scalar Util::getLabelColor(int label0) {
 		g = 0.25 * (ig + 1);
 		b = 0.25 * (ib + 1);
 	} else {
-		r = 0.5;
-		g = 0.5;
-		b = 0.5;
+		r = 0.25;
+		g = 0.25;
+		b = 0.25;
 	}
 	return Scalar(b * 0xFF, g * 0xFF, r * 0xFF);
 }
@@ -528,7 +590,13 @@ string Util::combinePath(string basepath, string templatePath) {
 	}
 }
 
-QImage Util::matToQImage(cv::Mat const& source) {
+Size Util::drawText(Mat* image, string text, Point point, HersheyFonts fontFace, double fontScale, Scalar color) {
+	Size size = getTextSize(text, fontFace, fontScale, 1, NULL);
+	putText(*image, text, point, fontFace, fontScale, color, 1, LineTypes::LINE_AA);
+	return size;
+}
+
+QImage Util::matToQImage(Mat const& source) {
 	if (source.channels() == 1) {
 		QImage qimage(source.data, source.cols, source.rows, source.step, QImage::Format_Grayscale8);
 		return qimage;

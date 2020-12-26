@@ -50,5 +50,5 @@ double PathNode::matchDistance(ClusterTrack* clusterTrack, double maxDistance) {
 void PathNode::draw(Mat* image, Scalar color) {
 	Point point((int)x, (int)y);
 
-	drawMarker(*image, point, color, MARKER_CROSS, 2, 1, LINE_AA);
+	drawMarker(*image, point, color, MarkerTypes::MARKER_CROSS, 2, 1, LineTypes::LINE_AA);
 }

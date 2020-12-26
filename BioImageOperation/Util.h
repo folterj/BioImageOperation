@@ -53,8 +53,14 @@ public:
 	static double calcDistance(double x0, double y0, double x1, double y1);
 	static double calcDistance(double x, double y);
 
-	static double getMomentsAngle(Moments* moments);
+	static double radiansToDegrees(double radAngle);
+	static double degreesToRadians(double degreeAngle);
+	static double calcAngle(double dy, double dx);
+	static double calcMomentsAngle(Moments* moments);
+	static double calcMomentsMajorRadius(Moments* moments);
+	static double calcMomentsMinorRadius(Moments* moments);
 	static double calcAngleDif(double angle1, double angle2);
+	static double calcShortAngleDif(double angle1, double angle2);
 
 	static Scalar getLabelColor(int label0);
 	static Scalar getHeatScale(double scale);
@@ -75,7 +81,8 @@ public:
 	static string extractFileExtension(string filename);
 	static string combinePath(string basepath, string templatePath);
 
-	static QImage matToQImage(cv::Mat const& src);
+	static Size drawText(Mat* image, string text, Point point, HersheyFonts fontFace, double fontScale, Scalar color);
+	static QImage matToQImage(Mat const& src);
 
 	static string getUrl(string url);
 	static bool openWebLink(string url);

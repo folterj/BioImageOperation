@@ -33,6 +33,7 @@ public:
 	bool hasOperations();
 	ScriptOperation* getCurrentOperation();
 	bool moveNextOperation();
-	string getDebug();
+	double getDuration();
+	string getDebug(int level);
 	void close();
 };

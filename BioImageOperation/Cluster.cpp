@@ -7,12 +7,14 @@
  * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include "Cluster.h"
 #include "Constants.h"
 #include "Util.h"
 
 
-Cluster::Cluster(double x, double y, double area, double angle, Rect box, Moments* moments, Mat* clusterImage) {
+Cluster::Cluster(double x, double y, double area, Rect box, Moments* moments, Mat* clusterImage) {
 	this->area = area;
 	this->x = x;
 	this->y = y;
@@ -20,7 +22,12 @@ Cluster::Cluster(double x, double y, double area, double angle, Rect box, Moment
 	this->box = box;
 	this->moments = *moments;
 	this->clusterImage = *clusterImage;
-	rad = sqrt(area);
+	if (moments->m00 != 0) {
+		angle = Util::calcMomentsAngle(moments);
+		rad = Util::calcMomentsMajorRadius(moments);
+	} else {
+		rad = sqrt(area);
+	}
 }
 
 void Cluster::unAssign() {
@@ -53,33 +60,60 @@ bool Cluster::isAssigned() {
 }
 
 double Cluster::calcDistance(ClusterTrack* track) {
-	return Util::calcDistance(track->estimateX, track->estimateY, x, y);
+	double distance, distance1, distance2;
+	double vx1 = track->x;
+	double vy1 = track->y;
+	double vx2 = track->estimateX;
+	double vy2 = track->estimateY;
+	double dvx = vx2 - vx1;
+	double dvy = vy2 - vy1;
+
+	if (dvx * dvx + dvy * dvy != 0) {
+		double t = -((vx1 - x) * dvx + (vy1 - y) * dvy) / (dvx * dvx + dvy * dvy);
+		if (t >= 0 && t <= 1) {
+			distance = abs(dvx * (vy1 - y) - dvy * (vx1 - x)) / sqrt(dvx * dvx + dvy * dvy);
+			return distance;
+		}
+	}
+
+	distance1 = Util::calcDistance(track->x, track->y, x, y);
+	distance2 = Util::calcDistance(track->estimateX, track->estimateY, x, y);
+	distance = min(distance1, distance2);
+	return distance;
 }
 
 double Cluster::calcAreaDif(ClusterTrack* track) {
 	return abs(area - track->area);
 }
 
-bool Cluster::isOverlap(ClusterTrack* track) {
-	return (calcDistance(track) - (2 * rad - track->rad) <= 0);
+double Cluster::calcAngleDif(ClusterTrack* track) {
+	return Util::calcShortAngleDif(angle, track->angle);
 }
 
 double Cluster::getRangeFactor(ClusterTrack* track, double distance, double maxMoveDistance) {
 	double rangeFactor = 1;
+	double clusterRad, extraDist;
 
 	if (maxMoveDistance != 0) {
-		if (track->isMerged) {
-			// allow for greater move distance after being merged
-			distance -= (2 * rad);
-		} else {
-			distance -= (2 * rad - track->rad);
-		}
-		if (distance < 0) {
-			distance = 0;
-		}
-		rangeFactor = 1 - distance / maxMoveDistance;
+		clusterRad = max(track->lastClusterRad, rad);
+		//extraDist = abs(clusterRad - track->rad) * 2;
+		extraDist = abs(2 * clusterRad - track->rad);
+		rangeFactor = 1 - distance / (maxMoveDistance + extraDist);
 	}
 	return rangeFactor;
+}
+
+double Cluster::calcAreaFactor(ClusterTrack* track, double areaDif) {
+	double areaFactor = 1;
+	if (!track->isMerged) {
+		areaFactor = 1 - pow(areaDif / area, 2);
+	}
+	return areaFactor;
+}
+
+double Cluster::calcAngleFactor(ClusterTrack* track, double angleDif) {
+	double angleFactor = 1 - sqrt(abs(angleDif) / 360);
+	return angleFactor;
 }
 
 int Cluster::getLabel() {
@@ -133,53 +167,38 @@ void Cluster::draw(Mat* image, int drawMode) {
 	if ((drawMode & (int)ClusterDrawMode::Angle) != 0) {
 		drawAngle(image, color);
 	}
-	if ((drawMode & (int)ClusterDrawMode::Label) != 0) {
-		drawLabel(image, labelColor, false);
-	}
-	if ((drawMode & (int)ClusterDrawMode::Labeln) != 0) {
-		drawLabel(image, labelColor, true);
-	}
+	drawLabel(image, labelColor, drawMode);
 }
 
 void Cluster::drawPoint(Mat* image, Scalar color) {
 	Point point((int)x, (int)y);
-
-	drawMarker(*image, point, color, MARKER_CROSS, 2, 1, LINE_AA);
+	int thickness = rad / 4;
+	if (thickness < 1) {
+		thickness = 1;
+	}
+	drawMarker(*image, point, color, MarkerTypes::MARKER_CROSS, 1, thickness, LineTypes::LINE_AA);
 }
 
 void Cluster::drawCircle(Mat* image, Scalar color) {
 	Point point((int)x, (int)y);
 
-	circle(*image, point, (int)rad, color, 1, LINE_AA);
+	circle(*image, point, (int)rad, color, 1, LineTypes::LINE_AA);
 }
 
 void Cluster::drawBox(Mat* image, Scalar color) {
 	Rect rect((int)(x - rad), (int)(y - rad), (int)(rad * 2), (int)(rad * 2));
 
-	rectangle(*image, rect, color, 1, LINE_AA);
+	rectangle(*image, rect, color, 1, LineTypes::LINE_AA);
 }
 
 void Cluster::drawAngle(Mat* image, Scalar color) {
-	int x0 = (int)(x - rad * cos(angle));
-	int y0 = (int)(y - rad * sin(angle));
-	int x1 = (int)(x + rad * cos(angle));
-	int y1 = (int)(y + rad * sin(angle));
+	double radAngle = Util::degreesToRadians(angle);
+	int x0 = (int)(x - rad * cos(radAngle));
+	int y0 = (int)(y - rad * sin(radAngle));
+	int x1 = (int)(x + rad * cos(radAngle));
+	int y1 = (int)(y + rad * sin(radAngle));
 
-	line(*image, Point(x0, y0), Point(x1, y1), color, 1, LINE_AA);
-}
-
-void Cluster::drawLabel(Mat* image, Scalar color, bool showCount) {
-	Point point((int)x, (int)y);
-	string labelx;
-
-	if (showCount) {
-		labelx = Util::format("%.0f", area);
-		point.y = (int)(y + rad);
-	} else {
-		labelx = getLabels();
-	}
-
-	putText(*image, labelx, point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, LINE_AA);
+	line(*image, Point(x0, y0), Point(x1, y1), color, 1, LineTypes::LINE_AA);
 }
 
 void Cluster::drawFill(Mat* image, Scalar color) {
@@ -192,7 +211,27 @@ void Cluster::drawFill(Mat* image, Scalar color) {
 	}
 }
 
-std::vector<Point> Cluster::getContour() {
+void Cluster::drawLabel(Mat* image, Scalar color, int drawMode) {
+	HersheyFonts fontFace = HersheyFonts::FONT_HERSHEY_SIMPLEX;
+	double fontScale = 0.5;
+	Point point((int)(x + rad), (int)(y + rad));
+	Size size;
+
+	if ((drawMode & (int)ClusterDrawMode::Label) != 0) {
+		size = Util::drawText(image, getLabels(), point, fontFace, fontScale, color);
+		point.y += size.height * 1.5;
+	}
+	if ((drawMode & (int)ClusterDrawMode::LabelArea) != 0) {
+		size = Util::drawText(image, Util::format("%.0f", area), point, fontFace, fontScale, color);
+		point.y += size.height * 1.5;
+	}
+	if ((drawMode & (int)ClusterDrawMode::LabelAngle) != 0) {
+		size = Util::drawText(image, Util::format("%.0f", angle), point, fontFace, fontScale, color);
+		point.y += size.height * 1.5;
+	}
+}
+
+vector<Point> Cluster::getContour() {
 	vector<Point> contour;
 	vector<vector<Point>> contours;
 	findContours(clusterImage, contours, RetrievalModes::RETR_EXTERNAL, ContourApproximationModes::CHAIN_APPROX_NONE);

@@ -15,8 +15,10 @@ TrackClusterMatch::TrackClusterMatch(ClusterTrack* track, Cluster* cluster, doub
 	this->cluster = cluster;
 	this->distance = distance;
 	areaDif = cluster->calcAreaDif(track);
-	double areaFactor = 1 - pow(areaDif / cluster->area, 2);
-	matchFactor = rangeFactor * areaFactor;
+	double areaFactor = cluster->calcAreaFactor(track, areaDif);
+	angleDif = cluster->calcAngleDif(track);
+	//double angleFactor = cluster->calcAngleFactor(track, angleDif);
+	matchFactor = rangeFactor * areaFactor;	// *angleFactor;
 }
 
 void TrackClusterMatch::assign() {

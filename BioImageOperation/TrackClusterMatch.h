@@ -23,6 +23,7 @@ public:
 	double matchFactor = 0;
 	double distance = 0;
 	double areaDif = 0;
+	double angleDif = 0;
 
 	TrackClusterMatch(ClusterTrack* track, Cluster* cluster, double distance, double rangeFactor);
 	void assign();

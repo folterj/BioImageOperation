@@ -63,8 +63,8 @@ void PathLink::draw(Mat* image, Scalar color, int maxUsage, bool animate) {
 		point.x = (int)(x1 + animPos2 * (x2 - x1));
 		point.y = (int)(y1 + animPos2 * (y2 - y1));
 
-		drawMarker(*image, point, color, MARKER_CROSS, 2, 1, LINE_AA);
+		drawMarker(*image, point, color, MarkerTypes::MARKER_CROSS, 2, 1, LineTypes::LINE_AA);
 	} else {
-		line(*image, cv::Point(x1, y1), cv::Point(x2, y2), color, 1, LINE_AA);
+		line(*image, Point(x1, y1), Point(x2, y2), color, 1, LineTypes::LINE_AA);
 	}
 }

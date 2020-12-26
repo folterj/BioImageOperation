@@ -15,37 +15,21 @@
 #include "ColorScale.h"
 
 
- /*
-  * Constructor for testing
-  */
-
 ImageTracker::ImageTracker(Observer* observer) {
 	this->observer = observer;
 	this->trackerId = "";
 }
-
-/*
- * Main constructor
- */
 
 ImageTracker::ImageTracker(Observer* observer, string trackerId) {
 	this->observer = observer;
 	this->trackerId = trackerId;
 }
 
-/*
- * Destructor
- */
-
 ImageTracker::~ImageTracker() {
 	deletePaths();
 	deleteClusters();
 	deleteTracks();
 }
-
-/*
- * Deep delete routines
- */
 
 void ImageTracker::deleteClusters() {
 	for (int i = 0; i < clusters.size(); i++) {
@@ -73,10 +57,6 @@ void ImageTracker::deletePaths() {
 	pathNodes.clear();
 }
 
-/*
- * Reset class properties
- */
-
 void ImageTracker::reset() {
 	deletePaths();
 	deleteClusters();
@@ -100,10 +80,6 @@ void ImageTracker::reset() {
 	closeStreams();
 }
 
-/*
- * Create clusters from image entry point
- */
-
 bool ImageTracker::createClusters(Mat* image, double minArea, double maxArea, string basePath, bool debugMode) {
 	bool clustersOk;
 
@@ -122,10 +98,6 @@ bool ImageTracker::createClusters(Mat* image, double minArea, double maxArea, st
 	}
 	return clustersOk;
 }
-
-/*
- * Create tracks entry point
- */
 
 void ImageTracker::createTracks(double maxMove, int minActive, int maxInactive, string basePath) {
 	bool clustersOk = (clusters.size() > 0);
@@ -147,10 +119,6 @@ void ImageTracker::createTracks(double maxMove, int minActive, int maxInactive, 
 	}
 }
 
-/*
- * Create paths entry point
- */
-
 void ImageTracker::createPaths(double pathDistance) {
 	if (pathDistance < Constants::minPathDistance) {
 		pathDistance = Constants::minPathDistance;
@@ -163,14 +131,10 @@ void ImageTracker::createPaths(double pathDistance) {
 	}
 }
 
-/*
- * Create clusters from image
- */
-
 bool ImageTracker::findClusters(Mat* image) {
 	int totArea = image->rows * image->cols;
 	int area, minArea, maxArea;
-	double x, y, angle;
+	double x, y;
 	Rect box;
 	int n;
 	bool clusterOk;
@@ -218,51 +182,44 @@ bool ImageTracker::findClusters(Mat* image) {
 				clusterRoiImage2 = (clusterRoiImage == label);
 				// get moments
 				clusterMoments = moments(clusterRoiImage2, true);
-				// get angle
-				angle = Util::getMomentsAngle(&clusterMoments);
 			} else {
-				angle = 0;
+				clusterMoments = Moments();
 			}
 			x = clusterCentroids(label, 0);
 			y = clusterCentroids(label, 1);
-			clusters.push_back(new Cluster(x, y, area, angle, box, &clusterMoments, &clusterRoiImage2));
+			clusters.push_back(new Cluster(x, y, area, box, &clusterMoments, &clusterRoiImage2));
 		}
 	}
 	return (clusters.size() > 0);
 }
-
-/*
- * Create tracks
- */
 
 // https://en.wikipedia.org/wiki/Assignment_problem
 
 // Custom algorithm used for optimal matching
 
 void ImageTracker::matchClusterTracks() {
-	vector<vector<TrackClusterMatch*>> bestTrackMatches;
-	vector<vector<TrackClusterMatch*>> trackMatches;
+	vector<vector<TrackClusterMatch*>> trackMatches, newTrackMatches;
 	vector<TrackClusterMatch*> trackMatch;
 	vector<vector<int>> clashMatches;
-	vector<int> trackMatchIndices;
+	unordered_map<int, int> trackMatchIndices;
 	ClusterTrack* track;
 	TrackClusterMatch* match;
 	Cluster* cluster;
 	int maxArea = (int)trackingParams.area.getMax();
 	double maxMove = trackingParams.maxMove.getMax();
 	double distance;
-	int label, i, ii;
+	int label, i, ii, mini;
 	string message;
-	double score;
-	double bestScore = 0;
+	double score, newScore;
+	bool foundMatch;
 
 	trackingStats.trackMatching.reset();
 	trackingStats.trackMatching.setTotal((int)clusterTracks.size());
 	trackingStats.trackDistance.reset();
 	trackingStats.trackDistance.setTotal((int)clusterTracks.size());
 
-	trackMatches.reserve(clusterTracks.size());
 	// for each track find clusters in range, sorted by preference
+	trackMatches.reserve(clusterTracks.size());
 	for (ClusterTrack* track : clusterTracks) {
 		track->unAssign();
 		trackMatch = calcTrackClusterMatches(track, maxMove);
@@ -275,60 +232,104 @@ void ImageTracker::matchClusterTracks() {
 	sort(trackMatches.begin(), trackMatches.end(),
 		[](vector<TrackClusterMatch*> a, vector<TrackClusterMatch*> b) { return a[0]->matchFactor > b[0]->matchFactor; });
 
-	clashMatches = findClashMatches(trackMatches);
-	bestScore = trackMatchScore(trackMatches);
-	bestTrackMatches = trackMatches;
-
-	if (!clashMatches.empty()) {
-		for (ClusterTrack* track : clusterTracks) {
-			i = 0;
-			for (vector<TrackClusterMatch*> trackMatch : trackMatches) {
-				if (trackMatch[0]->track == track) {
-					trackMatchIndices.push_back(i);
-				}
-				i++;
+	// build track-match lookup list
+	for (ClusterTrack* track : clusterTracks) {
+		i = 0;
+		for (vector<TrackClusterMatch*> trackMatch : trackMatches) {
+			if (trackMatch[0]->track == track) {
+				trackMatchIndices[track->label] = i;
 			}
-		}
-		for (vector<int> clashMatch : clashMatches) {
-			for (int clashTrack : clashMatch) {
-				ii = trackMatchIndices[clashTrack];
-				swap(trackMatches[0], trackMatches[ii]);
-				score = trackMatchScore(trackMatches);
-				if (score > bestScore) {
-					bestScore = score;
-					bestTrackMatches = trackMatches;
-				}
-				swap(trackMatches[0], trackMatches[ii]);
-			}
+			i++;
 		}
 	}
 
+	// find optimal solution
+	clashMatches = findClashMatches(trackMatches);
+	score = trackMatchScore(trackMatches);
+	if (!clashMatches.empty()) {
+		for (vector<int> clashMatch : clashMatches) {
+			// find first element as swap point
+			mini = trackMatchIndices.at(clashMatch[0]);
+			for (int clashTrack : clashMatch) {
+				ii = trackMatchIndices.at(clashTrack);
+				if (ii < mini) {
+					mini = ii;
+				}
+			}
+			for (int clashTrack : clashMatch) {
+				ii = trackMatchIndices.at(clashTrack);
+				if (ii != mini) {
+					newTrackMatches = trackMatches;
+					swap(newTrackMatches[mini], newTrackMatches[ii]);
+					newScore = trackMatchScore(newTrackMatches);
+					if (newScore > score) {
+						trackMatches = newTrackMatches;
+					}
+				}
+			}
+		}
+		// assign best matches
+		trackMatchScore(trackMatches);
+	}
+
+	// assign tracks to unassigned clusters
 	for (Cluster* cluster : clusters) {
 		if (!cluster->isAssigned()) {
-			// assign tracks to unassigned clusters
 			label = nextTrackLabel++;
 			track = new ClusterTrack(label);
 			clusterTracks.push_back(track);
 			cluster->assign(track);
 		}
-		// update
+	}
+	// update cluster tracks
+	for (Cluster* cluster : clusters) {
 		for (ClusterTrack* track : cluster->assignedTracks) {
 			track->update(cluster, maxArea, maxMove, trackParamsFinalised);
 		}
 	}
 
-	for (vector<TrackClusterMatch*> trackMatch : bestTrackMatches) {
-		match = trackMatch[0];
-		if (match->track->assigned) {
+	// stats & print failed matches
+	for (ClusterTrack* track : clusterTracks) {
+		foundMatch = false;
+		if (trackMatchIndices.find(track->label) != trackMatchIndices.end()) {
+			ii = trackMatchIndices[track->label];
+			trackMatch = trackMatches[ii];
+			match = trackMatch[0];
+			foundMatch = true;
+		}
+		if (track->assigned) {
 			trackingStats.trackMatching.addOne();
-			trackingStats.trackDistance.addValue(match->distance);
+			if (foundMatch) {
+				trackingStats.trackDistance.addValue(match->distance);
+			}
 		} else {
-			if (debugMode && trackParamsFinalised) {
-				message = "Failed match:\nTrack " + match->track->toString() + "\nPreferred:\nCluster " + match->cluster->toString();
-				observer->showDialog(message);
+			if (debugMode && trackParamsFinalised && track->isActive(trackingParams.minActive)) {
+				message = "Failed match:\nTrack " + track->toString();
+				if (foundMatch) {
+					message += "\nPreferred:\nCluster " + match->cluster->toString();
+				}
+				cout << message << endl;
 			}
 		}
 	}
+}
+
+vector<TrackClusterMatch*> ImageTracker::calcTrackClusterMatches(ClusterTrack* track, double maxMoveDistance) {
+	vector<TrackClusterMatch*> trackMatches;
+	double distance, rangeFactor;
+
+	for (Cluster* cluster : clusters) {
+		distance = cluster->calcDistance(track);
+		rangeFactor = cluster->getRangeFactor(track, distance, maxMoveDistance);
+		if (rangeFactor > 0) {
+			trackMatches.push_back(new TrackClusterMatch(track, cluster, distance, rangeFactor));
+		}
+	}
+
+	sort(trackMatches.begin(), trackMatches.end(),
+		[](TrackClusterMatch* a, TrackClusterMatch* b) { return a->matchFactor > b->matchFactor; });
+
+	return trackMatches;
 }
 
 vector<vector<int>> ImageTracker::findClashMatches(vector<vector<TrackClusterMatch*>> trackMatches) {
@@ -411,64 +412,45 @@ double ImageTracker::trackMatchScore(vector<vector<TrackClusterMatch*>> trackMat
 	return score;
 }
 
-vector<TrackClusterMatch*> ImageTracker::calcTrackClusterMatches(ClusterTrack* track, double maxMoveDistance) {
-	vector<TrackClusterMatch*> trackMatches;
-	double distance, rangeFactor;
-
-	for (Cluster* cluster : clusters) {
-		distance = cluster->calcDistance(track);
-		rangeFactor = cluster->getRangeFactor(track, distance, maxMoveDistance);
-		if (rangeFactor > 0) {
-			trackMatches.push_back(new TrackClusterMatch(track, cluster, distance, rangeFactor));
-		}
-	}
-
-	sort(trackMatches.begin(), trackMatches.end(),
-		[](TrackClusterMatch* a, TrackClusterMatch* b) { return a->matchFactor > b->matchFactor; });
-
-	return trackMatches;
-}
-
 void ImageTracker::pruneTracks() {
 	double maxInactive = trackingParams.maxInactive;
+	ClusterTrack* track;
+	int i = 0;
 
 	trackingStats.trackLifetime.reset();
 	trackingStats.trackLifetime.setTotal((int)clusterTracks.size());
 	trackingStats.nActiveTracks = 0;
 
-	for (int i = 0; i < clusterTracks.size(); i++) {
-		ClusterTrack* clusterTrack = clusterTracks[i];
-		if (!clusterTrack->assigned) {
-			clusterTrack->activeCount = 0;
-			clusterTrack->inactiveCount++;
+	while (i < clusterTracks.size()) {
+		track = clusterTracks[i];
+		if (!track->assigned) {
+			track->activeCount = 0;
+			track->inactiveCount++;
 		}
-		if (maxInactive >= 0 && clusterTrack->inactiveCount > maxInactive) {
-			logClusterTrack(clusterTrack);
+		if (maxInactive >= 0 && track->inactiveCount > maxInactive) {
+			logClusterTrack(track);
 			clusterTracks.erase(clusterTracks.begin() + i);
-			delete clusterTrack;
-		}
-
-		else if (clusterTrack->isActive(trackingParams.minActive)) {
-			if (clusterTrack->activeCount == trackingParams.minActive) {
-				// track has just become active
-				logClusterTrack(clusterTrack);
+			delete track;
+		} else {
+			if (track->isActive(trackingParams.minActive)) {
+				if (track->activeCount == trackingParams.minActive) {
+					// track has just become active
+					logClusterTrack(track);
+				}
+				trackingStats.nActiveTracks++;
+				trackingStats.trackLifetime.addValue(track->activeCount);
 			}
-			trackingStats.nActiveTracks++;
-			trackingStats.trackLifetime.addValue(clusterTrack->activeCount);
+			i++;
 		}
 	}
 }
 
-/*
- * Create paths
- */
-
 void ImageTracker::matchPaths() {
 	trackingStats.pathMatching.reset();
 
-	for (ClusterTrack* clusterTrack : clusterTracks) {
-		if (clusterTrack->dist != 0) {
-			if (matchPathElement(clusterTrack)) {
+	for (ClusterTrack* track : clusterTracks) {
+		if (track->dist != 0) {
+			if (matchPathElement(track)) {
 				trackingStats.pathMatching.addOne();
 			}
 			trackingStats.pathMatching.addTotal();
@@ -547,10 +529,6 @@ void ImageTracker::addPathLink(PathNode* node1, PathNode* node2) {
 	pathLinks.push_back(new PathLink(node1, node2));
 }
 
-/*
- * Update automatic clustering parameters
- */
-
 void ImageTracker::updateClusterParams() {
 	bool set = false;
 
@@ -578,10 +556,6 @@ void ImageTracker::updateClusterParams() {
 		deleteTracks();
 	}
 }
-
-/*
- * Update automatic tracking parameters
- */
 
 void ImageTracker::updateTrackParams() {
 	double dist;
@@ -613,10 +587,6 @@ void ImageTracker::updateTrackParams() {
 		deleteTracks();
 	}
 }
-
-/*
- * Drawing routines
- */
 
 void ImageTracker::drawClusters(Mat* source, Mat* dest, int drawMode) {
 	source->copyTo(*dest);
@@ -740,12 +710,8 @@ void ImageTracker::drawTrackInfo(Mat* source, Mat* dest) {
 	if (position.x < 0) position.x = 0;
 	if (position.y < 0) position.y = 0;
 
-	putText(*dest, label, position, HersheyFonts::FONT_HERSHEY_SIMPLEX, 1, color, 1, LINE_AA);
+	Util::drawText(dest, label, position, HersheyFonts::FONT_HERSHEY_SIMPLEX, 1, color);
 }
-
-/*
- * Return tracking information to show in text Form
- */
 
 string ImageTracker::getInfo() {
 	string info = "Tracker ID: " + trackerId + "\n\n";
@@ -766,10 +732,6 @@ string ImageTracker::getInfo() {
 
 	return info;
 }
-
-/*
- * Save routines
- */
 
 void ImageTracker::saveClusters(string filename, int frame, double time, SaveFormat saveFormat, bool writeContour) {
 	OutputStream outStream;
@@ -948,10 +910,6 @@ Cluster* ImageTracker::findTrackedCluster(ClusterTrack* track) {
 	}
 	return NULL;
 }
-
-/*
- * Ensure closing & flushing any open streams
- */
 
 void ImageTracker::closeStreams() {
 	clusterStream.closeStream();

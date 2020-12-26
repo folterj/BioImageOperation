@@ -52,6 +52,12 @@ void ImageOperations::crop(Mat* source, Mat* dest, double width, double height, 
 	int sheight = source->rows;
 
 	if (width < 1 && height < 1 && x < 1 && y < 1) {
+		if (x + width > 1) {
+			width = 1 - x;
+		}
+		if (y + height > 1) {
+			height = 1 - y;
+		}
 		width *= swidth;
 		height *= sheight;
 		x *= swidth;
@@ -233,7 +239,7 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Pale
 	xbar = xstart + (int)(0.25 * width);
 	xline = xstart + (int)(0.4 * width);
 
-	rectangle(*dest, rect.tl(), rect.br(), background, LineTypes::FILLED, LINE_AA);
+	rectangle(*dest, rect.tl(), rect.br(), background, LineTypes::FILLED, LineTypes::LINE_AA);
 
 	for (int y = ystart; y < yend; y++) {
 		val = (float)(y - ystart) / yrange;
@@ -243,7 +249,7 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Pale
 		default: color = ColorScale::getGrayScale(val); break;
 		}
 
-		line(*dest, Point(xstart, y), Point(xbar, y), Util::bgrtoScalar(color), 1, LINE_AA);
+		line(*dest, Point(xstart, y), Point(xbar, y), Util::bgrtoScalar(color), 1, LineTypes::LINE_AA);
 	}
 
 	for (int i = 0; i <= logPower; i++) {
@@ -253,10 +259,10 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Pale
 		if (i == 0) {
 			label += "   (1)";
 		}
-		putText(*dest, label, Point(xline, (int)(y + textSize.height / 2)), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, infoColor, thickness, LINE_AA);
+		putText(*dest, label, Point(xline, (int)(y + textSize.height / 2)), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, infoColor, thickness, LineTypes::LINE_AA);
 		label = Util::format("%d", -i);
-		putText(*dest, label, Point((int)(xline + textSize.width), y), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, infoColor, thickness, LINE_AA);
-		line(*dest, Point(xstart, y), Point(xline, y), infoColor, 1, LINE_AA);
+		putText(*dest, label, Point((int)(xline + textSize.width), y), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, infoColor, thickness, LineTypes::LINE_AA);
+		line(*dest, Point(xstart, y), Point(xline, y), infoColor, 1, LineTypes::LINE_AA);
 	}
 }
 
@@ -277,12 +283,12 @@ void ImageOperations::drawColorSwatches(Mat* dest, Rect rect) {
 	double fontScale = width * 0.004;
 	int ntotal = 27;
 
-	rectangle(*dest, rect.tl(), rect.br(), background, LineTypes::FILLED, LINE_AA);
+	rectangle(*dest, rect.tl(), rect.br(), background, LineTypes::FILLED, LineTypes::LINE_AA);
 
 	for (int i = 0; i < ntotal; i++) {
 		y1 = (int)(ystart + i * yrange / ntotal) + 1;
 		y2 = (int)(ystart + (i + 1) * yrange / ntotal) - 1;
 		color = Util::getLabelColor(i);
-		rectangle(*dest, Point(xstart, y1), Point(xbar, y2), color, LineTypes::FILLED, LINE_AA);
+		rectangle(*dest, Point(xstart, y1), Point(xbar, y2), color, LineTypes::FILLED, LineTypes::LINE_AA);
 	}
 }

@@ -86,10 +86,10 @@ bool ScriptOperations::moveNextOperation() {
 	return (currentOperationi < size());
 }
 
-string ScriptOperations::getDebug() {
+string ScriptOperations::getDebug(int level) {
 	string s;
 	for (ScriptOperation* operation : *this) {
-		s += operation->getDebug();
+		s += operation->getDebug(level);
 	}
 	return s;
 }
