@@ -71,7 +71,7 @@ void ScriptProcessing::reset() {
 	sourceFps = 0;
 	sourceFrameNumber = 0;
 	logPower = 0;
-	abort = false;
+	operationMode = OperationMode::Idle;
 
 	scriptOperations->reset();
 	imageList->reset();
@@ -92,7 +92,6 @@ bool ScriptProcessing::startProcessNoGui(string scriptFilename) {
 	string script;
 
 	this->observer = &observer;
-	this->qtGui = false;
 
 	reset();
 	if (!filesystem::exists(scriptFilename)) {
@@ -109,6 +108,7 @@ bool ScriptProcessing::startProcessNoGui(string scriptFilename) {
 		script = Util::readText(scriptFilename);
 		scriptOperations->extract(script, 0);
 		this->observer->resetProgressTimer();
+		operationMode = OperationMode::Run;
 		processThreadMethod();
 	} catch (exception e) {
 		showDialog(Util::getExceptionDetail(e), MessageLevel::Error);
@@ -119,13 +119,20 @@ bool ScriptProcessing::startProcessNoGui(string scriptFilename) {
 }
 
 bool ScriptProcessing::startProcess(string filepath, string script) {
-	reset();
-	basepath = Util::extractFilePath(filepath);
-
 	try {
-		scriptOperations->extract(script, 0);
-		observer->resetProgressTimer();
-		processThread = new std::thread(&ScriptProcessing::processThreadMethod, this);
+		if (operationMode != OperationMode::Run) {
+			if (operationMode == OperationMode::Idle) {
+				reset();
+				basepath = Util::extractFilePath(filepath);
+				scriptOperations->extract(script, 0);
+			}
+			observer->resetProgressTimer();
+			operationMode = OperationMode::Run;
+			processThread = new std::thread(&ScriptProcessing::processThreadMethod, this);
+		} else {
+			operationMode = OperationMode::Pause;
+		}
+		setMode(operationMode);
 	} catch (exception e) {
 		showDialog(Util::getExceptionDetail(e), MessageLevel::Error);
 		doAbort();
@@ -136,7 +143,9 @@ bool ScriptProcessing::startProcess(string filepath, string script) {
 
 void ScriptProcessing::processThreadMethod() {
 	processOperations(scriptOperations, NULL);
-	doAbort();
+	if (operationMode != OperationMode::Pause) {
+		doAbort();
+	}
 }
 
 void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOperation* prevOperation0) {
@@ -144,7 +153,7 @@ void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOpe
 	ScriptOperation* prevOperation = prevOperation0;
 	bool operationFinished;
 
-	while (!abort) {
+	while (operationMode == OperationMode::Run) {
 		operation = operations->getCurrentOperation();
 		if (operation) {
 			operation->reset();
@@ -639,19 +648,19 @@ double ScriptProcessing::getTime(int frame) {
 }
 
 void ScriptProcessing::doAbort() {
-	abort = true;
+	operationMode = OperationMode::Idle;
 	this_thread::sleep_for(100ms);
 
 	imageTrackers->close();
 	scriptOperations->close();
 
 	observer->resetProgressTimer();
-	resetUI();
+	setMode(OperationMode::Idle);
 	clearStatus();
 }
 
-void ScriptProcessing::resetUI() {
-	observer->resetUI();
+void ScriptProcessing::setMode(OperationMode mode) {
+	observer->setMode((int)mode);
 }
 
 void ScriptProcessing::clearStatus() {

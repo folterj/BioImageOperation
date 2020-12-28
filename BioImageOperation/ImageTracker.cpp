@@ -13,6 +13,7 @@
 #include "Util.h"
 #include "NumericPath.h"
 #include "ColorScale.h"
+#include "Types.h"
 
 
 ImageTracker::ImageTracker(Observer* observer) {
@@ -149,9 +150,7 @@ bool ImageTracker::findClusters(Mat* image) {
 		maxArea = 0;
 	}
 
-	// clean up
 	deleteClusters();
-
 	clusters.reserve(n - 1);
 	for (int label = 1; label < n; label++) {
 		// skip initial 'full-image label' returned by connectedComponents
@@ -204,10 +203,8 @@ void ImageTracker::matchClusterTracks() {
 	unordered_map<int, int> trackMatchIndices;
 	ClusterTrack* track;
 	TrackClusterMatch* match;
-	Cluster* cluster;
 	int maxArea = (int)trackingParams.area.getMax();
 	double maxMove = trackingParams.maxMove.getMax();
-	double distance;
 	int label, i, ii, mini;
 	string message;
 	double score, newScore;
@@ -232,17 +229,13 @@ void ImageTracker::matchClusterTracks() {
 	sort(trackMatches.begin(), trackMatches.end(),
 		[](vector<TrackClusterMatch*> a, vector<TrackClusterMatch*> b) { return a[0]->matchFactor > b[0]->matchFactor; });
 
-	// build track-match lookup list
-	for (ClusterTrack* track : clusterTracks) {
-		i = 0;
-		for (vector<TrackClusterMatch*> trackMatch : trackMatches) {
-			if (trackMatch[0]->track == track) {
-				trackMatchIndices[track->label] = i;
-			}
-			i++;
-		}
+	i = 0;
+	for (vector<TrackClusterMatch*> trackMatch : trackMatches) {
+		match = trackMatch[0];
+		trackMatchIndices[match->track->label] = i;
+		i++;
 	}
-
+	
 	// find optimal solution
 	clashMatches = findClashMatches(trackMatches);
 	score = trackMatchScore(trackMatches);

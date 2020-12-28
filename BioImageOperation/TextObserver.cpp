@@ -28,7 +28,7 @@ bool TextObserver::checkImageProcess(int displayi) {
 	return true;
 }
 
-void TextObserver::resetUI() {
+void TextObserver::setMode(int mode) {
 }
 
 void TextObserver::clearStatus() {

@@ -46,10 +46,9 @@ public:
 	int sourceFrameNumber = 0;
 	double logPower = 0;
 	Palette logPalette;
-	bool abort = false;
+	OperationMode operationMode = OperationMode::Idle;
 	bool debugMode = false;
-	bool qtGui = true;
-
+	
 	ScriptProcessing();
 	~ScriptProcessing();
 	void registerObserver(Observer* observer);
@@ -86,7 +85,7 @@ public:
 	 */
 	void doAbort();
 
-	void resetUI();
+	void setMode(OperationMode mode);
 	void clearStatus();
 	void showStatus(int i, int tot = 0, string label = "");
 	void showText(string text, int displayi, string reference = "");

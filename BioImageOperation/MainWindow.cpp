@@ -41,6 +41,7 @@ MainWindow::MainWindow(QWidget* parent)
 	ui.actionHelp->setIcon(style()->standardIcon(QStyle::SP_DialogHelpButton));
 	ui.actionAbout->setIcon(style()->standardIcon(QStyle::SP_MessageBoxQuestion));
 
+	defaultProcessText = ui.processButton->text().toStdString();
 	ui.processButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 	ui.abortButton->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
 
@@ -60,7 +61,7 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(ui.processButton, &QAbstractButton::clicked, this, &MainWindow::process);
 	connect(ui.abortButton, &QAbstractButton::clicked, &scriptProcessing, &ScriptProcessing::doAbort);
 
-	connect(this, &MainWindow::resetUI, this, &MainWindow::resetUIQt);
+	connect(this, &MainWindow::setMode, this, &MainWindow::setModeQt);
 	connect(this, &MainWindow::clearStatus, this, &MainWindow::clearStatusQt);
 	connect(this, &MainWindow::showStatus, this, &MainWindow::showStatusQt);
 	connect(this, &MainWindow::showText, this, &MainWindow::showTextQt);
@@ -190,28 +191,7 @@ void MainWindow::textChanged() {
 }
 
 void MainWindow::process() {
-	updateUI(true);
 	scriptProcessing.startProcess(filepath, ui.scriptTextEdit->toPlainText().toStdString());
-}
-
-void MainWindow::updateUI(bool start) {
-	ui.processButton->setEnabled(!start);
-	ui.abortButton->setEnabled(start);
-	ui.scriptTextEdit->setReadOnly(start);
-
-	if (start) {
-		Keepalive::startKeepAlive();
-	} else {
-		Keepalive::stopKeepAlive();
-	}
-}
-
-void MainWindow::resetUIQt() {
-	try {
-		updateUI(false);
-	} catch (exception e) {
-		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
-	}
 }
 
 void MainWindow::resetProgressTimer() {
@@ -234,6 +214,38 @@ void MainWindow::timerElapsed() {
 	try {
 		for (int i = 0; i < Constants::nDisplays; i++) {
 			imageWindows[i].updateFps();
+		}
+	} catch (exception e) {
+		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
+	}
+}
+
+void MainWindow::setModeQt(int mode0) {
+	OperationMode mode = (OperationMode)mode0;
+	bool controlsEnabled = (mode == OperationMode::Idle);
+	string buttonText;
+
+	try {
+		if (mode == OperationMode::Run) {
+			buttonText = "Pause";
+			ui.processButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
+		} else if (mode == OperationMode::Pause) {
+			buttonText = "Continue";
+			ui.processButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+		} else {
+			buttonText = defaultProcessText;
+			ui.processButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+		}
+		ui.processButton->setText(Util::convertToQString(buttonText));
+		ui.abortButton->setEnabled(!controlsEnabled);
+		ui.scriptTextEdit->setReadOnly(!controlsEnabled);
+		ui.actionClear->setEnabled(controlsEnabled);
+		ui.actionOpen->setEnabled(controlsEnabled);
+
+		if (mode == OperationMode::Run) {
+			Keepalive::startKeepAlive();
+		} else {
+			Keepalive::stopKeepAlive();
 		}
 	} catch (exception e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);

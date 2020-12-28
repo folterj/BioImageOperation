@@ -173,8 +173,6 @@ string Util::formatTimespan(int seconds0) {
 	string s;
 	int hours, minutes;
 	int seconds = seconds0;
-	const int buflen = 1000;
-	char buffer[buflen];
 	hours = seconds / 3600;
 	if (hours > 0) {
 		s += to_string(hours) + ":";
@@ -182,12 +180,12 @@ string Util::formatTimespan(int seconds0) {
 	}
 	minutes = seconds / 60;
 	if (minutes > 0) {
-		s += Util::format("%2d", minutes) + ":";
+		s += Util::format("%02d", minutes) + ":";
 		seconds %= 60;
 	} else {
 		s += "0:";
 	}
-	s += Util::format("%2d", minutes, seconds);
+	s += Util::format("%02d", seconds);
 	return s;
 }
 

@@ -26,7 +26,6 @@ class ScriptOperations;	// forward declaration
 class ScriptOperation
 {
 public:
-	ScriptOperations* innerOperations = NULL;
 	ScriptOperationType operationType = ScriptOperationType::None;
 	vector<Argument*> arguments;
 	int argumentPos;
@@ -38,6 +37,8 @@ public:
 	int interval = 1;
 	int offset = 0;
 	int count = 0;
+
+	ScriptOperations* innerOperations = NULL;
 
 	FrameSource* frameSource = NULL;
 	FrameOutput* frameOutput = NULL;

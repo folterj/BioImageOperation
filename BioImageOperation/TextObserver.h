@@ -11,11 +11,10 @@
 #include <chrono>
 #include "Observer.h"
 #include <opencv2/opencv.hpp>
+#include "Types.h"
 
 using namespace std;
 using namespace cv;
-
-typedef std::chrono::high_resolution_clock Clock;
 
 
 class TextObserver : public Observer
@@ -28,7 +27,7 @@ public:
 	virtual bool checkStatusProcess() override;
 	virtual bool checkTextProcess(int displayi) override;
 	virtual bool checkImageProcess(int displayi) override;
-	virtual void resetUI() override;
+	virtual void setMode(int mode) override;
 	virtual void clearStatus() override;
 	virtual void showStatus(int i, int tot = 0, string label = "") override;
 	virtual void showDialog(string message, int level = (int)MessageLevel::Info) override;

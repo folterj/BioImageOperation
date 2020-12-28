@@ -34,6 +34,7 @@ private:
 	ImageWindow imageWindows[Constants::nDisplays];
 	TextWindow textWindows[Constants::nTextWindows], scriptHelpWindow, debugWindow;
 	AboutWindow aboutWindow;
+	string defaultProcessText;
 	ScriptProcessing scriptProcessing;
 	QTimer* timer;
 	Clock::time_point time;
@@ -56,7 +57,6 @@ public:
 	bool askSaveChanges();
 	void textChanged();
 	void process();
-	void updateUI(bool start);
 	void timerElapsed();
 	virtual void resetProgressTimer() override;
 	virtual bool checkStatusProcess() override;
@@ -64,7 +64,7 @@ public:
 	virtual bool checkImageProcess(int displayi) override;
 
 signals:
-	void resetUI();
+	void setMode(int mode);
 	void clearStatus();
 	void showStatus(int i, int tot = 0, string label = "");
 	void showDialog(string message, int level = (int)MessageLevel::Info);
@@ -72,7 +72,7 @@ signals:
 	void showImage(Mat* image, int displayi, string reference = "");
 
 public slots:
-	void resetUIQt();
+	void setModeQt(int mode);
 	void clearStatusQt();
 	void showStatusQt(int i, int tot = 0, string label = "");
 	void showDialogQt(string message, int level = (int)MessageLevel::Info);

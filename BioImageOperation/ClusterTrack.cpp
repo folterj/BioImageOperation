@@ -19,7 +19,7 @@ ClusterTrack::ClusterTrack(int label) {
 
 void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistance, bool positionPrediction) {
 	double orientationGuess, slowMoveDist;
-	double angleInv, angleDif, angleDifInv;
+	double angleDif, angleDifInv;
 	double newx, newy, dx0, dy0, dist0, dangle;
 	int ntracks = (int)cluster->assignedTracks.size();
 	bool wasMerged = isMerged;
@@ -78,7 +78,7 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 		}
 
 		if (abs(angle) > 45 && abs(cluster->angle) > 45 && angle * cluster->angle < 0) {
-			// angle 'swapped sign'
+			// angle has 'swapped sign'
 			forwardDist = -forwardDist;
 		}
 		angle = cluster->angle;

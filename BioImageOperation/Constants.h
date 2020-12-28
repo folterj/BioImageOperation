@@ -144,6 +144,13 @@ const vector<string> ScriptOperationTypes =
 	"Debug"
 };
 
+enum class OperationMode
+{
+	Idle,
+	Run,
+	Pause
+};
+
 enum class MessageLevel
 {
 	Info,

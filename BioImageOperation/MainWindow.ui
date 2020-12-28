@@ -111,11 +111,6 @@
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionNew">
-   <property name="text">
-    <string>New</string>
-   </property>
-  </action>
   <action name="actionClear">
    <property name="text">
     <string>Clear</string>
