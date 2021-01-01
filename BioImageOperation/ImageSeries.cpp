@@ -14,19 +14,24 @@
 ImageSeries::ImageSeries() {
 }
 
-ImageSeries::~ImageSeries() {
-}
-
 void ImageSeries::reset() {
 	images.clear();
+	nchannels = 0;
+	type = 0;
 	width = 0;
 	height = 0;
 }
 
 void ImageSeries::addImage(Mat* image, int bufferSize) {
-	if (width == 0 || height == 0) {
+	vector<Mat> channels;
+
+	if (images.empty()) {
+		nchannels = image->channels();
+		type = image->type();
 		width = image->cols;
 		height = image->rows;
+	} else if (image->channels() != nchannels) {
+		throw invalid_argument("Number of image channels does not match current image series");
 	} else if (image->cols != width || image->rows != height) {
 		throw invalid_argument("Image size does not match current image series");
 	}
@@ -37,54 +42,50 @@ void ImageSeries::addImage(Mat* image, int bufferSize) {
 			images.pop_front();
 		}
 	}
-	images.push_back(image->clone());
+
+	vector<vector<uchar>> vimage(nchannels);
+
+	split(*image, channels);
+	for (int c = 0; c < nchannels; c++) {
+		channels[c].reshape(0, 1).copyTo(vimage[c]);
+	}
+	images.push_back(vimage);
 }
 
-bool ImageSeries::getMedian(OutputArray dest, Observer* observer) {
+bool ImageSeries::getMedian(OutputArray dest) {
 	Mat image;
-	unsigned char* outData;
-	unsigned char* inData;
+	uchar* outData;
+	uchar* inData;
 	int pixeli;
+	int npixels = width * height;
 	int m;
-	unsigned char median;
+	uchar median;
 	int n = (int)images.size();
-	vector<unsigned char> pixelBuffer(n);
+	vector<uchar> pixelBuffer(n), vimage;
 
 	if (n == 0) {
 		return false;
 	}
 
-	// Currently only works for GrayScale
-	for (int i = 0; i < n; i++) {
-		if (images[i].channels() > 1) {
-			ImageOperations::convertToGrayScale(images[i], images[i]);
-		}
-	}
-
-	dest.create(height, width, CV_8U);
+	dest.create(height, width, type);
 	image = dest.getMat();
-	outData = (unsigned char*)image.data;
+	outData = (uchar*)image.data;
 
-	for (int y = 0; y < height; y++) {
-		for (int x = 0; x < width; x++) {
-			pixeli = y * width + x;
+	for (pixeli = 0; pixeli < npixels; pixeli++) {
+		for (int c = 0; c < nchannels; c++) {
 			for (int i = 0; i < n; i++) {
-				inData = images[i].data;
-				pixelBuffer[i] = inData[pixeli]; // * slow
+				pixelBuffer[i] = images[i][c][pixeli];
 			}
-			sort(pixelBuffer.begin(), pixelBuffer.end()); // * very slow
 			m = n / 2;
-			if (n % 2 != 0) {
-				// odd number: single middle element
-				median = pixelBuffer[m];
-			} else {
-				// even number: two middle elements
-				median = (pixelBuffer[m] + pixelBuffer[m - 1]) / 2;
+			nth_element(pixelBuffer.begin(), pixelBuffer.begin() + m, pixelBuffer.end());
+			median = pixelBuffer[m];
+			if (n % 2 == 0) {
+				// even number of images: average of 2 middle elements
+				m--;
+				nth_element(pixelBuffer.begin(), pixelBuffer.begin() + m, pixelBuffer.end());
+				median = (median + pixelBuffer[m]) / 2;
 			}
-			outData[y * width + x] = median;
-		}
-		if (observer) {
-			observer->showStatus(y, height);
+			outData[pixeli * nchannels + c] = median;
 		}
 	}
 	return true;

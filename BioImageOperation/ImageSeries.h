@@ -22,14 +22,14 @@ using namespace cv;
 class ImageSeries
 {
 public:
-	deque<Mat> images;
+	deque<vector<vector<uchar>>> images;
+	int nchannels = 0;
+	int type = 0;
 	int width = 0;
 	int height = 0;
 
 	ImageSeries();
-	~ImageSeries();
-
 	void reset();
 	void addImage(Mat* image, int bufferSize = 0);
-	bool getMedian(OutputArray dest, Observer* observer);
+	bool getMedian(OutputArray dest);
 };

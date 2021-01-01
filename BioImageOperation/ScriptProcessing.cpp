@@ -446,7 +446,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::GetSeriesMedian:
-			newImageSet = imageSeries->getMedian(*newImage, observer);
+			newImageSet = imageSeries->getMedian(*newImage);
 			break;
 
 		case ScriptOperationType::AddAccum:
