@@ -48,8 +48,8 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 			dist = slowMoveDist;
 		}
 		// movement towards centre
-		dx = (dx * 0.9 + dx0 * 0.1);
-		dy = (dy * 0.9 + dy0 * 0.1);
+		dx = (dx * 0.9 + dx0 * 0.1) * 0.8;
+		dy = (dy * 0.9 + dy0 * 0.1) * 0.8;
 		dist = Util::calcDistance(dx, dy);
 		newx = x + dx;
 		newy = y + dy;
@@ -107,7 +107,7 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 		orientation = angle + 180;
 	}
 
-	if ((ntracks == 1 || area == 0) && cluster->area < maxArea) {
+	if ((ntracks == 1 && cluster->area < maxArea) || area == 0) {
 		// only assign area if single track
 		area = cluster->area;
 		rad = cluster->rad;
@@ -122,7 +122,6 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 	isNew = false;
 	activeCount++;
 	inactiveCount = 0;
-	assign();
 }
 
 void ClusterTrack::unAssign() {

@@ -39,10 +39,11 @@ public:
 
 
 	Cluster(double x, double y, double area, Rect box, Moments* moments, Mat* clusterImage);
-	void unAssign();
 	bool isAssignable(double trackedArea);
 	void assign(ClusterTrack* track);
 	bool isAssigned();
+	void unAssign(ClusterTrack* track);
+	void unAssign();
 
 	double calcDistance(ClusterTrack* track);
 	double calcAreaDif(ClusterTrack* track);

@@ -222,25 +222,15 @@ double Util::toDouble(string s) {
 }
 
 bool Util::isNumeric(string s) {
-	bool ok = (s != "");
-	int digits = 0;
-	int dots = 0;
-
-	for (char c : s) {
-		if (c == '.') {
-			dots++;
-			if (dots > 1) {
-				ok = false;
-			}
-		} else {
-			if (isdigit(c)) {
-				digits++;
-			} else {
-				ok = false;
-			}
+	double d = 0;
+	size_t stodEnd;
+	try {
+		if (s != "") {
+			d = stod(s, &stodEnd);
+			return (stodEnd == s.size());
 		}
-	}
-	return ok;
+	} catch(...) { }
+	return false;
 }
 
 bool Util::toBoolean(string s) {

@@ -38,6 +38,7 @@ public:
 	vector<vector<Point>> contours;
 	vector<Cluster*> clusters;
 	vector<ClusterTrack*> clusterTracks;
+	vector<vector<TrackClusterMatch*>> trackMatches;
 	vector<PathNode*> pathNodes;
 	vector<PathLink*> pathLinks;
 	int nextTrackLabel = 0;
@@ -112,10 +113,13 @@ public:
 	/*
 	 * Create tracks
 	 */
-	void matchClusterTracks();
+
+	void matchClusterTracks(bool findOptimalSolution);
+	void unAssignClustersTracks();
+	bool removeMatch(vector<TrackClusterMatch*>* trackMatches, TrackClusterMatch* removeMatch);
+	vector<TrackClusterMatch*> assignTracks();
+	double calcMatchScore(vector<TrackClusterMatch*>* trackMatches);
 	vector<TrackClusterMatch*> calcTrackClusterMatches(ClusterTrack* track, double maxMoveDistance);
-	vector<vector<int>> findClashMatches(vector<vector<TrackClusterMatch*>> trackMatches);
-	double trackMatchScore(vector<vector<TrackClusterMatch*>> trackMatches);
 	void pruneTracks();
 
 	/*

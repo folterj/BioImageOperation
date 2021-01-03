@@ -30,10 +30,6 @@ Cluster::Cluster(double x, double y, double area, Rect box, Moments* moments, Ma
 	}
 }
 
-void Cluster::unAssign() {
-	assignedTracks.clear();
-}
-
 bool Cluster::isAssignable(double trackedArea) {
 	int n = (int)assignedTracks.size();
 	double totalArea;
@@ -57,6 +53,17 @@ void Cluster::assign(ClusterTrack* track) {
 
 bool Cluster::isAssigned() {
 	return (assignedTracks.size() != 0);
+}
+
+void Cluster::unAssign(ClusterTrack* track) {
+	auto position = find(assignedTracks.begin(), assignedTracks.end(), track);
+	if (position != assignedTracks.end()) {
+		assignedTracks.erase(position);
+	}
+}
+
+void Cluster::unAssign() {
+	assignedTracks.clear();
 }
 
 double Cluster::calcDistance(ClusterTrack* track) {
@@ -105,8 +112,9 @@ double Cluster::getRangeFactor(ClusterTrack* track, double distance, double maxM
 
 double Cluster::calcAreaFactor(ClusterTrack* track, double areaDif) {
 	double areaFactor = 1;
-	if (!track->isMerged) {
-		areaFactor = 1 - pow(areaDif / area, 2);
+	double a = max(track->area, area);
+	if (!track->isMerged && a != 0) {
+		areaFactor = 1 - pow(areaDif / a, 2);
 	}
 	return areaFactor;
 }

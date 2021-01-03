@@ -14,13 +14,24 @@ TrackClusterMatch::TrackClusterMatch(ClusterTrack* track, Cluster* cluster, doub
 	this->track = track;
 	this->cluster = cluster;
 	this->distance = distance;
+	this->rangeFactor = rangeFactor;
 	areaDif = cluster->calcAreaDif(track);
-	double areaFactor = cluster->calcAreaFactor(track, areaDif);
+	areaFactor = cluster->calcAreaFactor(track, areaDif);
 	angleDif = cluster->calcAngleDif(track);
-	//double angleFactor = cluster->calcAngleFactor(track, angleDif);
-	matchFactor = rangeFactor * areaFactor;	// *angleFactor;
+	angleFactor = cluster->calcAngleFactor(track, angleDif);
+	matchFactor = rangeFactor * areaFactor;
+}
+
+bool TrackClusterMatch::isAssignable() {
+	return cluster->isAssignable(track->area);
 }
 
 void TrackClusterMatch::assign() {
 	cluster->assign(track);
+	track->assign();
+}
+
+void TrackClusterMatch::unAssign() {
+	cluster->unAssign(track);
+	track->unAssign();
 }
