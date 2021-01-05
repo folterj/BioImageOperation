@@ -74,7 +74,6 @@ enum class ScriptOperationType
 	ShowTrackInfo,
 	DrawTrackInfo,
 	SaveTrackInfo,
-	SaveTrackLog,
 	DrawLegend,
 
 	Wait,
@@ -137,7 +136,6 @@ const vector<string> ScriptOperationTypes =
 	"ShowTrackInfo",
 	"DrawTrackInfo",
 	"SaveTrackInfo",
-	"SaveTrackLog",
 	"DrawLegend",
 
 	"Wait",

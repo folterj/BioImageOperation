@@ -34,6 +34,6 @@ public:
 	ScriptOperation* getCurrentOperation();
 	bool moveNextOperation();
 	double getDuration();
-	string getDebug(int level);
+	string getDebug(int level = 0);
 	void close();
 };

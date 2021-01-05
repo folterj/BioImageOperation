@@ -14,7 +14,8 @@
 #include "Util.h"
 
 
-Cluster::Cluster(double x, double y, double area, Rect box, Moments* moments, Mat* clusterImage) {
+Cluster::Cluster(int clusterLabel, double x, double y, double area, Rect box, Moments* moments, Mat* clusterImage) {
+	this->clusterLabel = clusterLabel;
 	this->area = area;
 	this->x = x;
 	this->y = y;
@@ -113,14 +114,19 @@ double Cluster::getRangeFactor(ClusterTrack* track, double distance, double maxM
 double Cluster::calcAreaFactor(ClusterTrack* track, double areaDif) {
 	double areaFactor = 1;
 	double a = max(track->area, area);
-	if (!track->isMerged && a != 0) {
-		areaFactor = 1 - pow(areaDif / a, 2);
+	bool suspectMerged = (area > 1.5 * track->area);
+	if (!suspectMerged && a != 0) {
+		areaFactor = 1 - sqrt(areaDif / a);
 	}
 	return areaFactor;
 }
 
 double Cluster::calcAngleFactor(ClusterTrack* track, double angleDif) {
-	double angleFactor = 1 - sqrt(abs(angleDif) / 360);
+	double angleFactor = 1;
+	bool suspectMerged = (area > 1.5 * track->area);
+	if (!suspectMerged) {
+		angleFactor = 1 - abs(angleDif) / 360;
+	}
 	return angleFactor;
 }
 
@@ -200,13 +206,7 @@ void Cluster::drawBox(Mat* image, Scalar color) {
 }
 
 void Cluster::drawAngle(Mat* image, Scalar color) {
-	double radAngle = Util::degreesToRadians(angle);
-	int x0 = (int)(x - rad * cos(radAngle));
-	int y0 = (int)(y - rad * sin(radAngle));
-	int x1 = (int)(x + rad * cos(radAngle));
-	int y1 = (int)(y + rad * sin(radAngle));
-
-	line(*image, Point(x0, y0), Point(x1, y1), color, 1, LineTypes::LINE_AA);
+	Util::drawAngle(image, x, y, rad, angle, color, false);
 }
 
 void Cluster::drawFill(Mat* image, Scalar color) {
@@ -251,7 +251,7 @@ vector<Point> Cluster::getContour() {
 
 string Cluster::getCsv(bool writeContour) {
 	// https://www.learnopencv.com/blob-detection-using-opencv-python-c/
-	string s = format("%d,%f,%f,%f,%f,%f", getFirstLabel(), area, rad, angle, x, y);
+	string s = format("%d,%f,%f,%f,%f,%f", Util::replace(getLabels(), ",", "."), area, rad, angle, x, y);
 	/*
 	if (assignedTracks.size() == 1)
 	{

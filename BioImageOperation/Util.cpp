@@ -584,6 +584,24 @@ Size Util::drawText(Mat* image, string text, Point point, HersheyFonts fontFace,
 	return size;
 }
 
+void Util::drawAngle(Mat* image, double x, double y, double rad, double angle, Scalar color, bool isArrow) {
+	double radAngle = Util::degreesToRadians(angle);
+	double frontLength = 1;
+	if (isArrow) {
+		frontLength = 2;
+	}
+	int x0 = (int)(x - rad * cos(radAngle));
+	int y0 = (int)(y - rad * sin(radAngle));
+	int x1 = (int)(x + frontLength * rad * cos(radAngle));
+	int y1 = (int)(y + frontLength * rad * sin(radAngle));
+
+	if (isArrow) {
+		arrowedLine(*image, Point(x0, y0), Point(x1, y1), color, 1, LineTypes::LINE_AA);
+	} else {
+		line(*image, Point(x0, y0), Point(x1, y1), color, 1, LineTypes::LINE_AA);
+	}
+}
+
 QImage Util::matToQImage(Mat const& source) {
 	if (source.channels() == 1) {
 		QImage qimage(source.data, source.cols, source.rows, source.step, QImage::Format_Grayscale8);

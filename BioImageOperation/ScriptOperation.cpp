@@ -586,12 +586,6 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 		description = "Save tracking information to CSV file";
 		break;
 
-	case ScriptOperationType::SaveTrackLog:
-		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker };
-		description = "Save tracking log to CSV file";
-		break;
-
 	case ScriptOperationType::DrawLegend:
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Display, ArgumentLabel::Position };
@@ -606,8 +600,8 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 
 	case ScriptOperationType::Debug:
 		requiredArguments = vector<ArgumentLabel> { };
-		optionalArguments = vector<ArgumentLabel> { };
-		description = "Debug mode";
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker };
+		description = "For debugging / benchmarking";
 		break;
 
 	// end of switch

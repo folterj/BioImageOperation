@@ -32,4 +32,6 @@ public:
 	bool isAssignable();
 	void assign();
 	void unAssign();
+	
+	string toString();
 };

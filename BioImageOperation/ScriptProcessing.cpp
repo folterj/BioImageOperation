@@ -201,7 +201,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 	NumericPath outputPath;
 	ImageTracker* imageTracker;
-	string source;
+	string source, trackerId, output;
 	int width, height;
 	int displayi;
 	double fps;
@@ -546,12 +546,6 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			imageTracker->saveTrackInfo(outputPath.createFilePath(frame), frame, getTime(frame));
 			break;
 
-		case ScriptOperationType::SaveTrackLog:
-			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultDataExtension);
-			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
-			imageTracker->initLogClusterTrack(outputPath.createFilePath(count));
-			break;
-
 		case ScriptOperationType::DrawLegend:
 			displayi = (int)operation->getArgumentNumeric(ArgumentLabel::Display);
 			if (displayi > 0) {
@@ -578,7 +572,13 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::Debug:
 			debugMode = true;
-			showText(scriptOperations->getDebug(0), Constants::nTextWindows);
+			trackerId = operation->getArgument(ArgumentLabel::Tracker);
+			if (trackerId != "") {
+				output = imageTrackers->getTracker(NULL, trackerId)->getDebugInfo();
+			} else {
+				output = scriptOperations->getDebug();
+			}
+			showText(output, Constants::nTextWindows);
 			break;
 
 			// end of switch

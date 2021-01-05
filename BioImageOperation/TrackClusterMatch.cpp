@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #include "TrackClusterMatch.h"
+#include "Util.h"
 
 
 TrackClusterMatch::TrackClusterMatch(ClusterTrack* track, Cluster* cluster, double distance, double rangeFactor) {
@@ -34,4 +35,9 @@ void TrackClusterMatch::assign() {
 void TrackClusterMatch::unAssign() {
 	cluster->unAssign(track);
 	track->unAssign();
+}
+
+string TrackClusterMatch::toString() {
+	return Util::format("Track:%d Cluster:%d Dist:%.1f Range:%.3f DArea:%.0f FArea:%.3f DAngle:%.0f FAngle:%.3f Match:%0.3f",
+						track->label, cluster->clusterLabel, distance, rangeFactor, areaDif, areaFactor, angleDif, angleFactor, matchFactor);
 }

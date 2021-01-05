@@ -32,13 +32,14 @@ public:
 	double area = 0;
 	double rad = 0;
 	double angle = 0;
+	int clusterLabel = 0;
 
 	Rect box;
 	Moments moments;
 	Mat clusterImage;
 
 
-	Cluster(double x, double y, double area, Rect box, Moments* moments, Mat* clusterImage);
+	Cluster(int clusterLabel, double x, double y, double area, Rect box, Moments* moments, Mat* clusterImage);
 	bool isAssignable(double trackedArea);
 	void assign(ClusterTrack* track);
 	bool isAssigned();

@@ -137,6 +137,7 @@ bool ImageTracker::findClusters(Mat* image) {
 	int area, minArea, maxArea;
 	double x, y;
 	Rect box;
+	int minlabel = 1;	// skip initial 'full-image label' returned by connectedComponents
 	int n;
 	bool clusterOk;
 
@@ -152,8 +153,7 @@ bool ImageTracker::findClusters(Mat* image) {
 
 	deleteClusters();
 	clusters.reserve(n - 1);
-	for (int label = 1; label < n; label++) {
-		// skip initial 'full-image label' returned by connectedComponents
+	for (int label = minlabel; label < n; label++) {
 		area = clusterStats(label, ConnectedComponentsTypes::CC_STAT_AREA);
 
 		if ((double)area / totArea > Constants::maxBinaryPixelsFactor) {
@@ -186,7 +186,7 @@ bool ImageTracker::findClusters(Mat* image) {
 			}
 			x = clusterCentroids(label, 0);
 			y = clusterCentroids(label, 1);
-			clusters.push_back(new Cluster(x, y, area, box, &clusterMoments, &clusterRoiImage2));
+			clusters.push_back(new Cluster(label - minlabel, x, y, area, box, &clusterMoments, &clusterRoiImage2));
 		}
 	}
 	return (clusters.size() > 0);
@@ -411,15 +411,10 @@ void ImageTracker::pruneTracks() {
 			track->inactiveCount++;
 		}
 		if (maxInactive >= 0 && track->inactiveCount > maxInactive) {
-			logClusterTrack(track);
 			clusterTracks.erase(clusterTracks.begin() + i);
 			delete track;
 		} else {
 			if (track->isActive(trackingParams.minActive)) {
-				if (track->activeCount == trackingParams.minActive) {
-					// track has just become active
-					logClusterTrack(track);
-				}
 				trackingStats.nActiveTracks++;
 				trackingStats.trackLifetime.addValue(track->activeCount);
 			}
@@ -716,6 +711,17 @@ string ImageTracker::getInfo() {
 	return info;
 }
 
+string ImageTracker::getDebugInfo() {
+	string s = "";
+	for (vector<TrackClusterMatch*> trackMatch : trackMatches) {
+		for (TrackClusterMatch* match : trackMatch) {
+			s += match->toString() + "\n";
+		}
+		s += "\n";
+	}
+	return s;
+}
+
 void ImageTracker::saveClusters(string filename, int frame, double time, SaveFormat saveFormat, bool writeContour) {
 	OutputStream outStream;
 	string s = "";
@@ -780,6 +786,7 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 
 void ImageTracker::saveTracks(string filename, int frame, double time, SaveFormat saveFormat, bool writeContour) {
 	OutputStream outStream;
+	Cluster* cluster;
 	string s = "";
 	string header;
 	string sfilename;
@@ -814,7 +821,10 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 							s += string(',', dcol * nmaincols);
 							col = i;
 						}
-						s += track->getCsv(findTrackedCluster(track), writeContour) + ",";
+						if (writeContour) {
+							cluster = findTrackedCluster(track);
+						}
+						s += track->getCsv(cluster, writeContour) + ",";
 						col++;
 					}
 				}
@@ -822,11 +832,17 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 			s += "\n";
 		} else if (saveFormat == SaveFormat::ByTime) {
 			for (ClusterTrack* track : clusterTracks) {
-				s += Util::format("%d,%f,%s\n", frame, time, track->getCsv(findTrackedCluster(track), writeContour).c_str());
+				if (writeContour) {
+					cluster = findTrackedCluster(track);
+				}
+				s += Util::format("%d,%f,%s\n", frame, time, track->getCsv(cluster, writeContour).c_str());
 			}
 		} else if (saveFormat == SaveFormat::Split) {
 			for (ClusterTrack* track : clusterTracks) {
-				s = Util::format("%d,%f,%s\n", frame, time, track->getCsv(findTrackedCluster(track), writeContour).c_str());
+				if (writeContour) {
+					cluster = findTrackedCluster(track);
+				}
+				s = Util::format("%d,%f,%s\n", frame, time, track->getCsv(cluster, writeContour).c_str());
 				filepath.setOutputPath(filename);
 				sfilename = filepath.createFilePath(track->label);
 				outStream.init(sfilename, header);
@@ -869,20 +885,6 @@ void ImageTracker::saveTrackInfo(string filename, int frame, double time) {
 	}
 }
 
-void ImageTracker::initLogClusterTrack(string filename) {
-	trackLogStream.init(filename, "Label,Area,Rad,Pos X,Pos Y,Active count,Inactive count\n");
-}
-
-void ImageTracker::logClusterTrack(ClusterTrack* clusterTrack) {
-	string s = "";
-
-	if (trackLogStream.isOpen) {
-		s += Util::format("%d,%f,%f,%f,%f,%d,%d\n",
-			clusterTrack->label, clusterTrack->area, clusterTrack->rad, clusterTrack->x, clusterTrack->y, clusterTrack->activeCount, clusterTrack->inactiveCount);
-		trackLogStream.write(s);
-	}
-}
-
 Cluster* ImageTracker::findTrackedCluster(ClusterTrack* track) {
 	for (Cluster* cluster : clusters) {
 		for (ClusterTrack* clusterTrack : cluster->assignedTracks) {
@@ -899,5 +901,4 @@ void ImageTracker::closeStreams() {
 	trackStream.closeStream();
 	pathStream.closeStream();
 	trackInfoStream.closeStream();
-	trackLogStream.closeStream();
 }

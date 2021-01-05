@@ -56,6 +56,8 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 		estimateX = newx + dx;
 		estimateY = newy + dy;
 
+		forwardDist = 0;	// reset orientation when merged
+
 		dangle = Util::calcShortAngleDif(angle, cluster->angle);
 		angle += dangle * 0.01;
 	} else if (isNew) {
@@ -186,13 +188,7 @@ void ClusterTrack::drawBox(Mat* image, Scalar color) {
 }
 
 void ClusterTrack::drawAngle(Mat* image, Scalar color) {
-	double radOrientation = Util::degreesToRadians(orientation);
-	int x0 = (int)(x - rad * cos(radOrientation));
-	int y0 = (int)(y - rad * sin(radOrientation));
-	int x1 = (int)(x + 2 * rad * cos(radOrientation));
-	int y1 = (int)(y + 2 * rad * sin(radOrientation));
-
-	arrowedLine(*image, Point(x0, y0), Point(x1, y1), color, 1, LineTypes::LINE_AA);
+	Util::drawAngle(image, x, y, rad, orientation, color, (forwardDist != 0));
 }
 
 void ClusterTrack::drawTracks(Mat* image, Scalar color, int ntracks) {

@@ -50,7 +50,7 @@ public:
 	double pathDistance = Constants::minPathDistance;
 	int pathAge = 0;
 	Point countPosition;
-	OutputStream clusterStream, trackStream, pathStream, trackInfoStream, trackLogStream;
+	OutputStream clusterStream, trackStream, pathStream, trackInfoStream;
 	Mat clusterLabelImage, clusterRoiImage;
 	Mat1i clusterStats;
 	Mat1d clusterCentroids;
@@ -152,6 +152,7 @@ public:
 	 * Return tracking information to show in text Form
 	 */
 	string getInfo();
+	string getDebugInfo();
 
 	/*
 	 * Save routines
@@ -160,9 +161,7 @@ public:
 	void saveTracks(string fileName, int frame, double time, SaveFormat byLabel, bool saveContour);
 	void savePaths(string fileName, int frame, double time);
 	void saveTrackInfo(string fileName, int frame, double time);
-	void initLogClusterTrack(string fileName);
 	Cluster* findTrackedCluster(ClusterTrack* track);
-	void logClusterTrack(ClusterTrack* clusterTrack);
 
 	/*
 	 * Ensure closing & flushing any open streams
