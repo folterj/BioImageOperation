@@ -59,12 +59,16 @@ bool Util::startsWith(string src, string start) {
 
 vector<string> Util::split(const string s, const string delim, bool removeEmptyEntries) {
 	vector<string> parts;
+	string part;
 	int i = 0;
 	int i0 = 0;
 	while (i >= 0) {
 		i = s.find(delim, i0);
 		if (i >= 0) {
-			parts.push_back(s.substr(i0, i - i0));
+			part = s.substr(i0, i - i0);
+			if (part != "" || !removeEmptyEntries) {
+				parts.push_back(part);
+			}
 			i0 = i + 1;
 		}
 	}
@@ -74,6 +78,7 @@ vector<string> Util::split(const string s, const string delim, bool removeEmptyE
 
 vector<string> Util::split(const string s, const vector<string> delims, bool removeEmptyEntries) {
 	vector<string> parts;
+	string part;
 	int i = 0;
 	int i0 = 0;
 	while (i >= 0) {
@@ -84,7 +89,10 @@ vector<string> Util::split(const string s, const vector<string> delims, bool rem
 			}
 		}
 		if (i >= 0) {
-			parts.push_back(s.substr(i0, i - i0));
+			part = s.substr(i0, i - i0);
+			if (part != "" || !removeEmptyEntries) {
+				parts.push_back(part);
+			}
 			i0 = i + 1;
 		}
 	}

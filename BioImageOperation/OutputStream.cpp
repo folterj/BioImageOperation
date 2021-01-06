@@ -15,7 +15,7 @@
 OutputStream::OutputStream() {
 }
 
-OutputStream::OutputStream(string filename, bool append) {
+OutputStream::OutputStream(string filename) {
 	this->filename = filename;
 	exceptions(ofstream::failbit);
 	open(filename, std::ios_base::out);

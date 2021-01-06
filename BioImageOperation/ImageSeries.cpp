@@ -55,7 +55,6 @@ void ImageSeries::addImage(Mat* image, int bufferSize) {
 bool ImageSeries::getMedian(OutputArray dest) {
 	Mat image;
 	uchar* outData;
-	uchar* inData;
 	int pixeli;
 	int npixels = width * height;
 	int m;

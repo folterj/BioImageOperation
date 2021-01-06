@@ -24,7 +24,7 @@ public:
 	bool isOpen = false;
 
 	OutputStream();
-	OutputStream(string filename, bool append = false);
+	OutputStream(string filename);
 	~OutputStream();
 	void reset();
 	void init(string filename, string header = "");

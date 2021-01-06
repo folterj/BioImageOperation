@@ -40,8 +40,10 @@ int main(int argc, char *argv[]) {
 		} else {
 			arg = argv[1];
 			cout << PROJECT_NAME << " version " << PROJECT_VER << " / " << PROJECT_DESC << "\n" << PROJECT_URL << "\n" << endl;
-			if (Util::startsWith(arg, "-")) {
-				min_arg = Util::replace(Util::replace(arg, "--", "-"), "-", "");
+			if (Util::startsWith(arg, "-") || arg == "/help") {
+				min_arg = Util::replace(arg, "--", "-");
+				min_arg = Util::replace(min_arg, "-", "");
+				min_arg = Util::replace(min_arg, "/", "");
 				if (min_arg == "help") {
 					if (argc > 2) {
 						arg2 = argv[2];

@@ -1040,9 +1040,9 @@ string ScriptOperation::getOperationList(bool richFormat, string operation) {
 	}
 	s += "\n";
 	if (richFormat) {
-		s += "**Arguments:** **Required** Optional";
+		s += "(**Arguments:** [**required**] [optional])";
 	} else {
-		s += "Arguments:  Required*  Optional";
+		s += "(Arguments: [required*] [optional])";
 	}
 	s += "\n";
 

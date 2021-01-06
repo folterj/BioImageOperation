@@ -190,7 +190,6 @@ void ImageOperations::drawLegend(InputArray source, OutputArray dest, DrawPositi
 	int lwidth = (int)(vwidth * width);
 	int lheight = (int)(vheight * height);
 	int top, left;
-	bool isColor = (source.channels() > 1);
 
 	switch (position) {
 	case DrawPosition::TopLeft: left = 0; top = 0; break;
@@ -278,9 +277,7 @@ void ImageOperations::drawColorSwatches(Mat* dest, Rect rect) {
 	int yrange = yend - ystart;
 	int xstart = rect.tl().x;
 	int xbar = xstart + (int)(0.25 * width);
-	int xline = xstart + (int)(0.5 * width);
 	int y1, y2;
-	double fontScale = width * 0.004;
 	int ntotal = 27;
 
 	rectangle(*dest, rect.tl(), rect.br(), background, LineTypes::FILLED, LineTypes::LINE_AA);

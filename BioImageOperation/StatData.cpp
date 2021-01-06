@@ -120,7 +120,7 @@ void StatData::calcSSStdDev() {
 }
 
 void StatData::calcHistogram() {
-	int n = (int)data.size();
+    //int n = (int)data.size();
 	int i;
 
 	std::sort(data.begin(), data.end());

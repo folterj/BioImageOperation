@@ -22,7 +22,6 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 	double angleDif, angleDifInv;
 	double newx, newy, dx0, dy0, dist0, dangle;
 	int ntracks = (int)cluster->assignedTracks.size();
-	bool wasMerged = isMerged;
 
 	isMerged = (ntracks > 1);
 
