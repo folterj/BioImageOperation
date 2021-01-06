@@ -10,9 +10,9 @@ The solution balancing both the need for research purposes and flexibility requi
 
 The tool uses the widely used OpenCV for many of it's image operations, with an efficient tracking algorithm allowing real time processing.
 
-This is a Microsoft Visual Studio 2019 / C++ CMake project
+This is a CMake / Qt / Microsoft Visual Studio 2019 project
 
-The project can either be opened as a Visual Studio project opening the solution file, or as a CMake project by opening the BioImageOperation root folder.
+The project can be opened as a CMake or Qt project by opening the BioImageOperation root folder, or as a Visual Studio project opening the solution file.
 
 ## Requirements
 - CMake ([cmake.org](https://cmake.org/)) / Visual Studio ([visualstudio.microsoft.com](https://visualstudio.microsoft.com/))
