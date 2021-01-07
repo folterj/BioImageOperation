@@ -246,5 +246,5 @@ string ClusterTrack::getCsv(Cluster* cluster, bool writeContour) {
 }
 
 string ClusterTrack::toString() {
-	return Util::format("Label:%d Area:%.1f Radius:%.1f Angle:%.1f X:%.1f Y:%.1f", label, area, rad, orientation, x, y);
+	return Util::format("Label:%d Area:%.0f Radius:%.0f Orientation:%.0f X:%.0f Y:%.0f", label, area, rad, orientation, x, y);
 }
