@@ -22,6 +22,7 @@ using namespace cv;
 class Observer abstract
 {
 public:
+	virtual void pause() = 0;
 	virtual void setMode(int mode) = 0;
 	virtual void resetProgressTimer() = 0;
 	virtual void clearStatus() = 0;

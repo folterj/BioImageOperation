@@ -58,6 +58,7 @@ public:
 	void textChanged();
 	void process();
 	void timerElapsed();
+	virtual void pause() override;
 	virtual void resetProgressTimer() override;
 	virtual bool checkStatusProcess() override;
 	virtual bool checkTextProcess(int displayi) override;

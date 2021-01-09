@@ -27,6 +27,7 @@ public:
 	double areaFactor = 0;
 	double angleFactor = 0;
 	double matchFactor = 0;
+	bool assigned = false;
 
 	TrackClusterMatch(ClusterTrack* track, Cluster* cluster, double distance, double rangeFactor);
 	bool isAssignable();

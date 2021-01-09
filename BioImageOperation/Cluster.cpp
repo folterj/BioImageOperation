@@ -113,8 +113,11 @@ double Cluster::getRangeFactor(ClusterTrack* track, double distance, double maxM
 
 double Cluster::calcAreaFactor(ClusterTrack* track, double areaDif) {
 	double areaFactor = 1;
-	double a = max(track->area, area);
 	bool suspectMerged = (area > 1.5 * track->area);
+	double a = track->area;
+	if (a == 0) {
+		a = area;
+	}
 	if (!suspectMerged && a != 0) {
 		areaFactor = 1 - sqrt(areaDif / a);
 	}
@@ -315,5 +318,5 @@ string Cluster::getCsv(bool writeContour) {
 }
 
 string Cluster::toString() {
-	return Util::format("Label:%s Area:%.1f Radius:%.1f Angle:%.1f X:%.1f Y:%.1f", getLabels().c_str(), area, rad, angle, x, y);
+	return Util::format("#%d Labels:%s Area:%.0f Radius:%.0f Angle:%.0f X:%.0f Y:%.0f", clusterLabel, getLabels().c_str(), area, rad, angle, x, y);
 }

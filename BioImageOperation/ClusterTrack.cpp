@@ -47,8 +47,8 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 			dist = slowMoveDist;
 		}
 		// movement towards centre
-		dx = (dx * 0.9 + dx0 * 0.1) * 0.8;
-		dy = (dy * 0.9 + dy0 * 0.1) * 0.8;
+		dx = (dx * 0.9 + dx0 * 0.1) * 0.5;
+		dy = (dy * 0.9 + dy0 * 0.1) * 0.5;
 		dist = Util::calcDistance(dx, dy);
 		newx = x + dx;
 		newy = y + dy;

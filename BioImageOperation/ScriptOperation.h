@@ -73,7 +73,7 @@ public:
 	bool initFrameSource(FrameType frameType, int apiCode, string basepath, string templatePath, string start = "", string length = "", double fps0 = 1, int interval = 1);
 	void initFrameOutput(FrameType frameType, string basepath, string templatePath, string defaultExtension = "", string start = "", string length = "", double fps = 0, string codecs = "");
 	double getDuration();
-	string getDebug(int level);
+	string getBenchmarking(int level);
 	void close();
 
 private:

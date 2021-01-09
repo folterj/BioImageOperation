@@ -70,6 +70,7 @@ void ScriptProcessing::reset() {
 	sourceHeight = 0;
 	sourceFps = 0;
 	sourceFrameNumber = 0;
+	pixelSize = 0;
 	logPower = 0;
 	operationMode = OperationMode::Idle;
 
@@ -158,9 +159,7 @@ void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOpe
 		if (operation) {
 			operation->reset();
 			operationFinished = processOperation(operation, prevOperation);
-			if (debugMode) {
-				operation->finish();
-			}
+			operation->finish();
 			if (operationFinished) {
 				operations->moveNextOperation();
 			}
@@ -201,17 +200,41 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 	NumericPath outputPath;
 	ImageTracker* imageTracker;
-	string source, trackerId, output;
+	string path, source, output;
 	int width, height;
 	int displayi;
-	double fps;
+	double fps, size;
 	int frame = sourceFrameNumber;
 
 	int delay;
+	bool debugMode;
 	bool done = true;
 
 	try {
 		switch (operation->operationType) {
+		case ScriptOperationType::Set:
+			path = operation->getArgument(ArgumentLabel::Path);
+			if (path != "") {
+				basepath = path;
+			}
+			width = (int)operation->getArgumentNumeric(ArgumentLabel::Width);
+			if (width != 0) {
+				sourceWidth = width;
+			}
+			height = (int)operation->getArgumentNumeric(ArgumentLabel::Height);
+			if (height != 0) {
+				sourceHeight = height;
+			}
+			fps = operation->getArgumentNumeric(ArgumentLabel::Fps);
+			if (fps != 0) {
+				sourceFps = fps;
+			}
+			size = operation->getArgumentNumeric(ArgumentLabel::PixelSize);
+			if (size != 0) {
+				pixelSize = size;
+			}
+			break;
+
 		case ScriptOperationType::SetPath:
 			basepath = operation->getArgument(ArgumentLabel::Path);
 			break;
@@ -461,23 +484,35 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::CreateClusters:
+			debugMode = operation->getArgumentBoolean(ArgumentLabel::Debug);
 			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker), true);
-			imageTracker->createClusters(image, operation->getArgumentNumeric(ArgumentLabel::MinArea),
-										operation->getArgumentNumeric(ArgumentLabel::MaxArea),
-										basepath, debugMode);
+			output = imageTracker->createClusters(image, operation->getArgumentNumeric(ArgumentLabel::MinArea),
+													operation->getArgumentNumeric(ArgumentLabel::MaxArea),
+													basepath, debugMode);
+			if (debugMode) {
+				showText(output, Constants::nTextWindows);
+			}
 			break;
 
 		case ScriptOperationType::CreateTracks:
+			debugMode = operation->getArgumentBoolean(ArgumentLabel::Debug);
 			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
-			imageTracker->createTracks(operation->getArgumentNumeric(ArgumentLabel::MaxMove),
-										(int)operation->getArgumentNumeric(ArgumentLabel::MinActive),
-										(int)operation->getArgumentNumeric(ArgumentLabel::MaxInactive),
-										basepath);
+			output = imageTracker->createTracks(operation->getArgumentNumeric(ArgumentLabel::MaxMove),
+												(int)operation->getArgumentNumeric(ArgumentLabel::MinActive),
+												(int)operation->getArgumentNumeric(ArgumentLabel::MaxInactive),
+												basepath, debugMode);
+			if (debugMode) {
+				showText(output, Constants::nTextWindows);
+			}
 			break;
 
 		case ScriptOperationType::CreatePaths:
+			debugMode = operation->getArgumentBoolean(ArgumentLabel::Debug);
 			imageTracker = imageTrackers->getTracker(observer, operation->getArgument(ArgumentLabel::Tracker));
-			imageTracker->createPaths(operation->getArgumentNumeric(ArgumentLabel::Distance));
+			output = imageTracker->createPaths(operation->getArgumentNumeric(ArgumentLabel::Distance), debugMode);
+			if (debugMode) {
+				showText(output, Constants::nTextWindows);
+			}
 			break;
 
 		case ScriptOperationType::DrawClusters:
@@ -570,15 +605,8 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			this_thread::sleep_for(chrono::milliseconds(delay));
 			break;
 
-		case ScriptOperationType::Debug:
-			debugMode = true;
-			trackerId = operation->getArgument(ArgumentLabel::Tracker);
-			if (trackerId != "") {
-				output = imageTrackers->getTracker(NULL, trackerId)->getDebugInfo();
-			} else {
-				output = scriptOperations->getDebug();
-			}
-			showText(output, Constants::nTextWindows);
+		case ScriptOperationType::Benchmark:
+			showText(scriptOperations->getBenchmarking(), Constants::nTextWindows);
 			break;
 
 			// end of switch
@@ -657,6 +685,11 @@ void ScriptProcessing::doAbort() {
 	observer->resetProgressTimer();
 	setMode(OperationMode::Idle);
 	clearStatus();
+}
+
+void ScriptProcessing::doPause() {
+	operationMode = OperationMode::Pause;
+	setMode(operationMode);
 }
 
 void ScriptProcessing::setMode(OperationMode mode) {

@@ -61,8 +61,6 @@ public:
 	StatData distanceStats;
 	TrackingStats trackingStats;
 
-	bool debugMode = false;
-
 	/*
 	 * Constructor for testing
 	 */
@@ -93,34 +91,36 @@ public:
 	/*
 	 * Create clusters from image entry point
 	 */
-	bool createClusters(Mat* image, double areaMin, double areaMax, string basePath, bool debugMode);
+	string createClusters(Mat* image, double areaMin, double areaMax, string basePath, bool debugMode);
 
 	/*
 	 * Create tracks entry point
 	 */
-	void createTracks(double maxMove, int minActive, int maxInactive, string basePath);
+	string createTracks(double maxMove, int minActive, int maxInactive, string basePath, bool debugMode);
 
 	/*
 	 * Create paths entry point
 	 */
-	void createPaths(double pathDistance);
+	string createPaths(double pathDistance, bool debugMode);
 
 	/*
 	 * Create clusters from image
 	 */
-	bool findClusters(Mat* image);
+	bool findClusters(Mat* image, bool debugMode);
 
 	/*
 	 * Create tracks
 	 */
 
-	void matchClusterTracks(bool findOptimalSolution);
-	void unAssignClustersTracks();
+	void matchClusterTracks(bool findOptimalSolution, bool debugMode);
+	void unAssignAll();
 	bool removeMatch(vector<TrackClusterMatch*>* trackMatches, TrackClusterMatch* removeMatch);
 	vector<TrackClusterMatch*> assignTracks();
 	double calcMatchScore(vector<TrackClusterMatch*>* trackMatches);
 	vector<TrackClusterMatch*> calcTrackClusterMatches(ClusterTrack* track, double maxMoveDistance);
 	void pruneTracks();
+	string getClusterDebugInfo();
+	string getTrackDebugInfo();
 
 	/*
 	 * Create paths
@@ -133,12 +133,12 @@ public:
 	/*
 	 * Update automatic clustering parameters
 	 */
-	void updateClusterParams();
+	void updateClusterParams(bool debugMode);
 
 	/*
 	 * Update automatic tracking parameters
 	 */
-	void updateTrackParams();
+	void updateTrackParams(bool debugMode);
 
 	/*
 	 * Drawing routines
@@ -149,10 +149,9 @@ public:
 	void drawTrackInfo(Mat* source, Mat* dest);
 
 	/*
-	 * Return tracking information to show in text Form
+	 * Return tracking information to show in text window
 	 */
 	string getInfo();
-	string getDebugInfo();
 
 	/*
 	 * Save routines

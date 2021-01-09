@@ -44,10 +44,10 @@ public:
 	int sourceHeight = 0;
 	double sourceFps = 0;
 	int sourceFrameNumber = 0;
+	double pixelSize = 0;
 	double logPower = 0;
 	Palette logPalette;
 	OperationMode operationMode = OperationMode::Idle;
-	bool debugMode = false;
 	
 	ScriptProcessing();
 	~ScriptProcessing();
@@ -84,7 +84,7 @@ public:
 	 * Abort thread, attempt closing output streams to prevent data loss
 	 */
 	void doAbort();
-
+	void doPause();
 	void setMode(OperationMode mode);
 	void clearStatus();
 	void showStatus(int i, int tot = 0, string label = "");

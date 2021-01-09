@@ -194,6 +194,10 @@ void MainWindow::process() {
 	scriptProcessing.startProcess(filepath, ui.scriptTextEdit->toPlainText().toStdString());
 }
 
+void MainWindow::pause() {
+	scriptProcessing.doPause();
+}
+
 void MainWindow::resetProgressTimer() {
 	time = Clock::now();
 	processCount = 0;

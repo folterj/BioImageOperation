@@ -21,6 +21,7 @@ using namespace std;
 enum class ScriptOperationType
 {
 	None,
+	Set,
 	SetPath,
 
 	CreateImage,
@@ -77,12 +78,13 @@ enum class ScriptOperationType
 	DrawLegend,
 
 	Wait,
-	Debug,
+	Benchmark,
 };
 
 const vector<string> ScriptOperationTypes =
 {
 	"None",
+	"Set",
 	"SetPath",
 
 	"CreateImage",
@@ -139,7 +141,7 @@ const vector<string> ScriptOperationTypes =
 	"DrawLegend",
 
 	"Wait",
-	"Debug"
+	"Benchmark"
 };
 
 enum class OperationMode

@@ -30,14 +30,20 @@ bool TrackClusterMatch::isAssignable() {
 void TrackClusterMatch::assign() {
 	cluster->assign(track);
 	track->assign();
+	assigned = true;
 }
 
 void TrackClusterMatch::unAssign() {
 	cluster->unAssign(track);
 	track->unAssign();
+	assigned = false;
 }
 
 string TrackClusterMatch::toString() {
-	return Util::format("Track:%d Cluster:%d Dist:%.1f Range:%.3f DArea:%.0f FArea:%.3f DAngle:%.0f FAngle:%.3f Match:%0.3f",
-						track->label, cluster->clusterLabel, distance, rangeFactor, areaDif, areaFactor, angleDif, angleFactor, matchFactor);
+	string s = Util::format("Track:%d Cluster:#%d Dist:%.1f Range:%.3f DArea:%.0f FArea:%.3f DAngle:%.0f FAngle:%.3f Match:%0.3f",
+							track->label, cluster->clusterLabel, distance, rangeFactor, areaDif, areaFactor, angleDif, angleFactor, matchFactor);
+	if (assigned) {
+		s += " *";
+	}
+	return s;
 }

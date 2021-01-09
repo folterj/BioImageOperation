@@ -55,6 +55,7 @@ enum class ArgumentLabel
 	Path,
 	Codec,
 	Fps,
+	PixelSize,
 	AccumMode,
 	DrawMode,
 	DrawLabel,
@@ -81,7 +82,8 @@ enum class ArgumentLabel
 	Display,
 	Position,
 	Format,
-	Contour
+	Contour,
+	Debug
 };
 
 const vector<string> ArgumentLabels =
@@ -100,6 +102,7 @@ const vector<string> ArgumentLabels =
 	"Path",
 	"Codec",
 	"Fps",
+	"PixelSize",
 	"AccumMode",
 	"DrawMode",
 	"DrawLabel",
@@ -126,7 +129,8 @@ const vector<string> ArgumentLabels =
 	"Display",
 	"Position",
 	"Format",
-	"Contour"
+	"Contour",
+	"Debug"
 };
 
 class Argument

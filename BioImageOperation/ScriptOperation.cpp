@@ -310,6 +310,12 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 	string description = "";
 
 	switch (type) {
+	case ScriptOperationType::Set:
+		requiredArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Path, ArgumentLabel::Width, ArgumentLabel::Height, ArgumentLabel::Fps, ArgumentLabel::PixelSize };
+		description = "Set parameters";
+		break;
+
 	case ScriptOperationType::SetPath:
 		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
 		optionalArguments = vector<ArgumentLabel> { };
@@ -516,19 +522,19 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 
 	case ScriptOperationType::CreateClusters:
 		requiredArguments = vector<ArgumentLabel> { };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::MinArea, ArgumentLabel::MaxArea };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::MinArea, ArgumentLabel::MaxArea, ArgumentLabel::Debug };
 		description = "Create clusters; auto calibrate using initial images if no parameters specified";
 		break;
 
 	case ScriptOperationType::CreateTracks:
 		requiredArguments = vector<ArgumentLabel> { };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::MaxMove, ArgumentLabel::MinActive, ArgumentLabel::MaxInactive };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::MaxMove, ArgumentLabel::MinActive, ArgumentLabel::MaxInactive, ArgumentLabel::Debug };
 		description = "Create cluster tracking; auto calibrate using initial images if no parameters specified";
 		break;
 
 	case ScriptOperationType::CreatePaths:
 		requiredArguments = vector<ArgumentLabel> { };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Distance };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Distance, ArgumentLabel::Debug };
 		description = "Create common path usage";
 		break;
 
@@ -598,10 +604,10 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 		description = "Pause execution for a period (1000 ms default)";
 		break;
 
-	case ScriptOperationType::Debug:
+	case ScriptOperationType::Benchmark:
 		requiredArguments = vector<ArgumentLabel> { };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker };
-		description = "For debugging / benchmarking";
+		optionalArguments = vector<ArgumentLabel> { };
+		description = "For benchmarking/debugging";
 		break;
 
 	// end of switch
@@ -630,6 +636,7 @@ ArgumentType ScriptOperation::getExpectedArgumentType(ArgumentLabel argument) {
 		break;
 
 	case ArgumentLabel::Contour:
+	case ArgumentLabel::Debug:
 		type = ArgumentType::Bool;
 		break;
 
@@ -660,6 +667,7 @@ ArgumentType ScriptOperation::getExpectedArgumentType(ArgumentLabel argument) {
 	case ArgumentLabel::MaxInactive:
 	case ArgumentLabel::Distance:
 	case ArgumentLabel::Radius:
+	case ArgumentLabel::PixelSize:
 		type = ArgumentType::Num;
 		break;
 
@@ -788,6 +796,10 @@ string ScriptOperation::getArgumentDescription(ArgumentLabel argument) {
 		s = "Frames per second";
 		break;
 
+	case ArgumentLabel::PixelSize:
+		s = "Size of a pixel in arbitrary unit";
+		break;
+
 	case ArgumentLabel::Factor:
 		s = "Multiplication factor";
 		break;
@@ -854,6 +866,10 @@ string ScriptOperation::getArgumentDescription(ArgumentLabel argument) {
 
 	case ArgumentLabel::PathDrawMode:
 		s = "Path draw mode";
+		break;
+
+	case ArgumentLabel::Debug:
+		s = "Debug mode";
 		break;
 
 	case ArgumentLabel::Format:
@@ -1099,7 +1115,7 @@ double ScriptOperation::getDuration() {
 	return duration;
 }
 
-string ScriptOperation::getDebug(int level) {
+string ScriptOperation::getBenchmarking(int level) {
 	string s = string(level * 2, ' ') + line;
 	double duration = getDuration();
 	if (duration > 0) {
@@ -1112,7 +1128,7 @@ string ScriptOperation::getDebug(int level) {
 	}
 	s += "\n";
 	if (hasInnerOperations()) {
-		s += innerOperations->getDebug(level + 1);
+		s += innerOperations->getBenchmarking(level + 1);
 	}
 	return s;
 }

@@ -12,6 +12,9 @@
 #include "Util.h"
 
 
+void TextObserver::pause() {
+}
+
 void TextObserver::resetProgressTimer() {
 	time = Clock::now();
 }
