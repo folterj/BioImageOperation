@@ -212,12 +212,12 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Pale
 	Scalar background = Scalar(0, 0, 0);
 	Scalar infoColor = Scalar(0x7F, 0x7F, 0x7F);
 	BGR color;
-	int width, height;
+	int width, height, textHeight;
 	double fontScale;
 	int thickness;
 	int y, ystart, yend, yrange, xstart, xbar, xline;
-	string label0 = "10";
-	string label;
+	string label = "10";
+	string label1;
 	float val;
 	Size textSize;
 
@@ -229,10 +229,11 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Pale
 		thickness = 1;
 	}
 
-	textSize = getTextSize(label0, HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, thickness, NULL);
+	textSize = getTextSize(label, HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, thickness, NULL);
+	textHeight = textSize.height;
 
-	ystart = rect.tl().y + textSize.height;
-	yend = rect.tl().y + height - textSize.height;
+	ystart = rect.tl().y + textHeight;
+	yend = rect.tl().y + height - textHeight;
 	yrange = yend - ystart;
 	xstart = rect.tl().x;
 	xbar = xstart + (int)(0.25 * width);
@@ -247,20 +248,14 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Pale
 		case Palette::Rainbow: color = ColorScale::getRainbowScale(val); break;
 		default: color = ColorScale::getGrayScale(val); break;
 		}
-
 		line(*dest, Point(xstart, y), Point(xbar, y), Util::bgrtoScalar(color), 1, LineTypes::LINE_AA);
 	}
 
 	for (int i = 0; i <= logPower; i++) {
 		y = (int)(ystart + i * yrange / logPower);
-		label = label0 + to_string(-i);
-
-		if (i == 0) {
-			label += "   (1)";
-		}
-		putText(*dest, label, Point(xline, (int)(y + textSize.height / 2)), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, infoColor, thickness, LineTypes::LINE_AA);
-		label = Util::format("%d", -i);
-		putText(*dest, label, Point((int)(xline + textSize.width), y), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, infoColor, thickness, LineTypes::LINE_AA);
+		label1 = Util::format("%d", -i);
+		putText(*dest, label, Point(xline, (int)(y + textHeight * 0.5)), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, infoColor, thickness, LineTypes::LINE_AA);
+		putText(*dest, label1, Point((int)(xline + textSize.width), y - textHeight * 0.25), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale * 0.75, infoColor, thickness, LineTypes::LINE_AA);
 		line(*dest, Point(xstart, y), Point(xline, y), infoColor, 1, LineTypes::LINE_AA);
 	}
 }
