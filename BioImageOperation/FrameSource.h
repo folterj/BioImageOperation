@@ -19,7 +19,7 @@ using namespace cv;
  * Base class for image source classes
  */
 
-class FrameSource abstract
+class FrameSource
 {
 public:
 	virtual void reset() = 0;

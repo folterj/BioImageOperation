@@ -11,7 +11,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QStyle>
-#include "Keepalive.h"
+#include "KeepAlive.h"
 #include "Util.h"
 #include "config.h"
 
@@ -184,7 +184,7 @@ bool MainWindow::askSaveChanges() {
 }
 
 void MainWindow::textChanged() {
-	if (!fileModified) {
+    if (!fileModified && !ui.scriptTextEdit->toPlainText().isEmpty()) {
 		fileModified = true;
 		updateTitle();
 	}
@@ -247,9 +247,9 @@ void MainWindow::setModeQt(int mode0) {
 		ui.actionOpen->setEnabled(controlsEnabled);
 
 		if (mode == OperationMode::Run) {
-			Keepalive::startKeepAlive();
+            KeepAlive::startKeepAlive();
 		} else {
-			Keepalive::stopKeepAlive();
+            KeepAlive::stopKeepAlive();
 		}
 	} catch (exception e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);

@@ -10,6 +10,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <QObject>
 #include <QImage>
 #include <opencv2/opencv.hpp>
 #include "ColorScale.h"

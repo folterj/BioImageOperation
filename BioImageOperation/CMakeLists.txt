@@ -29,8 +29,13 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "C:/Qt/5.15.2/msvc2019_64/lib/cmake" "C:/opencv/build/x64/vc15/lib")
-set(OpenCV_BIN "C:/opencv/build/x64/vc15/bin")
+if(WIN32)
+    list(APPEND CMAKE_PREFIX_PATH "C:/Qt/5.15.2/msvc2019_64/lib/cmake" "C:/opencv/build/x64/vc15/lib")
+    set(OpenCV_BIN "C:/opencv/build/x64/vc15/bin")
+else()
+    list(APPEND CMAKE_PREFIX_PATH "/usr/lib/qt5/bin" "/usr/lib/x86_64-linux-gnu")
+    set(OpenCV_BIN "/usr/lib/x86_64-linux-gnu")
+endif()
 
 find_package(Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
@@ -52,11 +57,13 @@ set(RESOURCE_FILES
 )
 
 add_executable(${PROJECT_NAME}
-	${BIO_SRC}
+    ${BIO_SRC}
     ${RESOURCE_FILES}
 )
 
 qt5_add_resources(RESOURCE_FILES ${RESOURCE})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core)
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
@@ -80,12 +87,21 @@ if(APPLE AND NOT MACDEPLOYQT_EXECUTABLE)
     message(FATAL_ERROR "macdeployqt not found")
 endif()
 
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND "${CMAKE_COMMAND}" -E
-        env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}"
-            "$<TARGET_FILE:${PROJECT_NAME}>"
-    COMMENT "Running windeployqt..."
-)
+if(WIN32)
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	    COMMAND "${CMAKE_COMMAND}" -E
+		env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}"
+		    "$<TARGET_FILE:${PROJECT_NAME}>"
+	    COMMENT "Running windeployqt..."
+	)
+
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_world440.dll" ${CMAKE_CURRENT_BINARY_DIR}
+	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_world440d.dll" ${CMAKE_CURRENT_BINARY_DIR}
+	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_videoio_ffmpeg440_64.dll" ${CMAKE_CURRENT_BINARY_DIR}
+	    COMMENT "Copying OpenCV dlls..."
+	)
+endif()
 
 if(APPLE)
     add_custom_command(TARGET ${target} POST_BUILD
@@ -95,13 +111,6 @@ if(APPLE)
         COMMENT "Running windeployqt..."
     )
 endif()
-
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_world440.dll" ${CMAKE_CURRENT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_world440d.dll" ${CMAKE_CURRENT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_videoio_ffmpeg440_64.dll" ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Copying OpenCV dlls..."
-)
 
 
 

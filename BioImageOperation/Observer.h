@@ -19,7 +19,7 @@ using namespace cv;
  * Observer interface to update back to the UI
  */
 
-class Observer abstract
+class Observer
 {
 public:
 	virtual void pause() = 0;

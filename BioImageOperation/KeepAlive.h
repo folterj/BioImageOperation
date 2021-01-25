@@ -14,7 +14,7 @@
  * Prevent Windows from sleeping while busy processing
  */
 
-class Keepalive
+class KeepAlive
 {
 public:
 	static void startKeepAlive();

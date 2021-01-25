@@ -25,5 +25,5 @@ public:
 	~ImageTrackers();
 	void reset();
 	void close();
-	ImageTracker* ImageTrackers::getTracker(Observer* observer, string trackerId, bool firstCreate = false);
+    ImageTracker* getTracker(Observer* observer, string trackerId, bool firstCreate = false);
 };

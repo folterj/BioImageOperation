@@ -23,7 +23,7 @@ macx {
     INCLUDEPATH += /usr/local/include
 
     LIBS += -L/usr/local/lib \
-            -lopencv_core
+            -lopencv_core -lopencv_imgproc -lopencv_videoio -lopencv_imgcodecs
 
     QMAKE_CXXFLAGS_WARN_ON = -Wno-unused-variable -Wno-reorder
 }
@@ -31,10 +31,11 @@ macx {
 unix {
     QMAKE_CXXFLAGS += -std=c++17
 
-    INCLUDEPATH += /usr/include
+    INCLUDEPATH += /usr/include/opencv4
 
     LIBS += -L/usr/lib \
-            -lopencv_core
+            -L/usr/lib/x86_64-linux-gnu \
+            -lopencv_core -lopencv_imgproc -lopencv_videoio -lopencv_imgcodecs
 
     QMAKE_CXXFLAGS_WARN_ON = -Wno-unused-variable -Wno-reorder
 }
@@ -44,7 +45,6 @@ win32 {
 
     CONFIG(debug,debug|release){
         LIBS += C:/opencv/build/x64/vc15/lib/opencv_world440d.lib
-
     }
 
     CONFIG(release,debug|release){

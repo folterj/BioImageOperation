@@ -19,7 +19,6 @@ Cluster::Cluster(int clusterLabel, double x, double y, double area, Rect box, Mo
 	this->area = area;
 	this->x = x;
 	this->y = y;
-	this->angle = angle;
 	this->box = box;
 	this->moments = *moments;
 	this->clusterImage = *clusterImage;
@@ -254,7 +253,7 @@ vector<Point> Cluster::getContour() {
 
 string Cluster::getCsv(bool writeContour) {
 	// https://www.learnopencv.com/blob-detection-using-opencv-python-c/
-	string s = format("%d,%f,%f,%f,%f,%f", Util::replace(getLabels(), ",", "."), area, rad, angle, x, y);
+    string s = format("%s,%f,%f,%f,%f,%f", Util::replace(getLabels(), ",", ".").c_str(), area, rad, angle, x, y);
 	/*
 	if (assignedTracks.size() == 1)
 	{

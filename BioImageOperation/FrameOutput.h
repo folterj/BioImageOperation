@@ -18,7 +18,7 @@ using namespace cv;
  * Base class for image output classes
  */
 
-class FrameOutput abstract
+class FrameOutput
 {
 public:
 	virtual void reset() = 0;

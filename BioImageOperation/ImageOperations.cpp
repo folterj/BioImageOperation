@@ -183,6 +183,7 @@ void ImageOperations::invert(InputArray source, OutputArray dest) {
 }
 
 void ImageOperations::drawLegend(InputArray source, OutputArray dest, DrawPosition position, double logPower, Palette palette) {
+    Mat dest_image = dest.getMat();
 	double vwidth = 0.05;
 	double vheight = 0.25;
 	int width = source.cols();
@@ -202,9 +203,9 @@ void ImageOperations::drawLegend(InputArray source, OutputArray dest, DrawPositi
 	source.copyTo(dest);
 
 	if (logPower != 0) {
-		drawColorScale(&dest.getMat(), Rect(left, top, lwidth, lheight), logPower, palette);
+        drawColorScale(&dest_image, Rect(left, top, lwidth, lheight), logPower, palette);
 	} else {
-		drawColorSwatches(&dest.getMat(), Rect(left, top, lwidth, lheight));
+        drawColorSwatches(&dest_image, Rect(left, top, lwidth, lheight));
 	}
 }
 

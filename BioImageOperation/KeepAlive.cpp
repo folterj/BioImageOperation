@@ -8,14 +8,20 @@
  *****************************************************************************/
 
 #include "KeepAlive.h"
+#ifdef WIN32
 #include "windows.h"
+#endif
 
 
-void Keepalive::startKeepAlive() {
-	SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED);
+void KeepAlive::startKeepAlive() {
+#ifdef WIN32
+    SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED);
+#endif
 }
 
 
-void Keepalive::stopKeepAlive() {
-	SetThreadExecutionState(ES_CONTINUOUS);
+void KeepAlive::stopKeepAlive() {
+#ifdef WIN32
+    SetThreadExecutionState(ES_CONTINUOUS);
+#endif
 }
