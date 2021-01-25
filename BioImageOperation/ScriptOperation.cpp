@@ -312,7 +312,7 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 	switch (type) {
 	case ScriptOperationType::Set:
 		requiredArguments = vector<ArgumentLabel> { };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Path, ArgumentLabel::Width, ArgumentLabel::Height, ArgumentLabel::Fps, ArgumentLabel::PixelSize };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Path, ArgumentLabel::Width, ArgumentLabel::Height, ArgumentLabel::Fps, ArgumentLabel::PixelSize, ArgumentLabel::WindowSize };
 		description = "Set parameters";
 		break;
 
@@ -668,6 +668,7 @@ ArgumentType ScriptOperation::getExpectedArgumentType(ArgumentLabel argument) {
 	case ArgumentLabel::Distance:
 	case ArgumentLabel::Radius:
 	case ArgumentLabel::PixelSize:
+	case ArgumentLabel::WindowSize:
 		type = ArgumentType::Num;
 		break;
 
@@ -798,6 +799,10 @@ string ScriptOperation::getArgumentDescription(ArgumentLabel argument) {
 
 	case ArgumentLabel::PixelSize:
 		s = "Size of a pixel in arbitrary unit";
+		break;
+
+	case ArgumentLabel::WindowSize:
+		s = "Window size for moving average calculations [s]";
 		break;
 
 	case ArgumentLabel::Factor:
