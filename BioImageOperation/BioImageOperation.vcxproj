@@ -136,7 +136,7 @@
     <ClCompile Include="ImageTracker.cpp" />
     <ClCompile Include="ImageTrackers.cpp" />
     <ClCompile Include="ImageWindow.cpp" />
-    <ClCompile Include="Keepalive.cpp" />
+    <ClCompile Include="KeepAlive.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="NumericPath.cpp" />
     <ClCompile Include="OperationInfo.cpp" />
@@ -162,6 +162,7 @@
     <QtUic Include="TextWindow.ui" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="KeepAlive.h" />
     <ClInclude Include="ScriptOperation.h" />
     <ClInclude Include="ScriptOperations.h" />
     <ClInclude Include="StatData.h" />
@@ -196,7 +197,6 @@
     <ClInclude Include="ImageTracker.h" />
     <ClInclude Include="ImageTrackers.h" />
     <QtMoc Include="ImageWindow.h" />
-    <ClInclude Include="Keepalive.h" />
     <QtMoc Include="MainWindow.h" />
     <ClInclude Include="NumericPath.h" />
     <ClInclude Include="Observer.h" />

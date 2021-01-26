@@ -63,7 +63,9 @@ add_executable(${PROJECT_NAME}
 
 qt5_add_resources(RESOURCE_FILES ${RESOURCE})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
+if(NOT WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
+endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core)
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
