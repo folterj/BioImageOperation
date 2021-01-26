@@ -468,7 +468,7 @@ Scalar Util::bgrtoScalar(BGR bgr) {
 	return Scalar(bgr.b, bgr.g, bgr.r);
 }
 
-string Util::getExceptionDetail(exception e, int level) {
+string Util::getExceptionDetail(exception & e, int level) {
 	string s = e.what();
 	string inner;
 	try {
@@ -511,79 +511,47 @@ void Util::saveImage(string filename, Mat* image) {
 	imwrite(filename, *image);
 }
 
-vector<string> Util::getImageFilenames(string searchPath) {
+vector<string> Util::getImageFilenames(string searchpath) {
 	vector<string> filenames;
 	string filename;
-	string path = extractFilePath(searchPath);
-	string pattern = extractFileName(searchPath);
+    string path = extractFilePath(searchpath);
+    string pattern = extractFileName(searchpath);
 	regex rx;
 
 	// very basic * ? pattern matching using regex
 	pattern = replace(pattern, ".", "\\.");
 	pattern = replace(pattern, "?", ".");
 	pattern = replace(pattern, "*", ".*");
-	rx = regex(pattern);
+    rx = regex(pattern);
 
-	for (const auto& entry : filesystem::directory_iterator(path)) {
-		filename = entry.path().string();
-		if (regex_match(extractFileName(filename), rx)) {
+    for (const auto& entry : filesystem::directory_iterator(path)) {
+        filename = entry.path().string();
+        if (regex_match(extractFileName(filename), rx)) {
 			filenames.push_back(filename);
-		}
-	}
+        }
+    }
 	sort(filenames.begin(), filenames.end());
 	return filenames;
 }
 
-string Util::extractFilePath(string path) {
-	string filepath = "";
-	vector<string> parts = split(path, vector<string>{"\\", "/"});
-	for (int i = 0; i < (int)parts.size() - 1; i++) {
-		filepath += parts[i];
-		filepath += "\\";
-	}
-	return filepath;
+string Util::extractFilePath(string filepath) {
+    return filesystem::path(filepath).parent_path().string();
 }
 
-string Util::extractTitle(string path) {
-	return extractFileTitle(extractFileName(path));
+string Util::extractTitle(string filepath) {
+    return filesystem::path(filepath).stem().string();
 }
 
-string Util::extractFileName(string path) {
-	string filename = path;
-	vector<string> parts = split(path, vector<string>{"\\", "/"});
-	if (parts.size() > 1) {
-		filename = parts[parts.size() - 1];
-	}
-	return filename;
+string Util::extractFileName(string filepath) {
+    return filesystem::path(filepath).filename().string();
 }
 
-string Util::extractFileTitle(string filename) {
-	string fileTitle = "";
-	vector<string> parts = split(filename, ".");
-	for (int i = 0; i < parts.size() - 1; i++) {
-		if (i > 0) {
-			fileTitle += ".";
-		}
-		fileTitle += parts[i];
-	}
-	return fileTitle;
+string Util::extractFileExtension(string filepath) {
+    return filesystem::path(filepath).extension().string();
 }
 
-string Util::extractFileExtension(string filename) {
-	string fileExtension = filename;
-	vector<string> parts = split(fileExtension, ".");
-	if (parts.size() > 1) {
-		fileExtension = parts[parts.size() - 1];
-	}
-	return fileExtension;
-}
-
-string Util::combinePath(string basepath, string templatePath) {
-	if (basepath == "" || Util::contains(templatePath, ":")) {
-		return templatePath;
-	} else {
-		return (filesystem::path(basepath) / filesystem::path(templatePath)).string();
-	}
+string Util::combinePath(string basepath, string templatepath) {
+    return (filesystem::path(basepath) / filesystem::path(templatepath)).string();
 }
 
 Size Util::drawText(Mat* image, string text, Point point, HersheyFonts fontFace, double fontScale, Scalar color) {

@@ -27,10 +27,11 @@ int main(int argc, char *argv[]) {
 	string arg, arg2, min_arg;
 
 	try {
-		qRegisterMetaType<string>("string");
+        qRegisterMetaType<string>("string");
 
 		if (hasGui) {
 			QApplication application(argc, argv);
+            application.setWindowIcon(QIcon(":/BioImageOperation/BioImageOperation.png"));
 			application.setApplicationName(PROJECT_NAME);
 			application.setApplicationVersion(PROJECT_VER);
 			application.setOrganizationDomain(PROJECT_URL);

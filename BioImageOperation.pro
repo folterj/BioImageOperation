@@ -3,9 +3,6 @@ TEMPLATE = app
 
 QT += core widgets gui network
 
-#Added for linux build
-QT += printsupport
-
 include(BioImageOperation/BioImageOperation.pri)
 
 CONFIG += c++17

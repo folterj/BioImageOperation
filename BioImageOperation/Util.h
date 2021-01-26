@@ -68,19 +68,18 @@ public:
 	static Scalar getRainbowScale(double scale);
 	static Scalar bgrtoScalar(BGR bgr);
 
-	static string getExceptionDetail(exception e, int level = 0);
+    static string getExceptionDetail(exception & e, int level = 0);
 	static Mat loadImage(string filename);
 	static void saveImage(string filename, Mat* image);
 	static bool isValidImage(Mat* image);
 	static string getCodecString(int codec);
 
-	static vector<string> getImageFilenames(string searchPath);
-	static string extractFilePath(string path);
-	static string extractTitle(string path);
-	static string extractFileName(string path);
-	static string extractFileTitle(string filename);
-	static string extractFileExtension(string filename);
-	static string combinePath(string basepath, string templatePath);
+    static vector<string> getImageFilenames(string searchpath);
+    static string extractFilePath(string filepath);
+    static string extractTitle(string filepath);
+    static string extractFileName(string filepath);
+    static string extractFileExtension(string filepath);
+    static string combinePath(string basepath, string templatepath);
 
 	static Size drawText(Mat* image, string text, Point point, HersheyFonts fontFace, double fontScale, Scalar color);
 	static void drawAngle(Mat* image, double x, double y, double rad, double angle, Scalar color, bool isArrow);

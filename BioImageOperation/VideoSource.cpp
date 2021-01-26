@@ -45,22 +45,22 @@ bool VideoSource::init(int apiCode, string basepath, string filepath, string sta
 	bool canSeek;
 	int lengthi = 0;
 	int nframes0;
-	string message;
+    string message;
 
-	reset();
-	this->apiCode = apiCode;
-	sourcePath.setInputPath(basepath, filepath);
+    reset();
+    this->apiCode = apiCode;
+    sourcePath.setInputPath(basepath, filepath);
 
 	nsources = sourcePath.getFileCount();
-	if (nsources == 0) {
-		throw ios_base::failure("File(s) not found: " + sourcePath.templatePath);
-	}
+    if (nsources == 0) {
+        throw ios_base::failure("File(s) not found: " + sourcePath.templatePath);
+    }
 
 	nframes = 0;
-	while (filename != "") {
-		filename = sourcePath.createFilePath();
-		if (filename != "") {
-			if (videoCapture.open(filename)) {
+    while (filename != "") {
+        filename = sourcePath.createFilePath();
+        if (filename != "") {
+            if (videoCapture.open(filename)) {
 				nframes0 = (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_COUNT);
 				if (nframes0 > 0) {
 					nframes += nframes0;
@@ -74,8 +74,8 @@ bool VideoSource::init(int apiCode, string basepath, string filepath, string sta
 			} else {
 				message = "Unable to open capture";
 				if (apiCode != 0) {
-					message += " API code: " + apiCode;
-				}
+                    message += " API code: " + to_string(apiCode);
+                }
 				message += " filename: " + filename;
 				throw ios_base::failure(message);
 
@@ -125,13 +125,13 @@ bool VideoSource::init(int apiCode, string basepath, string filepath, string sta
 bool VideoSource::open() {
 	bool ok = videoIsOpen;
 	string filename;
-	string message;
+    string message;
 
 	if (!videoIsOpen) {
 		// open (next) video
 		filename = sourcePath.createFilePath();
-		if (filename != "") {
-			if (videoCapture.open(filename, apiCode)) {
+        if (filename != "") {
+            if (videoCapture.open(filename, apiCode)) {
 				videoNframes = (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_COUNT);
 				if (videoNframes < 0) {
 					videoNframes = 0;
@@ -139,14 +139,14 @@ bool VideoSource::open() {
 				label = Util::extractFileName(filename);
 				sourcei++;
 				videoIsOpen = videoCapture.isOpened();
-				ok = videoIsOpen;
+                ok = videoIsOpen;
 			}
 
 			if (!videoIsOpen) {
 				close();
 				message = "Unable to open capture";
 				if (apiCode != 0) {
-					message += " API code: " + apiCode;
+                    message += " API code: " + to_string(apiCode);
 				}
 				message += " filename: " + filename;
 				throw invalid_argument(message);

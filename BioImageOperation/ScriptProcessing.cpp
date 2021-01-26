@@ -98,7 +98,7 @@ bool ScriptProcessing::startProcessNoGui(string scriptFilename) {
 	if (!filesystem::exists(scriptFilename)) {
 		showDialog("Script file not found: " + scriptFilename, MessageLevel::Error);
 		return false;
-	}
+    }
 
 	basepath = Util::extractFilePath(scriptFilename);
 	if (basepath == "") {
@@ -123,8 +123,8 @@ bool ScriptProcessing::startProcess(string filepath, string script) {
 	try {
 		if (operationMode != OperationMode::Run) {
 			if (operationMode == OperationMode::Idle) {
-				reset();
-				basepath = Util::extractFilePath(filepath);
+                reset();
+                basepath = Util::extractFilePath(filepath);
 				scriptOperations->extract(script, 0);
 			}
 			observer->resetProgressTimer();
@@ -172,7 +172,7 @@ void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOpe
 
 bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperation* prevOperation) {
 	int count = operation->count;
-	string errorMsg;
+    string errorMsg;
 
 	operation->count++;
 
@@ -275,7 +275,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			newImageSet = true;
 			break;
 
-		case ScriptOperationType::OpenVideo:
+        case ScriptOperationType::OpenVideo:
 			operation->initFrameSource(FrameType::Video,
 										(int)operation->getArgumentNumeric(ArgumentLabel::API), basepath,
 										operation->getArgument(ArgumentLabel::Path),
@@ -630,7 +630,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				operation->imageRef = newImage;
 			}
 		}
-	} catch (cv::Exception e) {
+    } catch (cv::Exception & e) {
 		errorMsg = e.what();
 		if (Util::contains(errorMsg, "==")) {
 			// adding more user friendly messages:
@@ -647,7 +647,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		errorMsg += " in\n" + operation->line;
 		showDialog(errorMsg, MessageLevel::Error);
 		doAbort();
-	} catch (std::exception e) {
+    } catch (std::exception & e) {
 		errorMsg = Util::getExceptionDetail(e) + " in\n" + operation->line;
 		showDialog(errorMsg, MessageLevel::Error);
 		doAbort();
