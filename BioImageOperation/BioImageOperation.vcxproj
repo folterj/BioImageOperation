@@ -122,7 +122,7 @@
     <ClCompile Include="BioImageOperation.cpp" />
     <ClCompile Include="CaptureSource.cpp" />
     <ClCompile Include="Cluster.cpp" />
-    <ClCompile Include="ClusterTrack.cpp" />
+    <ClCompile Include="Track.cpp" />
     <ClCompile Include="ColorScale.cpp" />
     <ClCompile Include="Constants.cpp" />
     <ClCompile Include="FrameOutput.cpp" />
@@ -183,7 +183,7 @@
     <ClInclude Include="Averager.h" />
     <ClInclude Include="CaptureSource.h" />
     <ClInclude Include="Cluster.h" />
-    <ClInclude Include="ClusterTrack.h" />
+    <ClInclude Include="Track.h" />
     <ClInclude Include="ColorScale.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="FrameOutput.h" />

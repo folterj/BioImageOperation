@@ -11,7 +11,7 @@
 #include <opencv2/opencv.hpp>
 #include "Observer.h"
 #include "Cluster.h"
-#include "ClusterTrack.h"
+#include "Track.h"
 #include "TrackClusterMatch.h"
 #include "PathNode.h"
 #include "PathLink.h"
@@ -37,7 +37,7 @@ public:
 	string basePath = "";
 	vector<vector<Point>> contours;
 	vector<Cluster*> clusters;
-	vector<ClusterTrack*> clusterTracks;
+	vector<Track*> tracks;
 	vector<vector<TrackClusterMatch*>> trackMatches;
 	vector<PathNode*> pathNodes;
 	vector<PathLink*> pathLinks;
@@ -61,15 +61,14 @@ public:
 	StatData distanceStats;
 	TrackingStats trackingStats;
 
-	/*
-	 * Constructor for testing
-	 */
-	ImageTracker(Observer* observer);
+	double fps = 0;
+	double pixelSize = 1;
+	double windowSize = 1;
 
 	/*
 	 * Main constructor
 	 */
-	ImageTracker(Observer* observer, string trackerId);
+	ImageTracker(string trackerId, double fps, double pixelSize, double windowSize, Observer* observer);
 
 	/*
 	 * Destructor
@@ -117,7 +116,7 @@ public:
 	bool removeMatch(vector<TrackClusterMatch*>* trackMatches, TrackClusterMatch* removeMatch);
 	vector<TrackClusterMatch*> assignTracks();
 	double calcMatchScore(vector<TrackClusterMatch*>* trackMatches);
-	vector<TrackClusterMatch*> calcTrackClusterMatches(ClusterTrack* track, double maxMoveDistance);
+	vector<TrackClusterMatch*> calcTrackClusterMatches(Track* track, double maxMoveDistance);
 	void pruneTracks();
 	string getClusterDebugInfo();
 	string getTrackDebugInfo();
@@ -126,7 +125,7 @@ public:
 	 * Create paths
 	 */
 	void matchPaths();
-	bool matchPathElement(ClusterTrack* track);
+	bool matchPathElement(Track* track);
 	void updatePaths();
 	void addPathLink(PathNode* node1, PathNode* node2);
 
@@ -146,7 +145,7 @@ public:
 	void drawClusters(Mat* source, Mat* dest, int drawMode);
 	void drawTracks(Mat* source, Mat* dest, int drawMode, int ntracks);
 	void drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, float power, Palette palette);
-	void drawTrackInfo(Mat* source, Mat* dest);
+	void drawTrackCount(Mat* source, Mat* dest);
 
 	/*
 	 * Return tracking information to show in text window
@@ -160,7 +159,7 @@ public:
 	void saveTracks(string fileName, int frame, double time, SaveFormat byLabel, bool saveContour);
 	void savePaths(string fileName, int frame, double time);
 	void saveTrackInfo(string fileName, int frame, double time);
-	Cluster* findTrackedCluster(ClusterTrack* track);
+	Cluster* findTrackedCluster(Track* targetTrack);
 
 	/*
 	 * Ensure closing & flushing any open streams

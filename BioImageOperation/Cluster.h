@@ -9,13 +9,13 @@
 
 #pragma once
 #include <opencv2/opencv.hpp>
-#include "ClusterTrack.h"
+#include "Track.h"
 #include "Constants.h"
 
 using namespace cv;
 
 
-class ClusterTrack;		// forward declaration
+class Track;		// forward declaration
 
 
 /*
@@ -25,12 +25,14 @@ class ClusterTrack;		// forward declaration
 class Cluster
 {
 public:
-	vector<ClusterTrack*> assignedTracks;
+	vector<Track*> assignedTracks;
 
 	double x = 0;
 	double y = 0;
 	double area = 0;
 	double rad = 0;
+	double length_major = 0;
+	double length_minor = 0;
 	double angle = 0;
 	int clusterLabel = 0;
 
@@ -38,20 +40,22 @@ public:
 	Moments moments;
 	Mat clusterImage;
 
+	double pixelSize = 1;
 
-	Cluster(int clusterLabel, double x, double y, double area, Rect box, Moments* moments, Mat* clusterImage);
+
+	Cluster(int clusterLabel, double x, double y, double area, Rect box, Moments* moments, Mat* clusterImage, double pixelSize);
 	bool isAssignable(double trackedArea);
-	void assign(ClusterTrack* track);
+	void assign(Track* track);
 	bool isAssigned();
-	void unAssign(ClusterTrack* track);
+	void unAssign(Track* track);
 	void unAssign();
 
-	double calcDistance(ClusterTrack* track);
-	double calcAreaDif(ClusterTrack* track);
-	double calcAngleDif(ClusterTrack* track);
-	double getRangeFactor(ClusterTrack* track, double distance, double maxMoveDistance);
-	double calcAreaFactor(ClusterTrack* track, double areaDif);
-	double calcAngleFactor(ClusterTrack* track, double angleDif);
+	double calcDistance(Track* track);
+	double calcAreaDif(Track* track);
+	double calcAngleDif(Track* track);
+	double getRangeFactor(Track* track, double distance, double maxMoveDistance);
+	double calcAreaFactor(Track* track, double areaDif);
+	double calcAngleFactor(Track* track, double angleDif);
 
 	int getLabel();
 	int getFirstLabel();
@@ -63,7 +67,8 @@ public:
 	void drawAngle(Mat* image, Scalar color);
 	void drawFill(Mat* image, Scalar color);
 	void drawLabel(Mat* image, Scalar color, int drawMode);
-	vector<Point> getContour();
+	static string getCsvHeader(bool writeContour = false);
 	string getCsv(bool writeContour = false);
+	vector<Point> getContour();
 	string toString();
 };

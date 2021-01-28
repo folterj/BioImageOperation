@@ -30,7 +30,7 @@ void ScriptOperations::reset() {
 }
 
 void ScriptOperations::extract(string script, int linei0) {
-	ScriptOperation* operation = NULL;
+	ScriptOperation* operation = nullptr;
 	vector<string> lines = Util::split(script, "\n");
 	string line;
 	bool skipping = false;
@@ -74,7 +74,7 @@ bool ScriptOperations::hasOperations() {
 }
 
 ScriptOperation* ScriptOperations::getCurrentOperation() {
-	ScriptOperation* operation = NULL;
+	ScriptOperation* operation = nullptr;
 	if (currentOperationi < size()) {
 		operation = at(currentOperationi);
 	}

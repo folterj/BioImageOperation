@@ -11,7 +11,7 @@
 #include "Util.h"
 
 
-TrackClusterMatch::TrackClusterMatch(ClusterTrack* track, Cluster* cluster, double distance, double rangeFactor) {
+TrackClusterMatch::TrackClusterMatch(Track* track, Cluster* cluster, double distance, double rangeFactor) {
 	this->track = track;
 	this->cluster = cluster;
 	this->distance = distance;

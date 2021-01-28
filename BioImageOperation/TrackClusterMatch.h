@@ -18,8 +18,8 @@
 class TrackClusterMatch
 {
 public:
-	ClusterTrack* track = NULL;
-	Cluster* cluster = NULL;
+	Track* track = nullptr;
+	Cluster* cluster = nullptr;
 	double distance = 0;
 	double areaDif = 0;
 	double angleDif = 0;
@@ -29,7 +29,7 @@ public:
 	double matchFactor = 0;
 	bool assigned = false;
 
-	TrackClusterMatch(ClusterTrack* track, Cluster* cluster, double distance, double rangeFactor);
+	TrackClusterMatch(Track* track, Cluster* cluster, double distance, double rangeFactor);
 	bool isAssignable();
 	void assign();
 	void unAssign();

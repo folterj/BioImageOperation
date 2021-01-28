@@ -147,7 +147,7 @@ Argument* ScriptOperation::getNextArgument(ArgumentLabel label) {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void ScriptOperation::parseArguments() {
@@ -194,14 +194,14 @@ void ScriptOperation::parseArguments() {
 }
 
 bool ScriptOperation::hasInnerOperations() {
-	if (innerOperations != NULL) {
+	if (innerOperations) {
 		return innerOperations->hasOperations();
 	}
 	return false;
 }
 
 ScriptOperation* ScriptOperation::getNextInnerOperation() {
-	ScriptOperation* innerOperation = NULL;
+	ScriptOperation* innerOperation = nullptr;
 	if (hasInnerOperations()) {
 		innerOperation = innerOperations->getCurrentOperation();
 		innerOperations->moveNextOperation();
@@ -556,10 +556,10 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 		description = "Draw common paths";
 		break;
 
-	case ScriptOperationType::DrawTrackInfo:
+	case ScriptOperationType::DrawTrackCount:
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker };
-		description = "Draw tracking stats on image";
+		description = "Draw tracking count on image";
 		break;
 
 	case ScriptOperationType::SaveClusters:

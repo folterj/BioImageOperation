@@ -16,14 +16,12 @@
 #include "Types.h"
 
 
-ImageTracker::ImageTracker(Observer* observer) {
-	this->observer = observer;
-	this->trackerId = "";
-}
-
-ImageTracker::ImageTracker(Observer* observer, string trackerId) {
-	this->observer = observer;
+ImageTracker::ImageTracker(string trackerId, double fps, double pixelSize, double windowSize, Observer* observer) {
 	this->trackerId = trackerId;
+	this->fps = fps;
+	this->pixelSize = pixelSize;
+	this->windowSize = windowSize;
+	this->observer = observer;
 }
 
 ImageTracker::~ImageTracker() {
@@ -40,10 +38,10 @@ void ImageTracker::deleteClusters() {
 }
 
 void ImageTracker::deleteTracks() {
-	for (int i = 0; i < clusterTracks.size(); i++) {
-		delete clusterTracks[i];
+	for (int i = 0; i < tracks.size(); i++) {
+		delete tracks[i];
 	}
-	clusterTracks.clear();
+	tracks.clear();
 }
 
 void ImageTracker::deletePaths() {
@@ -196,7 +194,7 @@ bool ImageTracker::findClusters(Mat* image, bool debugMode) {
 			}
 			x = clusterCentroids(label, 0);
 			y = clusterCentroids(label, 1);
-			clusters.push_back(new Cluster(label - minlabel, x, y, area, box, &clusterMoments, &clusterRoiImage2));
+			clusters.push_back(new Cluster(label - minlabel, x, y, area, box, &clusterMoments, &clusterRoiImage2, pixelSize));
 		}
 	}
 	return (!clusters.empty());
@@ -211,7 +209,7 @@ void ImageTracker::matchClusterTracks(bool findOptimalSolution, bool debugMode) 
 	vector<TrackClusterMatch*> bestMatches, matches, newMatches;
 	vector<TrackClusterMatch*> trackMatch;
 	unordered_map<int, int> trackMatchIndices;
-	ClusterTrack* track;
+	Track* track;
 	TrackClusterMatch* match;
 	int maxArea = (int)trackingParams.area.getMax();
 	double maxMove = trackingParams.maxMove.getMax();
@@ -220,14 +218,14 @@ void ImageTracker::matchClusterTracks(bool findOptimalSolution, bool debugMode) 
 	double score, bestScore;
 
 	trackingStats.trackMatching.reset();
-	trackingStats.trackMatching.setTotal((int)clusterTracks.size());
+	trackingStats.trackMatching.setTotal((int)tracks.size());
 	trackingStats.trackDistance.reset();
-	trackingStats.trackDistance.setTotal((int)clusterTracks.size());
+	trackingStats.trackDistance.setTotal((int)tracks.size());
 
 	// for each track find clusters in range, sorted by preference
 	trackMatches.clear();
-	trackMatches.reserve(clusterTracks.size());
-	for (ClusterTrack* track : clusterTracks) {
+	trackMatches.reserve(tracks.size());
+	for (Track* track : tracks) {
 		track->unAssign();
 		trackMatch = calcTrackClusterMatches(track, maxMove);
 		if (!trackMatch.empty()) {
@@ -268,7 +266,7 @@ void ImageTracker::matchClusterTracks(bool findOptimalSolution, bool debugMode) 
 						// select next candidate match (cluster)
 						match = trackMatch[i];
 						// force unassign all tracks assigned to cluster
-						for (ClusterTrack* track : match->cluster->assignedTracks) {
+						for (Track* track : match->cluster->assignedTracks) {
 							// remove other tracks from matches as well
 							for (TrackClusterMatch* match0 : trackMatches[trackMatchIndices[track->label]]) {
 								match0->unAssign();
@@ -305,15 +303,15 @@ void ImageTracker::matchClusterTracks(bool findOptimalSolution, bool debugMode) 
 	for (Cluster* cluster : clusters) {
 		if (!cluster->isAssigned()) {
 			label = nextTrackLabel++;
-			track = new ClusterTrack(label);
-			clusterTracks.push_back(track);
+			track = new Track(label, fps, pixelSize, windowSize);
+			tracks.push_back(track);
 			cluster->assign(track);
 			track->assign();
 		}
 	}
 	// update cluster tracks
 	for (Cluster* cluster : clusters) {
-		for (ClusterTrack* track : cluster->assignedTracks) {
+		for (Track* track : cluster->assignedTracks) {
 			if (debugMode) {
 				if (track->isMerged && cluster->assignedTracks.size() <= 1) {
 					message = Util::format("Merged cluster split: Track %d", track->label);
@@ -329,7 +327,7 @@ void ImageTracker::matchClusterTracks(bool findOptimalSolution, bool debugMode) 
 	for (TrackClusterMatch* match : bestMatches) {
 		trackingStats.trackDistance.addValue(match->distance);
 	}
-	for (ClusterTrack* track : clusterTracks) {
+	for (Track* track : tracks) {
 		if (track->assigned) {
 			trackingStats.trackMatching.addOne();
 		} else {
@@ -356,7 +354,7 @@ void ImageTracker::unAssignAll() {
 	for (Cluster* cluster : clusters) {
 		cluster->unAssign();
 	}
-	for (ClusterTrack* track : clusterTracks) {
+	for (Track* track : tracks) {
 		track->unAssign();
 	}
 }
@@ -403,7 +401,7 @@ double ImageTracker::calcMatchScore(vector<TrackClusterMatch*>* trackMatches) {
 	return score;
 }
 
-vector<TrackClusterMatch*> ImageTracker::calcTrackClusterMatches(ClusterTrack* track, double maxMoveDistance) {
+vector<TrackClusterMatch*> ImageTracker::calcTrackClusterMatches(Track* track, double maxMoveDistance) {
 	vector<TrackClusterMatch*> trackMatches;
 	double distance, rangeFactor;
 
@@ -423,21 +421,21 @@ vector<TrackClusterMatch*> ImageTracker::calcTrackClusterMatches(ClusterTrack* t
 
 void ImageTracker::pruneTracks() {
 	double maxInactive = trackingParams.maxInactive;
-	ClusterTrack* track;
+	Track* track;
 	int i = 0;
 
 	trackingStats.trackLifetime.reset();
-	trackingStats.trackLifetime.setTotal((int)clusterTracks.size());
+	trackingStats.trackLifetime.setTotal((int)tracks.size());
 	trackingStats.nActiveTracks = 0;
 
-	while (i < clusterTracks.size()) {
-		track = clusterTracks[i];
+	while (i < tracks.size()) {
+		track = tracks[i];
 		if (!track->assigned) {
 			track->activeCount = 0;
 			track->inactiveCount++;
 		}
 		if (maxInactive >= 0 && track->inactiveCount > maxInactive) {
-			clusterTracks.erase(clusterTracks.begin() + i);
+			tracks.erase(tracks.begin() + i);
 			delete track;
 		} else {
 			if (track->isActive(trackingParams.minActive)) {
@@ -471,7 +469,7 @@ string ImageTracker::getTrackDebugInfo() {
 void ImageTracker::matchPaths() {
 	trackingStats.pathMatching.reset();
 
-	for (ClusterTrack* track : clusterTracks) {
+	for (Track* track : tracks) {
 		if (track->dist != 0) {
 			if (matchPathElement(track)) {
 				trackingStats.pathMatching.addOne();
@@ -481,8 +479,8 @@ void ImageTracker::matchPaths() {
 	}
 }
 
-bool ImageTracker::matchPathElement(ClusterTrack* track) {
-	PathNode* matchNode = NULL;
+bool ImageTracker::matchPathElement(Track* track) {
+	PathNode* matchNode = nullptr;
 	double distance;
 	double minDistance = 0;
 	bool match = false;
@@ -586,8 +584,8 @@ void ImageTracker::updateTrackParams(bool debugMode) {
 	double dist;
 	bool set = false;
 
-	for (ClusterTrack* clusterTrack : clusterTracks) {
-		dist = clusterTrack->dist;
+	for (Track* track : tracks) {
+		dist = track->dist;
 		if (dist != 0) {
 			// skip non-moving objects
 			distanceStats.add(dist);
@@ -626,8 +624,8 @@ void ImageTracker::drawClusters(Mat* source, Mat* dest, int drawMode) {
 void ImageTracker::drawTracks(Mat* source, Mat* dest, int drawMode, int ntracks) {
 	source->copyTo(*dest);
 
-	for (ClusterTrack* clusterTrack : clusterTracks) {
-		clusterTrack->draw(dest, drawMode, ntracks);
+	for (Track* track : tracks) {
+		track->draw(dest, drawMode, ntracks);
 	}
 }
 
@@ -701,11 +699,11 @@ void ImageTracker::drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, floa
 	}
 }
 
-void ImageTracker::drawTrackInfo(Mat* source, Mat* dest) {
+void ImageTracker::drawTrackCount(Mat* source, Mat* dest) {
 	string label;
 	double x = 0;
 	double y = 0;
-	int n = (int)clusterTracks.size();
+	int n = (int)tracks.size();
 	Scalar color = Scalar(0xFF, 0xFF, 0xFF);
 	Point position;
 	Size textSize;
@@ -715,10 +713,10 @@ void ImageTracker::drawTrackInfo(Mat* source, Mat* dest) {
 	label = Util::format("Count: %d", trackingStats.nActiveTracks);
 
 	if (trackParamsFinalised && !countPositionSet) {
-		if (clusterTracks.size() != 0) {
-			for (ClusterTrack* clusterTrack : clusterTracks) {
-				x += clusterTrack->x;
-				y += clusterTrack->y;
+		if (tracks.size() != 0) {
+			for (Track* track : tracks) {
+				x += track->x;
+				y += track->y;
 			}
 			if (n != 0) {
 				x /= n;
@@ -731,7 +729,7 @@ void ImageTracker::drawTrackInfo(Mat* source, Mat* dest) {
 	}
 	position = countPosition;
 	// use countPosition as centre point
-	textSize = getTextSize(label, HersheyFonts::FONT_HERSHEY_SIMPLEX, 1, 1, NULL);
+	textSize = getTextSize(label, HersheyFonts::FONT_HERSHEY_SIMPLEX, 1, 1, nullptr);
 	position.x -= textSize.width / 2;
 	position.y -= textSize.height / 2;
 	if (position.x < 0) position.x = 0;
@@ -747,7 +745,7 @@ string ImageTracker::getInfo() {
 	info += Util::format("Tracking max move/min active/max inactive = %.1f/%d/%d\n\n", trackingParams.maxMove.getMax(), trackingParams.minActive, trackingParams.maxInactive);
 
 	info += Util::format("Tot clusters = %d\n", clusters.size());
-	info += Util::format("Tot tracked clusters (active) = %d (%d)\n", clusterTracks.size(), trackingStats.nActiveTracks);
+	info += Util::format("Tot tracked clusters (active) = %d (%d)\n", tracks.size(), trackingStats.nActiveTracks);
 	info += Util::format("Tracking match rate = %.2f\n\n", trackingStats.trackMatching.getAverage());
 
 	info += Util::format("Average distance = %.3f\n", trackingStats.trackDistance.getAverage());
@@ -762,21 +760,15 @@ string ImageTracker::getInfo() {
 
 void ImageTracker::saveClusters(string filename, int frame, double time, SaveFormat saveFormat, bool writeContour) {
 	OutputStream outStream;
-	string s = "";
-	string header;
+	string csv = "";
 	string sfilename;
 	NumericPath filepath;
-	int nmaincols;
 	int dcol;
 	int col = 0;
 	int maxi = 0;
-
-	header = "Frame,Time,Label,Area,Rad,Angle,Pos X,Pos Y";
-	if (writeContour) {
-		header += ",Contour";
-	}
-	header += "\n";
-	nmaincols = Util::split(header, ",").size() - 2;
+	string maincols = Cluster::getCsvHeader(writeContour);
+	int nmaincols = Util::split(maincols, ",").size();
+	string header = "Frame,Time," + maincols + "\n";
 
 	if (saveFormat != SaveFormat::Split) {
 		clusterStream.init(filename, header);
@@ -787,37 +779,37 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 			for (Cluster* cluster : clusters) {
 				maxi = max(cluster->getFirstLabel(), maxi);
 			}
-			s += Util::format("{0},{1},", frame, time);
+			csv += Util::format("{0},{1},", frame, time);
 			for (int i = 0; i <= maxi; i++) {
 				for (Cluster* cluster : clusters) {
 					if (cluster->getFirstLabel() == i) {
 						dcol = i - col;
 						if (dcol > 0) {
-							s += string(',', dcol * nmaincols);
+							csv += string(',', dcol * nmaincols);
 							col = i;
 						}
-						s += cluster->getCsv(writeContour) + ",";
+						csv += cluster->getCsv(writeContour) + ",";
 						col++;
 					}
 				}
 			}
-			s += "\n";
+			csv += "\n";
 		} else if (saveFormat == SaveFormat::ByTime) {
 			for (Cluster* cluster : clusters) {
-				s += Util::format("%d,%f,%s\n", frame, time, cluster->getCsv(writeContour).c_str());
+				csv += Util::format("%d,%f,%s\n", frame, time, cluster->getCsv(writeContour).c_str());
 			}
 		} else if (saveFormat == SaveFormat::Split) {
 			for (Cluster* cluster : clusters) {
-				s = Util::format("%d,%f,%s\n", frame, time, cluster->getCsv(writeContour).c_str());
+				csv = Util::format("%d,%f,%s\n", frame, time, cluster->getCsv(writeContour).c_str());
 				filepath.setOutputPath(filename);
 				sfilename = filepath.createFilePath(cluster->getFirstLabel());
 				outStream.init(sfilename, header);
-				outStream.write(s);
+				outStream.write(csv);
 			}
 		}
 
 		if (saveFormat != SaveFormat::Split) {
-			clusterStream.write(s);
+			clusterStream.write(csv);
 		}
 	}
 }
@@ -825,21 +817,15 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 void ImageTracker::saveTracks(string filename, int frame, double time, SaveFormat saveFormat, bool writeContour) {
 	OutputStream outStream;
 	Cluster* cluster;
-	string s = "";
-	string header;
+	string csv = "";
 	string sfilename;
 	NumericPath filepath;
-	int nmaincols;
 	int dcol;
 	int col = 0;
 	int maxi = 0;
-
-	header = "Frame,Time,Label,Area,Rad,Orientation,Pos X,Pos Y";
-	if (writeContour) {
-		header += ",Contour";
-	}
-	header += "\n";
-	nmaincols = Util::split(header, ",").size() - 2;
+	string maincols = Track::getCsvHeader(writeContour);
+	int nmaincols = Util::split(maincols, ",").size();
+	string header = "frame,time," + maincols + "\n";
 
 	if (saveFormat != SaveFormat::Split) {
 		trackStream.init(filename, header);
@@ -847,49 +833,49 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 
 	if (trackParamsFinalised) {
 		if (saveFormat == SaveFormat::ByLabel) {
-			for (ClusterTrack* track : clusterTracks) {
+			for (Track* track : tracks) {
 				maxi = max(track->label, maxi);
 			}
-			s += Util::format("{0},{1},", frame, time);
+			csv += Util::format("{0},{1},", frame, time);
 			for (int i = 0; i <= maxi; i++) {
-				for (ClusterTrack* track : clusterTracks) {
+				for (Track* track : tracks) {
 					if (track->label == i) {
 						dcol = i - col;
 						if (dcol > 0) {
-							s += string(',', dcol * nmaincols);
+							csv += string(',', dcol * nmaincols);
 							col = i;
 						}
 						if (writeContour) {
 							cluster = findTrackedCluster(track);
 						}
-						s += track->getCsv(cluster, writeContour) + ",";
+						csv += track->getCsv(cluster, writeContour) + ",";
 						col++;
 					}
 				}
 			}
-			s += "\n";
+			csv += "\n";
 		} else if (saveFormat == SaveFormat::ByTime) {
-			for (ClusterTrack* track : clusterTracks) {
+			for (Track* track : tracks) {
 				if (writeContour) {
 					cluster = findTrackedCluster(track);
 				}
-				s += Util::format("%d,%f,%s\n", frame, time, track->getCsv(cluster, writeContour).c_str());
+				csv += Util::format("%d,%f,%s\n", frame, time, track->getCsv(cluster, writeContour).c_str());
 			}
 		} else if (saveFormat == SaveFormat::Split) {
-			for (ClusterTrack* track : clusterTracks) {
+			for (Track* track : tracks) {
 				if (writeContour) {
 					cluster = findTrackedCluster(track);
 				}
-				s = Util::format("%d,%f,%s\n", frame, time, track->getCsv(cluster, writeContour).c_str());
+				csv = Util::format("%d,%f,%s\n", frame, time, track->getCsv(cluster, writeContour).c_str());
 				filepath.setOutputPath(filename);
 				sfilename = filepath.createFilePath(track->label);
 				outStream.init(sfilename, header);
-				outStream.write(s);
+				outStream.write(csv);
 			}
 		}
 
 		if (saveFormat != SaveFormat::Split) {
-			trackStream.write(s);
+			trackStream.write(csv);
 		}
 	}
 }
@@ -916,22 +902,22 @@ void ImageTracker::saveTrackInfo(string filename, int frame, double time) {
 		s += Util::format("%d,%f,%d", frame, time, clusters.size());
 		if (trackParamsFinalised) {
 			s += Util::format(",%d,%d,%f,%f,%f",
-				clusterTracks.size(), trackingStats.nActiveTracks, trackingStats.trackMatching.getAverage(), trackingStats.trackDistance.getAverage(), trackingStats.trackLifetime.getAverage());
+				tracks.size(), trackingStats.nActiveTracks, trackingStats.trackMatching.getAverage(), trackingStats.trackDistance.getAverage(), trackingStats.trackLifetime.getAverage());
 		}
 		s += "\n";
 		trackInfoStream.write(s);
 	}
 }
 
-Cluster* ImageTracker::findTrackedCluster(ClusterTrack* track) {
+Cluster* ImageTracker::findTrackedCluster(Track* targetTrack) {
 	for (Cluster* cluster : clusters) {
-		for (ClusterTrack* clusterTrack : cluster->assignedTracks) {
-			if (clusterTrack == track) {
+		for (Track* track : cluster->assignedTracks) {
+			if (track == targetTrack) {
 				return cluster;
 			}
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 void ImageTracker::closeStreams() {

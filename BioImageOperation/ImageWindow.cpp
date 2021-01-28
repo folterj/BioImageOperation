@@ -73,7 +73,7 @@ void ImageWindow::showImage(Mat* image, string reference) {
 	pixmap.setPixmap(QPixmap::fromImage(Util::matToQImage(*image)));
 	pixmap.setTransformationMode(Qt::TransformationMode::SmoothTransformation);
 	if (needResize) {
-		resizeEvent(NULL);
+		resizeEvent(nullptr);
 	}
 	ui.graphicsView->repaint();
 

@@ -44,9 +44,10 @@ public:
 	int sourceHeight = 0;
 	double sourceFps = 0;
 	int sourceFrameNumber = 0;
-	double pixelSize = 0;
+	double pixelSize = 1;
+	double windowSize = 1;
 	double logPower = 0;
-	Palette logPalette;
+	Palette logPalette = Palette::Grayscale;
 	OperationMode operationMode = OperationMode::Idle;
 	
 	ScriptProcessing();

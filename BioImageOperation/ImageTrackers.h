@@ -25,5 +25,5 @@ public:
 	~ImageTrackers();
 	void reset();
 	void close();
-    ImageTracker* getTracker(Observer* observer, string trackerId, bool firstCreate = false);
+    ImageTracker* getTracker(string trackerId, double fps = 0, double pixelSize = 1, double windowSize = 1, Observer* observer = nullptr);
 };

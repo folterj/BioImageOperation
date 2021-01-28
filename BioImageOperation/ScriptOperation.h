@@ -38,12 +38,12 @@ public:
 	int offset = 0;
 	int count = 0;
 
-	ScriptOperations* innerOperations = NULL;
+	ScriptOperations* innerOperations = nullptr;
 
-	FrameSource* frameSource = NULL;
-	FrameOutput* frameOutput = NULL;
+	FrameSource* frameSource = nullptr;
+	FrameOutput* frameOutput = nullptr;
 	Mat image;
-	Mat* imageRef = NULL;
+	Mat* imageRef = nullptr;
 	Clock::time_point start;
 	double timeElapseds = 0;
 	int countElapsed = 0;

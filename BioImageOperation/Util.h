@@ -51,6 +51,7 @@ public:
 	static bool isBoolean(string s);
 	static int parseFrameTime(string s, double fps);
 	static string readText(string filename);
+	static double calcDistance(Point2d point0, Point2d point1);
 	static double calcDistance(double x0, double y0, double x1, double y1);
 	static double calcDistance(double x, double y);
 

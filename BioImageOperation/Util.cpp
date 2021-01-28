@@ -168,13 +168,15 @@ string Util::replace(string s, string target, string replacement) {
 }
 
 string Util::format(string format, ...) {
-	const int buflen = 1000;
-	char buffer[buflen];
 	va_list args;
 	va_start(args, format);
-	vsnprintf(buffer, buflen, format.c_str(), args);
+	const int buflen = vsnprintf(nullptr, 0, format.c_str(), args) + 1;
 	va_end(args);
-	return string(buffer);
+	vector<char> buffer(buflen);
+	va_start(args, format);
+	vsnprintf(buffer.data(), buflen, format.c_str(), args);
+	va_end(args);
+	return string(buffer.data());
 }
 
 string Util::formatTimespan(int seconds0) {
@@ -275,6 +277,10 @@ string Util::readText(string filename) {
 	input.exceptions(ifstream::failbit);
 	ss << input.rdbuf();
 	return ss.str();
+}
+
+double Util::calcDistance(Point2d point0, Point2d point1) {
+	return calcDistance(point0.x, point0.y, point1.x, point1.y);
 }
 
 double Util::calcDistance(double x0, double y0, double x1, double y1) {
@@ -555,7 +561,7 @@ string Util::combinePath(string basepath, string templatepath) {
 }
 
 Size Util::drawText(Mat* image, string text, Point point, HersheyFonts fontFace, double fontScale, Scalar color) {
-	Size size = getTextSize(text, fontFace, fontScale, 1, NULL);
+	Size size = getTextSize(text, fontFace, fontScale, 1, nullptr);
 	putText(*image, text, point, fontFace, fontScale, color, 1, LineTypes::LINE_AA);
 	return size;
 }

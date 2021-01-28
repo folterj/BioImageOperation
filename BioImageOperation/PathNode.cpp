@@ -8,15 +8,14 @@
  *****************************************************************************/
 
 #include "PathNode.h"
-#include "ClusterTrack.h"
 #include "Util.h"
 
 
-PathNode::PathNode(int label, ClusterTrack* clusterTrack) {
+PathNode::PathNode(int label, Track* track) {
 	this->label = label;
 
-	x = clusterTrack->x;
-	y = clusterTrack->y;
+	x = track->x;
+	y = track->y;
 }
 
 void PathNode::updateUse(int pathAge) {
@@ -38,8 +37,8 @@ double PathNode::getAccumUsage2(int totalAge) {
 	return totalUse;
 }
 
-double PathNode::matchDistance(ClusterTrack* clusterTrack, double maxDistance) {
-	double distance = Util::calcDistance(x, y, clusterTrack->x, clusterTrack->y);
+double PathNode::matchDistance(Track* track, double maxDistance) {
+	double distance = Util::calcDistance(x, y, track->x, track->y);
 
 	if (distance < maxDistance) {
 		return distance;

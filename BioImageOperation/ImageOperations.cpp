@@ -230,7 +230,7 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Pale
 		thickness = 1;
 	}
 
-	textSize = getTextSize(label, HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, thickness, NULL);
+	textSize = getTextSize(label, HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, thickness, nullptr);
 	textHeight = textSize.height;
 
 	ystart = rect.tl().y + textHeight;

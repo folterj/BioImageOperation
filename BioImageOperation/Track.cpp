@@ -9,15 +9,18 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include "ClusterTrack.h"
+#include "Track.h"
 #include "Util.h"
 
 
-ClusterTrack::ClusterTrack(int label) {
+Track::Track(int label, double fps, double pixelSize, double windowSize) {
 	this->label = label;
+	this->fps = fps;
+	this->pixelSize = pixelSize;
+	this->windowSize = windowSize;
 }
 
-void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistance, bool positionPrediction) {
+void Track::update(Cluster* cluster, double maxArea, double maxMoveDistance, bool positionPrediction) {
 	double orientationGuess, slowMoveDist;
 	double angleDif, angleDifInv;
 	double newx, newy, dx0, dy0, dist0, dangle;
@@ -64,6 +67,8 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 		newy = cluster->y;
 		estimateX = newx;
 		estimateY = newy;
+		originX = newx;
+		originY = newy;
 	} else {
 		// not new; can use position history
 		newx = cluster->x;
@@ -71,12 +76,7 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 		dx = newx - x;
 		dy = newy - y;
 		dist = Util::calcDistance(dx, dy);
-
 		totdist += dist;
-		avgdist = totdist / points.size();
-		if (dist > maxdist) {
-			maxdist = dist;
-		}
 
 		if (abs(angle) > 45 && abs(cluster->angle) > 45 && angle * cluster->angle < 0) {
 			// angle has 'swapped sign'
@@ -112,12 +112,17 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 		// only assign area if single track
 		area = cluster->area;
 		rad = cluster->rad;
+		length_major = cluster->length_major;
+		length_minor = cluster->length_minor;
 	}
 
 	x = newx;
 	y = newy;
 
 	points.push_back(Point2d(x, y));
+	if (!isNew) {
+		angles.push_back(orientation);
+	}
 
 	lastClusterRad = cluster->rad;
 	isNew = false;
@@ -125,19 +130,23 @@ void ClusterTrack::update(Cluster* cluster, double maxArea, double maxMoveDistan
 	inactiveCount = 0;
 }
 
-void ClusterTrack::unAssign() {
+double Track::getDistFromOrigin() {
+	return Util::calcDistance(originX, originY, x, y);
+}
+
+void Track::unAssign() {
 	assigned = false;
 }
 
-void ClusterTrack::assign() {
+void Track::assign() {
 	assigned = true;
 }
 
-bool ClusterTrack::isActive(int minActive) {
+bool Track::isActive(int minActive) {
 	return (assigned && activeCount >= minActive && inactiveCount == 0);
 }
 
-void ClusterTrack::draw(Mat* image, int drawMode, int ntracks) {
+void Track::draw(Mat* image, int drawMode, int ntracks) {
 	Scalar color = Util::getLabelColor(label);
 	Scalar labelColor = Scalar(0x80, 0x80, 0x80);
 
@@ -165,7 +174,7 @@ void ClusterTrack::draw(Mat* image, int drawMode, int ntracks) {
 	drawLabel(image, labelColor, drawMode);
 }
 
-void ClusterTrack::drawPoint(Mat* image, Scalar color) {
+void Track::drawPoint(Mat* image, Scalar color) {
 	Point point((int)x, (int)y);
 	int thickness = rad / 4;
 	if (thickness < 1) {
@@ -174,23 +183,23 @@ void ClusterTrack::drawPoint(Mat* image, Scalar color) {
 	drawMarker(*image, point, color, MarkerTypes::MARKER_CROSS, 1, thickness, LineTypes::LINE_AA);
 }
 
-void ClusterTrack::drawCircle(Mat* image, Scalar color) {
+void Track::drawCircle(Mat* image, Scalar color) {
 	Point point((int)x, (int)y);
 
 	circle(*image, point, (int)rad, color, 1, LineTypes::LINE_AA);
 }
 
-void ClusterTrack::drawBox(Mat* image, Scalar color) {
+void Track::drawBox(Mat* image, Scalar color) {
 	Rect rect((int)(x - rad), (int)(y - rad), (int)(rad * 2), (int)(rad * 2));
 
 	rectangle(*image, rect, color, 1, LineTypes::LINE_AA);
 }
 
-void ClusterTrack::drawAngle(Mat* image, Scalar color) {
+void Track::drawAngle(Mat* image, Scalar color) {
 	Util::drawAngle(image, x, y, rad, orientation, color, (forwardDist != 0));
 }
 
-void ClusterTrack::drawTracks(Mat* image, Scalar color, int ntracks) {
+void Track::drawTracks(Mat* image, Scalar color, int ntracks) {
 	Point point0, point1;
 	bool init = false;
 	int n = 0;
@@ -207,7 +216,7 @@ void ClusterTrack::drawTracks(Mat* image, Scalar color, int ntracks) {
 	}
 }
 
-void ClusterTrack::drawLabel(Mat* image, Scalar color, int drawMode) {
+void Track::drawLabel(Mat* image, Scalar color, int drawMode) {
 	HersheyFonts fontFace = HersheyFonts::FONT_HERSHEY_SIMPLEX;
 	double fontScale = 0.5;
 	Point point((int)(x + rad), (int)(y + rad));
@@ -227,24 +236,113 @@ void ClusterTrack::drawLabel(Mat* image, Scalar color, int drawMode) {
 	}
 }
 
-string ClusterTrack::getCsv(Cluster* cluster, bool writeContour) {
-	vector<vector<Point>> contours;
-	Point absPoint;
-
-	string s = format("%d,%f,%f,%f,%f,%f", label, area, rad, orientation, x, y);
+string Track::getCsvHeader(bool writeContour) {
+	string header = "label,x,y,v,a"
+					",dist_tot,dist_origin"
+					",angle,v_angle,a_angle"
+					",area,rad,length_major,length_minor";
 	if (writeContour) {
-		s += ",";
+		header += ",contour";
+	}
+	return header;
+}
+
+string Track::getCsv(Cluster* cluster, bool writeContour) {
+	string csv = format("%d", label);
+	vector<vector<Point>> contours;
+	Point2d lastpoint;
+	double d, lastd, dd, lastangle, centdist;
+	double v = 0;
+	double v_angle = 0;
+	double a = 0;
+	double a_angle = 0;
+	int vn = 0;
+	int an = 0;
+	int i = 0;
+	int n = (int)(round(fps * windowSize));
+
+	for (auto point = points.rbegin(); point != points.rend(); point++) {
+		if (i > 0) {
+			d = Util::calcDistance(lastpoint, *point);
+			if (vn < n) {
+				v += d;
+				vn++;
+			}
+			if (i > 1) {
+				dd = lastd - d;		// reverse order loop
+				if (an < n) {
+					a += dd;
+					an++;
+				} else {
+					break;			// completed a and v
+				}
+			}
+			lastd = d;
+		}
+		lastpoint = *point;
+		i++;
+	}
+	if (vn != 0) {
+		v = v / vn * pixelSize * fps;
+	}
+	if (an != 0) {
+		a = a / an * pixelSize * fps * fps;
+	}
+
+	vn = 0;
+	an = 0;
+	i = 0;
+	for (auto angle = angles.rbegin(); angle != angles.rend(); angle++) {
+		if (i > 0) {
+			d = lastangle - *angle;
+			if (vn < n) {
+				v_angle += d;
+				vn++;
+			}
+			if (i > 1) {
+				dd = lastd - d;		// reverse order loop
+				if (an < n) {
+					a_angle += dd;
+					an++;
+				} else {
+					break;			// completed a and v
+				}
+			}
+			lastd = d;
+		}
+		lastangle = *angle;
+		i++;
+	}
+	if (vn != 0) {
+		v_angle = v_angle / vn * fps;
+	}
+	if (an != 0) {
+		a_angle = a_angle / an * fps * fps;
+	}
+
+	centdist = Util::calcDistance(originX, originY, x, y);
+
+	csv += format(",%f,%f,%f,%f", x * pixelSize, y * pixelSize, v, a);
+	csv += format(",%f,%f", totdist * pixelSize, centdist * pixelSize);
+	csv += format(",%f,%f,%f", orientation, v_angle, a_angle);
+	csv += format(",%f,%f,%f,%f", area * pixelSize * pixelSize, rad * pixelSize, length_major * pixelSize, length_minor * pixelSize);
+	if (writeContour) {
+		csv += ",";
 		if (cluster) {
 			if (cluster->assignedTracks.size() == 1) {
 				for (Point point : cluster->getContour()) {
-					s += Util::format("%d %d ", point.x, point.y);
+					if (pixelSize == 1) {
+						csv += Util::format("%d %d ", point.x, point.y);
+					} else {
+						csv += Util::format("%f %f ", point.x * pixelSize, point.y * pixelSize);
+					}
 				}
 			}
 		}
 	}
-	return s;
+	return csv;
 }
 
-string ClusterTrack::toString() {
+string Track::toString() {
 	return Util::format("Label:%d Area:%.0f Radius:%.0f Orientation:%.0f X:%.0f Y:%.0f", label, area, rad, orientation, x, y);
 }

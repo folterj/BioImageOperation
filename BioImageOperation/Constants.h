@@ -68,12 +68,12 @@ enum class ScriptOperationType
 	DrawClusters,
 	DrawTracks,
 	DrawPaths,
+	DrawTrackCount,
 	SaveClusters,
 	SaveTracks,
 	SavePaths,
 
 	ShowTrackInfo,
-	DrawTrackInfo,
 	SaveTrackInfo,
 	DrawLegend,
 
@@ -131,12 +131,12 @@ const vector<string> ScriptOperationTypes =
 	"DrawClusters",
 	"DrawTracks",
 	"DrawPaths",
+	"DrawTrackCount",
 	"SaveClusters",
 	"SaveTracks",
 	"SavePaths",
 
 	"ShowTrackInfo",
-	"DrawTrackInfo",
 	"SaveTrackInfo",
 	"DrawLegend",
 

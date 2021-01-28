@@ -24,7 +24,7 @@ class PathNode;		// forward declaration
  * Tracked cluster element
  */
 
-class ClusterTrack
+class Track
 {
 public:
 	int label = 0;
@@ -35,16 +35,18 @@ public:
 	double estimateY = 0;
 	double area = 0;
 	double rad = 0;
+	double length_major = 0;
+	double length_minor = 0;
 	double angle = 0;
 	double orientation = 0;
 	bool orientInvertAngle = false;
 
+	double originX = 0;
+	double originY = 0;
 	double dx = 0;
 	double dy = 0;
 	double dist = 0;
 	double totdist = 0;
-	double avgdist = 0;
-	double maxdist = 0;
 	double lastClusterRad = 0;
 	double forwardDist = 0;
 
@@ -53,14 +55,20 @@ public:
 	bool isMerged = false;
 	int activeCount = 0;
 	int inactiveCount = 0;
+
+	double fps = 0;
+	double pixelSize = 1;
+	double windowSize = 1;
 	
-	PathNode* lastPathNode = NULL;
+	PathNode* lastPathNode = nullptr;
 
 	vector<Point2d> points;
+	vector<double> angles;
 
 
-	ClusterTrack(int label);
+	Track(int label, double fps, double pixelSize, double windowSize);
 	void update(Cluster* cluster, double maxArea, double maxMoveDistance, bool positionPrediction);
+	double getDistFromOrigin();
 
 	void unAssign();
 	void assign();
@@ -73,6 +81,7 @@ public:
 	void drawAngle(Mat* image, Scalar color);
 	void drawTracks(Mat* image, Scalar color, int ntracks = 1);
 	void drawLabel(Mat* image, Scalar color, int drawMode);
+	static string getCsvHeader(bool writeContour = false);
 	string getCsv(Cluster* cluster, bool writeContour = false);
 	string toString();
 };

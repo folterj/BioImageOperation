@@ -35,7 +35,7 @@ Mat* ImageItemList::getImage(string label, bool mustExist) {
 	if (mustExist) {
 		throw invalid_argument("Image not found: " + label);
 	}
-	return NULL;
+	return nullptr;
 }
 
 void ImageItemList::setImage(Mat* image, string label) {

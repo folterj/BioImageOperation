@@ -33,17 +33,17 @@ void ImageTrackers::close() {
 	}
 }
 
-ImageTracker* ImageTrackers::getTracker(Observer* observer, string trackerId, bool firstCreate) {
+ImageTracker* ImageTrackers::getTracker(string trackerId, double fps, double pixelSize, double windowSize, Observer* observer) {
 	for (int i = 0; i < size(); i++) {
 		if (at(i)->trackerId == trackerId) {
 			return at(i);
 		}
 	}
-	if (firstCreate) {
-		ImageTracker* newTracker = new ImageTracker(observer, trackerId);
+	if (observer) {
+		ImageTracker* newTracker = new ImageTracker(trackerId, fps, pixelSize, windowSize, observer);
 		push_back(newTracker);
 		return newTracker;
 	}
 	throw invalid_argument("Tracker with ID: '" + trackerId + "' not found");
-	return NULL;
+	return nullptr;
 }

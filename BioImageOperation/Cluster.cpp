@@ -14,7 +14,9 @@
 #include "Util.h"
 
 
-Cluster::Cluster(int clusterLabel, double x, double y, double area, Rect box, Moments* moments, Mat* clusterImage) {
+ // https://www.learnopencv.com/blob-detection-using-opencv-python-c/
+
+Cluster::Cluster(int clusterLabel, double x, double y, double area, Rect box, Moments* moments, Mat* clusterImage, double pixelSize) {
 	this->clusterLabel = clusterLabel;
 	this->area = area;
 	this->x = x;
@@ -22,9 +24,12 @@ Cluster::Cluster(int clusterLabel, double x, double y, double area, Rect box, Mo
 	this->box = box;
 	this->moments = *moments;
 	this->clusterImage = *clusterImage;
+	this->pixelSize = pixelSize;
 	if (moments->m00 != 0) {
 		angle = Util::calcMomentsAngle(moments);
 		rad = Util::calcMomentsMajorRadius(moments);
+		length_major = 2 * rad;
+		length_minor = 2 * Util::calcMomentsMinorRadius(moments);
 	} else {
 		rad = sqrt(area);
 	}
@@ -39,7 +44,7 @@ bool Cluster::isAssignable(double trackedArea) {
 	}
 
 	totalArea = trackedArea;
-	for (ClusterTrack* track : assignedTracks) {
+	for (Track* track : assignedTracks) {
 		if (track) {
 			totalArea += track->area;
 		}
@@ -47,7 +52,7 @@ bool Cluster::isAssignable(double trackedArea) {
 	return (totalArea * 0.75 < area && n < Constants::maxMergedBlobs);
 }
 
-void Cluster::assign(ClusterTrack* track) {
+void Cluster::assign(Track* track) {
 	assignedTracks.push_back(track);
 }
 
@@ -55,7 +60,7 @@ bool Cluster::isAssigned() {
 	return (assignedTracks.size() != 0);
 }
 
-void Cluster::unAssign(ClusterTrack* track) {
+void Cluster::unAssign(Track* track) {
 	auto position = find(assignedTracks.begin(), assignedTracks.end(), track);
 	if (position != assignedTracks.end()) {
 		assignedTracks.erase(position);
@@ -66,7 +71,7 @@ void Cluster::unAssign() {
 	assignedTracks.clear();
 }
 
-double Cluster::calcDistance(ClusterTrack* track) {
+double Cluster::calcDistance(Track* track) {
 	double distance, distance1, distance2;
 	double vx1 = track->x;
 	double vy1 = track->y;
@@ -89,15 +94,15 @@ double Cluster::calcDistance(ClusterTrack* track) {
 	return distance;
 }
 
-double Cluster::calcAreaDif(ClusterTrack* track) {
+double Cluster::calcAreaDif(Track* track) {
 	return abs(area - track->area);
 }
 
-double Cluster::calcAngleDif(ClusterTrack* track) {
+double Cluster::calcAngleDif(Track* track) {
 	return Util::calcShortAngleDif(angle, track->angle);
 }
 
-double Cluster::getRangeFactor(ClusterTrack* track, double distance, double maxMoveDistance) {
+double Cluster::getRangeFactor(Track* track, double distance, double maxMoveDistance) {
 	double rangeFactor = 1;
 	double clusterRad, extraDist;
 
@@ -110,7 +115,7 @@ double Cluster::getRangeFactor(ClusterTrack* track, double distance, double maxM
 	return rangeFactor;
 }
 
-double Cluster::calcAreaFactor(ClusterTrack* track, double areaDif) {
+double Cluster::calcAreaFactor(Track* track, double areaDif) {
 	double areaFactor = 1;
 	bool suspectMerged = (area > 1.5 * track->area);
 	double a = track->area;
@@ -123,7 +128,7 @@ double Cluster::calcAreaFactor(ClusterTrack* track, double areaDif) {
 	return areaFactor;
 }
 
-double Cluster::calcAngleFactor(ClusterTrack* track, double angleDif) {
+double Cluster::calcAngleFactor(Track* track, double angleDif) {
 	double angleFactor = 1;
 	bool suspectMerged = (area > 1.5 * track->area);
 	if (!suspectMerged) {
@@ -155,7 +160,7 @@ int Cluster::getFirstLabel() {
 string Cluster::getLabels() {
 	string labels = "";
 
-	for (ClusterTrack* track : assignedTracks) {
+	for (Track* track : assignedTracks) {
 		if (labels != "") {
 			labels += ",";
 		}
@@ -241,6 +246,32 @@ void Cluster::drawLabel(Mat* image, Scalar color, int drawMode) {
 	}
 }
 
+string Cluster::getCsvHeader(bool writeContour) {
+	string header = "label,x,y,angle,area,rad,length_major,length_minor";
+	if (writeContour) {
+		header += ",contour";
+	}
+	return header;
+}
+
+string Cluster::getCsv(bool writeContour) {
+	string csv = Util::replace(getLabels(), ",", ".");
+    
+	csv += format(",%f,%f,%f", x * pixelSize, y * pixelSize, angle);
+	csv += format(",%f,%f,%f,%f", area * pixelSize * pixelSize, rad * pixelSize, length_major * pixelSize, length_minor * pixelSize);
+	if (writeContour) {
+		csv += ",";
+		for (Point point : getContour()) {
+			if (pixelSize == 1) {
+				csv += Util::format("%d %d ", point.x, point.y);
+			} else {
+				csv += Util::format("%f %f ", point.x * pixelSize, point.y * pixelSize);
+			}
+		}
+	}
+	return csv;
+}
+
 vector<Point> Cluster::getContour() {
 	vector<Point> contour;
 	vector<vector<Point>> contours;
@@ -249,71 +280,6 @@ vector<Point> Cluster::getContour() {
 		contour.push_back(box.tl() + point);
 	}
 	return contour;
-}
-
-string Cluster::getCsv(bool writeContour) {
-	// https://www.learnopencv.com/blob-detection-using-opencv-python-c/
-    string s = format("%s,%f,%f,%f,%f,%f", Util::replace(getLabels(), ",", ".").c_str(), area, rad, angle, x, y);
-	/*
-	if (assignedTracks.size() == 1)
-	{
-		s += System::String::Format(",{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}",
-			moments.m00, moments.m01, moments.m10,
-			moments.m11, moments.m02, moments.m20,
-			moments.m21, moments.m12, moments.m30, moments.m03);
-
-		s += System::String::Format(",{0},{1},{2},{3},{4},{5},{6}",
-			moments.mu02, moments.mu03, moments.mu11,
-			moments.mu12, moments.mu20, moments.mu21,
-			moments.mu30);
-
-		s += System::String::Format(",{0},{1},{2},{3},{4},{5},{6}",
-			moments.nu02, moments.nu03, moments.nu11,
-			moments.nu12, moments.nu20, moments.nu21,
-			moments.nu30);
-	}
-	*/
-
-	/*
-	double mx = moments.m10 / moments.m00;
-	double my = moments.m01 / moments.m00;
-
-	double a = moments.m20 / moments.m00 - mx * mx;
-	double b = 2 * (moments.m11 / moments.m00 - mx * my);
-	double c = moments.m02 / moments.m00 - my * my;
-
-	double l = Math::Sqrt(8 * (a + c + Math::Sqrt(b * b + (a - c) * (a - c)))) / 2;
-	double w = Math::Sqrt(8 * (a + c - Math::Sqrt(b * b + (a - c) * (a - c)))) / 2;
-
-	double norml = l / rad;
-	double normw = w / rad;
-	double ratio = w / l;
-
-	std::vector<Point> contour = getContour();
-	double perimeter = arcLength(contour, true);
-	std::vector<Point> hull;
-	std::vector<Point2f> contour2;
-
-	convexHull(contour, hull);
-	approxPolyDP(hull, contour2, 0.001, true);
-
-	double circularity = area * 4 * Math::PI / (perimeter * perimeter);
-	double ellipsity = area / (Math::PI * l * w);
-	double convexity = area / contourArea(contour2);
-
-	if (assignedTracks.size() == 1) {
-		s += System::String::Format(",{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}",
-			area, rad, l, w, norml, normw, ratio, circularity, ellipsity, convexity);
-	}
-	*/
-
-	if (writeContour) {
-		s += ",";
-		for (Point point : getContour()) {
-			s += Util::format("%d %d ", point.x, point.y);
-		}
-	}
-	return s;
 }
 
 string Cluster::toString() {
