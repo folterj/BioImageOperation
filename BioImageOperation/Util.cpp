@@ -357,7 +357,7 @@ Scalar Util::getLabelColor(int label0) {
 	int ir, ig, ib;
 	double r, g, b;
 
-	if (label0 != 0x10000) {
+	if (label0 >= 0) {
 		label = (label0 % 27);  // 0 ... 26 (27 unique colors)
 		ir = label % 3;
 		ig = (label / 3) % 3;

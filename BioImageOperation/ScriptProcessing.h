@@ -84,8 +84,9 @@ public:
 	/*
 	 * Abort thread, attempt closing output streams to prevent data loss
 	 */
-	void doAbort();
 	void doPause();
+	void doAbort();
+	void doReset();
 	void setMode(OperationMode mode);
 	void clearStatus();
 	void showStatus(int i, int tot = 0, string label = "");

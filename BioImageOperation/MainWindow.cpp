@@ -124,7 +124,7 @@ void MainWindow::openDialog() {
 				clearInput();
 				bioSettings.setValue(DEFAULT_DIR_KEY, QVariant(qfilename));
 				filepath = qfilename.toStdString();
-				scriptProcessing.doAbort();
+				scriptProcessing.doReset();
 				ui.scriptTextEdit->setPlainText(Util::convertToQString(Util::readText(filepath)));
 				fileModified = false;
 				updateTitle();
@@ -184,8 +184,9 @@ bool MainWindow::askSaveChanges() {
 }
 
 void MainWindow::textChanged() {
-    if (!fileModified && !ui.scriptTextEdit->toPlainText().isEmpty()) {
-		fileModified = true;
+	// simplified logic
+    if (fileModified == ui.scriptTextEdit->toPlainText().isEmpty()) {
+		fileModified = !fileModified;
 		updateTitle();
 	}
 }

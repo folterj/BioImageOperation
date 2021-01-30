@@ -72,6 +72,7 @@ void Cluster::unAssign() {
 }
 
 double Cluster::calcDistance(Track* track) {
+	// project on line between previous and estimated new position
 	double distance, distance1, distance2;
 	double vx1 = track->x;
 	double vy1 = track->y;
@@ -96,6 +97,10 @@ double Cluster::calcDistance(Track* track) {
 
 double Cluster::calcAreaDif(Track* track) {
 	return abs(area - track->area);
+}
+
+double Cluster::calcLengthDif(Track* track) {
+	return abs(length_major - track->length_major);
 }
 
 double Cluster::calcAngleDif(Track* track) {
@@ -123,9 +128,22 @@ double Cluster::calcAreaFactor(Track* track, double areaDif) {
 		a = area;
 	}
 	if (!suspectMerged && a != 0) {
-		areaFactor = 1 - sqrt(areaDif / a);
+		areaFactor = 1 - areaDif / a;
 	}
 	return areaFactor;
+}
+
+double Cluster::calcLengthFactor(Track* track, double lengthDif) {
+	double lengthFactor = 1;
+	bool suspectMerged = (area > 1.5 * track->area);
+	double len = track->length_major;
+	if (len == 0) {
+		len = length_major;
+	}
+	if (!suspectMerged && len != 0) {
+		lengthFactor = 1 - lengthDif / len;
+	}
+	return lengthFactor;
 }
 
 double Cluster::calcAngleFactor(Track* track, double angleDif) {
@@ -137,24 +155,19 @@ double Cluster::calcAngleFactor(Track* track, double angleDif) {
 	return angleFactor;
 }
 
-int Cluster::getLabel() {
-	int label0 = 0;
-
-	if (assignedTracks.size() == 1) {
-		label0 = assignedTracks[0]->label;
-	} else if (assignedTracks.size() > 1) {
-		label0 = 0x10000;
-	}
-	return label0;
+bool Cluster::hasSingleLabel() {
+	return (assignedTracks.size() == 1);
 }
 
-int Cluster::getFirstLabel() {
-	int label0 = -1;
+int Cluster::getInitialLabel() {
+	int label = -1;
 
 	if (!assignedTracks.empty()) {
-		label0 = assignedTracks[0]->label;
+		label = assignedTracks[0]->label;
+	} else {
+		label = clusterLabel;
 	}
-	return label0;
+	return label;
 }
 
 string Cluster::getLabels() {
@@ -170,7 +183,11 @@ string Cluster::getLabels() {
 }
 
 void Cluster::draw(Mat* image, int drawMode) {
-	Scalar color = Util::getLabelColor(getLabel());
+	int label = -1;
+	if (hasSingleLabel()) {
+		label = getInitialLabel();
+	}
+	Scalar color = Util::getLabelColor(label);
 	Scalar labelColor = Scalar(0x80, 0x80, 0x80);
 
 	if ((drawMode & (int)ClusterDrawMode::Fill) != 0) {
@@ -247,7 +264,7 @@ void Cluster::drawLabel(Mat* image, Scalar color, int drawMode) {
 }
 
 string Cluster::getCsvHeader(bool writeContour) {
-	string header = "label,x,y,angle,area,rad,length_major,length_minor";
+	string header = "#,label,x,y,angle,area,rad,length_major,length_minor";
 	if (writeContour) {
 		header += ",contour";
 	}
@@ -255,7 +272,7 @@ string Cluster::getCsvHeader(bool writeContour) {
 }
 
 string Cluster::getCsv(bool writeContour) {
-	string csv = Util::replace(getLabels(), ",", ".");
+	string csv = to_string(clusterLabel) + "," + Util::replace(getLabels(), ",", " ");
     
 	csv += format(",%f,%f,%f", x * pixelSize, y * pixelSize, angle);
 	csv += format(",%f,%f,%f,%f", area * pixelSize * pixelSize, rad * pixelSize, length_major * pixelSize, length_minor * pixelSize);

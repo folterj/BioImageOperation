@@ -9,20 +9,15 @@
 
 #pragma once
 #include <vector>
-#include "ImageTracker.h"
+#include "OutputStream.h"
 
 using namespace std;
 
 
-/*
- * Helper for vector of ImageTracker
- */
-
-class ImageTrackers : vector<ImageTracker*>
+class OutputStreams : vector<OutputStream*>
 {
 public:
-	~ImageTrackers();
-	void reset();
+	~OutputStreams();
 	void close();
-    ImageTracker* get(string id, double fps = 0, double pixelSize = 1, double windowSize = 1, Observer* observer = nullptr);
+	OutputStream* get(string filename, string header = "");
 };

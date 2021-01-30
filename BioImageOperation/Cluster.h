@@ -52,13 +52,15 @@ public:
 
 	double calcDistance(Track* track);
 	double calcAreaDif(Track* track);
+	double calcLengthDif(Track* track);
 	double calcAngleDif(Track* track);
 	double getRangeFactor(Track* track, double distance, double maxMoveDistance);
 	double calcAreaFactor(Track* track, double areaDif);
+	double calcLengthFactor(Track* track, double lengthDif);
 	double calcAngleFactor(Track* track, double angleDif);
 
-	int getLabel();
-	int getFirstLabel();
+	bool hasSingleLabel();
+	int getInitialLabel();
 	string getLabels();
 	void draw(Mat* image, int drawMode);
 	void drawPoint(Mat* image, Scalar color);

@@ -10,61 +10,59 @@
 #include <filesystem>
 #include "OutputStream.h"
 #include "Util.h"
+#include "Constants.h"
 
 
-OutputStream::OutputStream() {
-}
-
-OutputStream::OutputStream(string filename) {
-	this->filename = filename;
-	exceptions(ofstream::failbit);
-	open(filename, std::ios_base::out);
-	isOpen = is_open();
+OutputStream::OutputStream(string filename, string header) {
+	if (filename != "") {
+		init(filename, header);
+	}
 }
 
 OutputStream::~OutputStream() {
-	closeStream();
+	reset();
 }
 
 void OutputStream::reset() {
 	closeStream();
+	filename = "";
+	buffer = "";
+	created = false;
 }
 
 void OutputStream::init(string filename, string header) {
-	bool fileExists;
-
-	if (filename != this->filename) {
-		closeStream();
-		this->filename = filename;
+	this->filename = filename;
+	exceptions(ofstream::failbit | ofstream::badbit);
+	if (header != "") {
+		write(header);
 	}
-
-	if (!is_open()) {
-		fileExists = filesystem::exists(filename);
-
-		open(filename, std::ios_base::out | std::ios_base::app);
-
-		if (!fileExists && header != "") {
-			write(header);
-		}
-	}
-	isOpen = is_open();
 }
 
 void OutputStream::write(string output) {
-	if (is_open()) {
-		(*this) << output;
-	} else {
-		isOpen = false;
-		throw ios_base::failure("Unable to write to file " + filename);
+	if (output != "") {
+		buffer += output;
+		if (created && buffer.size() < Constants::maxLogBuffer) {
+			return;
+		}
+	}
+	if (buffer != "") {
+		ios_base::openmode openMode = std::ios_base::out;
+		if (created) {
+			openMode |= std::ios_base::app;
+		}
+		open(filename, openMode);
+		if (is_open()) {
+			(*this) << buffer;
+			flush();
+			close();
+			buffer = "";
+			created = true;
+		} else {
+			throw ios_base::failure("Unable to write to file " + filename);
+		}
 	}
 }
 
 void OutputStream::closeStream() {
-	if (isOpen) {
-		if (is_open()) {
-			flush();
-			close();
-		}
-		isOpen = false;
-	}
+	write("");
 }

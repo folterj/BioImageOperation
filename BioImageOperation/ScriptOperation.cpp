@@ -55,6 +55,12 @@ void ScriptOperation::reset() {
 	start = Clock::now();
 }
 
+void ScriptOperation::initialFinish() {
+	chrono::duration<double> totalElapsed = Clock::now() - start;
+	timeElapsedInits += totalElapsed.count();
+	countElapsedInit++;
+}
+
 void ScriptOperation::finish() {
 	chrono::duration<double> totalElapsed = Clock::now() - start;
 	timeElapseds += totalElapsed.count();
@@ -1120,12 +1126,27 @@ double ScriptOperation::getDuration() {
 	return duration;
 }
 
+double ScriptOperation::getDurationInit() {
+	double duration = 0;
+	if (countElapsedInit != 0) {
+		duration = timeElapsedInits / countElapsedInit;
+		timeElapsedInits = 0;
+		countElapsedInit = 0;
+	}
+	return duration;
+}
+
 string ScriptOperation::getBenchmarking(int level) {
 	string s = string(level * 2, ' ') + line;
+	string times;
 	double duration = getDuration();
+	double durationInit = getDurationInit();
 	if (duration > 0) {
-		string times = Util::formatThousands(round(duration * 1000000));
-		int i = 48 - s.length() - times.length();
+		if (hasInnerOperations()) {
+			times = "(" + Util::formatThousands(round(durationInit * 1000000)) + ") ";
+		}
+		times += Util::formatThousands(round(duration * 1000000)) + " us";
+		int i = 80 - s.length() - times.length();
 		if (i < 1) {
 			i = 1;
 		}

@@ -302,6 +302,7 @@ public:
 	static const int statBins = 20;
 	static const int nDisplays = 4;
 	static const int nTextWindows = 4;
+	static const int maxLogBuffer = 1000000;
 
 	static const string webPage;
 	static const string webFilesUrl;

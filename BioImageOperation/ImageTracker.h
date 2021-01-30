@@ -20,6 +20,7 @@
 #include "TrackingStats.h"
 #include "Cluster.h"
 #include "OutputStream.h"
+#include "OutputStreams.h"
 
 using namespace std;
 using namespace cv;
@@ -33,7 +34,7 @@ class ImageTracker
 {
 public:
 	Observer* observer;
-	string trackerId = "";
+	string id = "";
 	string basePath = "";
 	vector<vector<Point>> contours;
 	vector<Cluster*> clusters;
@@ -50,7 +51,8 @@ public:
 	double pathDistance = Constants::minPathDistance;
 	int pathAge = 0;
 	Point countPosition;
-	OutputStream clusterStream, trackStream, pathStream, trackInfoStream;
+	OutputStreams clusterStreams, trackStreams;
+	OutputStream pathStream, trackInfoStream;
 	Mat clusterLabelImage, clusterRoiImage;
 	Mat1i clusterStats;
 	Mat1d clusterCentroids;
@@ -68,7 +70,7 @@ public:
 	/*
 	 * Main constructor
 	 */
-	ImageTracker(string trackerId, double fps, double pixelSize, double windowSize, Observer* observer);
+	ImageTracker(string id, double fps, double pixelSize, double windowSize, Observer* observer);
 
 	/*
 	 * Destructor
@@ -164,5 +166,5 @@ public:
 	/*
 	 * Ensure closing & flushing any open streams
 	 */
-	void closeStreams();
+	void close();
 };

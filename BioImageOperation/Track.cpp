@@ -329,7 +329,7 @@ string Track::getCsv(Cluster* cluster, bool writeContour) {
 	if (writeContour) {
 		csv += ",";
 		if (cluster) {
-			if (cluster->assignedTracks.size() == 1) {
+			if (cluster->hasSingleLabel()) {
 				for (Point point : cluster->getContour()) {
 					if (pixelSize == 1) {
 						csv += Util::format("%d %d ", point.x, point.y);

@@ -21,10 +21,10 @@ class OutputStream : ofstream
 {
 public:
 	string filename = "";
-	bool isOpen = false;
+	string buffer = "";
+	bool created = false;
 
-	OutputStream();
-	OutputStream(string filename);
+	OutputStream(string filename = "", string header = "");
 	~OutputStream();
 	void reset();
 	void init(string filename, string header = "");

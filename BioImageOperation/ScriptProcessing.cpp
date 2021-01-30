@@ -115,7 +115,7 @@ bool ScriptProcessing::startProcessNoGui(string scriptFilename) {
 		processThreadMethod();
 	} catch (exception e) {
 		showDialog(Util::getExceptionDetail(e), MessageLevel::Error);
-		doAbort();
+		doReset();
 		return false;
 	}
 	return true;
@@ -138,7 +138,7 @@ bool ScriptProcessing::startProcess(string filepath, string script) {
 		setMode(operationMode);
 	} catch (exception e) {
 		showDialog(Util::getExceptionDetail(e), MessageLevel::Error);
-		doAbort();
+		doReset();
 		return false;
 	}
 	return true;
@@ -147,7 +147,7 @@ bool ScriptProcessing::startProcess(string filepath, string script) {
 void ScriptProcessing::processThreadMethod() {
 	processOperations(scriptOperations, nullptr);
 	if (operationMode != OperationMode::Pause) {
-		doAbort();
+		doReset();
 	}
 }
 
@@ -491,7 +491,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::CreateClusters:
 			debugMode = operation->getArgumentBoolean(ArgumentLabel::Debug);
-			imageTracker = imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker), sourceFps, pixelSize, windowSize, observer);
+			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker), sourceFps, pixelSize, windowSize, observer);
 			output = imageTracker->createClusters(image, operation->getArgumentNumeric(ArgumentLabel::MinArea),
 													operation->getArgumentNumeric(ArgumentLabel::MaxArea),
 													basepath, debugMode);
@@ -502,7 +502,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::CreateTracks:
 			debugMode = operation->getArgumentBoolean(ArgumentLabel::Debug);
-			imageTracker = imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			output = imageTracker->createTracks(operation->getArgumentNumeric(ArgumentLabel::MaxMove),
 												(int)operation->getArgumentNumeric(ArgumentLabel::MinActive),
 												(int)operation->getArgumentNumeric(ArgumentLabel::MaxInactive),
@@ -514,7 +514,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::CreatePaths:
 			debugMode = operation->getArgumentBoolean(ArgumentLabel::Debug);
-			imageTracker = imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			output = imageTracker->createPaths(operation->getArgumentNumeric(ArgumentLabel::Distance), debugMode);
 			if (debugMode) {
 				showText(output, Constants::nTextWindows);
@@ -522,14 +522,14 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::DrawClusters:
-			imageTracker = imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->drawClusters(getLabelOrCurrentImage(operation, image), newImage,
 										operation->getArgument(ArgumentLabel::DrawMode, (int)ClusterDrawMode::ClusterDefault));
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::DrawTracks:
-			imageTracker = imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->drawTracks(getLabelOrCurrentImage(operation, image), newImage,
 										operation->getArgument(ArgumentLabel::DrawMode, (int)ClusterDrawMode::TracksDefault),
 										(int)sourceFps);
@@ -539,7 +539,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		case ScriptOperationType::DrawPaths:
 			logPower = operation->getArgumentNumeric();
 			logPalette = (Palette)operation->getArgument(ArgumentLabel::Palette, (int)Palette::Grayscale);
-			imageTracker = imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->drawPaths(getLabelOrCurrentImage(operation, image), newImage,
 									(PathDrawMode)operation->getArgument(ArgumentLabel::PathDrawMode, (int)PathDrawMode::Age),
 									(float)logPower, logPalette);
@@ -547,13 +547,13 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::DrawTrackCount:
-			imageTracker = imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->drawTrackCount(getLabelOrCurrentImage(operation, image), newImage);
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::ShowTrackInfo:
-			imageTracker = imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			showText(imageTracker->getInfo(),
 					(int)operation->getArgumentNumeric(ArgumentLabel::Display, true),
 					"#" + to_string(count));
@@ -561,7 +561,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::SaveClusters:
 			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultDataExtension);
-			imageTracker = imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->saveClusters(outputPath.createFilePath(frame), frame, getTime(frame),
 										(SaveFormat)operation->getArgument(ArgumentLabel::Format, (int)SaveFormat::ByTime),
 										operation->getArgumentBoolean(ArgumentLabel::Contour));
@@ -569,7 +569,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::SaveTracks:
 			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultDataExtension);
-			imageTracker = imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->saveTracks(outputPath.createFilePath(frame), frame, getTime(frame),
 										(SaveFormat)operation->getArgument(ArgumentLabel::Format, (int)SaveFormat::ByTime),
 										operation->getArgumentBoolean(ArgumentLabel::Contour));
@@ -577,13 +577,13 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::SavePaths:
 			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultDataExtension);
-			imageTracker = imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->savePaths(outputPath.createFilePath(frame), frame, getTime(frame));
 			break;
 
 		case ScriptOperationType::SaveTrackInfo:
 			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultDataExtension);
-			imageTracker = imageTrackers->getTracker(operation->getArgument(ArgumentLabel::Tracker));
+			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->saveTrackInfo(outputPath.createFilePath(frame), frame, getTime(frame));
 			break;
 
@@ -622,6 +622,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			if (newImageSet) {
 				operation->imageRef = newImage;
 			}
+			operation->initialFinish();
 			processOperations(operation->innerOperations, operation);
 		}
 
@@ -652,11 +653,11 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		}
 		errorMsg += " in\n" + operation->line;
 		showDialog(errorMsg, MessageLevel::Error);
-		doAbort();
+		doReset();
     } catch (std::exception & e) {
 		errorMsg = Util::getExceptionDetail(e) + " in\n" + operation->line;
 		showDialog(errorMsg, MessageLevel::Error);
-		doAbort();
+		doReset();
 	}
 	return done;
 }
@@ -681,21 +682,22 @@ double ScriptProcessing::getTime(int frame) {
 	return time;
 }
 
+void ScriptProcessing::doPause() {
+	operationMode = OperationMode::Pause;
+	setMode(operationMode);
+}
+
 void ScriptProcessing::doAbort() {
 	operationMode = OperationMode::Idle;
-	this_thread::sleep_for(100ms);
+}
 
+void ScriptProcessing::doReset() {
 	imageTrackers->close();
 	scriptOperations->close();
 
 	observer->resetProgressTimer();
 	setMode(OperationMode::Idle);
 	clearStatus();
-}
-
-void ScriptProcessing::doPause() {
-	operationMode = OperationMode::Pause;
-	setMode(operationMode);
 }
 
 void ScriptProcessing::setMode(OperationMode mode) {

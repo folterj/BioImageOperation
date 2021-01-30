@@ -47,11 +47,14 @@ public:
 	Clock::time_point start;
 	double timeElapseds = 0;
 	int countElapsed = 0;
+	double timeElapsedInits = 0;
+	int countElapsedInit = 0;
 
 	ScriptOperation();
 	ScriptOperation(string line);
 	~ScriptOperation();
 	void reset();
+	void initialFinish();
 	void finish();
 	void extract(string line);
 	void parseArguments();
@@ -73,6 +76,7 @@ public:
 	bool initFrameSource(FrameType frameType, int apiCode, string basepath, string templatePath, string start = "", string length = "", double fps0 = 1, int interval = 1);
 	void initFrameOutput(FrameType frameType, string basepath, string templatePath, string defaultExtension = "", string start = "", string length = "", double fps = 0, string codecs = "");
 	double getDuration();
+	double getDurationInit();
 	string getBenchmarking(int level);
 	void close();
 

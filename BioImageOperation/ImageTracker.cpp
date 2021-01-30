@@ -16,8 +16,8 @@
 #include "Types.h"
 
 
-ImageTracker::ImageTracker(string trackerId, double fps, double pixelSize, double windowSize, Observer* observer) {
-	this->trackerId = trackerId;
+ImageTracker::ImageTracker(string id, double fps, double pixelSize, double windowSize, Observer* observer) {
+	this->id = id;
 	this->fps = fps;
 	this->pixelSize = pixelSize;
 	this->windowSize = windowSize;
@@ -76,7 +76,7 @@ void ImageTracker::reset() {
 	countPositionSet = false;
 	countPosition.x = 0;
 	countPosition.y = 0;
-	closeStreams();
+	close();
 }
 
 string ImageTracker::createClusters(Mat* image, double minArea, double maxArea, string basePath, bool debugMode) {
@@ -739,7 +739,7 @@ void ImageTracker::drawTrackCount(Mat* source, Mat* dest) {
 }
 
 string ImageTracker::getInfo() {
-	string info = "Tracker ID: " + trackerId + "\n\n";
+	string info = "Tracker ID: " + id + "\n\n";
 
 	info += Util::format("Cluster min/max area = %.0f/%.0f\n", trackingParams.area.min, trackingParams.area.max);
 	info += Util::format("Tracking max move/min active/max inactive = %.1f/%d/%d\n\n", trackingParams.maxMove.getMax(), trackingParams.minActive, trackingParams.maxInactive);
@@ -759,7 +759,7 @@ string ImageTracker::getInfo() {
 }
 
 void ImageTracker::saveClusters(string filename, int frame, double time, SaveFormat saveFormat, bool writeContour) {
-	OutputStream outStream;
+	OutputStream* clusterStream;
 	string csv = "";
 	string sfilename;
 	NumericPath filepath;
@@ -771,18 +771,18 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 	string header = "Frame,Time," + maincols + "\n";
 
 	if (saveFormat != SaveFormat::Split) {
-		clusterStream.init(filename, header);
+		clusterStream = clusterStreams.get(filename, header);
 	}
 
 	if (clusterParamsFinalised) {
 		if (saveFormat == SaveFormat::ByLabel) {
 			for (Cluster* cluster : clusters) {
-				maxi = max(cluster->getFirstLabel(), maxi);
+				maxi = max(cluster->getInitialLabel(), maxi);
 			}
 			csv += Util::format("{0},{1},", frame, time);
 			for (int i = 0; i <= maxi; i++) {
 				for (Cluster* cluster : clusters) {
-					if (cluster->getFirstLabel() == i) {
+					if (cluster->getInitialLabel() == i) {
 						dcol = i - col;
 						if (dcol > 0) {
 							csv += string(',', dcol * nmaincols);
@@ -802,20 +802,20 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 			for (Cluster* cluster : clusters) {
 				csv = Util::format("%d,%f,%s\n", frame, time, cluster->getCsv(writeContour).c_str());
 				filepath.setOutputPath(filename);
-				sfilename = filepath.createFilePath(cluster->getFirstLabel());
-				outStream.init(sfilename, header);
-				outStream.write(csv);
+				sfilename = filepath.createFilePath(cluster->getInitialLabel());
+				clusterStream = clusterStreams.get(sfilename, header);
+				clusterStream->write(csv);
 			}
 		}
 
 		if (saveFormat != SaveFormat::Split) {
-			clusterStream.write(csv);
+			clusterStream->write(csv);
 		}
 	}
 }
 
 void ImageTracker::saveTracks(string filename, int frame, double time, SaveFormat saveFormat, bool writeContour) {
-	OutputStream outStream;
+	OutputStream* trackStream;
 	Cluster* cluster;
 	string csv = "";
 	string sfilename;
@@ -828,7 +828,7 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 	string header = "frame,time," + maincols + "\n";
 
 	if (saveFormat != SaveFormat::Split) {
-		trackStream.init(filename, header);
+		trackStream = trackStreams.get(filename, header);
 	}
 
 	if (trackParamsFinalised) {
@@ -869,13 +869,13 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 				csv = Util::format("%d,%f,%s\n", frame, time, track->getCsv(cluster, writeContour).c_str());
 				filepath.setOutputPath(filename);
 				sfilename = filepath.createFilePath(track->label);
-				outStream.init(sfilename, header);
-				outStream.write(csv);
+				trackStream = trackStreams.get(sfilename, header);
+				trackStream->write(csv);
 			}
 		}
 
 		if (saveFormat != SaveFormat::Split) {
-			trackStream.write(csv);
+			trackStream->write(csv);
 		}
 	}
 }
@@ -883,7 +883,7 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 void ImageTracker::savePaths(string filename, int frame, double time) {
 	string s = "";
 
-	pathStream.init(filename, "Frame,Time,Label,Age,Usage,Last use,Pos X,Pos Y\n");
+	pathStream.init(filename, "frame,time,label,age,usage,last use,x,y\n");
 
 	if (trackParamsFinalised) {
 		for (PathNode* node : pathNodes) {
@@ -920,9 +920,9 @@ Cluster* ImageTracker::findTrackedCluster(Track* targetTrack) {
 	return nullptr;
 }
 
-void ImageTracker::closeStreams() {
-	clusterStream.closeStream();
-	trackStream.closeStream();
+void ImageTracker::close() {
+	clusterStreams.close();
+	trackStreams.close();
 	pathStream.closeStream();
 	trackInfoStream.closeStream();
 }

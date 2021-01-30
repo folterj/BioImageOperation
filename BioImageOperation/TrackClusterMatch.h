@@ -22,9 +22,11 @@ public:
 	Cluster* cluster = nullptr;
 	double distance = 0;
 	double areaDif = 0;
+	double lengthDif = 0;
 	double angleDif = 0;
 	double rangeFactor = 0;
 	double areaFactor = 0;
+	double lengthFactor = 0;
 	double angleFactor = 0;
 	double matchFactor = 0;
 	bool assigned = false;

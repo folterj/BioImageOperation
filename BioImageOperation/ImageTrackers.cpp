@@ -10,14 +10,9 @@
 #include "ImageTrackers.h"
 
 
-ImageTrackers::ImageTrackers() {
-}
-
 ImageTrackers::~ImageTrackers() {
-	for (int i = 0; i < size(); i++) {
-		delete at(i);
-	}
-	clear();
+	close();
+	reset();
 }
 
 void ImageTrackers::reset() {
@@ -28,22 +23,22 @@ void ImageTrackers::reset() {
 }
 
 void ImageTrackers::close() {
-	for (int i = 0; i < size(); i++) {
-		at(i)->closeStreams();
+	for (ImageTracker* tracker : *this) {
+		tracker->close();
 	}
 }
 
-ImageTracker* ImageTrackers::getTracker(string trackerId, double fps, double pixelSize, double windowSize, Observer* observer) {
-	for (int i = 0; i < size(); i++) {
-		if (at(i)->trackerId == trackerId) {
-			return at(i);
+ImageTracker* ImageTrackers::get(string id, double fps, double pixelSize, double windowSize, Observer* observer) {
+	for (ImageTracker* tracker : *this) {
+		if (tracker->id == id) {
+			return tracker;
 		}
 	}
 	if (observer) {
-		ImageTracker* newTracker = new ImageTracker(trackerId, fps, pixelSize, windowSize, observer);
+		ImageTracker* newTracker = new ImageTracker(id, fps, pixelSize, windowSize, observer);
 		push_back(newTracker);
 		return newTracker;
 	}
-	throw invalid_argument("Tracker with ID: '" + trackerId + "' not found");
+	throw invalid_argument("Tracker with ID: '" + id + "' not found");
 	return nullptr;
 }
