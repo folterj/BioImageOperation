@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10)
 
 string (TIMESTAMP NOW "%Y-%m-%d")
 
-project (BioImageOperation VERSION "1.6.440.7" DESCRIPTION ${NOW} HOMEPAGE_URL "https://joostdefolter.info")
+project (BioImageOperation VERSION "1.7.1" DESCRIPTION ${NOW} HOMEPAGE_URL "https://joostdefolter.info")
 
 configure_file (
     "${PROJECT_SOURCE_DIR}/config.h.in"

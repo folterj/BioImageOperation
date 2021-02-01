@@ -157,8 +157,8 @@ public:
 	/*
 	 * Save routines
 	 */
-	void saveClusters(string fileName, int frame, double time, SaveFormat byLabel, bool saveContour);
-	void saveTracks(string fileName, int frame, double time, SaveFormat byLabel, bool saveContour);
+	void saveClusters(string fileName, int frame, double time, SaveFormat byLabel, bool outputShapeFeatures, bool outputContour);
+	void saveTracks(string fileName, int frame, double time, SaveFormat byLabel, bool outputShapeFeatures, bool outputContour);
 	void savePaths(string fileName, int frame, double time);
 	void saveTrackInfo(string fileName, int frame, double time);
 	Cluster* findTrackedCluster(Track* targetTrack);

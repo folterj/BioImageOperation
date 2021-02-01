@@ -1,4 +1,16 @@
-# Bio Image Operation script operations (v1.6.440.6 / 2020-12-14)
+# Bio Image Operation script operations (v1.7.1 / 2021-02-01)
+
+
+**Set** (Path, Width, Height, Fps, PixelSize, WindowSize)
+
+Set parameters
+
+ - Path:	 File path ("path")
+ - Width:	 Width (numeric value)
+ - Height:	 Height (numeric value)
+ - Fps:	 Frames per second (numeric value)
+ - PixelSize:	 Size of a pixel in arbitrary unit (numeric value)
+ - WindowSize:	 Window size for moving average calculations [s] (numeric value)
 
 
 **SetPath** (**Path**)
@@ -12,8 +24,8 @@ Set path for relative file paths (by default path of current script file)
 
 Create a new image
 
- - Width:	 Width in pixels (numeric value)
- - Height:	 Height in pixels (numeric value)
+ - Width:	 Width (numeric value)
+ - Height:	 Height (numeric value)
  - ColorMode:	 Color mode (GrayScale, Color, ColorAlpha)
  - Red:	 Red color component (numeric value between 0 and 1)
  - Green:	 Green color component (numeric value between 0 and 1)
@@ -48,8 +60,8 @@ Open capturing from video (IP) path or camera source
  - API:	 OpenCV API code (See OpenCV API codes) (numeric value)
  - Path:	 File path ("path")
  - Source:	 Camera source (#) (numeric value)
- - Width:	 Width in pixels (numeric value)
- - Height:	 Height in pixels (numeric value)
+ - Width:	 Width (numeric value)
+ - Height:	 Height (numeric value)
  - Interval:	 Interval in number of frames (numeric value)
 
 
@@ -143,8 +155,8 @@ Extract (HSL) Lightness from image
 
 Scale image (in pixels, or values between 0 and 1)
 
- - Width:	 Width in pixels (numeric value)
- - Height:	 Height in pixels (numeric value)
+ - Width:	 Width (numeric value)
+ - Height:	 Height (numeric value)
  - Label:	 Label id (string)
 
 
@@ -152,10 +164,10 @@ Scale image (in pixels, or values between 0 and 1)
 
 Crop image (in pixels, or values between 0 and 1)
 
- - X:	 X position in pixels (numeric value)
- - Y:	 Y position in pixels (numeric value)
- - Width:	 Width in pixels (numeric value)
- - Height:	 Height in pixels (numeric value)
+ - X:	 X position (numeric value)
+ - Y:	 Y position (numeric value)
+ - Width:	 Width (numeric value)
+ - Height:	 Height (numeric value)
  - Label:	 Label id (string)
 
 
@@ -277,16 +289,17 @@ Retrieve the accumulative buffer and convert to image
  - Palette:	 Palette (GrayScale, Heat, Rainbow)
 
 
-**CreateClusters** (Tracker, MinArea, MaxArea)
+**CreateClusters** (Tracker, MinArea, MaxArea, Debug)
 
 Create clusters; auto calibrate using initial images if no parameters specified
 
  - Tracker:	 Tracker id (string)
  - MinArea:	 Minimum area in number of pixels (numeric value)
  - MaxArea:	 Maximum area in number of pixels (numeric value)
+ - Debug:	 Debug mode (true / false)
 
 
-**CreateTracks** (Tracker, MaxMove, MinActive, MaxInactive)
+**CreateTracks** (Tracker, MaxMove, MinActive, MaxInactive, Debug)
 
 Create cluster tracking; auto calibrate using initial images if no parameters specified
 
@@ -294,14 +307,16 @@ Create cluster tracking; auto calibrate using initial images if no parameters sp
  - MaxMove:	 Maximum movement distance (single frame) (numeric value)
  - MinActive:	 Minimum number of frames being active before state is active (numeric value)
  - MaxInactive:	 Maximum number of frames being inactive before state is inactive (numeric value)
+ - Debug:	 Debug mode (true / false)
 
 
-**CreatePaths** (Tracker, Distance)
+**CreatePaths** (Tracker, Distance, Debug)
 
 Create common path usage
 
  - Tracker:	 Tracker id (string)
  - Distance:	 Maximum path distance (numeric value)
+ - Debug:	 Debug mode (true / false)
 
 
 **DrawClusters** (Label, Tracker, DrawMode)
@@ -310,7 +325,7 @@ Draw clusters
 
  - Label:	 Label id (string)
  - Tracker:	 Tracker id (string)
- - DrawMode:	 (Combination of) draw mode(s) (None, Point, Circle, Box, Angle, Label, Labeln, Track, Tracks, Fill, ClusterDefault, TracksDefault)
+ - DrawMode:	 Draw mode(s) (combine using | character) (None, Point, Circle, Box, Angle, Label, LabelArea, LabelAngle, Track, Tracks, Fill, ClusterDefault, TracksDefault)
 
 
 **DrawTracks** (Label, Tracker, DrawMode)
@@ -319,7 +334,7 @@ Draw tracked clusters
 
  - Label:	 Label id (string)
  - Tracker:	 Tracker id (string)
- - DrawMode:	 (Combination of) draw mode(s) (None, Point, Circle, Box, Angle, Label, Labeln, Track, Tracks, Fill, ClusterDefault, TracksDefault)
+ - DrawMode:	 Draw mode(s) (combine using | character) (None, Point, Circle, Box, Angle, Label, LabelArea, LabelAngle, Track, Tracks, Fill, ClusterDefault, TracksDefault)
 
 
 **DrawPaths** (Label, Tracker, PathDrawMode, Power, Palette)
@@ -333,23 +348,33 @@ Draw common paths
  - Palette:	 Palette (GrayScale, Heat, Rainbow)
 
 
-**SaveClusters** (**Path**, Tracker, Format, Contour)
+**DrawTrackCount** (Label, Tracker)
+
+Draw tracking count on image
+
+ - Label:	 Label id (string)
+ - Tracker:	 Tracker id (string)
+
+
+**SaveClusters** (**Path**, Tracker, Format, Features, Contour)
 
 Save clusters to CSV file
 
  - Path:	 File path ("path")
  - Tracker:	 Tracker id (string)
  - Format:	 Output format (ByTime, ByLabel, Split)
+ - Features:	 Extract features (true / false)
  - Contour:	 Extract contours (true / false)
 
 
-**SaveTracks** (**Path**, Tracker, Format, Contour)
+**SaveTracks** (**Path**, Tracker, Format, Features, Contour)
 
 Save cluster tracking to CSV file
 
  - Path:	 File path ("path")
  - Tracker:	 Tracker id (string)
  - Format:	 Output format (ByTime, ByLabel, Split)
+ - Features:	 Extract features (true / false)
  - Contour:	 Extract contours (true / false)
 
 
@@ -369,25 +394,9 @@ Show tracking information on screen
  - Display:	 Display id (number 1 - 4)
 
 
-**DrawTrackInfo** (Label, Tracker)
-
-Draw tracking stats on image
-
- - Label:	 Label id (string)
- - Tracker:	 Tracker id (string)
-
-
 **SaveTrackInfo** (**Path**, Tracker)
 
 Save tracking information to CSV file
-
- - Path:	 File path ("path")
- - Tracker:	 Tracker id (string)
-
-
-**SaveTrackLog** (**Path**, Tracker)
-
-Save tracking log to CSV file
 
  - Path:	 File path ("path")
  - Tracker:	 Tracker id (string)
@@ -409,11 +418,11 @@ Pause execution for a period (1000 ms default)
  - MS:	 Time in milliseconds (numeric value)
 
 
-**Debug** ()
+**Benchmark** ()
 
-Debug mode
-
-
+For benchmarking/debugging
 
 
-**Arguments:** **Required** Optional
+
+
+(**Arguments:** [**required**] [optional])

@@ -564,6 +564,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->saveClusters(outputPath.createFilePath(frame), frame, getTime(frame),
 										(SaveFormat)operation->getArgument(ArgumentLabel::Format, (int)SaveFormat::ByTime),
+										operation->getArgumentBoolean(ArgumentLabel::Features),
 										operation->getArgumentBoolean(ArgumentLabel::Contour));
 			break;
 
@@ -572,6 +573,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->saveTracks(outputPath.createFilePath(frame), frame, getTime(frame),
 										(SaveFormat)operation->getArgument(ArgumentLabel::Format, (int)SaveFormat::ByTime),
+										operation->getArgumentBoolean(ArgumentLabel::Features),
 										operation->getArgumentBoolean(ArgumentLabel::Contour));
 			break;
 
@@ -683,13 +685,11 @@ double ScriptProcessing::getTime(int frame) {
 }
 
 void ScriptProcessing::doPause() {
-	operationMode = OperationMode::Pause;
-	setMode(operationMode);
+	setMode(OperationMode::Pause);
 }
 
 void ScriptProcessing::doAbort() {
-	operationMode = OperationMode::Abort;
-	setMode(operationMode);
+	setMode(OperationMode::Abort);
 }
 
 void ScriptProcessing::doReset() {
@@ -702,7 +702,8 @@ void ScriptProcessing::doReset() {
 }
 
 void ScriptProcessing::setMode(OperationMode mode) {
-	observer->setMode((int)mode);
+	operationMode = mode;
+	observer->setMode((int)operationMode);
 }
 
 void ScriptProcessing::clearStatus() {

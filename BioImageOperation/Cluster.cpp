@@ -263,22 +263,38 @@ void Cluster::drawLabel(Mat* image, Scalar color, int drawMode) {
 	}
 }
 
-string Cluster::getCsvHeader(bool writeContour) {
-	string header = "#,label,x,y,angle,area,rad,length_major,length_minor";
-	if (writeContour) {
+string Cluster::getCsvHeader(bool outputShapeFeatures, bool outputContour) {
+	string header = "track_label,cluster_label,is_merged"
+		",x,y"
+		",angle"
+		",area,rad,length_major,length_minor";
+	if (outputShapeFeatures) {
+		header += ",size_ratio,ellipsity,circularity,convexity";
+	}
+	if (outputContour) {
 		header += ",contour";
 	}
 	return header;
 }
 
-string Cluster::getCsv(bool writeContour) {
-	string csv = to_string(clusterLabel) + "," + Util::replace(getLabels(), ",", " ");
+string Cluster::getCsv(bool outputShapeFeatures, bool outputContour) {
+	string csv;
+	vector<Point> contour;
     
+	csv = Util::replace(getLabels(), ",", " ") + "," + to_string(clusterLabel);
+	csv += format(",%s", (assignedTracks.size() > 1) ? "true" : "false");
 	csv += format(",%f,%f,%f", x * pixelSize, y * pixelSize, angle);
 	csv += format(",%f,%f,%f,%f", area * pixelSize * pixelSize, rad * pixelSize, length_major * pixelSize, length_minor * pixelSize);
-	if (writeContour) {
+
+	if (outputShapeFeatures || outputContour) {
+		contour = getContour();
+	}
+	if (outputShapeFeatures) {
+		csv += Util::getShapeFeatures(&contour, area, length_major, length_minor);
+	}
+	if (outputContour) {
 		csv += ",";
-		for (Point point : getContour()) {
+		for (Point point : contour) {
 			if (pixelSize == 1) {
 				csv += Util::format("%d %d ", point.x, point.y);
 			} else {
@@ -288,6 +304,7 @@ string Cluster::getCsv(bool writeContour) {
 	}
 	return csv;
 }
+
 
 vector<Point> Cluster::getContour() {
 	vector<Point> contour;

@@ -28,6 +28,7 @@ class Track
 {
 public:
 	int label = 0;
+	int clusterLabel = -1;
 
 	double x = 0;
 	double y = 0;
@@ -81,7 +82,7 @@ public:
 	void drawAngle(Mat* image, Scalar color);
 	void drawTracks(Mat* image, Scalar color, int ntracks = 1);
 	void drawLabel(Mat* image, Scalar color, int drawMode);
-	static string getCsvHeader(bool writeContour = false);
-	string getCsv(Cluster* cluster, bool writeContour = false);
+	static string getCsvHeader(bool outputShapeFeatures = false, bool outputContour = false);
+	string getCsv(bool outputShapeFeatures = false, bool outputContour = false, Cluster* cluster = nullptr);
 	string toString();
 };

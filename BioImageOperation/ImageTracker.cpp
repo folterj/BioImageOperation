@@ -433,6 +433,7 @@ void ImageTracker::pruneTracks() {
 		if (!track->assigned) {
 			track->activeCount = 0;
 			track->inactiveCount++;
+			track->clusterLabel = -1;
 		}
 		if (maxInactive >= 0 && track->inactiveCount > maxInactive) {
 			tracks.erase(tracks.begin() + i);
@@ -625,7 +626,9 @@ void ImageTracker::drawTracks(Mat* source, Mat* dest, int drawMode, int ntracks)
 	source->copyTo(*dest);
 
 	for (Track* track : tracks) {
-		track->draw(dest, drawMode, ntracks);
+		if (track->isActive(trackingParams.minActive)) {
+			track->draw(dest, drawMode, ntracks);
+		}
 	}
 }
 
@@ -758,7 +761,7 @@ string ImageTracker::getInfo() {
 	return info;
 }
 
-void ImageTracker::saveClusters(string filename, int frame, double time, SaveFormat saveFormat, bool writeContour) {
+void ImageTracker::saveClusters(string filename, int frame, double time, SaveFormat saveFormat, bool outputShapeFeatures, bool outputContour) {
 	OutputStream* clusterStream;
 	string csv = "";
 	string sfilename;
@@ -766,9 +769,9 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 	int dcol;
 	int col = 0;
 	int maxi = 0;
-	string maincols = Cluster::getCsvHeader(writeContour);
+	string maincols = Cluster::getCsvHeader(outputShapeFeatures, outputContour);
 	int nmaincols = Util::split(maincols, ",").size();
-	string header = "Frame,Time," + maincols + "\n";
+	string header = "frame,time," + maincols + "\n";
 
 	if (saveFormat != SaveFormat::Split) {
 		clusterStream = clusterStreams.get(filename, header);
@@ -788,7 +791,7 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 							csv += string(',', dcol * nmaincols);
 							col = i;
 						}
-						csv += cluster->getCsv(writeContour) + ",";
+						csv += cluster->getCsv(outputShapeFeatures, outputContour) + ",";
 						col++;
 					}
 				}
@@ -796,11 +799,11 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 			csv += "\n";
 		} else if (saveFormat == SaveFormat::ByTime) {
 			for (Cluster* cluster : clusters) {
-				csv += Util::format("%d,%f,%s\n", frame, time, cluster->getCsv(writeContour).c_str());
+				csv += Util::format("%d,%f,%s\n", frame, time, cluster->getCsv(outputShapeFeatures, outputContour).c_str());
 			}
 		} else if (saveFormat == SaveFormat::Split) {
 			for (Cluster* cluster : clusters) {
-				csv = Util::format("%d,%f,%s\n", frame, time, cluster->getCsv(writeContour).c_str());
+				csv = Util::format("%d,%f,%s\n", frame, time, cluster->getCsv(outputShapeFeatures, outputContour).c_str());
 				filepath.setOutputPath(filename);
 				sfilename = filepath.createFilePath(cluster->getInitialLabel());
 				clusterStream = clusterStreams.get(sfilename, header);
@@ -814,16 +817,18 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 	}
 }
 
-void ImageTracker::saveTracks(string filename, int frame, double time, SaveFormat saveFormat, bool writeContour) {
+void ImageTracker::saveTracks(string filename, int frame, double time, SaveFormat saveFormat, bool outputShapeFeatures, bool outputContour) {
 	OutputStream* trackStream;
-	Cluster* cluster;
+	Cluster* cluster = nullptr;
 	string csv = "";
 	string sfilename;
 	NumericPath filepath;
 	int dcol;
 	int col = 0;
 	int maxi = 0;
-	string maincols = Track::getCsvHeader(writeContour);
+	int minActive = trackingParams.minActive;
+	bool findClusters = (outputShapeFeatures || outputContour);
+	string maincols = Track::getCsvHeader(outputShapeFeatures, outputContour);
 	int nmaincols = Util::split(maincols, ",").size();
 	string header = "frame,time," + maincols + "\n";
 
@@ -834,43 +839,51 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 	if (trackParamsFinalised) {
 		if (saveFormat == SaveFormat::ByLabel) {
 			for (Track* track : tracks) {
-				maxi = max(track->label, maxi);
+				if (track->isActive(minActive)) {
+					maxi = max(track->label, maxi);
+				}
 			}
 			csv += Util::format("{0},{1},", frame, time);
 			for (int i = 0; i <= maxi; i++) {
 				for (Track* track : tracks) {
-					if (track->label == i) {
-						dcol = i - col;
-						if (dcol > 0) {
-							csv += string(',', dcol * nmaincols);
-							col = i;
+					if (track->isActive(minActive)) {
+						if (track->label == i) {
+							dcol = i - col;
+							if (dcol > 0) {
+								csv += string(',', dcol * nmaincols);
+								col = i;
+							}
+							if (findClusters) {
+								cluster = findTrackedCluster(track);
+							}
+							csv += track->getCsv(outputShapeFeatures, outputContour, cluster) + ",";
+							col++;
 						}
-						if (writeContour) {
-							cluster = findTrackedCluster(track);
-						}
-						csv += track->getCsv(cluster, writeContour) + ",";
-						col++;
 					}
 				}
 			}
 			csv += "\n";
 		} else if (saveFormat == SaveFormat::ByTime) {
 			for (Track* track : tracks) {
-				if (writeContour) {
-					cluster = findTrackedCluster(track);
+				if (track->isActive(minActive)) {
+					if (findClusters) {
+						cluster = findTrackedCluster(track);
+					}
+					csv += Util::format("%d,%f,%s\n", frame, time, track->getCsv(outputShapeFeatures, outputContour, cluster).c_str());
 				}
-				csv += Util::format("%d,%f,%s\n", frame, time, track->getCsv(cluster, writeContour).c_str());
 			}
 		} else if (saveFormat == SaveFormat::Split) {
 			for (Track* track : tracks) {
-				if (writeContour) {
-					cluster = findTrackedCluster(track);
+				if (track->isActive(minActive)) {
+					if (findClusters) {
+						cluster = findTrackedCluster(track);
+					}
+					csv = Util::format("%d,%f,%s\n", frame, time, track->getCsv(outputShapeFeatures, outputContour, cluster).c_str());
+					filepath.setOutputPath(filename);
+					sfilename = filepath.createFilePath(track->label);
+					trackStream = trackStreams.get(sfilename, header);
+					trackStream->write(csv);
 				}
-				csv = Util::format("%d,%f,%s\n", frame, time, track->getCsv(cluster, writeContour).c_str());
-				filepath.setOutputPath(filename);
-				sfilename = filepath.createFilePath(track->label);
-				trackStream = trackStreams.get(sfilename, header);
-				trackStream->write(csv);
 			}
 		}
 

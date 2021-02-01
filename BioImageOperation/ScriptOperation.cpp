@@ -570,13 +570,13 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 
 	case ScriptOperationType::SaveClusters:
 		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Contour };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Features, ArgumentLabel::Contour };
 		description = "Save clusters to CSV file";
 		break;
 
 	case ScriptOperationType::SaveTracks:
 		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Contour };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Features, ArgumentLabel::Contour };
 		description = "Save cluster tracking to CSV file";
 		break;
 
@@ -641,6 +641,7 @@ ArgumentType ScriptOperation::getExpectedArgumentType(ArgumentLabel argument) {
 		type = ArgumentType::Display;
 		break;
 
+	case ArgumentLabel::Features:
 	case ArgumentLabel::Contour:
 	case ArgumentLabel::Debug:
 		type = ArgumentType::Bool;
@@ -739,10 +740,6 @@ string ScriptOperation::getArgumentDescription(ArgumentLabel argument) {
 		s = "Display id";
 		break;
 
-	case ArgumentLabel::Contour:
-		s = "Extract contours";
-		break;
-
 	case ArgumentLabel::Red:
 		s = "Red color component";
 		break;
@@ -764,19 +761,19 @@ string ScriptOperation::getArgumentDescription(ArgumentLabel argument) {
 		break;
 
 	case ArgumentLabel::Width:
-		s = "Width in pixels";
+		s = "Width";
 		break;
 
 	case ArgumentLabel::Height:
-		s = "Height in pixels";
+		s = "Height";
 		break;
 
 	case ArgumentLabel::X:
-		s = "X position in pixels";
+		s = "X position";
 		break;
 
 	case ArgumentLabel::Y:
-		s = "Y position in pixels";
+		s = "Y position";
 		break;
 
 	case ArgumentLabel::Interval:
@@ -872,15 +869,11 @@ string ScriptOperation::getArgumentDescription(ArgumentLabel argument) {
 		break;
 
 	case ArgumentLabel::DrawMode:
-		s = "(Combination of) draw mode(s)";
+		s = "Draw mode(s) (combine using | character)";
 		break;
 
 	case ArgumentLabel::PathDrawMode:
 		s = "Path draw mode";
-		break;
-
-	case ArgumentLabel::Debug:
-		s = "Debug mode";
 		break;
 
 	case ArgumentLabel::Format:
@@ -889,6 +882,18 @@ string ScriptOperation::getArgumentDescription(ArgumentLabel argument) {
 
 	case ArgumentLabel::Position:
 		s = "Draw position";
+		break;
+
+	case ArgumentLabel::Features:
+		s = "Extract features";
+		break;
+
+	case ArgumentLabel::Contour:
+		s = "Extract contours";
+		break;
+
+	case ArgumentLabel::Debug:
+		s = "Debug mode";
 		break;
 
 		// end of switch
@@ -1143,9 +1148,15 @@ string ScriptOperation::getBenchmarking(int level) {
 	double durationInit = getDurationInit();
 	if (duration > 0) {
 		if (hasInnerOperations()) {
-			times = "(" + Util::formatThousands(round(durationInit * 1000000)) + ") ";
+			times = Util::formatThousands(round(durationInit * 1000000)) + " [";
 		}
-		times += Util::formatThousands(round(duration * 1000000)) + " us";
+		times += Util::formatThousands(round(duration * 1000000));
+		if (hasInnerOperations()) {
+			times += "]";
+		} else {
+			times += " ";
+		}
+		times += "us";
 		int i = 80 - s.length() - times.length();
 		if (i < 1) {
 			i = 1;

@@ -58,12 +58,13 @@ public:
 	static double radiansToDegrees(double radAngle);
 	static double degreesToRadians(double degreeAngle);
 	static double calcAngle(double dy, double dx);
-	static double calcMomentsAngle(Moments* moments);
-	static double calcMomentsMajorRadius(Moments* moments);
-	static double calcMomentsMinorRadius(Moments* moments);
 	static double calcAngleDif(double angle1, double angle2);
 	static double calcShortAngleDif(double angle1, double angle2);
 	static double normAngle(double angle);
+	static double calcMomentsAngle(Moments* moments);
+	static double calcMomentsMajorRadius(Moments* moments);
+	static double calcMomentsMinorRadius(Moments* moments);
+	static string getShapeFeatures(vector<Point>* contour, double area, double length_major, double length_minor);
 
 	static Scalar getLabelColor(int label0);
 	static Scalar getHeatScale(double scale);

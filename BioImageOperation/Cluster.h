@@ -69,8 +69,10 @@ public:
 	void drawAngle(Mat* image, Scalar color);
 	void drawFill(Mat* image, Scalar color);
 	void drawLabel(Mat* image, Scalar color, int drawMode);
-	static string getCsvHeader(bool writeContour = false);
-	string getCsv(bool writeContour = false);
+
+	static string getCsvHeader(bool outputShapeFeatures = false, bool outputContour = false);
+	string getCsv(bool outputShapeFeatures = false, bool outputContour = false);
 	vector<Point> getContour();
+
 	string toString();
 };

@@ -304,6 +304,29 @@ double Util::calcAngle(double dy, double dx) {
 	return radiansToDegrees(atan2(dy, dx));
 }
 
+double Util::calcAngleDif(double angle1, double angle2) {
+	// for values between -180 and 180
+	// returns value between -180 and 180
+	// https://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles
+	return normAngle(angle2 - angle1);
+}
+
+double Util::calcShortAngleDif(double angle1, double angle2) {
+	// for values between -90 and 90
+	// returns value between -90 and 90
+	double dangle = angle2 - angle1;
+	while (dangle < -90) dangle += 180;
+	while (dangle > 90) dangle -= 180;
+	return dangle;
+}
+
+double Util::normAngle(double angle) {
+	// returns value between -180 and 180
+	while (angle < -180) angle += 360;
+	while (angle > 180) angle -= 360;
+	return angle;
+}
+
 // https://en.wikipedia.org/wiki/Image_moment
 // http://raphael.candelier.fr/?blog=Image%20Moments
 
@@ -333,27 +356,42 @@ double Util::calcMomentsMinorRadius(Moments* moments) {
 	return sqrt(2 * (mu2sum - sqrt(mu2dif * mu2dif + 4 * mu11 * mu11)));
 }
 
-double Util::calcAngleDif(double angle1, double angle2) {
-	// for values between -180 and 180
-	// returns value between -180 and 180
-	// https://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles
-	return normAngle(angle2 - angle1);
-}
+// https://docs.opencv.org/master/dd/d49/tutorial_py_contour_features.html
 
-double Util::calcShortAngleDif(double angle1, double angle2) {
-	// for values between -90 and 90
-	// returns value between -90 and 90
-	double dangle = angle2 - angle1;
-	while (dangle < -90) dangle += 180;
-	while (dangle > 90) dangle -= 180;
-	return dangle;
-}
+string Util::getShapeFeatures(vector<Point>* contour, double area, double length_major, double length_minor) {
+	string csvExtra;
+	vector<Point> hull;
+	//vector<Point2f> contour2;
+	Rect rect;
+	Mat areaImage;
+	double sizeRatio, ellipsity, circularity, convexity;
+	double hullArea, perimeter, epsilon;
 
-double Util::normAngle(double angle) {
-	// returns value between -180 and 180
-	while (angle < -180) angle += 360;
-	while (angle > 180) angle -= 360;
-	return angle;
+	sizeRatio = length_minor / length_major;
+	ellipsity = area / (M_PI * (length_major / 2) * (length_minor / 2));
+	csvExtra += Util::format(",%f,%f", sizeRatio, ellipsity);
+
+	if (!contour->empty()) {
+		perimeter = arcLength(*contour, true);
+		convexHull(*contour, hull);
+		//epsilon = 0.01 * perimeter;
+		//approxPolyDP(hull, contour2, epsilon, true);		// approximation not needed
+		//hullArea = contourArea(hull);		// * don't use: returns inaccurate area
+		rect = boundingRect(hull);
+		// remove offset from hull:
+		for (int i = 0; i < hull.size(); i++) {
+			hull[i] -= rect.tl();
+		}
+		areaImage = Mat::zeros(rect.size(), CV_8U);
+		fillPoly(areaImage, hull, 1);
+		hullArea = countNonZero(areaImage);
+		convexity = area / hullArea;
+		circularity = area * 4 * M_PI / (perimeter * perimeter);
+		csvExtra += Util::format(",%f,%f", circularity, convexity);
+	} else {
+		csvExtra += ",,";
+	}
+	return csvExtra;
 }
 
 Scalar Util::getLabelColor(int label0) {
