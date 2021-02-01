@@ -688,7 +688,8 @@ void ScriptProcessing::doPause() {
 }
 
 void ScriptProcessing::doAbort() {
-	operationMode = OperationMode::Idle;
+	operationMode = OperationMode::Abort;
+	setMode(operationMode);
 }
 
 void ScriptProcessing::doReset() {

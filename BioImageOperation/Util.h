@@ -63,6 +63,7 @@ public:
 	static double calcMomentsMinorRadius(Moments* moments);
 	static double calcAngleDif(double angle1, double angle2);
 	static double calcShortAngleDif(double angle1, double angle2);
+	static double normAngle(double angle);
 
 	static Scalar getLabelColor(int label0);
 	static Scalar getHeatScale(double scale);

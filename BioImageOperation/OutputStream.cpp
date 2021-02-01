@@ -26,8 +26,12 @@ OutputStream::~OutputStream() {
 void OutputStream::reset() {
 	closeStream();
 	filename = "";
-	buffer = "";
+	clearBuffer();
 	created = false;
+}
+
+void OutputStream::clearBuffer() {
+	buffer.str("");
 }
 
 void OutputStream::init(string filename, string header) {
@@ -40,26 +44,30 @@ void OutputStream::init(string filename, string header) {
 
 void OutputStream::write(string output) {
 	if (output != "") {
-		buffer += output;
-		if (created && buffer.size() < Constants::maxLogBuffer) {
+		buffer << output;
+		if (created && buffer.tellp() < Constants::maxLogBuffer) {
 			return;
 		}
 	}
-	if (buffer != "") {
-		ios_base::openmode openMode = std::ios_base::out;
-		if (created) {
-			openMode |= std::ios_base::app;
-		}
-		open(filename, openMode);
-		if (is_open()) {
-			(*this) << buffer;
-			flush();
-			close();
-			buffer = "";
-			created = true;
-		} else {
-			throw ios_base::failure("Unable to write to file " + filename);
-		}
+	if (buffer.tellp() != 0) {
+		writeToFile();
+	}
+}
+
+void OutputStream::writeToFile() {
+	ios_base::openmode openMode = std::ios_base::out;
+	if (created) {
+		openMode |= std::ios_base::app;
+	}
+	open(filename, openMode);
+	if (is_open()) {
+		(*this) << buffer.str();
+		flush();
+		close();
+		clearBuffer();
+		created = true;
+	} else {
+		throw ios_base::failure("Unable to write to file " + filename);
 	}
 }
 

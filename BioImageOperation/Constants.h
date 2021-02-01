@@ -148,7 +148,8 @@ enum class OperationMode
 {
 	Idle,
 	Run,
-	Pause
+	Pause,
+	Abort
 };
 
 enum class MessageLevel

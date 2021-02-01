@@ -337,10 +337,7 @@ double Util::calcAngleDif(double angle1, double angle2) {
 	// for values between -180 and 180
 	// returns value between -180 and 180
 	// https://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles
-	double dangle = angle2 - angle1;
-	while (dangle < -180) dangle += 360;
-	while (dangle > 180) dangle -= 360;
-	return dangle;
+	return normAngle(angle2 - angle1);
 }
 
 double Util::calcShortAngleDif(double angle1, double angle2) {
@@ -350,6 +347,13 @@ double Util::calcShortAngleDif(double angle1, double angle2) {
 	while (dangle < -90) dangle += 180;
 	while (dangle > 90) dangle -= 180;
 	return dangle;
+}
+
+double Util::normAngle(double angle) {
+	// returns value between -180 and 180
+	while (angle < -180) angle += 360;
+	while (angle > 180) angle -= 360;
+	return angle;
 }
 
 Scalar Util::getLabelColor(int label0) {

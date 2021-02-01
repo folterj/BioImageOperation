@@ -9,6 +9,8 @@
 
 #pragma once
 #include <fstream>
+#include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -21,13 +23,15 @@ class OutputStream : ofstream
 {
 public:
 	string filename = "";
-	string buffer = "";
+	ostringstream buffer;
 	bool created = false;
 
 	OutputStream(string filename = "", string header = "");
 	~OutputStream();
 	void reset();
+	void clearBuffer();
 	void init(string filename, string header = "");
 	void write(string output);
+	void writeToFile();
 	void closeStream();
 };

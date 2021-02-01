@@ -105,7 +105,7 @@ void Track::update(Cluster* cluster, double maxArea, double maxMoveDistance, boo
 	if (forwardDist >= 0) {
 		orientation = angle;
 	} else {
-		orientation = angle + 180;
+		orientation = Util::normAngle(angle + 180);
 	}
 
 	if ((ntracks == 1 && cluster->area < maxArea) || area == 0) {
@@ -294,7 +294,7 @@ string Track::getCsv(Cluster* cluster, bool writeContour) {
 	i = 0;
 	for (auto angle = angles.rbegin(); angle != angles.rend(); angle++) {
 		if (i > 0) {
-			d = lastangle - *angle;
+			d = Util::calcAngleDif(lastangle, *angle);
 			if (vn < n) {
 				v_angle += d;
 				vn++;

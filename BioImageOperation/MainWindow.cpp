@@ -237,11 +237,14 @@ void MainWindow::setModeQt(int mode0) {
 		} else if (mode == OperationMode::Pause) {
 			buttonText = "Continue";
 			ui.processButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+		} else if (mode == OperationMode::Abort) {
+			buttonText = "Aborting...";
 		} else {
 			buttonText = defaultProcessText;
 			ui.processButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 		}
 		ui.processButton->setText(Util::convertToQString(buttonText));
+		ui.processButton->setEnabled(mode != OperationMode::Abort);
 		ui.abortButton->setEnabled(!controlsEnabled);
 		ui.scriptTextEdit->setReadOnly(!controlsEnabled);
 		ui.actionClear->setEnabled(controlsEnabled);
