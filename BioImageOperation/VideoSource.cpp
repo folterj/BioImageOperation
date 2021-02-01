@@ -216,6 +216,8 @@ bool VideoSource::seekFrame() {
 	return videoCapture.set(VideoCaptureProperties::CAP_PROP_POS_FRAMES, videoFramei);
 }
 
+// gopro opencv issue https://stackoverflow.com/questions/49060054/opencv-videocapture-closes-with-videos-from-gopro
+
 bool VideoSource::nextFrame() {
 	bool frameOk = false;
 
@@ -228,6 +230,12 @@ bool VideoSource::nextFrame() {
 		}
 		if (videoIsOpen) {
 			frameOk = videoCapture.grab();
+			if (!frameOk) {
+				if (framei < 100 && framei < videoNframes - 1) {
+					// work-around for initial empty frames in stream
+					frameOk = true;
+				}
+			}
 			if (!frameOk) {
 				release();
 			}
