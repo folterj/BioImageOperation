@@ -231,7 +231,7 @@ bool VideoSource::nextFrame() {
 		if (videoIsOpen) {
 			frameOk = videoCapture.grab();
 			if (!frameOk) {
-				if (framei < 100 && framei < videoNframes - 1) {
+				if (framei > 0 && framei < 100 && framei < videoNframes - 1) {
 					// work-around for initial empty frames in stream
 					frameOk = true;
 				}

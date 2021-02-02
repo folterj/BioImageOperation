@@ -147,6 +147,7 @@ bool ScriptProcessing::startProcess(string filepath, string script) {
 void ScriptProcessing::processThreadMethod() {
 	processOperations(scriptOperations, nullptr);
 	if (operationMode != OperationMode::Pause) {
+		this_thread::sleep_for(100ms);		// finish async tasks (show image)
 		doReset();
 	}
 }
