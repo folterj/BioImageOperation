@@ -91,7 +91,7 @@ void ImageWindow::saveImage() {
 		qfilename = QFileDialog::getSaveFileName(this, tr("Save Image"));
 		if (qfilename != "") {
 			filename = qfilename.toStdString();
-			extPos = filename.rfind(".");
+			extPos = (int)filename.rfind(".");
 			if (extPos < 0) {
 				extension = Constants::defaultImageExtension;
 				if (!Util::startsWith(extension, ".")) {

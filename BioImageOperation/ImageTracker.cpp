@@ -251,7 +251,7 @@ void ImageTracker::matchClusterTracks(bool findOptimalSolution, bool debugMode) 
 		matches = bestMatches;
 		bestScore = calcMatchScore(&bestMatches);
 		for (vector<TrackClusterMatch*> trackMatch : trackMatches) {
-			n = trackMatch.size();
+			n = (int)trackMatch.size();
 			if (n > 1) {
 				// try next potential cluster for current track
 				for (i = 0; i < n; i++) {
@@ -762,7 +762,7 @@ string ImageTracker::getInfo() {
 }
 
 void ImageTracker::saveClusters(string filename, int frame, double time, SaveFormat saveFormat, bool outputShapeFeatures, bool outputContour) {
-	OutputStream* clusterStream;
+	OutputStream* clusterStream = nullptr;
 	string csv = "";
 	string sfilename;
 	NumericPath filepath;
@@ -770,7 +770,7 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 	int col = 0;
 	int maxi = 0;
 	string maincols = Cluster::getCsvHeader(outputShapeFeatures, outputContour);
-	int nmaincols = Util::split(maincols, ",").size();
+	int nmaincols = (int)Util::split(maincols, ",").size();
 	string header = "frame,time," + maincols + "\n";
 
 	if (saveFormat != SaveFormat::Split) {
@@ -818,7 +818,7 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 }
 
 void ImageTracker::saveTracks(string filename, int frame, double time, SaveFormat saveFormat, bool outputShapeFeatures, bool outputContour) {
-	OutputStream* trackStream;
+	OutputStream* trackStream = nullptr;
 	Cluster* cluster = nullptr;
 	string csv = "";
 	string sfilename;
@@ -829,7 +829,7 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 	int minActive = trackingParams.minActive;
 	bool findClusters = (outputShapeFeatures || outputContour);
 	string maincols = Track::getCsvHeader(outputShapeFeatures, outputContour);
-	int nmaincols = Util::split(maincols, ",").size();
+	int nmaincols = (int)Util::split(maincols, ",").size();
 	string header = "frame,time," + maincols + "\n";
 
 	if (saveFormat != SaveFormat::Split) {

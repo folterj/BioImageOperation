@@ -53,7 +53,7 @@ void TextObserver::showStatus(int i, int tot, string label) {
 		totalElapsed = now - time;
 		totalElapseds = totalElapsed.count();
 		avgFrametime = totalElapseds / (i + 1);
-		processFps = 1 / avgFrametime;
+		processFps = (int)(1 / avgFrametime);
 
 		if (tot > 0) {
 			progress = (double)i / tot;
@@ -74,11 +74,11 @@ void TextObserver::showStatus(int i, int tot, string label) {
 }
 
 void TextObserver::showDialog(string message, int level) {
-	cout << MessageLevels[level] + " " + message << endl;
+	cout << "\n" + MessageLevels[level] + " " + message << endl;
 }
 
 void TextObserver::showText(string text, int displayi, string reference) {
-	cout << Util::format("[%d] (%s) %s", displayi, reference.c_str(), text.c_str()) << endl;
+	cout << Util::format("\n[%d] (%s)\n", displayi, reference.c_str()) << text << endl;
 }
 
 void TextObserver::showImage(Mat* image, int displayi, string reference) {

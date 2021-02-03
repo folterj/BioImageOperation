@@ -9,7 +9,9 @@
 
 #pragma once
 #include <thread>
+#ifndef _CONSOLE
 #include <QObject>
+#endif
 #include "Observer.h"
 #include "Constants.h"
 #include "ScriptOperations.h"
@@ -25,11 +27,14 @@
  * Main processing of the operations recevied from the script
  */
 
-class ScriptProcessing : public QObject
+class ScriptProcessing
+#ifndef _CONSOLE
+	: public QObject
+#endif
 {
 public:
-	Observer* observer;
-	std::thread* processThread;
+	Observer* observer = nullptr;
+	std::thread* processThread = nullptr;
 	ScriptOperations* scriptOperations = new ScriptOperations();
 	ImageItemList* imageList = new ImageItemList();
 	AverageBuffer* backgroundBuffer = new AverageBuffer();

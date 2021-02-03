@@ -12,7 +12,7 @@
 
 #define PROJECT_NAME "BioImageOperation"
 #define PROJECT_VER  "1.7.1"
-#define PROJECT_DESC "2021-02-01"
+#define PROJECT_DESC "2021-02-03"
 #define PROJECT_URL  "https://joostdefolter.info"
 
 #endif // INCLUDE_GUARD

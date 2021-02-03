@@ -210,7 +210,7 @@ void Cluster::draw(Mat* image, int drawMode) {
 
 void Cluster::drawPoint(Mat* image, Scalar color) {
 	Point point((int)x, (int)y);
-	int thickness = rad / 4;
+	int thickness = (int)(rad / 4);
 	if (thickness < 1) {
 		thickness = 1;
 	}
@@ -251,15 +251,15 @@ void Cluster::drawLabel(Mat* image, Scalar color, int drawMode) {
 
 	if ((drawMode & (int)ClusterDrawMode::Label) != 0) {
 		size = Util::drawText(image, getLabels(), point, fontFace, fontScale, color);
-		point.y += size.height * 1.5;
+		point.y += (int)(size.height * 1.5);
 	}
 	if ((drawMode & (int)ClusterDrawMode::LabelArea) != 0) {
 		size = Util::drawText(image, Util::format("%.0f", area), point, fontFace, fontScale, color);
-		point.y += size.height * 1.5;
+		point.y += (int)(size.height * 1.5);
 	}
 	if ((drawMode & (int)ClusterDrawMode::LabelAngle) != 0) {
 		size = Util::drawText(image, Util::format("%.0f", angle), point, fontFace, fontScale, color);
-		point.y += size.height * 1.5;
+		point.y += (int)(size.height * 1.5);
 	}
 }
 

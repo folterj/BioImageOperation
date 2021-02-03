@@ -10,8 +10,10 @@
 #pragma once
 #include <string>
 #include <vector>
+#ifndef _CONSOLE
 #include <QObject>
 #include <QImage>
+#endif
 #include <opencv2/opencv.hpp>
 #include "ColorScale.h"
 
@@ -23,7 +25,10 @@ using namespace cv;
  * General utilities
  */
 
-class Util : public QObject
+class Util
+#ifndef _CONSOLE
+	: public QObject
+#endif
 {
 public:
 	static bool contains(string src, string target);
@@ -43,7 +48,6 @@ public:
 	static string format(string format, ...);
 	static string formatTimespan(int seconds);
 	static string formatThousands(int x);
-	static QString convertToQString(string s);
 
 	static double toDouble(string s);
 	static bool isNumeric(string s);
@@ -86,9 +90,12 @@ public:
 
 	static Size drawText(Mat* image, string text, Point point, HersheyFonts fontFace, double fontScale, Scalar color);
 	static void drawAngle(Mat* image, double x, double y, double rad, double angle, Scalar color, bool isArrow);
-	static QImage matToQImage(Mat const& src);
 
+#ifndef _CONSOLE
+	static QImage matToQImage(Mat const& src);
 	static string getUrl(string url);
 	static bool openWebLink(string url);
 	static int compareVersions(string version1, string version2);
+	static QString convertToQString(string s);
+#endif
 };

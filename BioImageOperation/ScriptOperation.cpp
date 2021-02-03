@@ -73,9 +73,9 @@ void ScriptOperation::extract(string line) {
 
 	this->line = line;
 
-	i = line.find(":");
-	i1 = line.find("-");
-	i2 = line.find("(");
+	i = (int)line.find(":");
+	i1 = (int)line.find("-");
+	i2 = (int)line.find("(");
 	if (i > 0 && (i < i2 || i2 < 0)) {
 		if (i1 > 0 && i1 < i) {
 			// interval & offset
@@ -98,19 +98,19 @@ void ScriptOperation::extract(string line) {
 		line = Util::trim(line.substr(i + 1));
 	}
 
-	i = line.find("=");
-	i1 = line.find("(");
+	i = (int)line.find("=");
+	i1 = (int)line.find("(");
 	if (i > 0 && i < i1) {
 		asignee = Util::trim(line.substr(0, i));
 		line = Util::trim(line.substr(i + 1));
 	}
 
-	i1 = line.find("(");	// get index again in shortened line
+	i1 = (int)line.find("(");	// get index again in shortened line
 	if (i1 > 0) {
 		operation = Util::trim(line.substr(0, i1));
-		i2 = line.find_last_of(")");
+		i2 = (int)line.find_last_of(")");
 		if (i2 < 0) {
-			i2 = line.size();
+			i2 = (int)line.size();
 		}
 		line = Util::trim(line.substr(i1 + 1, i2 - i1 - 1));
 
@@ -1148,16 +1148,16 @@ string ScriptOperation::getBenchmarking(int level) {
 	double durationInit = getDurationInit();
 	if (duration > 0) {
 		if (hasInnerOperations()) {
-			times = Util::formatThousands(round(durationInit * 1000000)) + " [";
+			times = Util::formatThousands((int)round(durationInit * 1000000)) + " [";
 		}
-		times += Util::formatThousands(round(duration * 1000000));
+		times += Util::formatThousands((int)round(duration * 1000000));
 		if (hasInnerOperations()) {
 			times += "]";
 		} else {
 			times += " ";
 		}
 		times += "us";
-		int i = 80 - s.length() - times.length();
+		int i = (int)(80 - s.length() - times.length());
 		if (i < 1) {
 			i = 1;
 		}

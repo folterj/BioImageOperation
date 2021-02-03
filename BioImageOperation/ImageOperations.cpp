@@ -44,7 +44,7 @@ void ImageOperations::scale(InputArray source, OutputArray dest, double width, d
 	} else if (height == 0 && width != 0) {
 		height = sheight * width / swidth;
 	}
-	resize(source, dest, cv::Size(width, height));
+	resize(source, dest, cv::Size((int)width, (int)height));
 }
 
 void ImageOperations::crop(Mat* source, Mat* dest, double width, double height, double x, double y) {
@@ -69,7 +69,7 @@ void ImageOperations::crop(Mat* source, Mat* dest, double width, double height, 
 	if (height == 0) {
 		height = sheight - y;
 	}
-	*dest = (*source)(Rect(x, y, width, height));
+	*dest = (*source)(Rect((int)x, (int)y, (int)width, (int)height));
 }
 
 void ImageOperations::mask(InputArray source, InputArray mask, OutputArray dest) {
@@ -256,7 +256,7 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Pale
 		y = (int)(ystart + i * yrange / logPower);
 		label1 = Util::format("%d", -i);
 		putText(*dest, label, Point(xline, (int)(y + textHeight * 0.5)), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, infoColor, thickness, LineTypes::LINE_AA);
-		putText(*dest, label1, Point((int)(xline + textSize.width), y - textHeight * 0.25), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale * 0.75, infoColor, thickness, LineTypes::LINE_AA);
+		putText(*dest, label1, Point((int)(xline + textSize.width), (int)(y - textHeight * 0.25)), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale * 0.75, infoColor, thickness, LineTypes::LINE_AA);
 		line(*dest, Point(xstart, y), Point(xline, y), infoColor, 1, LineTypes::LINE_AA);
 	}
 }

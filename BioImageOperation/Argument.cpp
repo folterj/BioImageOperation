@@ -18,7 +18,7 @@ Argument::Argument(string arg) {
 
 	allArgument = arg;
 
-	i = arg.find("=");
+	i = (int)arg.find("=");
 	if (i > 0) {
 		value = Util::removeQuotes(Util::trim(arg.substr(i + 1)));
 		arg = Util::trim(arg.substr(0, i));	// label

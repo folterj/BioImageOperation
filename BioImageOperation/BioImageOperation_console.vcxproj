@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{1b80384d-a02a-407c-9a10-b62b08dda195}</ProjectGuid>
+    <RootNamespace>BioImageOperationconsole</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\opencv\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\opencv\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\opencv\build\x64\vc15\bin</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_world440d.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\opencv\build\x64\vc15\bin</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_world440.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="AccumBuffer.cpp" />
+    <ClCompile Include="Argument.cpp" />
+    <ClCompile Include="AverageBuffer.cpp" />
+    <ClCompile Include="Averager.cpp" />
+    <ClCompile Include="BioImageOperation.cpp" />
+    <ClCompile Include="CaptureSource.cpp" />
+    <ClCompile Include="Cluster.cpp" />
+    <ClCompile Include="ColorScale.cpp" />
+    <ClCompile Include="Constants.cpp" />
+    <ClCompile Include="FrameOutput.cpp" />
+    <ClCompile Include="FrameSource.cpp" />
+    <ClCompile Include="ImageItem.cpp" />
+    <ClCompile Include="ImageItemList.cpp" />
+    <ClCompile Include="ImageOperations.cpp" />
+    <ClCompile Include="ImageOutput.cpp" />
+    <ClCompile Include="ImageSeries.cpp" />
+    <ClCompile Include="ImageSource.cpp" />
+    <ClCompile Include="ImageTracker.cpp" />
+    <ClCompile Include="ImageTrackers.cpp" />
+    <ClCompile Include="NumericPath.cpp" />
+    <ClCompile Include="OperationInfo.cpp" />
+    <ClCompile Include="OutputStream.cpp" />
+    <ClCompile Include="OutputStreams.cpp" />
+    <ClCompile Include="ParamRange.cpp" />
+    <ClCompile Include="PathLink.cpp" />
+    <ClCompile Include="PathNode.cpp" />
+    <ClCompile Include="ScriptOperation.cpp" />
+    <ClCompile Include="ScriptOperations.cpp" />
+    <ClCompile Include="ScriptProcessing.cpp" />
+    <ClCompile Include="StatData.cpp" />
+    <ClCompile Include="TextObserver.cpp" />
+    <ClCompile Include="Track.cpp" />
+    <ClCompile Include="TrackClusterMatch.cpp" />
+    <ClCompile Include="TrackingParams.cpp" />
+    <ClCompile Include="TrackingStats.cpp" />
+    <ClCompile Include="Util.cpp" />
+    <ClCompile Include="VideoOutput.cpp" />
+    <ClCompile Include="VideoSource.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AccumBuffer.h" />
+    <ClInclude Include="Argument.h" />
+    <ClInclude Include="AverageBuffer.h" />
+    <ClInclude Include="Averager.h" />
+    <ClInclude Include="CaptureSource.h" />
+    <ClInclude Include="Cluster.h" />
+    <ClInclude Include="ColorScale.h" />
+    <ClInclude Include="config.h" />
+    <ClInclude Include="Constants.h" />
+    <ClInclude Include="FrameOutput.h" />
+    <ClInclude Include="FrameSource.h" />
+    <ClInclude Include="ImageItem.h" />
+    <ClInclude Include="ImageItemList.h" />
+    <ClInclude Include="ImageOperations.h" />
+    <ClInclude Include="ImageOutput.h" />
+    <ClInclude Include="ImageSeries.h" />
+    <ClInclude Include="ImageSource.h" />
+    <ClInclude Include="ImageTracker.h" />
+    <ClInclude Include="ImageTrackers.h" />
+    <ClInclude Include="NumericPath.h" />
+    <ClInclude Include="Observer.h" />
+    <ClInclude Include="OperationInfo.h" />
+    <ClInclude Include="OutputStream.h" />
+    <ClInclude Include="OutputStreams.h" />
+    <ClInclude Include="ParamRange.h" />
+    <ClInclude Include="PathLink.h" />
+    <ClInclude Include="PathNode.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="ScriptOperation.h" />
+    <ClInclude Include="ScriptOperations.h" />
+    <ClInclude Include="ScriptProcessing.h" />
+    <ClInclude Include="StatData.h" />
+    <ClInclude Include="TextObserver.h" />
+    <ClInclude Include="Track.h" />
+    <ClInclude Include="TrackClusterMatch.h" />
+    <ClInclude Include="TrackingParams.h" />
+    <ClInclude Include="TrackingStats.h" />
+    <ClInclude Include="Types.h" />
+    <ClInclude Include="Util.h" />
+    <ClInclude Include="VideoOutput.h" />
+    <ClInclude Include="VideoSource.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -9,7 +9,6 @@
 
 #include <filesystem>
 #include "ScriptProcessing.h"
-#include "MainWindow.h"
 #include "ImageOperations.h"
 #include "NumericPath.h"
 #include "TextObserver.h"

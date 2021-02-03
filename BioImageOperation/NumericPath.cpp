@@ -46,7 +46,7 @@ bool NumericPath::setInputPath(string basepath, string templatePath) {
 	initialPath = templatePath;
 
 	inputFilenames = Util::getImageFilenames(templatePath);
-	totaln = inputFilenames.size();
+	totaln = (int)inputFilenames.size();
 
 	extension = Util::extractFileExtension(templatePath);
 	initialPath = Util::extractFilePath(templatePath);
@@ -79,7 +79,7 @@ bool NumericPath::setOutputPath(string basepath, string templatePath, string def
 
 	this->templatePath = templatePath;
 
-	extPos = templatePath.find_last_of(".");
+	extPos = (int)templatePath.find_last_of(".");
 	if (extPos >= 0) {
 		extension = templatePath.substr(extPos);
 		numpos = extPos - 1;
@@ -88,7 +88,7 @@ bool NumericPath::setOutputPath(string basepath, string templatePath, string def
 			defaultExtension = "." + defaultExtension;
 		}
 		extension = defaultExtension;
-		numpos = templatePath.length() - 1;
+		numpos = (int)(templatePath.length() - 1);
 	}
 
 	while (ok) {

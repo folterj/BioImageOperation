@@ -12,12 +12,14 @@
 #include <filesystem>
 #include <fstream>
 #include <regex>
+#ifndef _CONSOLE
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QDesktopServices>
 #include <QUrl>
 #include <QEventLoop>
+#endif
 #include "Util.h"
 
 
@@ -63,7 +65,7 @@ vector<string> Util::split(const string s, const string delim, bool removeEmptyE
 	int i = 0;
 	int i0 = 0;
 	while (i >= 0) {
-		i = s.find(delim, i0);
+		i = (int)s.find(delim, i0);
 		if (i >= 0) {
 			part = s.substr(i0, i - i0);
 			if (part != "" || !removeEmptyEntries) {
@@ -83,7 +85,7 @@ vector<string> Util::split(const string s, const vector<string> delims, bool rem
 	int i0 = 0;
 	while (i >= 0) {
 		for (string delim : delims) {
-			i = s.find(delim, i0);
+			i = (int)s.find(delim, i0);
 			if (i >= 0) {
 				break;
 			}
@@ -156,10 +158,10 @@ string Util::replace(string s, string target, string replacement) {
 
 	while (i >= 0) {
 		i0 = i;
-		i = s.find(target, i);
+		i = (int)s.find(target, i);
 		if (i >= 0) {
 			output += s.substr(i0, i - i0) + replacement;
-			i += target.length();
+			i += (int)target.length();
 		} else {
 			output += s.substr(i0);
 		}
@@ -215,10 +217,6 @@ string Util::formatThousands(int x) {
 	return s;
 }
 
-QString Util::convertToQString(string s) {
-	return QString::fromUtf8(s.c_str());
-}
-
 double Util::toDouble(string s) {
 	double d = 0;
 	size_t stodEnd;
@@ -260,7 +258,7 @@ int Util::parseFrameTime(string s, double fps) {
 			// time format
 			for (string part : split(s, ":")) {
 				totalSeconds *= 60;
-				totalSeconds += toDouble(part);
+				totalSeconds += stoi(part);
 			}
 			frames = (int)(totalSeconds * fps);
 		} else {
@@ -365,7 +363,7 @@ string Util::getShapeFeatures(vector<Point>* contour, double area, double length
 	Rect rect;
 	Mat areaImage;
 	double sizeRatio, ellipsity, circularity, convexity;
-	double hullArea, perimeter, epsilon;
+	double hullArea, perimeter;
 
 	sizeRatio = length_minor / length_major;
 	ellipsity = area / (M_PI * (length_major / 2) * (length_minor / 2));
@@ -374,7 +372,7 @@ string Util::getShapeFeatures(vector<Point>* contour, double area, double length
 	if (!contour->empty()) {
 		perimeter = arcLength(*contour, true);
 		convexHull(*contour, hull);
-		//epsilon = 0.01 * perimeter;
+		//double epsilon = 0.01 * perimeter;
 		//approxPolyDP(hull, contour2, epsilon, true);		// approximation not needed
 		//hullArea = contourArea(hull);		// * don't use: returns inaccurate area
 		rect = boundingRect(hull);
@@ -626,6 +624,7 @@ void Util::drawAngle(Mat* image, double x, double y, double rad, double angle, S
 	}
 }
 
+#ifndef _CONSOLE
 QImage Util::matToQImage(Mat const& source) {
 	if (source.channels() == 1) {
 		QImage qimage(source.data, source.cols, source.rows, source.step, QImage::Format_Grayscale8);
@@ -684,3 +683,8 @@ int Util::compareVersions(string version1, string version2) {
 	}
 	return comp;
 }
+
+QString Util::convertToQString(string s) {
+	return QString::fromUtf8(s.c_str());
+}
+#endif
