@@ -773,7 +773,9 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 	int nmaincols = (int)Util::split(maincols, ",").size();
 	string header = "frame,time," + maincols + "\n";
 
-	if (saveFormat != SaveFormat::Split) {
+	if (saveFormat == SaveFormat::Split) {
+		filepath.setOutputPath(filename);
+	} else {
 		clusterStream = clusterStreams.get(filename, header);
 	}
 
@@ -804,7 +806,6 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 		} else if (saveFormat == SaveFormat::Split) {
 			for (Cluster* cluster : clusters) {
 				csv = Util::format("%d,%f,%s\n", frame, time, cluster->getCsv(outputShapeFeatures, outputContour).c_str());
-				filepath.setOutputPath(filename);
 				sfilename = filepath.createFilePath(cluster->getInitialLabel());
 				clusterStream = clusterStreams.get(sfilename, header);
 				clusterStream->write(csv);
@@ -832,7 +833,9 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 	int nmaincols = (int)Util::split(maincols, ",").size();
 	string header = "frame,time," + maincols + "\n";
 
-	if (saveFormat != SaveFormat::Split) {
+	if (saveFormat == SaveFormat::Split) {
+		filepath.setOutputPath(filename);
+	} else {
 		trackStream = trackStreams.get(filename, header);
 	}
 
@@ -879,7 +882,6 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 						cluster = findTrackedCluster(track);
 					}
 					csv = Util::format("%d,%f,%s\n", frame, time, track->getCsv(outputShapeFeatures, outputContour, cluster).c_str());
-					filepath.setOutputPath(filename);
 					sfilename = filepath.createFilePath(track->label);
 					trackStream = trackStreams.get(sfilename, header);
 					trackStream->write(csv);

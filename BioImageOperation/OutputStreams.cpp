@@ -15,19 +15,18 @@ OutputStreams::~OutputStreams() {
 }
 
 void OutputStreams::close() {
-	for (OutputStream* stream : *this) {
-		stream->closeStream();
+	for (auto item : *this) {
+		item.second->closeStream();
 	}
 	clear();
 }
 
 OutputStream* OutputStreams::get(string filename, string header) {
-	for (OutputStream* stream : *this) {
-		if (stream->filename == filename) {
-			return stream;
-		}
+	auto item = find(filename);
+	if (item != end()) {
+		return item->second;
 	}
 	OutputStream* newOutputStream = new OutputStream(filename, header);
-	push_back(newOutputStream);
+	emplace(filename, newOutputStream);
 	return newOutputStream;
 }

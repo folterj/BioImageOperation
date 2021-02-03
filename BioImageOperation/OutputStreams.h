@@ -8,13 +8,13 @@
  *****************************************************************************/
 
 #pragma once
-#include <vector>
+#include <map>
 #include "OutputStream.h"
 
 using namespace std;
 
 
-class OutputStreams : vector<OutputStream*>
+class OutputStreams : map<string, OutputStream*>
 {
 public:
 	~OutputStreams();
