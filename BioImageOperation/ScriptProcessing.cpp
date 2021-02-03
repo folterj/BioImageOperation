@@ -690,7 +690,11 @@ void ScriptProcessing::doPause() {
 }
 
 void ScriptProcessing::doAbort() {
-	setMode(OperationMode::Abort);
+	if (operationMode == OperationMode::Pause) {
+		doReset();
+	} else {
+		setMode(OperationMode::Abort);
+	}
 }
 
 void ScriptProcessing::doReset() {
