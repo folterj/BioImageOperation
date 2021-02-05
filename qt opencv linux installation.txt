@@ -1,3 +1,5 @@
+Install library / packages:
+
 Generic:
 apt-get install build-essential
 (cmake)
@@ -11,23 +13,24 @@ apt-get install qt5-doc qtbase5-examples qtbase5-doc-html
 qtchooser -l
 qtchooser -print-env (make sure qt5 is selected)
 
-Qt from online installer:
+Qt from online installer (installs Qt IDE - Qt Creator):
 https://the-codeslinger.com/2020/12/20/manual-install-of-qt6-on-linux-mint/
 https://www.qt.io/download-open-source
 
 
 OpenCV:
 apt-get install libopencv-dev
-Source code (for include headers)
-https://github.com/opencv/opencv/archive/4.4.0.tar.gz
+Source code (for include headers): download same version as libopencv
+e.g.: https://github.com/opencv/opencv/archive/4.4.0.tar.gz
 
 
 Clone project using git
-Graphical app: gitg
 
 
 Compile using Qt Creator, or CMake:
-create 'build' folder in project root folder
+- go to BioImageOperation root folder
+- type:
+mkdir build
 cd build
 cmake ..
 make
