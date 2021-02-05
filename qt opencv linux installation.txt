@@ -1,0 +1,34 @@
+Generic:
+apt-get install build-essential
+(cmake)
+(gcc)
+
+
+Qt:
+apt-get install qtcreator
+apt-get install qt5-default
+apt-get install qt5-doc qtbase5-examples qtbase5-doc-html
+qtchooser -l
+qtchooser -print-env (make sure qt5 is selected)
+
+Qt from online installer:
+https://the-codeslinger.com/2020/12/20/manual-install-of-qt6-on-linux-mint/
+https://www.qt.io/download-open-source
+
+
+OpenCV:
+apt-get install libopencv-dev
+Source code (for include headers)
+https://github.com/opencv/opencv/archive/4.4.0.tar.gz
+
+
+Clone project using git
+Graphical app: gitg
+
+
+Compile using Qt Creator, or CMake:
+create 'build' folder in project root folder
+cd build
+cmake ..
+make
+
