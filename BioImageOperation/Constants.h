@@ -228,8 +228,8 @@ enum class ClusterDrawMode : int
 	Track = 0x80,
 	Tracks = 0x100,
 	Fill = 0x200,
-	ClusterDefault = Fill,
-	TracksDefault = Tracks
+	ClusterDefault = Fill|Label,
+	TracksDefault = Point|Angle|Label
 };
 
 const vector<string> ClusterDrawModes =
@@ -314,6 +314,10 @@ public:
 	static const string defaultImageExtension;
 	static const string defaultVideoExtension;
 	static const string defaultVideoCodec;
+
+	static const string scriptTemplatePath;
+	static const string trackingScriptTemplate;
+	static const string filenameTemplate;
 
 	static const int seekModeInterval;
 	static const int minPixels;

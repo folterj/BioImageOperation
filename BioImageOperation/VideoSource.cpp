@@ -39,7 +39,7 @@ void VideoSource::reset() {
 	close();
 }
 
-bool VideoSource::init(int apiCode, string basepath, string filepath, string start, string length, double fps0, int interval) {
+bool VideoSource::init(int apiCode, string basepath, string filepath, string start, string length, double fps, int interval, int total) {
 	string filename = ".";	// dummy value to pass initial while-loop condition
 	bool ok = false;
 	bool canSeek;
@@ -85,26 +85,10 @@ bool VideoSource::init(int apiCode, string basepath, string filepath, string sta
 	}
 	sourcePath.resetFilePath();
 
-	if (fps == 0) {
-		fps = fps0;
-	}
+	calcFrameParams(start, length, fps, interval, total, nframes);
 
-	this->start = Util::parseFrameTime(start, fps);
-	lengthi = Util::parseFrameTime(length, fps);
-
-	if (lengthi > 0) {
-		this->end = this->start + lengthi;
-		if (this->end > nframes) {
-			this->end = 0;
-		}
-	}
-
-	this->interval = interval;
-	if (this->interval == 0) {
-		this->interval = 1;
-	}
 	canSeek = (nframes != 0);
-	seekMode = (interval >= Constants::seekModeInterval && nframes != 0);		// auto select seek mode: if interval >= x frames
+	seekMode = (canSeek && this->interval >= Constants::seekModeInterval);		// auto select seek mode: if interval >= x frames
 
 	ok = open();
 	if (ok) {

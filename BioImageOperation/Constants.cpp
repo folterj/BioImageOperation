@@ -20,6 +20,10 @@ const string Constants::defaultImageExtension = "png";
 const string Constants::defaultVideoExtension = "mp4";
 const string Constants::defaultVideoCodec = "H264";
 
+const string Constants::scriptTemplatePath = ":/BioImageOperation/templates/";
+const string Constants::trackingScriptTemplate = scriptTemplatePath + "template_tracking.bioscript";
+const string Constants::filenameTemplate = "<filename>";
+
 const int Constants::seekModeInterval = 100;
 const int Constants::minPixels = 2;
 const int Constants::maxMergedBlobs = 5;

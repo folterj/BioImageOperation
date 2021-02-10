@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/BioImageOperation">
         <file>BioImageOperation.png</file>
-        <file>JetBrainsMono-Regular.ttf</file>
+        <file>JetBrainsMono.ttf</file>
+        <file>templates/template_tracking.bioscript</file>
     </qresource>
 </RCC>

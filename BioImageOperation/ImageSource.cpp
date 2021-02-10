@@ -29,7 +29,7 @@ void ImageSource::reset() {
 	height = 0;
 }
 
-bool ImageSource::init(int apiCode, string basepath, string filepath, string start, string length, double fps0, int interval) {
+bool ImageSource::init(int apiCode, string basepath, string filepath, string start, string length, double fps, int interval, int total) {
 	int lengthi = 0;
 
 	reset();
@@ -41,24 +41,7 @@ bool ImageSource::init(int apiCode, string basepath, string filepath, string sta
 		throw ios_base::failure("File(s) not found: " + sourcePath.templatePath);
 	}
 
-	this->start = Util::parseFrameTime(start, fps0);
-	lengthi = Util::parseFrameTime(length, fps0);
-
-	if (lengthi > 0) {
-		this->end = this->start + lengthi;
-		if (this->end > nfiles) {
-			this->end = nfiles;
-		}
-	}
-
-	if (this->end == 0) {
-		this->end = nfiles;
-	}
-
-	this->interval = interval;
-	if (this->interval == 0) {
-		this->interval = 1;
-	}
+	calcFrameParams(start, length, fps, interval, total, nfiles);
 
 	sourcePath.resetFilePath();
 

@@ -42,7 +42,7 @@ void TrackClusterMatch::unAssign() {
 }
 
 string TrackClusterMatch::toString() {
-	string s = Util::format("Track:%d Cluster:#%d Dist:%.1f Range:%.3f DArea:%.0f FArea:%.3f DLength:%.1f FLength:%.3f DAngle:%.0f FAngle:%.3f Match:%0.3f",
+	string s = Util::format("Track:%d Cluster:%d Dist:%.1f Range:%.3f DArea:%.0f FArea:%.3f DLength:%.1f FLength:%.3f DAngle:%.0f FAngle:%.3f Match:%0.3f",
 							track->label, cluster->clusterLabel, distance, rangeFactor, areaDif, areaFactor, lengthDif, lengthFactor, angleDif, angleFactor, matchFactor);
 	if (assigned) {
 		s += " *";

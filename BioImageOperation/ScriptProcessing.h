@@ -84,6 +84,7 @@ public:
 	 * Helper function to get reference image, or else current image
 	 */
 	Mat* getLabelOrCurrentImage(ScriptOperation* operation, Mat* currentImage);
+	OperationMode getMode();
 	double getTime(int frame);
 
 	/*

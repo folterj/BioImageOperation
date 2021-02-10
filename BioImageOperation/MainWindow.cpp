@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QStyle>
+#include <QTextStream>
 #include "KeepAlive.h"
 #include "Util.h"
 #include "config.h"
@@ -22,13 +23,15 @@ MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent) {
 
 	QFont font;
-	int fontId = QFontDatabase::addApplicationFont(":/BioImageOperation/JetBrainsMono-Regular.ttf");
+	int fontId = QFontDatabase::addApplicationFont(":/BioImageOperation/JetBrainsMono.ttf");
 	if (fontId >= 0) {
 		QString family = QFontDatabase::applicationFontFamilies(fontId).at(0);
 		font = QFont(family);
 	} else {
 		font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
 	}
+	font.setPointSize(9);
+
 	ui.setupUi(this);
 	ui.scriptTextEdit->setFont(font);
 
@@ -50,6 +53,9 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(ui.actionSave, &QAction::triggered, this, &MainWindow::save);
 	connect(ui.actionSaveAs, &QAction::triggered, this, &MainWindow::saveDialog);
 	connect(ui.actionExit, &QAction::triggered, this, &QWidget::close);
+
+	connect(ui.actionGenerateTrackingScript, &QAction::triggered, this, &MainWindow::generateTrackingScript);
+
 	connect(ui.actionScriptHelp, &QAction::triggered, this, &MainWindow::showScriptHelp);
 	connect(ui.actionSaveScriptHelp, &QAction::triggered, this, &MainWindow::saveScriptHelp);
 	connect(ui.actionAbout, &QAction::triggered, this, &MainWindow::showAbout);
@@ -92,6 +98,12 @@ void MainWindow::setFilePath(string filepath) {
 	updateTitle();
 }
 
+void MainWindow::setText(string text) {
+	ignoreTextChangeEvent = true;
+	ui.scriptTextEdit->setPlainText(Util::convertToQString(text));
+	ignoreTextChangeEvent = false;
+}
+
 void MainWindow::updateTitle() {
 	string title = "Bio Image Operation";
 	string fileTitle = Util::extractTitle(filepath);
@@ -107,9 +119,8 @@ void MainWindow::updateTitle() {
 void MainWindow::clearInput() {
 	if (askSaveChanges()) {
 		ui.scriptTextEdit->clear();
-		filepath = "";
 		fileModified = false;
-		updateTitle();
+		setFilePath("");
 	}
 }
 
@@ -120,14 +131,11 @@ void MainWindow::openDialog() {
 		try {
 			qfilename = QFileDialog::getOpenFileName(this, tr("Load script"), bioSettings.value(DEFAULT_DIR_KEY).toString(), Util::convertToQString(Constants::scriptFileDialogFilter));
 			if (qfilename != "") {
-				fileModified = false;
 				clearInput();
 				bioSettings.setValue(DEFAULT_DIR_KEY, QVariant(qfilename));
-				filepath = qfilename.toStdString();
+				setFilePath(qfilename.toStdString());
+				setText(Util::readText(filepath));
 				scriptProcessing.doReset();
-				ui.scriptTextEdit->setPlainText(Util::convertToQString(Util::readText(filepath)));
-				fileModified = false;
-				updateTitle();
 			}
 		} catch (exception e) {
 			showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
@@ -183,11 +191,57 @@ bool MainWindow::askSaveChanges() {
 	return true;
 }
 
+bool MainWindow::askCloseInProgress() {
+	QMessageBox::StandardButton response;
+	if (scriptProcessing.getMode() != OperationMode::Idle) {
+		response = QMessageBox::question(this, "Operation in progress", "Close while operation in progress?", QMessageBox::Yes | QMessageBox::No);
+		if (response == QMessageBox::No) {
+			return false;
+		}
+	}
+	return true;
+}
+
+void MainWindow::generateTrackingScript() {
+	generateScript("Tracking", "Select source video", Constants::trackingScriptTemplate);
+}
+
+void MainWindow::generateScript(string title, string instruction, string scriptFilename) {
+	QString qfilename;
+	string script;
+
+	if (askSaveChanges()) {
+		try {
+			QFile file(Util::convertToQString(scriptFilename));
+			if (file.open(QFile::ReadOnly)) {
+				QTextStream stream(&file);
+				script = stream.readAll().toStdString();
+			}
+			qfilename = QFileDialog::getOpenFileName(this, Util::convertToQString(instruction));
+			if (qfilename != "") {
+				clearInput();
+				filepath = qfilename.toStdString();
+				script = Util::replace(script, Constants::filenameTemplate, Util::extractFileName(filepath));
+				fileModified = true;
+				setFilePath(Util::combinePath(Util::extractFilePath(filepath), title + " " + Util::extractTitle(filepath) + ".bioscript"));
+				bioSettings.setValue(DEFAULT_DIR_KEY, QVariant(Util::convertToQString(filepath)));
+				setText(script);
+				scriptProcessing.doReset();
+			}
+		}
+		catch (exception e) {
+			showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
+		}
+	}
+}
+
 void MainWindow::textChanged() {
-	// simplified logic
-    if (fileModified == ui.scriptTextEdit->toPlainText().isEmpty()) {
-		fileModified = !fileModified;
-		updateTitle();
+	if (!ignoreTextChangeEvent) {
+		// simplified logic
+		if (fileModified == ui.scriptTextEdit->toPlainText().isEmpty()) {
+			fileModified = !fileModified;
+			updateTitle();
+		}
 	}
 }
 
@@ -431,10 +485,13 @@ void MainWindow::showAboutQt() {
 
 void MainWindow::closeEvent(QCloseEvent* event) {
 	// when main window is closed: ensure to close everything
-	scriptProcessing.doAbort();
 	if (askSaveChanges()) {
-		QApplication::quit();
-	} else {
-		event->setAccepted(false);
+		if (askCloseInProgress()) {
+			scriptProcessing.doAbort();
+			this_thread::sleep_for(100ms);		// finish async tasks (show image)
+			QApplication::quit();
+			return;
+		}
 	}
+	event->setAccepted(false);
 }

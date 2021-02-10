@@ -20,7 +20,7 @@ Track::Track(int label, double fps, double pixelSize, double windowSize) {
 	this->windowSize = windowSize;
 }
 
-void Track::update(Cluster* cluster, double maxArea, double maxMoveDistance, bool positionPrediction) {
+void Track::update(Cluster* cluster, double maxArea, double maxMoveDistance, bool trackParamsFinalised) {
 	double orientationGuess, slowMoveDist;
 	double angleDif, angleDifInv;
 	double newx, newy, dx0, dy0, dist0, dangle;
@@ -71,6 +71,11 @@ void Track::update(Cluster* cluster, double maxArea, double maxMoveDistance, boo
 		estimateY = newy;
 		originX = newx;
 		originY = newy;
+		if (x != 0 || y != 0) {
+			dx = newx - x;
+			dy = newy - y;
+			dist = Util::calcDistance(dx, dy);
+		}
 	} else {
 		// not new; can use position history
 		newx = cluster->x;
@@ -94,7 +99,7 @@ void Track::update(Cluster* cluster, double maxArea, double maxMoveDistance, boo
 			forwardDist -= dist;
 		}
 
-		if (dist < maxMoveDistance && positionPrediction) {
+		if (dist < maxMoveDistance) {
 			// estimate new position using delta; only if reasonable
 			estimateX = newx + dx;
 			estimateY = newy + dy;
@@ -121,14 +126,16 @@ void Track::update(Cluster* cluster, double maxArea, double maxMoveDistance, boo
 	x = newx;
 	y = newy;
 
-	points.push_back(Point2d(x, y));
 	if (!isNew) {
+		points.push_back(Point2d(x, y));
 		angles.push_back(orientation);
 	}
 
-	lastClusterRad = cluster->rad;
-	isNew = false;
-	activeCount++;
+	if (trackParamsFinalised) {
+		lastClusterRad = cluster->rad;
+		activeCount++;
+		isNew = false;
+	}
 	inactiveCount = 0;
 }
 

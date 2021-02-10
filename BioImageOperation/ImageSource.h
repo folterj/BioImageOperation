@@ -25,9 +25,6 @@ class ImageSource : public FrameSource
 public:
 	NumericPath sourcePath;
 	string label = "";
-	int start = 0;
-	int end = 0;
-	int interval = 1;
 	int width = 0;
 	int height = 0;
 	int nfiles = 0;
@@ -36,7 +33,7 @@ public:
 	ImageSource();
 	~ImageSource();
 	void reset();
-	bool init(int apiCode, string basepath, string filepath, string start = "", string length = "", double fps0 = 1, int interval = 1);
+	bool init(int apiCode, string basepath, string filepath, string start = "", string length = "", double fps = 1, int interval = 1, int total = 0);
 	bool open();
 	bool getNextImage(Mat* image);
 	void close();

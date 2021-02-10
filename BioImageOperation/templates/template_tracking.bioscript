@@ -1,0 +1,22 @@
+OpenVideo("<filename>", total=21)
+{
+	Grayscale()
+	AddSeries()
+}
+background = GetSeriesMedian()
+
+
+OpenVideo("<filename>")
+{
+	Grayscale()
+	DifferenceAbs(background)
+	Threshold()
+	
+	CreateClusters()
+	CreateTracks()
+
+	Color()
+	DrawTracks()
+	ShowImage()
+	ShowTrackInfo()
+}

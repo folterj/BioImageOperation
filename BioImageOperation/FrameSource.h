@@ -21,9 +21,15 @@ using namespace cv;
 
 class FrameSource
 {
+protected:
+	int start = 0;
+	int end = 0;
+	int interval = 1;
+	double fps = 1;
+
 public:
 	virtual void reset() = 0;
-	virtual bool init(int apiCode, string basepath, string filepath, string start = "", string length = "", double fps0 = 1, int interval = 1) = 0;
+	virtual bool init(int apiCode, string basepath, string filepath, string start = "", string length = "", double fps = 1, int interval = 1, int total = 0) = 0;
 	virtual bool getNextImage(Mat* image) = 0;
 	virtual void close() = 0;
 
@@ -35,4 +41,6 @@ public:
 	virtual string getLabel() = 0;
 	virtual int getCurrentFrame() = 0;
 	virtual int getTotalFrames() = 0;
+
+	void calcFrameParams(string start, string length, double fps, int interval, int total, int nframes);
 };

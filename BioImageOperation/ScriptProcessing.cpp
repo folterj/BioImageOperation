@@ -270,7 +270,8 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 										operation->getArgument(ArgumentLabel::Start),
 										operation->getArgument(ArgumentLabel::Length),
 										sourceFps,
-										(int)operation->getArgumentNumeric(ArgumentLabel::Interval));
+										(int)operation->getArgumentNumeric(ArgumentLabel::Interval),
+										(int)operation->getArgumentNumeric(ArgumentLabel::Total));
 			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage)) {
 				showStatus(operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames());
@@ -287,7 +288,8 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 										operation->getArgument(ArgumentLabel::Path),
 										operation->getArgument(ArgumentLabel::Start),
 										operation->getArgument(ArgumentLabel::Length), 0,
-										(int)operation->getArgumentNumeric(ArgumentLabel::Interval));
+										(int)operation->getArgumentNumeric(ArgumentLabel::Interval),
+										(int)operation->getArgumentNumeric(ArgumentLabel::Total));
 			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage)) {
 				showStatus(operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames(), operation->frameSource->getLabel());
@@ -672,6 +674,10 @@ Mat* ScriptProcessing::getLabelOrCurrentImage(ScriptOperation* operation, Mat* c
 		image = currentImage;
 	}
 	return image;
+}
+
+OperationMode ScriptProcessing::getMode() {
+	return operationMode;
 }
 
 double ScriptProcessing::getTime(int frame) {

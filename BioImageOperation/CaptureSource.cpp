@@ -28,7 +28,7 @@ void CaptureSource::reset() {
 	close();
 }
 
-bool CaptureSource::init(int apiCode, string basepath, string filepath, string start, string length, double fps0, int interval) {
+bool CaptureSource::init(int apiCode, string basepath, string filepath, string start, string length, double fps0, int interval, int total) {
 	reset();
 
 	this->apiCode = apiCode;

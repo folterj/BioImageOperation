@@ -40,6 +40,7 @@ private:
 	Clock::time_point time;
 	string filepath;
 	bool fileModified = false;
+	bool ignoreTextChangeEvent = false;
 	bool statusQueued = false;
 	bool textQueued[Constants::nTextWindows + 1] = { false, false, false, false, false };
 	bool imageQueued[Constants::nDisplays] = { false, false, false, false };
@@ -49,13 +50,19 @@ private:
 public:
 	MainWindow(QWidget *parent = Q_NULLPTR);
 	void setFilePath(string filepath);
+	void setText(string text);
 	void updateTitle();
 	void clearInput();
 	void openDialog();
 	bool saveDialog();
 	bool save();
 	bool askSaveChanges();
+	bool askCloseInProgress();
 	void textChanged();
+
+	void generateTrackingScript();
+	void generateScript(string title, string description, string scriptFilename);
+
 	void process();
 	void timerElapsed();
 	virtual void pause() override;

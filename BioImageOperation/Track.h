@@ -68,7 +68,7 @@ public:
 
 
 	Track(int label, double fps, double pixelSize, double windowSize);
-	void update(Cluster* cluster, double maxArea, double maxMoveDistance, bool positionPrediction);
+	void update(Cluster* cluster, double maxArea, double maxMoveDistance, bool trackParamsFinalised);
 	double getDistFromOrigin();
 
 	void unAssign();

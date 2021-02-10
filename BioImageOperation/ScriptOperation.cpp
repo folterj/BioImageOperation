@@ -336,13 +336,13 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 
 	case ScriptOperationType::OpenImage:
 		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Start, ArgumentLabel::Length, ArgumentLabel::Interval };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Start, ArgumentLabel::Length, ArgumentLabel::Interval, ArgumentLabel::Total };
 		description = "Open image file(s) for processing, accepts file name pattern";
 		break;
 
 	case ScriptOperationType::OpenVideo:
 		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::API, ArgumentLabel::Start, ArgumentLabel::Length, ArgumentLabel::Interval };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::API, ArgumentLabel::Start, ArgumentLabel::Length, ArgumentLabel::Interval, ArgumentLabel::Total };
 		description = "Open video file(s) and process frames, accepts file name pattern (ffmpeg formats supported)";
 		break;
 
@@ -660,6 +660,7 @@ ArgumentType ScriptOperation::getExpectedArgumentType(ArgumentLabel argument) {
 	case ArgumentLabel::X:
 	case ArgumentLabel::Y:
 	case ArgumentLabel::Interval:
+	case ArgumentLabel::Total:
 	case ArgumentLabel::MS:
 	case ArgumentLabel::Power:
 	case ArgumentLabel::Source:
@@ -778,6 +779,10 @@ string ScriptOperation::getArgumentDescription(ArgumentLabel argument) {
 
 	case ArgumentLabel::Interval:
 		s = "Interval in number of frames";
+		break;
+
+	case ArgumentLabel::Total:
+		s = "Total number of frames at regular interval";
 		break;
 
 	case ArgumentLabel::MS:
@@ -1093,7 +1098,7 @@ string ScriptOperation::getOperationListSimple() {
 	return s;
 }
 
-bool ScriptOperation::initFrameSource(FrameType frameType, int apiCode, string basepath, string templatePath, string start, string length, double fps0, int interval) {
+bool ScriptOperation::initFrameSource(FrameType frameType, int apiCode, string basepath, string templatePath, string start, string length, double fps0, int interval, int total) {
 	bool ok = true;
 
 	if (!frameSource) {
@@ -1103,7 +1108,7 @@ bool ScriptOperation::initFrameSource(FrameType frameType, int apiCode, string b
 		case FrameType::Capture: frameSource = new CaptureSource(); break;
 		}
 		if (frameSource) {
-			ok = frameSource->init(apiCode, basepath, templatePath, start, length, fps0, interval);
+			ok = frameSource->init(apiCode, basepath, templatePath, start, length, fps0, interval, total);
 		}
 	}
 	return ok;

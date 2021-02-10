@@ -342,6 +342,15 @@ void ImageTracker::matchClusterTracks(bool findOptimalSolution, bool debugMode) 
 			}
 		}
 	}
+
+	// tidy up
+	for (vector<TrackClusterMatch*> trackMatch : trackMatches) {
+		for (TrackClusterMatch* match : trackMatch) {
+			delete match;
+		}
+		trackMatch.clear();
+	}
+	trackMatches.clear();
 }
 
 void ImageTracker::unAssignAll() {
