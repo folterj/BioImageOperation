@@ -78,11 +78,13 @@
     <QtInstall>msvc2019_64</QtInstall>
     <QtModules>core;gui;network;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
+    <QtDeploy>true</QtDeploy>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>msvc2019_64</QtInstall>
     <QtModules>core;gui;network;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
+    <QtDeploy>true</QtDeploy>
   </PropertyGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
     <Import Project="$(QtMsBuild)\qt.props" />
@@ -117,7 +119,7 @@
     <ClCompile Include="AboutWindow.cpp" />
     <ClCompile Include="AccumBuffer.cpp" />
     <ClCompile Include="Argument.cpp" />
-    <ClCompile Include="AverageBuffer.cpp" />
+    <ClCompile Include="SimpleImageBuffer.cpp" />
     <ClCompile Include="Averager.cpp" />
     <ClCompile Include="BioImageOperation.cpp" />
     <ClCompile Include="CaptureSource.cpp" />
@@ -181,7 +183,7 @@
     <QtMoc Include="AboutWindow.h" />
     <ClInclude Include="AccumBuffer.h" />
     <ClInclude Include="Argument.h" />
-    <ClInclude Include="AverageBuffer.h" />
+    <ClInclude Include="SimpleImageBuffer.h" />
     <ClInclude Include="Averager.h" />
     <ClInclude Include="CaptureSource.h" />
     <ClInclude Include="Cluster.h" />
@@ -221,6 +223,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="CMakeSettings.json" />
+    <None Include="templates\template_tracking.bioscript" />
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="BioImageOperation.qrc" />

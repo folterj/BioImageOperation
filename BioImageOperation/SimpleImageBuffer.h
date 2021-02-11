@@ -17,14 +17,15 @@ using namespace cv;
  * Class to determine average image
  */
 
-class AverageBuffer
+class SimpleImageBuffer
 {
 public:
-	Mat averageImage;
+	Mat bufferImage;
 	bool set = false;
 
-	AverageBuffer();
+	SimpleImageBuffer();
 	void reset();
-	void addImage(Mat* image, double weight);
-	void getImage(Mat* image);
+	void addWeighted(Mat* image, Mat* result, double weight);
+	void addMin(Mat* image, Mat* result);
+	void addMax(Mat* image, Mat* result);
 };

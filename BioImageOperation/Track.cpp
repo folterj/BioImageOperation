@@ -185,7 +185,7 @@ void Track::draw(Mat* image, int drawMode, int ntracks) {
 
 void Track::drawPoint(Mat* image, Scalar color) {
 	Point point((int)x, (int)y);
-	int thickness = (int)(rad / 4);
+	int thickness = (int)(rad / 2);
 	if (thickness < 1) {
 		thickness = 1;
 	}

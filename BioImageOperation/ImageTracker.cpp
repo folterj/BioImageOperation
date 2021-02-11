@@ -25,9 +25,7 @@ ImageTracker::ImageTracker(string id, double fps, double pixelSize, double windo
 }
 
 ImageTracker::~ImageTracker() {
-	deletePaths();
-	deleteClusters();
-	deleteTracks();
+	reset();
 }
 
 void ImageTracker::deleteClusters() {
@@ -42,6 +40,8 @@ void ImageTracker::deleteTracks() {
 		delete tracks[i];
 	}
 	tracks.clear();
+
+	nextTrackLabel = 0;
 }
 
 void ImageTracker::deletePaths() {
@@ -54,6 +54,8 @@ void ImageTracker::deletePaths() {
 		delete pathNodes[i];
 	}
 	pathNodes.clear();
+
+	nextPathLabel = 0;
 }
 
 void ImageTracker::reset() {
@@ -61,8 +63,6 @@ void ImageTracker::reset() {
 	deleteClusters();
 	deleteTracks();
 
-	nextTrackLabel = 0;
-	nextPathLabel = 0;
 	pathAge = 0;
 	pathDistance = Constants::minPathDistance;
 
@@ -312,7 +312,7 @@ void ImageTracker::matchClusterTracks(bool findOptimalSolution, bool debugMode) 
 	// update cluster tracks
 	for (Cluster* cluster : clusters) {
 		for (Track* track : cluster->assignedTracks) {
-			if (debugMode) {
+			if (debugMode && trackParamsFinalised) {
 				if (track->isMerged && cluster->assignedTracks.size() <= 1) {
 					message = Util::format("Merged cluster split: Track %d", track->label);
 					cout << message << endl;

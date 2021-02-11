@@ -55,7 +55,9 @@ enum class ScriptOperationType
 	Invert,
 
 	UpdateBackground,
-	UpdateAverage,
+	UpdateWeight,
+	UpdateMin,
+	UpdateMax,
 	ClearSeries,
 	AddSeries,
 	GetSeriesMedian,
@@ -78,6 +80,7 @@ enum class ScriptOperationType
 	DrawLegend,
 
 	Wait,
+	Pause,
 	Benchmark,
 };
 
@@ -118,7 +121,9 @@ const vector<string> ScriptOperationTypes =
 	"Invert",
 
 	"UpdateBackground",
-	"UpdateAverage",
+	"UpdateWeight",
+	"UpdateMin",
+	"UpdateMax",
 	"ClearSeries",
 	"AddSeries",
 	"GetSeriesMedian",
@@ -141,7 +146,8 @@ const vector<string> ScriptOperationTypes =
 	"DrawLegend",
 
 	"Wait",
-	"Benchmark"
+	"Pause",
+	"Benchmark",
 };
 
 enum class OperationMode
@@ -229,7 +235,7 @@ enum class ClusterDrawMode : int
 	Tracks = 0x100,
 	Fill = 0x200,
 	ClusterDefault = Fill|Label,
-	TracksDefault = Point|Angle|Label
+	TracksDefault = Point|Label
 };
 
 const vector<string> ClusterDrawModes =

@@ -21,7 +21,7 @@ using namespace cv;
 class AccumBuffer
 {
 public:
-	Mat accumImage, helpImage;
+	Mat bufferImage, helpImage;
 	AccumMode accumMode = AccumMode::Age;
 	int total;
 	bool set = false;

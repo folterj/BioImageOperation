@@ -25,6 +25,7 @@ public:
 	string filename = "";
 	ostringstream buffer;
 	bool created = false;
+	bool errorMode = false;
 
 	OutputStream(string filename = "", string header = "");
 	~OutputStream();

@@ -1,4 +1,4 @@
-# Bio Image Operation script operations (v1.7.1 / 2021-02-01)
+# Bio Image Operation script operations (v1.7.1 / 2021-02-03)
 
 
 **Set** (Path, Width, Height, Fps, PixelSize, WindowSize)
@@ -32,7 +32,7 @@ Create a new image
  - Blue:	 Blue color component (numeric value between 0 and 1)
 
 
-**OpenImage** (**Path**, Start, Length, Interval)
+**OpenImage** (**Path**, Start, Length, Interval, Total)
 
 Open image file(s) for processing, accepts file name pattern
 
@@ -40,9 +40,10 @@ Open image file(s) for processing, accepts file name pattern
  - Start:	 Start (time reference as (hours:)minutes:seconds, or frame number)
  - Length:	 Length (time reference as (hours:)minutes:seconds, or frame number)
  - Interval:	 Interval in number of frames (numeric value)
+ - Total:	 Total number of frames at regular interval (numeric value)
 
 
-**OpenVideo** (**Path**, API, Start, Length, Interval)
+**OpenVideo** (**Path**, API, Start, Length, Interval, Total)
 
 Open video file(s) and process frames, accepts file name pattern (ffmpeg formats supported)
 
@@ -51,6 +52,7 @@ Open video file(s) and process frames, accepts file name pattern (ffmpeg formats
  - Start:	 Start (time reference as (hours:)minutes:seconds, or frame number)
  - Length:	 Length (time reference as (hours:)minutes:seconds, or frame number)
  - Interval:	 Interval in number of frames (numeric value)
+ - Total:	 Total number of frames at regular interval (numeric value)
 
 
 **OpenCapture** (API, Path, Source, Width, Height, Interval)
@@ -245,12 +247,26 @@ Add image to the adaptive background buffer
  - Weight:	 Weight value (numeric value between 0 and 1)
 
 
-**UpdateAverage** (Label, Weight)
+**UpdateWeight** (Label, Weight)
 
-Add image to the average buffer
+Add image using weight to simple image buffer
 
  - Label:	 Label id (string)
  - Weight:	 Weight value (numeric value between 0 and 1)
+
+
+**UpdateMin** (Label)
+
+Add image and perform minimum on simple image buffer
+
+ - Label:	 Label id (string)
+
+
+**UpdateMax** (Label)
+
+Add image and perform maximum on simple image buffer
+
+ - Label:	 Label id (string)
 
 
 **ClearSeries** ()
@@ -416,6 +432,12 @@ Draw legend
 Pause execution for a period (1000 ms default)
 
  - MS:	 Time in milliseconds (numeric value)
+
+
+**Pause** ()
+
+Pause processing
+
 
 
 **Benchmark** ()

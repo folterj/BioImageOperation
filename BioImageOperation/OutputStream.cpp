@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #include <filesystem>
+#include <cerrno>
 #include "OutputStream.h"
 #include "Util.h"
 #include "Constants.h"
@@ -28,6 +29,7 @@ void OutputStream::reset() {
 	filename = "";
 	clearBuffer();
 	created = false;
+	errorMode = false;
 }
 
 void OutputStream::clearBuffer() {
@@ -59,18 +61,26 @@ void OutputStream::writeToFile() {
 	if (created) {
 		openMode |= std::ios_base::app;
 	}
-	open(filename, openMode);
-	if (is_open()) {
-		(*this) << buffer.str();
-		flush();
-		close();
-		clearBuffer();
-		created = true;
-	} else {
-		throw ios_base::failure("Unable to write to file " + filename);
+	try {
+		open(filename, openMode);	// this can throw exception
+		if (is_open()) {
+			(*this) << buffer.str();
+			flush();
+			close();
+			clearBuffer();
+			created = true;
+		} else {
+			errorMode = true;
+			throw ios_base::failure("Unable to write to file " + filename + "\n" + strerror(errno));
+		}
+	} catch (ios_base::failure e) {
+		errorMode = true;
+		throw ios_base::failure("Unable to write to file " + filename + "\n" + strerror(errno));
 	}
 }
 
 void OutputStream::closeStream() {
-	write("");
+	if (!errorMode) {
+		write("");
+	}
 }

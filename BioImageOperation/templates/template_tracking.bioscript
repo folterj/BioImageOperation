@@ -3,7 +3,10 @@ OpenVideo("<filename>", total=21)
 	Grayscale()
 	AddSeries()
 }
-background = GetSeriesMedian()
+GetSeriesMedian()
+StoreImage(background)
+ShowImage()
+Pause()
 
 
 OpenVideo("<filename>")

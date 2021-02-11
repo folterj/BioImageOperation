@@ -10,9 +10,6 @@
     <ClCompile Include="Argument.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AverageBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Averager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -130,6 +127,9 @@
     <ClCompile Include="OutputStreams.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SimpleImageBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -139,9 +139,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Argument.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AverageBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Averager.h">
@@ -255,6 +252,9 @@
     <ClInclude Include="OutputStreams.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SimpleImageBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="AboutWindow.h">
@@ -302,7 +302,7 @@
     </Filter>
     <Filter Include="Resources">
       <UniqueIdentifier>{0e3ba909-f0c1-4edf-98bb-1bf482dd9af6}</UniqueIdentifier>
-      <Extensions>rc;qrc;ico;png</Extensions>
+      <Extensions>rc;qrc;ico;png;bioscript</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -323,6 +323,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="CMakeSettings.json" />
+    <None Include="templates\template_tracking.bioscript">
+      <Filter>Resources</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="BioImageOperation.qrc">

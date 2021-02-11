@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #include <filesystem>
+#include "KeepAlive.h"
 #include "ScriptProcessing.h"
 #include "ImageOperations.h"
 #include "NumericPath.h"
@@ -42,9 +43,9 @@ ScriptProcessing::~ScriptProcessing() {
 		backgroundBuffer = nullptr;
 	}
 
-	if (averageBuffer) {
-		delete averageBuffer;
-		averageBuffer = nullptr;
+	if (simpleBuffer) {
+		delete simpleBuffer;
+		simpleBuffer = nullptr;
 	}
 
 	if (imageTrackers) {
@@ -78,7 +79,7 @@ void ScriptProcessing::reset() {
 	scriptOperations->reset();
 	imageList->reset();
 	backgroundBuffer->reset();
-	averageBuffer->reset();
+	simpleBuffer->reset();
 	imageSeries->reset();
 	accumBuffer->reset();
 
@@ -156,6 +157,8 @@ void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOpe
 	ScriptOperation* prevOperation = prevOperation0;
 	bool operationFinished;
 
+	KeepAlive::startKeepAlive();
+
 	while (operationMode == OperationMode::Run) {
 		operation = operations->getCurrentOperation();
 		if (operation) {
@@ -170,6 +173,8 @@ void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOpe
 			break;
 		}
 	}
+
+	KeepAlive::stopKeepAlive();
 }
 
 bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperation* prevOperation) {
@@ -369,6 +374,8 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			ImageOperations::scale(*getLabelOrCurrentImage(operation, image), *newImage,
 									operation->getArgumentNumeric(ArgumentLabel::Width),
 									operation->getArgumentNumeric(ArgumentLabel::Height));
+			sourceWidth = newImage->cols;
+			sourceHeight = newImage->rows;
 			newImageSet = true;
 			break;
 
@@ -378,6 +385,8 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 									operation->getArgumentNumeric(ArgumentLabel::Height),
 									operation->getArgumentNumeric(ArgumentLabel::X),
 									operation->getArgumentNumeric(ArgumentLabel::Y));
+			sourceWidth = newImage->cols;
+			sourceHeight = newImage->rows;
 			newImageSet = true;
 			break;
 
@@ -457,14 +466,22 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::UpdateBackground:
-			backgroundBuffer->addImage(getLabelOrCurrentImage(operation, image), operation->getArgumentNumeric());
-			backgroundBuffer->getImage(newImage);
+			backgroundBuffer->addWeighted(getLabelOrCurrentImage(operation, image), newImage, operation->getArgumentNumeric());
 			newImageSet = true;
 			break;
 
-		case ScriptOperationType::UpdateAverage:
-			averageBuffer->addImage(getLabelOrCurrentImage(operation, image), operation->getArgumentNumeric());
-			averageBuffer->getImage(newImage);
+		case ScriptOperationType::UpdateWeight:
+			simpleBuffer->addWeighted(getLabelOrCurrentImage(operation, image), newImage, operation->getArgumentNumeric());
+			newImageSet = true;
+			break;
+
+		case ScriptOperationType::UpdateMin:
+			simpleBuffer->addMin(getLabelOrCurrentImage(operation, image), newImage);
+			newImageSet = true;
+			break;
+
+		case ScriptOperationType::UpdateMax:
+			simpleBuffer->addMax(getLabelOrCurrentImage(operation, image), newImage);
 			newImageSet = true;
 			break;
 
@@ -613,6 +630,10 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				delay = 1000;
 			}
 			this_thread::sleep_for(chrono::milliseconds(delay));
+			break;
+
+		case ScriptOperationType::Pause:
+			doPause();
 			break;
 
 		case ScriptOperationType::Benchmark:

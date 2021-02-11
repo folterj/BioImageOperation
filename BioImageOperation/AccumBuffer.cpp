@@ -20,8 +20,8 @@ void AccumBuffer::reset() {
 }
 
 void AccumBuffer::create(int width, int height) {
-	accumImage.create(height, width, CV_32F);
-	accumImage.setTo(0);
+	bufferImage.create(height, width, CV_32F);
+	bufferImage.setTo(0);
 
 	helpImage.create(height, width, CV_32F);
 	helpImage.setTo(0);
@@ -40,10 +40,10 @@ void AccumBuffer::addImage(Mat* image, AccumMode accumMode) {
 
 	if (accumMode == AccumMode::Usage) {
 		helpImage.setTo(1);							// binary image has values 0 or 255 -> instead use 0 or 1
-		accumulate(helpImage, accumImage, *image);	// use image as mask (add)
+		accumulate(helpImage, bufferImage, *image);	// use image as mask (add)
 	} else if (accumMode == AccumMode::Age) {
 		helpImage.setTo(total);
-		helpImage.copyTo(accumImage, *image);		// use image as mask (replace)
+		helpImage.copyTo(bufferImage, *image);		// use image as mask (replace)
 	}
 	total++;
 }
@@ -52,8 +52,8 @@ void AccumBuffer::getImage(Mat* dest, float power, Palette palette) {
 	Mat image;
 	float* inData;
 	unsigned char* outData;
-	int width = accumImage.cols;
-	int height = accumImage.rows;
+	int width = bufferImage.cols;
+	int height = bufferImage.rows;
 	float val, scale, colScale;
 	BGR color;
 	int pixeli;
@@ -62,7 +62,7 @@ void AccumBuffer::getImage(Mat* dest, float power, Palette palette) {
 		power = 1;
 	}
 
-	inData = (float*)accumImage.data;
+	inData = (float*)bufferImage.data;
 
 	dest->create(height, width, CV_8UC3);
 	outData = (unsigned char*)dest->data;
@@ -89,9 +89,9 @@ void AccumBuffer::getImage(Mat* dest, float power, Palette palette) {
 				}
 
 				switch (palette) {
-				case Palette::Grayscale: color = ColorScale::getGrayScale(colScale); break;
 				case Palette::Heat: color = ColorScale::getHeatScale(colScale); break;
 				case Palette::Rainbow: color = ColorScale::getRainbowScale(colScale); break;
+				default: color = ColorScale::getGrayScale(colScale); break;
 				}
 				outData[pixeli * 3 + 0] = color.b;
 				outData[pixeli * 3 + 1] = color.g;

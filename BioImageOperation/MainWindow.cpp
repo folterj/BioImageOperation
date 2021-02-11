@@ -12,7 +12,6 @@
 #include <QFileDialog>
 #include <QStyle>
 #include <QTextStream>
-#include "KeepAlive.h"
 #include "Util.h"
 #include "config.h"
 
@@ -41,6 +40,8 @@ MainWindow::MainWindow(QWidget* parent)
 	ui.actionSave->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
 	ui.actionSaveAs->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
 	ui.actionCheckForUpdates->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
+	ui.actionScriptHelp->setIcon(style()->standardIcon(QStyle::SP_DialogHelpButton));
+	ui.actionSaveScriptHelp->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
 	ui.actionHelp->setIcon(style()->standardIcon(QStyle::SP_DialogHelpButton));
 	ui.actionAbout->setIcon(style()->standardIcon(QStyle::SP_MessageBoxQuestion));
 
@@ -48,7 +49,7 @@ MainWindow::MainWindow(QWidget* parent)
 	ui.processButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 	ui.abortButton->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
 
-	connect(ui.actionClear, &QAction::triggered, this, &MainWindow::clearInput);
+	connect(ui.actionClear, &QAction::triggered, this, &MainWindow::clearDialog);
 	connect(ui.actionOpen, &QAction::triggered, this, &MainWindow::openDialog);
 	connect(ui.actionSave, &QAction::triggered, this, &MainWindow::save);
 	connect(ui.actionSaveAs, &QAction::triggered, this, &MainWindow::saveDialog);
@@ -117,14 +118,20 @@ void MainWindow::updateTitle() {
 }
 
 void MainWindow::clearInput() {
-	if (askSaveChanges()) {
-		ui.scriptTextEdit->clear();
-		fileModified = false;
-		setFilePath("");
-	}
+	ui.scriptTextEdit->clear();
+	fileModified = false;
+	setFilePath("");
 }
 
-void MainWindow::openDialog() {
+bool MainWindow::clearDialog() {
+	if (askSaveChanges()) {
+		clearInput();
+		return true;
+	}
+	return false;
+}
+
+bool MainWindow::openDialog() {
 	QString qfilename;
 
 	if (askSaveChanges()) {
@@ -136,11 +143,13 @@ void MainWindow::openDialog() {
 				setFilePath(qfilename.toStdString());
 				setText(Util::readText(filepath));
 				scriptProcessing.doReset();
+				return true;
 			}
 		} catch (exception e) {
 			showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 		}
 	}
+	return false;
 }
 
 bool MainWindow::saveDialog() {
@@ -303,12 +312,6 @@ void MainWindow::setModeQt(int mode0) {
 		ui.scriptTextEdit->setReadOnly(!controlsEnabled);
 		ui.actionClear->setEnabled(controlsEnabled);
 		ui.actionOpen->setEnabled(controlsEnabled);
-
-		if (mode == OperationMode::Run) {
-            KeepAlive::startKeepAlive();
-		} else {
-            KeepAlive::stopKeepAlive();
-		}
 	} catch (exception e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}

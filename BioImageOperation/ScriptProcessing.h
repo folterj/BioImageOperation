@@ -18,7 +18,7 @@
 #include "ScriptOperation.h"
 #include "ImageItemList.h"
 #include "ImageTrackers.h"
-#include "AverageBuffer.h"
+#include "SimpleImageBuffer.h"
 #include "ImageSeries.h"
 #include "AccumBuffer.h"
 
@@ -37,8 +37,8 @@ public:
 	std::thread* processThread = nullptr;
 	ScriptOperations* scriptOperations = new ScriptOperations();
 	ImageItemList* imageList = new ImageItemList();
-	AverageBuffer* backgroundBuffer = new AverageBuffer();
-	AverageBuffer* averageBuffer = new AverageBuffer();
+	SimpleImageBuffer* backgroundBuffer = new SimpleImageBuffer();
+	SimpleImageBuffer* simpleBuffer = new SimpleImageBuffer();
 	ImageSeries* imageSeries = new ImageSeries();
 	AccumBuffer* accumBuffer = new AccumBuffer();
 	ImageTrackers* imageTrackers = new ImageTrackers();

@@ -53,7 +53,8 @@ public:
 	void setText(string text);
 	void updateTitle();
 	void clearInput();
-	void openDialog();
+	bool clearDialog();
+	bool openDialog();
 	bool saveDialog();
 	bool save();
 	bool askSaveChanges();

@@ -490,10 +490,22 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 		description = "Add image to the adaptive background buffer";
 		break;
 
-	case ScriptOperationType::UpdateAverage:
+	case ScriptOperationType::UpdateWeight:
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Weight };
-		description = "Add image to the average buffer";
+		description = "Add image using weight to simple image buffer";
+		break;
+
+	case ScriptOperationType::UpdateMin:
+		requiredArguments = vector<ArgumentLabel>{ };
+		optionalArguments = vector<ArgumentLabel>{ ArgumentLabel::Label };
+		description = "Add image and perform minimum on simple image buffer";
+		break;
+
+	case ScriptOperationType::UpdateMax:
+		requiredArguments = vector<ArgumentLabel>{ };
+		optionalArguments = vector<ArgumentLabel>{ ArgumentLabel::Label };
+		description = "Add image and perform maximum on simple image buffer";
 		break;
 
 	case ScriptOperationType::ClearSeries:
@@ -608,6 +620,12 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::MS };
 		description = "Pause execution for a period (1000 ms default)";
+		break;
+
+	case ScriptOperationType::Pause:
+		requiredArguments = vector<ArgumentLabel>{ };
+		optionalArguments = vector<ArgumentLabel>{ };
+		description = "Pause processing";
 		break;
 
 	case ScriptOperationType::Benchmark:
