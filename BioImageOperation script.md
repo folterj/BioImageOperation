@@ -239,6 +239,13 @@ Invert image
  - Label:	 Label id (string)
 
 
+**SetBackground** (Label)
+
+Initialise adaptive background buffer with image
+
+ - Label:	 Label id (string)
+
+
 **UpdateBackground** (Label, Weight)
 
 Add image to the adaptive background buffer

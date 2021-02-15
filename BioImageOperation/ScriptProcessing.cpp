@@ -465,6 +465,10 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			newImageSet = true;
 			break;
 
+		case ScriptOperationType::SetBackground:
+			backgroundBuffer->setImage(getLabelOrCurrentImage(operation, image));
+			break;
+
 		case ScriptOperationType::UpdateBackground:
 			backgroundBuffer->addWeighted(getLabelOrCurrentImage(operation, image), newImage, operation->getArgumentNumeric());
 			newImageSet = true;

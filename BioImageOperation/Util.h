@@ -70,10 +70,11 @@ public:
 	static double calcMomentsMinorRadius(Moments* moments);
 	static string getShapeFeatures(vector<Point>* contour, double area, double length_major, double length_minor);
 
-	static Scalar getLabelColor(int label0);
 	static Scalar getHeatScale(double scale);
 	static Scalar getRainbowScale(double scale);
-	static Scalar bgrtoScalar(BGR bgr);
+	static Scalar hsvToColor(double hue1, double saturation, double value);
+	static Scalar normColorLightness(Scalar color0, double level = 0.5);
+	static Vec<unsigned char, 3> floatToByteColor(Scalar color);
 
     static string getExceptionDetail(exception & e, int level = 0);
 	static Mat loadImage(string filename);

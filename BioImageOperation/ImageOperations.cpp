@@ -184,7 +184,7 @@ void ImageOperations::invert(InputArray source, OutputArray dest) {
 }
 
 void ImageOperations::drawLegend(InputArray source, OutputArray dest, DrawPosition position, double logPower, Palette palette) {
-    Mat dest_image = dest.getMat();
+    Mat dest_image;
 	double vwidth = 0.05;
 	double vheight = 0.25;
 	int width = source.cols();
@@ -202,6 +202,7 @@ void ImageOperations::drawLegend(InputArray source, OutputArray dest, DrawPositi
 	}
 
 	source.copyTo(dest);
+	dest_image = dest.getMat();
 
 	if (logPower != 0) {
         drawColorScale(&dest_image, Rect(left, top, lwidth, lheight), logPower, palette);
@@ -211,9 +212,9 @@ void ImageOperations::drawLegend(InputArray source, OutputArray dest, DrawPositi
 }
 
 void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Palette palette) {
-	Scalar background = Scalar(0, 0, 0);
-	Scalar infoColor = Scalar(0x7F, 0x7F, 0x7F);
-	BGR color;
+	Scalar backColor = Scalar(0, 0, 0);
+	Scalar infoColor = Scalar(0x80, 0x80, 0x80);
+	Scalar color;
 	int width, height, textHeight;
 	double fontScale;
 	int thickness;
@@ -241,7 +242,7 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Pale
 	xbar = xstart + (int)(0.25 * width);
 	xline = xstart + (int)(0.4 * width);
 
-	rectangle(*dest, rect.tl(), rect.br(), background, LineTypes::FILLED, LineTypes::LINE_AA);
+	rectangle(*dest, rect, backColor, LineTypes::FILLED, LineTypes::LINE_AA);
 
 	for (int y = ystart; y < yend; y++) {
 		val = (float)(y - ystart) / yrange;
@@ -250,11 +251,11 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Pale
 		case Palette::Rainbow: color = ColorScale::getRainbowScale(val); break;
 		default: color = ColorScale::getGrayScale(val); break;
 		}
-		line(*dest, Point(xstart, y), Point(xbar, y), Util::bgrtoScalar(color), 1, LineTypes::LINE_AA);
+		line(*dest, Point(xstart, y), Point(xbar, y), color, 1, LineTypes::LINE_AA);
 	}
 
 	for (int i = 0; i <= logPower; i++) {
-		y = (int)(ystart + i * yrange / logPower);
+		y = (int)(ystart + yrange / logPower * i);
 		label1 = Util::format("%d", -i);
 		putText(*dest, label, Point(xline, (int)(y + textHeight * 0.5)), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale, infoColor, thickness, LineTypes::LINE_AA);
 		putText(*dest, label1, Point((int)(xline + textSize.width), (int)(y - textHeight * 0.25)), HersheyFonts::FONT_HERSHEY_SIMPLEX, fontScale * 0.75, infoColor, thickness, LineTypes::LINE_AA);
@@ -263,9 +264,8 @@ void ImageOperations::drawColorScale(Mat* dest, Rect rect, double logPower, Pale
 }
 
 void ImageOperations::drawColorSwatches(Mat* dest, Rect rect) {
-	Scalar background = Scalar(0, 0, 0);
-	Scalar infoColor = Scalar(0x7F, 0x7F, 0x7F);
-	Scalar color;
+	Scalar backColor = Scalar(0, 0, 0);
+	Scalar infoColor = Scalar(0x80, 0x80, 0x80);
 	int width = rect.width;
 	int height = rect.height;
 	double ymargin = 0.05;
@@ -277,12 +277,11 @@ void ImageOperations::drawColorSwatches(Mat* dest, Rect rect) {
 	int y1, y2;
 	int ntotal = 27;
 
-	rectangle(*dest, rect.tl(), rect.br(), background, LineTypes::FILLED, LineTypes::LINE_AA);
+	rectangle(*dest, rect, backColor, LineTypes::FILLED, LineTypes::LINE_AA);
 
 	for (int i = 0; i < ntotal; i++) {
 		y1 = (int)(ystart + i * yrange / ntotal) + 1;
 		y2 = (int)(ystart + (i + 1) * yrange / ntotal) - 1;
-		color = Util::getLabelColor(i);
-		rectangle(*dest, Point(xstart, y1), Point(xbar, y2), color, LineTypes::FILLED, LineTypes::LINE_AA);
+		rectangle(*dest, Point(xstart, y1), Point(xbar, y2), ColorScale::getLabelColor(i), LineTypes::FILLED, LineTypes::LINE_AA);
 	}
 }

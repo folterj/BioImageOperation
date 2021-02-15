@@ -25,6 +25,7 @@ public:
 
 	SimpleImageBuffer();
 	void reset();
+	void setImage(Mat* image);
 	void addWeighted(Mat* image, Mat* result, double weight);
 	void addMin(Mat* image, Mat* result);
 	void addMax(Mat* image, Mat* result);

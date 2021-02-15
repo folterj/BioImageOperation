@@ -17,9 +17,14 @@ void SimpleImageBuffer::reset() {
 	set = false;
 }
 
+void SimpleImageBuffer::setImage(Mat* image) {
+	image->convertTo(bufferImage, CV_32F);
+	set = true;
+}
+
 void SimpleImageBuffer::addWeighted(Mat* image, Mat* result, double weight) {
 	if (!set) {
-		// initialise using current image
+		// initialise using current image (uning setImage seems to change step size for some reason)
 		image->convertTo(bufferImage, CV_32F);
 		set = true;
 	} else {
@@ -34,7 +39,7 @@ void SimpleImageBuffer::addWeighted(Mat* image, Mat* result, double weight) {
 
 void SimpleImageBuffer::addMin(Mat* image, Mat* result) {
 	if (!set) {
-		// initialise using current image
+		// initialise using current image (uning setImage seems to change step size for some reason)
 		image->copyTo(bufferImage);
 		set = true;
 	} else {
@@ -45,7 +50,7 @@ void SimpleImageBuffer::addMin(Mat* image, Mat* result) {
 
 void SimpleImageBuffer::addMax(Mat* image, Mat* result) {
 	if (!set) {
-		// initialise using current image
+		// initialise using current image (uning setImage seems to change step size for some reason)
 		image->copyTo(bufferImage);
 		set = true;
 	} else {

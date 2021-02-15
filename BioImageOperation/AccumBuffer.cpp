@@ -55,7 +55,7 @@ void AccumBuffer::getImage(Mat* dest, float power, Palette palette) {
 	int width = bufferImage.cols;
 	int height = bufferImage.rows;
 	float val, scale, colScale;
-	BGR color;
+	Vec<unsigned char, 3> color;
 	int pixeli;
 
 	if (power == 0) {
@@ -93,9 +93,9 @@ void AccumBuffer::getImage(Mat* dest, float power, Palette palette) {
 				case Palette::Rainbow: color = ColorScale::getRainbowScale(colScale); break;
 				default: color = ColorScale::getGrayScale(colScale); break;
 				}
-				outData[pixeli * 3 + 0] = color.b;
-				outData[pixeli * 3 + 1] = color.g;
-				outData[pixeli * 3 + 2] = color.r;
+				outData[pixeli * 3 + 0] = color[0];
+				outData[pixeli * 3 + 1] = color[1];
+				outData[pixeli * 3 + 2] = color[2];
 			}
 		}
 	}

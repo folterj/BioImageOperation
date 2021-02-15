@@ -644,7 +644,7 @@ void ImageTracker::drawTracks(Mat* source, Mat* dest, int drawMode, int ntracks)
 void ImageTracker::drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, float power, Palette palette) {
 	float scale, colScale;
 	int maxUsage = 0;
-	BGR color;
+	Scalar color;
 	bool animate;
 
 	source->copyTo(*dest);
@@ -680,7 +680,7 @@ void ImageTracker::drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, floa
 			default: color = ColorScale::getGrayScale(colScale); break;
 			}
 
-			link->draw(dest, Util::bgrtoScalar(color), maxUsage, animate);
+			link->draw(dest, color, maxUsage, animate);
 		}
 	} else {
 		for (PathNode* node : pathNodes) {
@@ -706,7 +706,7 @@ void ImageTracker::drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, floa
 			default: color = ColorScale::getGrayScale(colScale); break;
 			}
 
-			node->draw(dest, Util::bgrtoScalar(color));
+			node->draw(dest, color);
 		}
 	}
 }

@@ -11,72 +11,77 @@
 #include "Util.h"
 
 
-BGR ColorScale::grayTable[scaleLength];
-BGR ColorScale::heatTable[scaleLength];
-BGR ColorScale::rainbowTable[scaleLength];
+Vec<unsigned char, 3> ColorScale::grayTable[scaleLength];
+Vec<unsigned char, 3> ColorScale::heatTable[scaleLength];
+Vec<unsigned char, 3> ColorScale::rainbowTable[scaleLength];
+Vec<unsigned char, 3> ColorScale::labelTable[labelLength];
+
 
 void ColorScale::init() {
 	// initialise lookup table
 	double scale;
-	cv::Scalar color;
-
-	for (int i = 0; i < scaleLength; i++) {
-		scale = (double)i / scaleLength;
-
-		grayTable[i].b = (unsigned char)((1 - scale) * 0xFF);
-		grayTable[i].g = (unsigned char)((1 - scale) * 0xFF);
-		grayTable[i].r = (unsigned char)((1 - scale) * 0xFF);
-
-		color = Util::getHeatScale(scale);
-		heatTable[i].b = (unsigned char)color[2];
-		heatTable[i].g = (unsigned char)color[1];
-		heatTable[i].r = (unsigned char)color[0];
-
-		color = Util::getRainbowScale(scale);
-		rainbowTable[i].b = (unsigned char)color[2];
-		rainbowTable[i].g = (unsigned char)color[1];
-		rainbowTable[i].r = (unsigned char)color[0];
-	}
-}
-
-BGR ColorScale::getGrayScale(float scale) {
+	unsigned char gray;
+	double hue = 0;
+	double lightness = 0.5;
 	int i;
 
-	if (scale < 0) {
-		i = 0;
-	} else if (scale >= 1) {
-		i = scaleLength - 1;
-	} else {
-		i = (int)(scale * scaleLength);
+	for (i = 0; i < scaleLength; i++) {
+		scale = (double)i / scaleLength;
+
+		gray = (unsigned char)((1 - scale) * 0xFF);
+		grayTable[i] = Vec<unsigned char, 3>(gray, gray, gray);
+
+		heatTable[i] = Util::floatToByteColor(Util::getHeatScale(scale));
+
+		rainbowTable[i] = Util::floatToByteColor(Util::getRainbowScale(scale));
 	}
 
+	/*
+	i = 0;
+	double step = 960;
+	while (i < labelLength) {
+		while (hue < 360 && i < labelLength) {
+			labelTable[i] = Util::floatToByteColor(Util::hsvToColor(hue / 360, 1, 1));
+			hue += step;
+			i++;
+		}
+		step /= 2;
+		hue = step / 2;
+	}
+	*/
+
+	for (i = 0; i < labelLength; i++) {
+		labelTable[i] = Util::floatToByteColor(Util::normColorLightness(Util::hsvToColor(hue, 1, 1), lightness));
+		//hue = fmod(hue + 0.618033989, 1);
+		hue = fmod(hue + (double)251/360, 1);
+		lightness -= 0.22;
+		if (lightness < 0.2) {
+			lightness += 0.6;
+		}
+	}
+
+}
+
+Vec<unsigned char, 3> ColorScale::getGrayScale(double scale) {
+	int i = min(max((int)(scale * scaleLength), 0), scaleLength - 1);
 	return grayTable[i];
 }
 
-BGR ColorScale::getHeatScale(float scale) {
-	int i;
-
-	if (scale < 0) {
-		i = 0;
-	} else if (scale >= 1) {
-		i = scaleLength - 1;
-	} else {
-		i = (int)(scale * scaleLength);
-	}
-
+Vec<unsigned char, 3> ColorScale::getHeatScale(double scale) {
+	int i = min(max((int)(scale * scaleLength), 0), scaleLength - 1);
 	return heatTable[i];
 }
 
-BGR ColorScale::getRainbowScale(float scale) {
-	int i;
-
-	if (scale < 0) {
-		i = 0;
-	} else if (scale >= 1) {
-		i = scaleLength - 1;
-	} else {
-		i = (int)(scale * scaleLength);
-	}
-
+Vec<unsigned char, 3> ColorScale::getRainbowScale(double scale) {
+	int i = min(max((int)(scale * scaleLength), 0), scaleLength - 1);
 	return rainbowTable[i];
+}
+
+Vec<unsigned char, 3> ColorScale::getLabelColor(int label) {
+	if (label < 0) {
+		return Vec<unsigned char, 3>(0x80, 0x80, 0x80);
+	} else {
+		label = label % labelLength;
+		return labelTable[label];
+	}
 }

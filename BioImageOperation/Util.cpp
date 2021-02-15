@@ -392,28 +392,6 @@ string Util::getShapeFeatures(vector<Point>* contour, double area, double length
 	return csvExtra;
 }
 
-Scalar Util::getLabelColor(int label0) {
-	int label;
-	int ir, ig, ib;
-	double r, g, b;
-
-	if (label0 >= 0) {
-		label = (label0 % 27);  // 0 ... 26 (27 unique colors)
-		ir = label % 3;
-		ig = (label / 3) % 3;
-		ib = (label / 9) % 3;
-
-		r = 0.25 * (ir + 1);
-		g = 0.25 * (ig + 1);
-		b = 0.25 * (ib + 1);
-	} else {
-		r = 0.25;
-		g = 0.25;
-		b = 0.25;
-	}
-	return Scalar(b * 0xFF, g * 0xFF, r * 0xFF);
-}
-
 Scalar Util::getHeatScale(double scale) {
 	double r = 0;
 	double g = 0;
@@ -453,65 +431,62 @@ Scalar Util::getHeatScale(double scale) {
 		f = 1 - floatScale;
 		break;
 	}
-	return Scalar((unsigned char)(f * r * 0xFF), (unsigned char)(f * g * 0xFF), (unsigned char)(f * b * 0xFF));
+	return Scalar(f * b, f * g, f * r);
 }
 
 Scalar Util::getRainbowScale(double scale) {
-	double r = 0;
-	double g = 0;
-	double b = 0;
-	double f = 1;
-	double colScale;
-	int intScale;
-	double floatScale;
-
-	colScale = scale * 6;
-	intScale = (int)colScale;
-	floatScale = colScale - intScale;
-	switch (intScale) {
-	case 0:
-		// red - yellow
-		r = 1 - floatScale;
-		g = 1;
-		b = 0;
-		break;
-	case 1:
-		// yellow - green
-		r = 0;
-		g = 1;
-		b = floatScale;
-		break;
-	case 2:
-		// green - cyan
-		r = 0;
-		g = 1 - floatScale;
-		b = 1;
-		break;
-	case 3:
-		// cyan - blue
-		r = floatScale;
-		g = 0;
-		b = 1;
-		break;
-	case 4:
-		// blue - purple
-		r = 1;
-		g = 0;
-		b = 1 - floatScale;
-		break;
-	case 5:
-		// purple - red/black
-		r = 1;
-		g = floatScale;
-		b = 0;
-		f = 1 - floatScale;
-		break;
-	}
-	return Scalar((unsigned char)(f * r * 0xFF), (unsigned char)(f * g * 0xFF), (unsigned char)(f * b * 0xFF));
+	return hsvToColor(scale, 1, 1);
 }
 
-Scalar Util::bgrtoScalar(BGR bgr) {
-	return Scalar(bgr.b, bgr.g, bgr.r);
+Scalar Util::hsvToColor(double hue1, double saturation, double value) {
+	// https://www.rapidtables.com/convert/color/hsv-to-rgb.html
+	Scalar rgb1;
+	double r, g, b;
+	double hue = hue1 * 360;
+	double heuf = hue / 60;
+	double c = value * saturation;
+	double x = c * (1 - abs(fmod(heuf, 2) - 1));
+	double m = value - c;
+	int huei = (int)heuf;
+
+	switch (huei) {
+	case 0: rgb1 = Scalar(c, x, 0); break;
+	case 1: rgb1 = Scalar(x, c, 0); break;
+	case 2: rgb1 = Scalar(0, c, x); break;
+	case 3: rgb1 = Scalar(0, x, c); break;
+	case 4: rgb1 = Scalar(x, 0, c); break;
+	case 5: rgb1 = Scalar(c, 0, x); break;
+	}
+	r = rgb1[0] + m;
+	g = rgb1[1] + m;
+	b = rgb1[2] + m;
+
+	return Scalar(b, g, r);
+}
+
+Scalar Util::normColorLightness(Scalar color, double level) {
+	double r = color[2];
+	double g = color[1];
+	double b = color[0];
+	double f;
+	double level0 = 0.299 * r + 0.587 * g + 0.114 * b;
+	if (level0 != 0) {
+		f = level / level0;
+		if (f > 1) {
+			r = 1 - (1 - r) / f;
+			g = 1 - (1 - g) / f;
+			b = 1 - (1 - b) / f;
+		} else {
+			r *= f;
+			g *= f;
+			b *= f;
+		}
+	}
+	return Scalar(b, g, r);
+}
+
+Vec<unsigned char, 3> Util::floatToByteColor(Scalar color) {
+	return Vec<unsigned char, 3>((unsigned char)(color[0] * 0xFF), (unsigned char)(color[1] * 0xFF), (unsigned char)(color[2] * 0xFF));
 }
 
 string Util::getExceptionDetail(exception & e, int level) {

@@ -187,7 +187,7 @@ void Cluster::draw(Mat* image, int drawMode) {
 	if (hasSingleLabel()) {
 		label = getInitialLabel();
 	}
-	Scalar color = Util::getLabelColor(label);
+	Scalar color = ColorScale::getLabelColor(label);
 	Scalar labelColor = Scalar(0x80, 0x80, 0x80);
 
 	if ((drawMode & (int)ClusterDrawMode::Fill) != 0) {

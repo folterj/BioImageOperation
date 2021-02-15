@@ -10,14 +10,7 @@
 #pragma once
 #include <opencv2/opencv.hpp>
 
-/*
- * Basic BGR structure for efficient memory mapping
- */
-
-struct BGR
-{
-	unsigned char b, g, r;
-};
+using namespace cv;
 
 
 /*
@@ -29,13 +22,16 @@ class ColorScale
 public:
 	static const int colorLevels = 16;											// 256 -> significant memory; anything from 8 actually looks fine
 	static const int scaleLength = colorLevels * colorLevels * colorLevels;
+	static const int labelLength = 1000;
 
-	static BGR grayTable[];
-	static BGR heatTable[];
-	static BGR rainbowTable[];
+	static Vec<unsigned char, 3> grayTable[];
+	static Vec<unsigned char, 3> heatTable[];
+	static Vec<unsigned char, 3> rainbowTable[];
+	static Vec<unsigned char, 3> labelTable[];
 
 	static void init();
-	static BGR getGrayScale(float scale);
-	static BGR getHeatScale(float scale);
-	static BGR getRainbowScale(float scale);
+	static Vec<unsigned char, 3> getGrayScale(double scale);
+	static Vec<unsigned char, 3> getHeatScale(double scale);
+	static Vec<unsigned char, 3> getRainbowScale(double scale);
+	static Vec<unsigned char, 3> getLabelColor(int label);
 };

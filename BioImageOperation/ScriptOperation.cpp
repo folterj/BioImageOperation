@@ -484,6 +484,12 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 		description = "Invert image";
 		break;
 
+	case ScriptOperationType::SetBackground:
+		requiredArguments = vector<ArgumentLabel>{ };
+		optionalArguments = vector<ArgumentLabel>{ ArgumentLabel::Label };
+		description = "Initialise adaptive background buffer with image";
+		break;
+
 	case ScriptOperationType::UpdateBackground:
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Weight };

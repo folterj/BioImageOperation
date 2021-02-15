@@ -156,7 +156,7 @@ bool Track::isActive(int minActive) {
 }
 
 void Track::draw(Mat* image, int drawMode, int ntracks) {
-	Scalar color = Util::getLabelColor(label);
+	Scalar color = ColorScale::getLabelColor(label);
 	Scalar labelColor = Scalar(0x80, 0x80, 0x80);
 
 	if ((drawMode & (int)ClusterDrawMode::Point) != 0) {

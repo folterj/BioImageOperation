@@ -54,6 +54,7 @@ enum class ScriptOperationType
 	Multiply,
 	Invert,
 
+	SetBackground,
 	UpdateBackground,
 	UpdateWeight,
 	UpdateMin,
@@ -120,6 +121,7 @@ const vector<string> ScriptOperationTypes =
 	"Multiply",
 	"Invert",
 
+	"SetBackground",
 	"UpdateBackground",
 	"UpdateWeight",
 	"UpdateMin",
