@@ -13,6 +13,7 @@
 #include <QStyle>
 #include <QTextStream>
 #include "Util.h"
+#include "Constants.h"
 #include "config.h"
 
 
@@ -232,7 +233,7 @@ void MainWindow::generateScript(string title, string instruction, string scriptF
 				filepath = qfilename.toStdString();
 				script = Util::replace(script, Constants::filenameTemplate, Util::extractFileName(filepath));
 				fileModified = true;
-				setFilePath(Util::combinePath(Util::extractFilePath(filepath), title + " " + Util::extractTitle(filepath) + ".bioscript"));
+				setFilePath(Util::combinePath(Util::extractFilePath(filepath), title + " " + Util::extractTitle(filepath) + "." + Constants::defaultScriptExtension));
 				bioSettings.setValue(DEFAULT_DIR_KEY, QVariant(Util::convertToQString(filepath)));
 				setText(script);
 				scriptProcessing.doReset();
@@ -467,7 +468,7 @@ void MainWindow::showScriptHelp() {
 void MainWindow::saveScriptHelp() {
 	QString qfilename;
 	try {
-		qfilename = QFileDialog::getSaveFileName(this, tr("Save script help"), QString(), Util::convertToQString(Constants::scriptHelpDialogFilter));
+		qfilename = QFileDialog::getSaveFileName(this, tr("Save script help"), Util::convertToQString(Constants::scriptHelpDefaultFilename), Util::convertToQString(Constants::scriptHelpDialogFilter));
 		if (qfilename != "") {
 			OutputStream outputStream(qfilename.toStdString());
 			outputStream.write(ScriptOperation::getOperationList(true));

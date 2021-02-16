@@ -299,9 +299,9 @@ void ImageTracker::matchClusterTracks(bool findOptimalSolution, bool debugMode) 
 		}
 	}
 
-	// assign tracks to unassigned clusters
+	// assign tracks to unassigned clusters (consider as single unmerged clusters)
 	for (Cluster* cluster : clusters) {
-		if (!cluster->isAssigned()) {
+		if (!cluster->isAssigned() && cluster->area < maxArea) {
 			label = nextTrackLabel++;
 			track = new Track(label, fps, pixelSize, windowSize);
 			tracks.push_back(track);

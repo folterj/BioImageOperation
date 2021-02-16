@@ -34,8 +34,6 @@ void VideoOutput::reset() {
 }
 
 void VideoOutput::init(string basepath, string filepath, string defaultExtension, string start, string length, double fps, string codecs) {
-	string filename;
-
 	reset();
 
 	outputPath.setOutputPath(basepath, filepath, defaultExtension);
@@ -46,11 +44,6 @@ void VideoOutput::init(string basepath, string filepath, string defaultExtension
 	}
 	Util::toUpper(codecs);
 	codec = VideoWriter::fourcc((char)codecs[0], (char)codecs[1], (char)codecs[2], (char)codecs[3]);
-
-	filename = outputPath.createFilePath(0);
-	if (filesystem::exists(filename)) {
-		throw ios_base::failure("Output file already exists " + filename);
-	}
 }
 
 bool VideoOutput::open() {

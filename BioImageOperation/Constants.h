@@ -313,15 +313,18 @@ public:
 	static const int nTextWindows = 4;
 	static const int maxLogBuffer = 1000000;
 
-	static const string webPage;
-	static const string webFilesUrl;
-	static const string scriptFileDialogFilter;
-	static const string scriptHelpDialogFilter;
-	static const int defaultScriptFileDialogFilter;
+	static const string defaultScriptExtension;
+	static const string defaultHelpExtension;
 	static const string defaultDataExtension;
 	static const string defaultImageExtension;
 	static const string defaultVideoExtension;
 	static const string defaultVideoCodec;
+	static const string scriptFileDialogFilter;
+	static const string scriptHelpDialogFilter;
+	static const int defaultScriptFileDialogFilter;
+	static const string scriptHelpDefaultFilename;
+	static const string webPage;
+	static const string webFilesUrl;
 
 	static const string scriptTemplatePath;
 	static const string trackingScriptTemplate;

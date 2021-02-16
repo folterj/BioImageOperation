@@ -18,10 +18,14 @@ void FrameSource::calcFrameParams(string start, string length, double fps, int i
 	this->start = Util::parseFrameTime(start, fps);
 	lengthi = Util::parseFrameTime(length, fps);
 
+	if (total > 0 && nframes <= 0 && lengthi <= 0) {
+		throw invalid_argument("Source length unknown, 'Total' not supported");
+	}
+
 	// set end
 	if (lengthi > 0) {
 		this->end = this->start + lengthi;
-		if (this->end > nframes) {
+		if (nframes > 0 && this->end > nframes) {
 			this->end = nframes;
 		}
 	}

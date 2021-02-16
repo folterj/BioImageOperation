@@ -1,4 +1,4 @@
-# Bio Image Operation script operations (v1.7.1 / 2021-02-03)
+# Bio Image Operation script operations (v1.7.1 / 2021-02-16)
 
 
 **Set** (Path, Width, Height, Fps, PixelSize, WindowSize)

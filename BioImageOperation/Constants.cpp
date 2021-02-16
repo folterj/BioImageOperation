@@ -10,18 +10,21 @@
 #include "Constants.h"
 
 
-const string Constants::webPage = "https://joostdefolter.info";
-const string Constants::webFilesUrl = webPage + "/files/";
-const string Constants::scriptFileDialogFilter = "BIO Script files (*.bioscript)";
-const string Constants::scriptHelpDialogFilter = "BIO script help (*.md)";
-const int Constants::defaultScriptFileDialogFilter = 1;
+const string Constants::defaultScriptExtension = "bioscript";
+const string Constants::defaultHelpExtension = "md";
 const string Constants::defaultDataExtension = "csv";
 const string Constants::defaultImageExtension = "png";
 const string Constants::defaultVideoExtension = "mp4";
 const string Constants::defaultVideoCodec = "H264";
+const string Constants::scriptFileDialogFilter = "BIO Script files (*." + defaultScriptExtension + ")";
+const string Constants::scriptHelpDialogFilter = "BIO script help (*." + defaultHelpExtension + ")";
+const int Constants::defaultScriptFileDialogFilter = 1;
+const string Constants::scriptHelpDefaultFilename = "BioImageOperation script." + defaultHelpExtension;
+const string Constants::webPage = "https://joostdefolter.info";
+const string Constants::webFilesUrl = webPage + "/files/";
 
 const string Constants::scriptTemplatePath = ":/BioImageOperation/templates/";
-const string Constants::trackingScriptTemplate = scriptTemplatePath + "template_tracking.bioscript";
+const string Constants::trackingScriptTemplate = scriptTemplatePath + "template_tracking." + defaultScriptExtension;
 const string Constants::filenameTemplate = "<filename>";
 
 const int Constants::seekModeInterval = 100;
