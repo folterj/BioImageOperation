@@ -51,3 +51,7 @@ void PathNode::draw(Mat* image, Scalar color) {
 
 	drawMarker(*image, point, color, MarkerTypes::MARKER_CROSS, 2, 1, LineTypes::LINE_AA);
 }
+
+string PathNode::toString() {
+	return Util::format("%d age:%d accumUsage:%d lastUse:%d X:%.0f Y:%.0f", label, age, accumUsage, lastUse, x, y);
+}

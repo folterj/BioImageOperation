@@ -13,8 +13,9 @@
 #include "Util.h"
 
 
-Track::Track(int label, double fps, double pixelSize, double windowSize) {
+Track::Track(int label, int minActive, double fps, double pixelSize, double windowSize) {
 	this->label = label;
+	this->minActive = minActive;
 	this->fps = fps;
 	this->pixelSize = pixelSize;
 	this->windowSize = windowSize;
@@ -139,6 +140,14 @@ void Track::update(Cluster* cluster, double maxArea, double maxMoveDistance, boo
 	inactiveCount = 0;
 }
 
+void Track::updateInactive() {
+	if (activeCount > 0) {
+		activeCount--;
+	}
+	inactiveCount++;
+	clusterLabel = -1;
+}
+
 double Track::getDistFromOrigin() {
 	return Util::calcDistance(originX, originY, x, y);
 }
@@ -151,7 +160,7 @@ void Track::assign() {
 	assigned = true;
 }
 
-bool Track::isActive(int minActive) {
+bool Track::isActive() {
 	return (assigned && activeCount >= minActive && inactiveCount == 0);
 }
 
@@ -159,26 +168,28 @@ void Track::draw(Mat* image, int drawMode, int ntracks) {
 	Scalar color = ColorScale::getLabelColor(label);
 	Scalar labelColor = Scalar(0x80, 0x80, 0x80);
 
-	if ((drawMode & (int)ClusterDrawMode::Point) != 0) {
-		drawPoint(image, color);
-	}
-	if ((drawMode & (int)ClusterDrawMode::Circle) != 0) {
-		drawCircle(image, color);
-	}
-	if ((drawMode & (int)ClusterDrawMode::Box) != 0) {
-		drawBox(image, color);
-	}
-	if ((drawMode & (int)ClusterDrawMode::Angle) != 0) {
-		drawAngle(image, color);
-	}
-	if ((drawMode & (int)ClusterDrawMode::Tracks) != 0) {
-		if (ntracks == 0) {
-			ntracks = 10;
+	if (isActive()) {
+		if ((drawMode & (int)ClusterDrawMode::Point) != 0) {
+			drawPoint(image, color);
 		}
-		drawTracks(image, color, ntracks);
-	}
-	if ((drawMode & (int)ClusterDrawMode::Track) != 0) {
-		drawTracks(image, color, 1);
+		if ((drawMode & (int)ClusterDrawMode::Circle) != 0) {
+			drawCircle(image, color);
+		}
+		if ((drawMode & (int)ClusterDrawMode::Box) != 0) {
+			drawBox(image, color);
+		}
+		if ((drawMode & (int)ClusterDrawMode::Angle) != 0) {
+			drawAngle(image, color);
+		}
+		if ((drawMode & (int)ClusterDrawMode::Tracks) != 0) {
+			if (ntracks == 0) {
+				ntracks = 10;
+			}
+			drawTracks(image, color, ntracks);
+		}
+		if ((drawMode & (int)ClusterDrawMode::Track) != 0) {
+			drawTracks(image, color, 1);
+		}
 	}
 	drawLabel(image, labelColor, drawMode);
 }
@@ -226,21 +237,35 @@ void Track::drawTracks(Mat* image, Scalar color, int ntracks) {
 }
 
 void Track::drawLabel(Mat* image, Scalar color, int drawMode) {
+	vector<string> texts;
 	HersheyFonts fontFace = HersheyFonts::FONT_HERSHEY_SIMPLEX;
 	double fontScale = 0.5;
 	Point point((int)(x + rad), (int)(y + rad));
 	Size size;
+	string text;
 
 	if ((drawMode & (int)ClusterDrawMode::Label) != 0) {
-		size = Util::drawText(image, to_string(label), point, fontFace, fontScale, color);
-		point.y += (int)(size.height * 1.5);
+		text = to_string(label);
+		texts.push_back(text);
 	}
 	if ((drawMode & (int)ClusterDrawMode::LabelArea) != 0) {
-		size = Util::drawText(image, Util::format("%.0f", area), point, fontFace, fontScale, color);
-		point.y += (int)(size.height * 1.5);
+		text = Util::format("%.0f", area);
+		texts.push_back(text);
+	}
+	if ((drawMode & (int)ClusterDrawMode::LabelLength) != 0) {
+		text = Util::format("%.1f", length_major);
+		texts.push_back(text);
 	}
 	if ((drawMode & (int)ClusterDrawMode::LabelAngle) != 0) {
-		size = Util::drawText(image, Util::format("%.0f", angle), point, fontFace, fontScale, color);
+		text = Util::format("%.0f", angle);
+		texts.push_back(text);
+	}
+
+	for (string text : texts) {
+		if (!isActive()) {
+			text = "(" + text + ")";
+		}
+		size = Util::drawText(image, text, point, fontFace, fontScale, color);
 		point.y += (int)(size.height * 1.5);
 	}
 }

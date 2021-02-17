@@ -244,21 +244,32 @@ void Cluster::drawFill(Mat* image, Scalar color) {
 }
 
 void Cluster::drawLabel(Mat* image, Scalar color, int drawMode) {
+	vector<string> texts;
 	HersheyFonts fontFace = HersheyFonts::FONT_HERSHEY_SIMPLEX;
 	double fontScale = 0.5;
 	Point point((int)(x + rad), (int)(y + rad));
 	Size size;
+	string text;
 
 	if ((drawMode & (int)ClusterDrawMode::Label) != 0) {
-		size = Util::drawText(image, getLabels(), point, fontFace, fontScale, color);
-		point.y += (int)(size.height * 1.5);
+		text = getLabels();
+		texts.push_back(text);
 	}
 	if ((drawMode & (int)ClusterDrawMode::LabelArea) != 0) {
-		size = Util::drawText(image, Util::format("%.0f", area), point, fontFace, fontScale, color);
-		point.y += (int)(size.height * 1.5);
+		text = Util::format("%.0f", area);
+		texts.push_back(text);
+	}
+	if ((drawMode & (int)ClusterDrawMode::LabelLength) != 0) {
+		text = Util::format("%.1f", length_major);
+		texts.push_back(text);
 	}
 	if ((drawMode & (int)ClusterDrawMode::LabelAngle) != 0) {
-		size = Util::drawText(image, Util::format("%.0f", angle), point, fontFace, fontScale, color);
+		text = Util::format("%.0f", angle);
+		texts.push_back(text);
+	}
+
+	for (string text : texts) {
+		size = Util::drawText(image, text, point, fontFace, fontScale, color);
 		point.y += (int)(size.height * 1.5);
 	}
 }

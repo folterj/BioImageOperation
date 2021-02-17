@@ -42,4 +42,5 @@ public:
 	double getAccumUsage2(int totalAge);
 	double matchDistance(Track* track, double maxDistance);
 	void draw(Mat* image, Scalar color);
+	string toString();
 };

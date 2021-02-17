@@ -57,6 +57,7 @@ public:
 	int activeCount = 0;
 	int inactiveCount = 0;
 
+	int minActive = 1;
 	double fps = 0;
 	double pixelSize = 1;
 	double windowSize = 1;
@@ -67,13 +68,14 @@ public:
 	vector<double> angles;
 
 
-	Track(int label, double fps, double pixelSize, double windowSize);
+	Track(int label, int minActive, double fps, double pixelSize, double windowSize);
 	void update(Cluster* cluster, double maxArea, double maxMoveDistance, bool trackParamsFinalised);
+	void updateInactive();
 	double getDistFromOrigin();
 
 	void unAssign();
 	void assign();
-	bool isActive(int minActive);
+	bool isActive();
 
 	void draw(Mat* image, int drawMode, int ntracks);
 	void drawPoint(Mat* image, Scalar color);

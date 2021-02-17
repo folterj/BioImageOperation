@@ -232,10 +232,11 @@ enum class ClusterDrawMode : int
 	Angle = 0x08,
 	Label = 0x10,
 	LabelArea = 0x20,
-	LabelAngle = 0x40,
-	Track = 0x80,
-	Tracks = 0x100,
-	Fill = 0x200,
+	LabelLength = 0x40,
+	LabelAngle = 0x80,
+	Track = 0x100,
+	Tracks = 0x200,
+	Fill = 0x400,
 	ClusterDefault = Fill|Label,
 	TracksDefault = Point|Label
 };
@@ -249,6 +250,7 @@ const vector<string> ClusterDrawModes =
 	"Angle",
 	"Label",
 	"LabelArea",
+	"LabelLength",
 	"LabelAngle",
 	"Track",
 	"Tracks",

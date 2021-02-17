@@ -47,6 +47,9 @@ public:
 
 	bool clusterParamsFinalised = false;
 	bool trackParamsFinalised = false;
+	bool clusterDebugMode = false;
+	bool trackDebugMode = false;
+	bool pathDebugMode = false;
 	bool countPositionSet = false;
 	double pathDistance = Constants::minPathDistance;
 	int pathAge = 0;
@@ -92,36 +95,34 @@ public:
 	/*
 	 * Create clusters from image entry point
 	 */
-	string createClusters(Mat* image, double areaMin, double areaMax, string basePath, bool debugMode);
+	string createClusters(Mat* image, double areaMin, double areaMax, string basePath, bool clusterDebugMode);
 
 	/*
 	 * Create tracks entry point
 	 */
-	string createTracks(double maxMove, int minActive, int maxInactive, string basePath, bool debugMode);
+	string createTracks(double maxMove, int minActive, int maxInactive, string basePath, bool trackDebugMode);
 
 	/*
 	 * Create paths entry point
 	 */
-	string createPaths(double pathDistance, bool debugMode);
+	string createPaths(double pathDistance, bool pathDebugMode);
 
 	/*
 	 * Create clusters from image
 	 */
-	bool findClusters(Mat* image, bool debugMode);
+	bool findClusters(Mat* image);
 
 	/*
 	 * Create tracks
 	 */
 
-	void matchClusterTracks(bool findOptimalSolution, bool debugMode);
+	void matchClusterTracks(bool findOptimalSolutione);
 	void unAssignAll();
 	bool removeMatch(vector<TrackClusterMatch*>* trackMatches, TrackClusterMatch* removeMatch);
 	vector<TrackClusterMatch*> assignTracks();
 	double calcMatchScore(vector<TrackClusterMatch*>* trackMatches);
 	vector<TrackClusterMatch*> calcTrackClusterMatches(Track* track, double maxMoveDistance);
 	void pruneTracks();
-	string getClusterDebugInfo();
-	string getTrackDebugInfo();
 
 	/*
 	 * Create paths
@@ -134,12 +135,19 @@ public:
 	/*
 	 * Update automatic clustering parameters
 	 */
-	void updateClusterParams(bool debugMode);
+	void updateClusterParams();
 
 	/*
 	 * Update automatic tracking parameters
 	 */
-	void updateTrackParams(bool debugMode);
+	void updateTrackParams();
+
+	/*
+	 * Debugging routines
+	 */
+	string getClusterDebugInfo();
+	string getTrackDebugInfo();
+	string getPathDebugInfo();
 
 	/*
 	 * Drawing routines

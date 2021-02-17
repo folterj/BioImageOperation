@@ -1,4 +1,4 @@
-# Bio Image Operation script operations (v1.7.1 / 2021-02-16)
+# Bio Image Operation script operations (v1.7.2 / 2021-02-17)
 
 
 **Set** (Path, Width, Height, Fps, PixelSize, WindowSize)
@@ -348,7 +348,7 @@ Draw clusters
 
  - Label:	 Label id (string)
  - Tracker:	 Tracker id (string)
- - DrawMode:	 Draw mode(s) (combine using | character) (None, Point, Circle, Box, Angle, Label, LabelArea, LabelAngle, Track, Tracks, Fill, ClusterDefault, TracksDefault)
+ - DrawMode:	 Draw mode(s) (combine using | character) (None, Point, Circle, Box, Angle, Label, LabelArea, LabelLength, LabelAngle, Track, Tracks, Fill, ClusterDefault, TracksDefault)
 
 
 **DrawTracks** (Label, Tracker, DrawMode)
@@ -357,7 +357,7 @@ Draw tracked clusters
 
  - Label:	 Label id (string)
  - Tracker:	 Tracker id (string)
- - DrawMode:	 Draw mode(s) (combine using | character) (None, Point, Circle, Box, Angle, Label, LabelArea, LabelAngle, Track, Tracks, Fill, ClusterDefault, TracksDefault)
+ - DrawMode:	 Draw mode(s) (combine using | character) (None, Point, Circle, Box, Angle, Label, LabelArea, LabelLength, LabelAngle, Track, Tracks, Fill, ClusterDefault, TracksDefault)
 
 
 **DrawPaths** (Label, Tracker, PathDrawMode, Power, Palette)
