@@ -65,6 +65,7 @@ qt5_add_resources(RESOURCE_FILES ${RESOURCE})
 
 if(NOT WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
+    target_link_libraries(${PROJECT_NAME} PRIVATE stdc++fs)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core)
