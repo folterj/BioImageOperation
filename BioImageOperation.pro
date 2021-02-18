@@ -20,7 +20,7 @@ macx {
     INCLUDEPATH += /usr/local/include
 
     LIBS += -L/usr/local/lib \
-            -lopencv_core -lopencv_imgproc -lopencv_videoio -lopencv_imgcodecs
+	        -lopencv_core -lopencv_imgproc -lopencv_videoio -lopencv_imgcodecs -lstdc++fs
 
     QMAKE_CXXFLAGS_WARN_ON = -Wno-unused-variable -Wno-reorder
 }
@@ -28,11 +28,12 @@ macx {
 unix {
     QMAKE_CXXFLAGS += -std=c++17
 
+    #INCLUDEPATH += /usr/local/include/opencv4	# if cmake compiled opencv
     INCLUDEPATH += /usr/include/opencv4
 
     LIBS += -L/usr/lib \
             -L/usr/lib/x86_64-linux-gnu \
-            -lopencv_core -lopencv_imgproc -lopencv_videoio -lopencv_imgcodecs
+			-lopencv_core -lopencv_imgproc -lopencv_videoio -lopencv_imgcodecs -lstdc++fs
 
     QMAKE_CXXFLAGS_WARN_ON = -Wno-unused-variable -Wno-reorder
 }
