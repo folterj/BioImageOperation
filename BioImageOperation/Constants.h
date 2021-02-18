@@ -62,6 +62,7 @@ enum class ScriptOperationType
 	ClearSeries,
 	AddSeries,
 	GetSeriesMedian,
+	GetSeriesMean,
 	AddAccum,
 	GetAccum,
 
@@ -129,6 +130,7 @@ const vector<string> ScriptOperationTypes =
 	"ClearSeries",
 	"AddSeries",
 	"GetSeriesMedian",
+	"GetSeriesMean",
 	"AddAccum",
 	"GetAccum",
 

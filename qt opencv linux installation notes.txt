@@ -6,7 +6,7 @@ apt-get install build-essential
 (gcc)
 
 
-Qt:
+Qt install:
 apt-get install qtcreator
 apt-get install qt5-default
 apt-get install qt5-doc qtbase5-examples qtbase5-doc-html
@@ -18,20 +18,21 @@ https://the-codeslinger.com/2020/12/20/manual-install-of-qt6-on-linux-mint/
 https://www.qt.io/download-open-source
 
 
-OpenCV:
+OpenCV install:
 apt-get install libopencv-dev
-Source code (for include headers): download same version as libopencv
-e.g.: https://github.com/opencv/opencv/archive/4.4.0.tar.gz
+
+Alternatively OpenCV build (e.g. on Raspbian):
+https://qengineering.eu/install-opencv-4.2-on-raspberry-pi-4.html
 
 
 Clone project using git
+git clone git@github.com:folterj/BioImageOperation.git
 
 
 Compile using Qt Creator, or CMake:
-- go to BioImageOperation root folder
-- type:
+- cmake from within sub-folder 'build' inside BioImageOperation root folder
+- when making changes ensure cleaning build folder
 mkdir build
 cd build
 cmake ..
 make
-

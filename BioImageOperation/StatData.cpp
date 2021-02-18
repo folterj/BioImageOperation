@@ -182,6 +182,9 @@ void StatData::calcPeak() {
 	if (maxi < 1) {
 		maxi = 1;
 	}
+	if (medi < mini) {
+		medi = mini;
+	}
 
 	// starting value
 	maxval = bins[medi];

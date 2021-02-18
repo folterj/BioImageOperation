@@ -501,6 +501,10 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			newImageSet = imageSeries->getMedian(*newImage);
 			break;
 
+		case ScriptOperationType::GetSeriesMean:
+			newImageSet = imageSeries->getMean(*newImage);
+			break;
+
 		case ScriptOperationType::AddAccum:
 			accumBuffer->addImage(getLabelOrCurrentImage(operation, image), (AccumMode)operation->getArgument(ArgumentLabel::AccumMode, (int)AccumMode::Age));
 			break;

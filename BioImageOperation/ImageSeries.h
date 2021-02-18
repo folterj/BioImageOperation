@@ -32,4 +32,5 @@ public:
 	void reset();
 	void addImage(Mat* image, int bufferSize = 0);
 	bool getMedian(OutputArray dest);
+	bool getMean(OutputArray dest);
 };

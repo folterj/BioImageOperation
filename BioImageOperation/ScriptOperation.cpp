@@ -529,7 +529,13 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 	case ScriptOperationType::GetSeriesMedian:
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { };
-		description = "Retrieve median image of image series buffer";
+		description = "Obtain image median of image series buffer";
+		break;
+
+	case ScriptOperationType::GetSeriesMean:
+		requiredArguments = vector<ArgumentLabel>{ };
+		optionalArguments = vector<ArgumentLabel>{ };
+		description = "Obtain image mean of image series buffer";
 		break;
 
 	case ScriptOperationType::AddAccum:

@@ -165,6 +165,7 @@
     <QtUic Include="TextWindow.ui" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="config.h" />
     <ClInclude Include="KeepAlive.h" />
     <ClInclude Include="OutputStreams.h" />
     <ClInclude Include="ScriptOperation.h" />

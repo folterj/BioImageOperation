@@ -600,7 +600,12 @@ void Util::drawAngle(Mat* image, double x, double y, double rad, double angle, S
 }
 
 #ifndef _CONSOLE
-QImage Util::matToQImage(Mat const& source) {
+QImage Util::matToQImage(Mat const& source0) {
+	Mat source = source0;
+
+	if (source.depth() != CV_8U) {
+		source.convertTo(source, CV_8U);
+	}
 	if (source.channels() == 1) {
 		QImage qimage(source.data, source.cols, source.rows, source.step, QImage::Format_Grayscale8);
 		return qimage;

@@ -60,7 +60,7 @@ bool ImageSeries::getMedian(OutputArray dest) {
 	int m;
 	uchar median;
 	int n = (int)images.size();
-	vector<uchar> pixelBuffer(n), vimage;
+	vector<uchar> pixelBuffer(n);
 
 	if (n == 0) {
 		return false;
@@ -85,6 +85,36 @@ bool ImageSeries::getMedian(OutputArray dest) {
 				median = (median + pixelBuffer[m]) / 2;
 			}
 			outData[pixeli * nchannels + c] = median;
+		}
+	}
+	return true;
+}
+
+bool ImageSeries::getMean(OutputArray dest) {
+	Mat image;
+	uchar* outData;
+	int pixeli;
+	int npixels = width * height;
+	int m;
+	int n = (int)images.size();
+	double sum, mean;
+
+	if (n == 0) {
+		return false;
+	}
+
+	dest.create(height, width, type);
+	image = dest.getMat();
+	outData = (uchar*)image.data;
+
+	for (pixeli = 0; pixeli < npixels; pixeli++) {
+		for (int c = 0; c < nchannels; c++) {
+			sum = 0;
+			for (int i = 0; i < n; i++) {
+				sum += images[i][c][pixeli];
+			}
+			mean = sum / n;
+			outData[pixeli * nchannels + c] = (uchar)mean;
 		}
 	}
 	return true;

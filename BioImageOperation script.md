@@ -292,7 +292,13 @@ Add image to image series buffer
 
 **GetSeriesMedian** ()
 
-Retrieve median image of image series buffer
+Obtain image median of image series buffer
+
+
+
+**GetSeriesMean** ()
+
+Obtain image mean of image series buffer
 
 
 
