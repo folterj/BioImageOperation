@@ -27,14 +27,14 @@ class Cluster
 public:
 	vector<Track*> assignedTracks;
 
+	int clusterLabel = 0;
 	double x = 0;
 	double y = 0;
 	double area = 0;
 	double rad = 0;
-	double length_major = 0;
-	double length_minor = 0;
+	double lengthMajor = 0;
+	double lengthMinor = 0;
 	double angle = 0;
-	int clusterLabel = 0;
 
 	Rect box;
 	Moments moments;
@@ -44,9 +44,12 @@ public:
 
 
 	Cluster(int clusterLabel, double x, double y, double area, Rect box, Moments* moments, Mat* clusterImage, double pixelSize);
-	bool isAssignable(double trackedArea);
+	bool isAssignable(Track* track);
 	void assign(Track* track);
 	bool isAssigned();
+	bool hasSingleTrack();
+	bool isMerged();
+	bool isSuspectMerged(Track* track);
 	void unAssign(Track* track);
 	void unAssign();
 
@@ -59,7 +62,6 @@ public:
 	double calcLengthFactor(Track* track, double lengthDif);
 	double calcAngleFactor(Track* track, double angleDif);
 
-	bool hasSingleLabel();
 	int getInitialLabel();
 	string getLabels();
 	void draw(Mat* image, int drawMode);

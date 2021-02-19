@@ -204,7 +204,7 @@ bool MainWindow::askSaveChanges() {
 bool MainWindow::askCloseInProgress() {
 	QMessageBox::StandardButton response;
 	if (scriptProcessing.getMode() != OperationMode::Idle) {
-		response = QMessageBox::question(this, "Operation in progress", "Close while operation in progress?", QMessageBox::Yes | QMessageBox::No);
+		response = QMessageBox::question(this, "Operation in progress", "Are you sure you want to exit?", QMessageBox::Yes | QMessageBox::No);
 		if (response == QMessageBox::No) {
 			return false;
 		}

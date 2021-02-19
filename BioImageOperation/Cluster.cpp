@@ -28,28 +28,37 @@ Cluster::Cluster(int clusterLabel, double x, double y, double area, Rect box, Mo
 	if (moments->m00 != 0) {
 		angle = Util::calcMomentsAngle(moments);
 		rad = Util::calcMomentsMajorRadius(moments);
-		length_major = 2 * rad;
-		length_minor = 2 * Util::calcMomentsMinorRadius(moments);
-	} else {
+		lengthMajor = 2 * rad;
+		lengthMinor = 2 * Util::calcMomentsMinorRadius(moments);
+	}
+	else {
 		rad = sqrt(area);
 	}
 }
 
-bool Cluster::isAssignable(double trackedArea) {
+bool Cluster::isAssignable(Track* track) {
 	int n = (int)assignedTracks.size();
 	double totalArea;
+	bool isActive = track->isActive(false);
 
-	if (n == 0) {
-		return true;
+	if ((n > 0 && !isActive) || n >= Constants::maxMergedBlobs) {
+		// for multiple matches: only allow active tracks
+		return false;
 	}
 
-	totalArea = trackedArea;
-	for (Track* track : assignedTracks) {
-		if (track) {
-			totalArea += track->area;
+	totalArea = track->meanArea;
+	for (Track* track0 : assignedTracks) {
+		if (track0) {
+			totalArea += track0->meanArea;
 		}
 	}
-	return (totalArea * 0.75 < area && n < Constants::maxMergedBlobs);
+
+	// allow margin for (total) size
+	if (n == 0) {
+		return (totalArea * 0.5 < area);
+	} else {
+		return (totalArea * 0.75 < area);
+	}
 }
 
 void Cluster::assign(Track* track) {
@@ -58,6 +67,18 @@ void Cluster::assign(Track* track) {
 
 bool Cluster::isAssigned() {
 	return (assignedTracks.size() != 0);
+}
+
+bool Cluster::hasSingleTrack() {
+	return (assignedTracks.size() == 1);
+}
+
+bool Cluster::isMerged() {
+	return (assignedTracks.size() > 1);
+}
+
+bool Cluster::isSuspectMerged(Track* track) {
+	return (area > 1.5 * track->area);
 }
 
 void Cluster::unAssign(Track* track) {
@@ -96,11 +117,11 @@ double Cluster::calcDistance(Track* track) {
 }
 
 double Cluster::calcAreaDif(Track* track) {
-	return abs(area - track->area);
+	return abs(area - track->meanArea);
 }
 
 double Cluster::calcLengthDif(Track* track) {
-	return abs(length_major - track->length_major);
+	return abs(lengthMajor - track->meanLengthMajor);
 }
 
 double Cluster::calcAngleDif(Track* track) {
@@ -122,41 +143,38 @@ double Cluster::getRangeFactor(Track* track, double distance, double maxMoveDist
 
 double Cluster::calcAreaFactor(Track* track, double areaDif) {
 	double areaFactor = 1;
-	bool suspectMerged = (area > 1.5 * track->area);
-	double a = track->area;
+	double a = track->meanArea;
 	if (a == 0) {
 		a = area;
 	}
-	if (!suspectMerged && a != 0) {
+	if (a != 0) {
 		areaFactor = 1 - areaDif / a;
+		if (areaFactor < 0) {
+			areaFactor = 0;
+		}
 	}
 	return areaFactor;
 }
 
 double Cluster::calcLengthFactor(Track* track, double lengthDif) {
 	double lengthFactor = 1;
-	bool suspectMerged = (area > 1.5 * track->area);
-	double len = track->length_major;
+	double len = track->meanLengthMajor;
 	if (len == 0) {
-		len = length_major;
+		len = lengthMajor;
 	}
-	if (!suspectMerged && len != 0) {
+	if (len != 0) {
 		lengthFactor = 1 - lengthDif / len;
+		if (lengthFactor < 0) {
+			lengthFactor = 0;
+		}
 	}
 	return lengthFactor;
 }
 
 double Cluster::calcAngleFactor(Track* track, double angleDif) {
 	double angleFactor = 1;
-	bool suspectMerged = (area > 1.5 * track->area);
-	if (!suspectMerged) {
-		angleFactor = 1 - abs(angleDif) / 360;
-	}
+	angleFactor = 1 - abs(angleDif) / 360;
 	return angleFactor;
-}
-
-bool Cluster::hasSingleLabel() {
-	return (assignedTracks.size() == 1);
 }
 
 int Cluster::getInitialLabel() {
@@ -184,7 +202,7 @@ string Cluster::getLabels() {
 
 void Cluster::draw(Mat* image, int drawMode) {
 	int label = -1;
-	if (hasSingleLabel()) {
+	if (hasSingleTrack()) {
 		label = getInitialLabel();
 	}
 	Scalar color = ColorScale::getLabelColor(label);
@@ -210,11 +228,11 @@ void Cluster::draw(Mat* image, int drawMode) {
 
 void Cluster::drawPoint(Mat* image, Scalar color) {
 	Point point((int)x, (int)y);
-	int thickness = (int)(rad / 2);
-	if (thickness < 1) {
-		thickness = 1;
+	int rad2 = (int)(lengthMinor / 2);
+	if (rad2 < 1) {
+		rad2 = 1;
 	}
-	drawMarker(*image, point, color, MarkerTypes::MARKER_CROSS, 1, thickness, LineTypes::LINE_AA);
+	circle(*image, point, rad2, color, LineTypes::FILLED, LineTypes::LINE_AA);
 }
 
 void Cluster::drawCircle(Mat* image, Scalar color) {
@@ -260,7 +278,7 @@ void Cluster::drawLabel(Mat* image, Scalar color, int drawMode) {
 		texts.push_back(text);
 	}
 	if ((drawMode & (int)ClusterDrawMode::LabelLength) != 0) {
-		text = Util::format("%.1f", length_major);
+		text = Util::format("%.1f", lengthMajor);
 		texts.push_back(text);
 	}
 	if ((drawMode & (int)ClusterDrawMode::LabelAngle) != 0) {
@@ -293,15 +311,15 @@ string Cluster::getCsv(bool outputShapeFeatures, bool outputContour) {
 	vector<Point> contour;
     
 	csv = Util::replace(getLabels(), ",", " ") + "," + to_string(clusterLabel);
-	csv += format(",%s", (assignedTracks.size() > 1) ? "true" : "false");
+	csv += format(",%s", isMerged() ? "true" : "false");
 	csv += format(",%f,%f,%f", x * pixelSize, y * pixelSize, angle);
-	csv += format(",%f,%f,%f,%f", area * pixelSize * pixelSize, rad * pixelSize, length_major * pixelSize, length_minor * pixelSize);
+	csv += format(",%f,%f,%f,%f", area * pixelSize * pixelSize, rad * pixelSize, lengthMajor * pixelSize, lengthMinor * pixelSize);
 
 	if (outputShapeFeatures || outputContour) {
 		contour = getContour();
 	}
 	if (outputShapeFeatures) {
-		csv += Util::getShapeFeatures(&contour, area, length_major, length_minor);
+		csv += Util::getShapeFeatures(&contour, area, lengthMajor, lengthMinor);
 	}
 	if (outputContour) {
 		csv += ",";

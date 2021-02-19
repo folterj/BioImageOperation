@@ -44,6 +44,16 @@ void ImageTracker::deleteTracks() {
 	nextTrackLabel = 0;
 }
 
+void ImageTracker::deleteTrackMatches() {
+	for (vector<TrackClusterMatch*> trackMatch : trackMatches) {
+		for (TrackClusterMatch* match : trackMatch) {
+			delete match;
+		}
+		trackMatch.clear();
+	}
+	trackMatches.clear();
+}
+
 void ImageTracker::deletePaths() {
 	for (int i = 0; i < pathLinks.size(); i++) {
 		delete pathLinks[i];
@@ -128,6 +138,7 @@ string ImageTracker::createTracks(double maxMove, int minActive, int maxInactive
 	if (trackDebugMode) {
 		output = getTrackDebugInfo();
 	}
+	deleteTrackMatches();
 	return output;
 }
 
@@ -352,15 +363,6 @@ void ImageTracker::matchClusterTracks(bool findOptimalSolution) {
 			}
 		}
 	}
-
-	// tidy up
-	for (vector<TrackClusterMatch*> trackMatch : trackMatches) {
-		for (TrackClusterMatch* match : trackMatch) {
-			delete match;
-		}
-		trackMatch.clear();
-	}
-	trackMatches.clear();
 }
 
 void ImageTracker::unAssignAll() {
@@ -400,7 +402,7 @@ vector<TrackClusterMatch*> ImageTracker::assignTracks() {
 					break;
 				}
 				match = trackMatch[i];
-				if (match->cluster->isAssignable(match->track->area)) {
+				if (match->isAssignable()) {
 					match->assign();
 					assignedMatches.push_back(match);
 					break;

@@ -28,6 +28,7 @@ public:
 	double areaFactor = 0;
 	double lengthFactor = 0;
 	double angleFactor = 0;
+	double activeFactor = 0;
 	double matchFactor = 0;
 	bool assigned = false;
 

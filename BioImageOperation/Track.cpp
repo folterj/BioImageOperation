@@ -120,16 +120,21 @@ void Track::update(Cluster* cluster, double maxArea, double maxMoveDistance, boo
 		// only assign area if single track
 		area = cluster->area;
 		rad = cluster->rad;
-		length_major = cluster->length_major;
-		length_minor = cluster->length_minor;
+		lengthMajor = cluster->lengthMajor;
+		lengthMinor = cluster->lengthMinor;
 	}
 
 	x = newx;
 	y = newy;
 
-	if (!isNew) {
+	if (isNew) {
+		meanArea = area;
+		meanLengthMajor = lengthMajor;
+	} else {
 		points.push_back(Point2d(x, y));
 		angles.push_back(orientation);
+		meanArea = meanArea * 0.9 + area * 0.1;
+		meanLengthMajor = meanLengthMajor * 0.9 + lengthMajor * 0.1;
 	}
 
 	if (trackParamsFinalised) {
@@ -160,8 +165,16 @@ void Track::assign() {
 	assigned = true;
 }
 
-bool Track::isActive() {
-	return (assigned && activeCount >= minActive && inactiveCount == 0);
+bool Track::isActive(bool needAssigned) {
+	return ((!needAssigned || assigned) && activeCount >= minActive && inactiveCount == 0);
+}
+
+double Track::activeFactor() {
+	double factor = (double)(activeCount + 1) / (minActive + 1);
+	if (factor > 1) {
+		factor = 1;
+	}
+	return factor;
 }
 
 void Track::draw(Mat* image, int drawMode, int ntracks) {
@@ -196,11 +209,11 @@ void Track::draw(Mat* image, int drawMode, int ntracks) {
 
 void Track::drawPoint(Mat* image, Scalar color) {
 	Point point((int)x, (int)y);
-	int thickness = (int)(rad / 2);
-	if (thickness < 1) {
-		thickness = 1;
+	int rad2 = (int)(lengthMinor / 2);
+	if (rad2 < 1) {
+		rad2 = 1;
 	}
-	drawMarker(*image, point, color, MarkerTypes::MARKER_CROSS, 1, thickness, LineTypes::LINE_AA);
+	circle(*image, point, rad2, color, LineTypes::FILLED, LineTypes::LINE_AA);
 }
 
 void Track::drawCircle(Mat* image, Scalar color) {
@@ -253,7 +266,7 @@ void Track::drawLabel(Mat* image, Scalar color, int drawMode) {
 		texts.push_back(text);
 	}
 	if ((drawMode & (int)ClusterDrawMode::LabelLength) != 0) {
-		text = Util::format("%.1f", length_major);
+		text = Util::format("%.1f", lengthMajor);
 		texts.push_back(text);
 	}
 	if ((drawMode & (int)ClusterDrawMode::LabelAngle) != 0) {
@@ -368,7 +381,7 @@ string Track::getCsv(bool outputShapeFeatures, bool outputContour, Cluster* clus
 	csv += format(",%f,%f,%f,%f", x * pixelSize, y * pixelSize, v, a);
 	csv += format(",%f,%f", totdist * pixelSize, centdist * pixelSize);
 	csv += format(",%f,%f,%f", orientation, v_angle, a_angle);
-	csv += format(",%f,%f,%f,%f", area * pixelSize * pixelSize, rad * pixelSize, length_major * pixelSize, length_minor * pixelSize);
+	csv += format(",%f,%f,%f,%f", area * pixelSize * pixelSize, rad * pixelSize, lengthMajor * pixelSize, lengthMinor * pixelSize);
 
 	if (outputShapeFeatures || outputContour) {
 		if (cluster) {
@@ -376,15 +389,15 @@ string Track::getCsv(bool outputShapeFeatures, bool outputContour, Cluster* clus
 		}
 	}
 	if (outputShapeFeatures) {
-		if (cluster && cluster->hasSingleLabel()) {
-			csv += Util::getShapeFeatures(&contour, area, length_major, length_minor);
+		if (cluster && cluster->hasSingleTrack()) {
+			csv += Util::getShapeFeatures(&contour, area, lengthMajor, lengthMinor);
 		} else {
 			csv += ",,,,";
 		}
 	}
 	if (outputContour) {
 		csv += ",";
-		if (cluster && cluster->hasSingleLabel()) {
+		if (cluster && cluster->hasSingleTrack()) {
 			for (Point point : contour) {
 				if (pixelSize == 1) {
 					csv += Util::format("%d %d ", point.x, point.y);

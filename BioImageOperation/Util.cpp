@@ -356,7 +356,7 @@ double Util::calcMomentsMinorRadius(Moments* moments) {
 
 // https://docs.opencv.org/master/dd/d49/tutorial_py_contour_features.html
 
-string Util::getShapeFeatures(vector<Point>* contour, double area, double length_major, double length_minor) {
+string Util::getShapeFeatures(vector<Point>* contour, double area, double lengthMajor, double lengthMinor) {
 	string csvExtra;
 	vector<Point> hull;
 	//vector<Point2f> contour2;
@@ -365,8 +365,8 @@ string Util::getShapeFeatures(vector<Point>* contour, double area, double length
 	double sizeRatio, ellipsity, circularity, convexity;
 	double hullArea, perimeter;
 
-	sizeRatio = length_minor / length_major;
-	ellipsity = area / (M_PI * (length_major / 2) * (length_minor / 2));
+	sizeRatio = lengthMinor / lengthMajor;
+	ellipsity = area / (M_PI * (lengthMajor / 2) * (lengthMinor / 2));
 	csvExtra += Util::format(",%f,%f", sizeRatio, ellipsity);
 
 	if (!contour->empty()) {

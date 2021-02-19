@@ -12,21 +12,36 @@
 
 
 TrackClusterMatch::TrackClusterMatch(Track* track, Cluster* cluster, double distance, double rangeFactor) {
+	bool suspectMerged;
+
 	this->track = track;
 	this->cluster = cluster;
 	this->distance = distance;
 	this->rangeFactor = rangeFactor;
+
+	suspectMerged = cluster->isSuspectMerged(track);
+
 	areaDif = cluster->calcAreaDif(track);
 	areaFactor = cluster->calcAreaFactor(track, areaDif);
+	if (suspectMerged) {
+		areaFactor = (areaFactor + 1) / 2;
+	}
 	lengthDif = cluster->calcLengthDif(track);
 	lengthFactor = cluster->calcLengthFactor(track, lengthDif);
+	if (suspectMerged) {
+		lengthFactor = (lengthFactor + 1) / 2;
+	}
 	angleDif = cluster->calcAngleDif(track);
 	angleFactor = cluster->calcAngleFactor(track, angleDif);
-	matchFactor = rangeFactor * areaFactor * lengthFactor;
+	if (suspectMerged) {
+		angleFactor = (angleFactor + 1) / 2;
+	}
+	activeFactor = track->activeFactor();
+	matchFactor = rangeFactor * areaFactor * lengthFactor * activeFactor;
 }
 
 bool TrackClusterMatch::isAssignable() {
-	return cluster->isAssignable(track->area);
+	return cluster->isAssignable(track);
 }
 
 void TrackClusterMatch::assign() {
@@ -42,8 +57,8 @@ void TrackClusterMatch::unAssign() {
 }
 
 string TrackClusterMatch::toString() {
-	string s = Util::format("Track:%d Cluster:%d Dist:%.1f Range:%.3f DArea:%.0f FArea:%.3f DLength:%.1f FLength:%.3f DAngle:%.0f FAngle:%.3f Match:%0.3f",
-							track->label, cluster->clusterLabel, distance, rangeFactor, areaDif, areaFactor, lengthDif, lengthFactor, angleDif, angleFactor, matchFactor);
+	string s = Util::format("Track:%d Cluster:%d Dist:%.1f Range:%.3f DArea:%.0f FArea:%.3f DLength:%.1f FLength:%.3f DAngle:%.0f FAngle:%.3f FActive:%.3f Match:%0.3f",
+							track->label, cluster->clusterLabel, distance, rangeFactor, areaDif, areaFactor, lengthDif, lengthFactor, angleDif, angleFactor, activeFactor, matchFactor);
 	if (assigned) {
 		s += " *";
 	}

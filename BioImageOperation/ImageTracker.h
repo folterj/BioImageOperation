@@ -85,6 +85,7 @@ public:
 	 */
 	void deleteClusters();
 	void deleteTracks();
+	void deleteTrackMatches();
 	void deletePaths();
 
 	/*

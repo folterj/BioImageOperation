@@ -35,9 +35,11 @@ public:
 	double estimateX = 0;
 	double estimateY = 0;
 	double area = 0;
+	double meanArea = 0;
 	double rad = 0;
-	double length_major = 0;
-	double length_minor = 0;
+	double lengthMajor = 0;
+	double lengthMinor = 0;
+	double meanLengthMajor = 0;
 	double angle = 0;
 	double orientation = 0;
 	bool orientInvertAngle = false;
@@ -75,7 +77,8 @@ public:
 
 	void unAssign();
 	void assign();
-	bool isActive();
+	bool isActive(bool needAssigned = false);
+	double activeFactor();
 
 	void draw(Mat* image, int drawMode, int ntracks);
 	void drawPoint(Mat* image, Scalar color);

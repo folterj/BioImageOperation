@@ -68,7 +68,7 @@ public:
 	static double calcMomentsAngle(Moments* moments);
 	static double calcMomentsMajorRadius(Moments* moments);
 	static double calcMomentsMinorRadius(Moments* moments);
-	static string getShapeFeatures(vector<Point>* contour, double area, double length_major, double length_minor);
+	static string getShapeFeatures(vector<Point>* contour, double area, double lengthMajor, double lengthMinor);
 
 	static Scalar getHeatScale(double scale);
 	static Scalar getRainbowScale(double scale);
