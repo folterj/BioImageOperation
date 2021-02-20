@@ -33,6 +33,7 @@ public:
 	bool assigned = false;
 
 	TrackClusterMatch(Track* track, Cluster* cluster, double distance, double rangeFactor);
+	static double calcMatchFactor(Track* track, Cluster* cluster, double distance, double rangeFactor);
 	bool isAssignable();
 	void assign();
 	void unAssign();

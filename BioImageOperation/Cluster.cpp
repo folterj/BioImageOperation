@@ -61,6 +61,22 @@ bool Cluster::isAssignable(Track* track) {
 	}
 }
 
+bool Cluster::isAssignable(Track* track, int ntotal, double totalArea) {
+	bool isActive = track->isActive(false);
+
+	if ((ntotal > 1 && !isActive) || ntotal >= Constants::maxMergedBlobs) {
+		// for multiple matches: only allow active tracks
+		return false;
+	}
+
+	// allow margin for (total) size
+	if (ntotal == 1) {
+		return (totalArea * 0.5 < area);
+	} else {
+		return (totalArea * 0.75 < area);
+	}
+}
+
 void Cluster::assign(Track* track) {
 	assignedTracks.push_back(track);
 }

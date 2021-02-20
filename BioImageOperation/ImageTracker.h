@@ -39,6 +39,7 @@ public:
 	vector<vector<Point>> contours;
 	vector<Cluster*> clusters;
 	vector<Track*> tracks;
+	vector<TrackClusterMatch*> solutionMatches;
 	vector<vector<TrackClusterMatch*>> trackMatches;
 	vector<PathNode*> pathNodes;
 	vector<PathLink*> pathLinks;
@@ -60,6 +61,10 @@ public:
 	Mat1i clusterStats;
 	Mat1d clusterCentroids;
 	Moments clusterMoments;
+
+	Mat_<double> costMatrix;
+	Mat_<bool> validMatrix;
+	Mat_<bool> maskMatrix;
 
 	TrackingParams trackingParams;
 	StatData areaStats;
@@ -118,6 +123,14 @@ public:
 	 */
 
 	void matchClusterTracks(bool findOptimalSolutione);
+
+	void initCostMatrix();
+	void minTracksCostMatrix();
+	void minClustersCostMatrix();
+	bool getSolutionCostMatrix();
+	void assignSolutionMatches();
+	void printCostMatrix();
+
 	void unAssignAll();
 	bool removeMatch(vector<TrackClusterMatch*>* trackMatches, TrackClusterMatch* removeMatch);
 	vector<TrackClusterMatch*> assignTracks();

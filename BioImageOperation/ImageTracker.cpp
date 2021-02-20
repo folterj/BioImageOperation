@@ -52,6 +52,11 @@ void ImageTracker::deleteTrackMatches() {
 		trackMatch.clear();
 	}
 	trackMatches.clear();
+
+	for (TrackClusterMatch* match : solutionMatches) {
+		delete match;
+	}
+	solutionMatches.clear();
 }
 
 void ImageTracker::deletePaths() {
@@ -221,104 +226,50 @@ bool ImageTracker::findClusters(Mat* image) {
 }
 
 // https://en.wikipedia.org/wiki/Assignment_problem
+// https://github.com/kostasl/FIMTrack/blob/master/Algorithm/Hungarian.cpp
+// https://cbom.atozmath.com/example/CBOM/Assignment.aspx?he=e&q=HM&ex=4
+// (sub-optimal) alternative using discrete clones? https://stackoverflow.com/questions/48108496/hungarian-algorithm-multiple-jobs-per-worker
 
 // Custom algorithm used for optimal matching
 
-
 void ImageTracker::matchClusterTracks(bool findOptimalSolution) {
-	vector<TrackClusterMatch*> bestMatches, matches, newMatches;
-	vector<TrackClusterMatch*> trackMatch;
-	unordered_map<int, int> trackMatchIndices;
 	Track* track;
+	Cluster* cluster;
 	TrackClusterMatch* match;
 	int maxArea = (int)trackingParams.area.getMax();
 	double maxMove = trackingParams.maxMove.getMax();
 	int minActive = trackingParams.minActive;
 	int label, i, n;
 	string message;
-	double score, bestScore;
+	bool ok;
 
 	trackingStats.trackMatching.reset();
 	trackingStats.trackMatching.setTotal((int)tracks.size());
 	trackingStats.trackDistance.reset();
 	trackingStats.trackDistance.setTotal((int)tracks.size());
 
-	// for each track find clusters in range, sorted by preference
-	trackMatches.clear();
-	trackMatches.reserve(tracks.size());
-	for (Track* track : tracks) {
-		track->unAssign();
-		trackMatch = calcTrackClusterMatches(track, maxMove);
-		if (!trackMatch.empty()) {
-			trackMatches.push_back(trackMatch);
+	initCostMatrix();
+
+	//printCostMatrix();
+
+	minTracksCostMatrix();
+
+	ok = getSolutionCostMatrix();
+	if (!ok) {
+		minClustersCostMatrix();
+		ok = getSolutionCostMatrix();
+		if (!ok) {
+			// use mask
 		}
 	}
 
-	// sort all tracks to match surest track first
-	sort(trackMatches.begin(), trackMatches.end(),
-		[](vector<TrackClusterMatch*> a, vector<TrackClusterMatch*> b) { return a[0]->matchFactor > b[0]->matchFactor; });
-
-	i = 0;
-	for (vector<TrackClusterMatch*> trackMatch : trackMatches) {
-		match = trackMatch[0];
-		trackMatchIndices[match->track->label] = i;
-		i++;
+	if (!ok) {
+		cout << "Error - no valid solution found!" << endl;
 	}
 
-	// find solution
-	bestMatches = assignTracks();
-	if (findOptimalSolution) {
-		// find optimal solution
-		matches = bestMatches;
-		bestScore = calcMatchScore(&bestMatches);
-		for (vector<TrackClusterMatch*> trackMatch : trackMatches) {
-			n = (int)trackMatch.size();
-			if (n > 1) {
-				// try next potential cluster for current track
-				for (i = 0; i < n; i++) {
-					if (!trackMatch[i]->assigned) {
-						// unassign preferred match (only if different from new candidate match)
-						for (TrackClusterMatch* match : trackMatch) {
-							if (match->assigned) {
-								match->unAssign();
-								removeMatch(&matches, match);
-							}
-						}
-						// select next candidate match (cluster)
-						match = trackMatch[i];
-						// force unassign all tracks assigned to cluster
-						for (Track* track : match->cluster->assignedTracks) {
-							// remove other tracks from matches as well
-							for (TrackClusterMatch* match0 : trackMatches[trackMatchIndices[track->label]]) {
-								match0->unAssign();
-								removeMatch(&matches, match0);
-							}
-							track->unAssign();
-						}
-						// unassign cluster
-						match->unAssign();
-						// try alternative match
-						if (match->isAssignable()) {
-							match->assign();
-							matches.insert(matches.begin(), match);
-						}
-						newMatches = assignTracks();
-						matches.insert(matches.end(), newMatches.begin(), newMatches.end());
-						score = calcMatchScore(&matches);
-						if (score > bestScore) {
-							bestScore = score;
-							bestMatches = matches;
-						} else {
-							// reset to best matches
-							matches = bestMatches;
-							unAssignAll();
-							assignTracks();
-						}
-					}
-				}
-			}
-		}
-	}
+	assignSolutionMatches();
+
+	//printCostMatrix();
 
 	// assign tracks to unassigned clusters (consider as single unmerged clusters)
 	for (Cluster* cluster : clusters) {
@@ -344,6 +295,7 @@ void ImageTracker::matchClusterTracks(bool findOptimalSolution) {
 		}
 	}
 
+	/*
 	// stats & print failed matches
 	for (TrackClusterMatch* match : bestMatches) {
 		trackingStats.trackDistance.addValue(match->distance);
@@ -363,6 +315,131 @@ void ImageTracker::matchClusterTracks(bool findOptimalSolution) {
 			}
 		}
 	}
+	*/
+}
+
+void ImageTracker::initCostMatrix() {
+	Track* track;
+	Cluster* cluster;
+	double distance, rangeFactor;
+	double maxMove = trackingParams.maxMove.getMax();
+
+	costMatrix.create(clusters.size(), tracks.size());
+	validMatrix.create(clusters.size(), tracks.size());
+	maskMatrix.create(clusters.size(), tracks.size());
+
+	for (int t = 0; t < tracks.size(); t++) {
+		track = tracks[t];
+		for (int c = 0; c < clusters.size(); c++) {
+			cluster = clusters[c];
+			distance = clusters[c]->calcDistance(track);
+			rangeFactor = clusters[c]->getRangeFactor(track, distance, maxMove);
+			validMatrix.at<bool>(c, t) = (rangeFactor > 0);
+			costMatrix.at<double>(c, t) = 1 - TrackClusterMatch::calcMatchFactor(track, cluster, distance, rangeFactor);
+		}
+	}
+}
+
+void ImageTracker::minTracksCostMatrix() {
+	double m;
+	// get min for each track
+	for (int t = 0; t < tracks.size(); t++) {
+		m = costMatrix.at<double>(0, t);
+		for (int c = 0; c < clusters.size(); c++) {
+			m = min(costMatrix.at<double>(c, t), m);
+		}
+		for (int c = 0; c < clusters.size(); c++) {
+			costMatrix.at<double>(c, t) -= m;
+		}
+	}
+}
+
+void ImageTracker::minClustersCostMatrix() {
+	double m;
+	// get min for each cluster
+	for (int c = 0; c < clusters.size(); c++) {
+		m = costMatrix.at<double>(c, 0);
+		for (int t = 0; t < tracks.size(); t++) {
+			m = min(costMatrix.at<double>(c, t), m);
+		}
+		for (int t = 0; t < tracks.size(); t++) {
+			costMatrix.at<double>(c, t) -= m;
+		}
+	}
+}
+
+bool ImageTracker::getSolutionCostMatrix() {
+	bool ok = true;
+	Track* track;
+	Cluster* cluster;
+	bool hasValid, hasMatch;
+	double distance, rangeFactor;
+	double maxMove = trackingParams.maxMove.getMax();
+	double totalArea;
+	int ntotal;
+
+	deleteTrackMatches();
+
+	for (int t = 0; t < tracks.size(); t++) {
+		hasValid = false;
+		hasMatch = false;
+		for (int c = 0; c < clusters.size(); c++) {
+			if (validMatrix.at<bool>(c, t)) {
+				hasValid = true;
+				if (costMatrix.at<double>(c, t) == 0) {
+					hasMatch = true;
+				}
+			}
+		}
+		if (hasValid && !hasMatch) {
+			return false;
+		}
+	}
+
+	for (int c = 0; c < clusters.size(); c++) {
+		cluster = clusters[c];
+		ntotal = 0;
+		totalArea = 0;
+		for (int t = 0; t < tracks.size(); t++) {
+			track = tracks[t];
+			if (validMatrix.at<bool>(c, t) && costMatrix.at<double>(c, t) == 0) {
+				totalArea += track->meanArea;
+				ntotal++;
+			}
+		}
+		for (int t = 0; t < tracks.size(); t++) {
+			track = tracks[t];
+			if (validMatrix.at<bool>(c, t) && costMatrix.at<double>(c, t) == 0) {
+				if (cluster->isAssignable(track, ntotal, totalArea)) {
+					distance = clusters[c]->calcDistance(track);
+					rangeFactor = clusters[c]->getRangeFactor(track, distance, maxMove);
+					solutionMatches.push_back(new TrackClusterMatch(track, cluster, distance, rangeFactor));
+				} else {
+					// can't assign (e.g. too much area for merged cluster)
+					ok = false;
+				}
+			}
+		}
+	}
+	return ok;
+}
+
+void ImageTracker::assignSolutionMatches() {
+	for (TrackClusterMatch* match : solutionMatches) {
+		match->assign();
+	}
+}
+
+void ImageTracker::printCostMatrix() {
+	string row;
+	for (int c = 0; c < clusters.size(); c++) {
+		row = "";
+		for (int t = 0; t < tracks.size(); t++) {
+			row += Util::format("%.1f ", costMatrix.at<double>(c, t));
+		}
+		cout << row << endl;
+	}
+	cout << endl;
 }
 
 void ImageTracker::unAssignAll() {
