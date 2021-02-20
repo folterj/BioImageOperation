@@ -228,22 +228,18 @@ void Cluster::draw(Mat* image, int drawMode) {
 
 void Cluster::drawPoint(Mat* image, Scalar color) {
 	Point point((int)x, (int)y);
-	int rad2 = (int)(lengthMinor / 2);
-	if (rad2 < 1) {
-		rad2 = 1;
-	}
+	int rad2 = (int)ceil(lengthMinor / 4);
 	circle(*image, point, rad2, color, LineTypes::FILLED, LineTypes::LINE_AA);
 }
 
 void Cluster::drawCircle(Mat* image, Scalar color) {
 	Point point((int)x, (int)y);
-
-	circle(*image, point, (int)rad, color, 1, LineTypes::LINE_AA);
+	circle(*image, point, (int)ceil(rad), color, 1, LineTypes::LINE_AA);
 }
 
 void Cluster::drawBox(Mat* image, Scalar color) {
-	Rect rect((int)(x - rad), (int)(y - rad), (int)(rad * 2), (int)(rad * 2));
-
+	int rad2 = (int)ceil(rad);
+	Rect rect((int)(x - rad2), (int)(y - rad2), (int)(rad2 * 2), (int)(rad2 * 2));
 	rectangle(*image, rect, color, 1, LineTypes::LINE_AA);
 }
 

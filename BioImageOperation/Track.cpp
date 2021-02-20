@@ -130,11 +130,13 @@ void Track::update(Cluster* cluster, double maxArea, double maxMoveDistance, boo
 	if (isNew) {
 		meanArea = area;
 		meanLengthMajor = lengthMajor;
+		meanLengthMinor = lengthMinor;
 	} else {
 		points.push_back(Point2d(x, y));
 		angles.push_back(orientation);
 		meanArea = meanArea * 0.9 + area * 0.1;
 		meanLengthMajor = meanLengthMajor * 0.9 + lengthMajor * 0.1;
+		meanLengthMinor = meanLengthMinor * 0.9 + lengthMinor * 0.1;
 	}
 
 	if (trackParamsFinalised) {
@@ -209,27 +211,34 @@ void Track::draw(Mat* image, int drawMode, int ntracks) {
 
 void Track::drawPoint(Mat* image, Scalar color) {
 	Point point((int)x, (int)y);
-	int rad2 = (int)(lengthMinor / 2);
-	if (rad2 < 1) {
-		rad2 = 1;
-	}
+	int rad2 = (int)ceil(meanLengthMinor / 4);
 	circle(*image, point, rad2, color, LineTypes::FILLED, LineTypes::LINE_AA);
 }
 
 void Track::drawCircle(Mat* image, Scalar color) {
 	Point point((int)x, (int)y);
-
-	circle(*image, point, (int)rad, color, 1, LineTypes::LINE_AA);
+	int rad2 = (int)ceil(meanLengthMajor / 2);
+	if (rad2 == 0) {
+		rad2 = rad;
+	}
+	circle(*image, point, rad2, color, 1, LineTypes::LINE_AA);
 }
 
 void Track::drawBox(Mat* image, Scalar color) {
-	Rect rect((int)(x - rad), (int)(y - rad), (int)(rad * 2), (int)(rad * 2));
-
+	int rad2 = (int)ceil(meanLengthMajor / 2);
+	if (rad2 == 0) {
+		rad2 = rad;
+	}
+	Rect rect((int)(x - rad2), (int)(y - rad2), (int)(rad2 * 2), (int)(rad2 * 2));
 	rectangle(*image, rect, color, 1, LineTypes::LINE_AA);
 }
 
 void Track::drawAngle(Mat* image, Scalar color) {
-	Util::drawAngle(image, x, y, rad, orientation, color, (forwardDist != 0));
+	double rad2 = meanLengthMinor / 2;
+	if (rad2 == 0) {
+		rad2 = rad;
+	}
+	Util::drawAngle(image, x, y, rad2, orientation, color, (forwardDist != 0));
 }
 
 void Track::drawTracks(Mat* image, Scalar color, int ntracks) {

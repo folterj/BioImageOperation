@@ -40,6 +40,7 @@ public:
 	double lengthMajor = 0;
 	double lengthMinor = 0;
 	double meanLengthMajor = 0;
+	double meanLengthMinor = 0;
 	double angle = 0;
 	double orientation = 0;
 	bool orientInvertAngle = false;
