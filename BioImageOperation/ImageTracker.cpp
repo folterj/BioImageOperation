@@ -377,6 +377,7 @@ bool ImageTracker::getSolutionCostMatrix() {
 	// for each track: one cluster, for each cluster: < max tracks
 	int nclusters = clusters.size();
 	int ntracks = tracks.size();
+	int ntracksMax = ntracks;
 	int maxTracksAssignable = min(ntracks, nclusters);
 	int nTracksAssigned = 0;
 	int nMatchClusters;
@@ -407,10 +408,10 @@ bool ImageTracker::getSolutionCostMatrix() {
 			return false;	// not resolved
 		}
 		if (!hasValidMatch) {
-			maxTracksAssignable--;
+			ntracksMax--;	// track has no possible match
 		}
 	}
-	if (nTracksAssigned < maxTracksAssignable) {
+	if (nTracksAssigned < min(ntracksMax, nclusters)) {
 		return false;
 	}
 
