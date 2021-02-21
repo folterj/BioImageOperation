@@ -44,7 +44,8 @@ public:
 
 
 	Cluster(int clusterLabel, double x, double y, double area, Rect box, Moments* moments, Mat* clusterImage, double pixelSize);
-	bool isAssignable(Track* track);
+	bool isAssignable(Track* track); // * deprecated
+	bool isAssignable(int ntotal, double totalArea);
 	bool isAssignable(Track* track, int ntotal, double totalArea);
 	void assign(Track* track);
 	bool isAssigned();

@@ -36,6 +36,7 @@ Cluster::Cluster(int clusterLabel, double x, double y, double area, Rect box, Mo
 	}
 }
 
+// * deprecated
 bool Cluster::isAssignable(Track* track) {
 	int n = (int)assignedTracks.size();
 	double totalArea;
@@ -56,6 +57,18 @@ bool Cluster::isAssignable(Track* track) {
 	// allow margin for (total) size
 	if (n == 0) {
 		return (totalArea * 0.5 < area);
+	} else {
+		return (totalArea * 0.75 < area);
+	}
+}
+
+bool Cluster::isAssignable(int ntotal, double totalArea) {
+	if (ntotal >= Constants::maxMergedBlobs) {
+		return false;
+	}
+
+	if (ntotal == 1) {
+		return true;
 	} else {
 		return (totalArea * 0.75 < area);
 	}

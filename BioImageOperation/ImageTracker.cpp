@@ -259,7 +259,12 @@ void ImageTracker::matchClusterTracks(bool findOptimalSolution) {
 		minClustersCostMatrix();
 		ok = getSolutionCostMatrix();
 		if (!ok) {
-			// use mask
+			// TODO: use mask, iteratively
+
+
+			if (!ok) {
+				// may need to be more permissive?
+			}
 		}
 	}
 
@@ -369,59 +374,73 @@ void ImageTracker::minClustersCostMatrix() {
 }
 
 bool ImageTracker::getSolutionCostMatrix() {
-	bool ok = true;
-	Track* track;
-	Cluster* cluster;
-	bool hasValid, hasMatch;
+	// for each track: one cluster, for each cluster: < max tracks
+	int nclusters = clusters.size();
+	int ntracks = tracks.size();
+	int maxTracksAssignable = min(ntracks, nclusters);
+	int nTracksAssigned = 0;
+	int nMatchClusters;
+	int nMatchTracks;
+	double totalArea;
 	double distance, rangeFactor;
 	double maxMove = trackingParams.maxMove.getMax();
-	double totalArea;
-	int ntotal;
+	bool hasValidMatch;
+	Cluster* cluster;
+	Track* track;
 
-	deleteTrackMatches();
-
-	for (int t = 0; t < tracks.size(); t++) {
-		hasValid = false;
-		hasMatch = false;
-		for (int c = 0; c < clusters.size(); c++) {
+	// for each track: one cluster
+	for (int t = 0; t < ntracks; t++) {
+		nMatchClusters = 0;
+		hasValidMatch = false;
+		for (int c = 0; c < nclusters; c++) {
 			if (validMatrix.at<bool>(c, t)) {
-				hasValid = true;
+				hasValidMatch = true;
 				if (costMatrix.at<double>(c, t) == 0) {
-					hasMatch = true;
+					nMatchClusters++;
 				}
 			}
 		}
-		if (hasValid && !hasMatch) {
-			return false;
+		if (nMatchClusters == 1) {
+			nTracksAssigned++;
 		}
+		if (nMatchClusters > 1) {			
+			return false;	// not resolved
+		}
+		if (!hasValidMatch) {
+			maxTracksAssignable--;
+		}
+	}
+	if (nTracksAssigned < maxTracksAssignable) {
+		return false;
 	}
 
-	for (int c = 0; c < clusters.size(); c++) {
+	// for each cluster: < max tracks
+	for (int c = 0; c < nclusters; c++) {
 		cluster = clusters[c];
-		ntotal = 0;
+		nMatchTracks = 0;
 		totalArea = 0;
-		for (int t = 0; t < tracks.size(); t++) {
-			track = tracks[t];
+		// determine total tracks
+		for (int t = 0; t < ntracks; t++) {
 			if (validMatrix.at<bool>(c, t) && costMatrix.at<double>(c, t) == 0) {
-				totalArea += track->meanArea;
-				ntotal++;
+				nMatchTracks++;
+				totalArea += tracks[t]->meanArea;
 			}
 		}
-		for (int t = 0; t < tracks.size(); t++) {
+		if (nMatchTracks > 0 && !cluster->isAssignable(nMatchTracks, totalArea)) {
+			return false;	// not resolved
+		}
+		for (int t = 0; t < ntracks; t++) {
 			track = tracks[t];
 			if (validMatrix.at<bool>(c, t) && costMatrix.at<double>(c, t) == 0) {
-				if (cluster->isAssignable(track, ntotal, totalArea)) {
-					distance = clusters[c]->calcDistance(track);
-					rangeFactor = clusters[c]->getRangeFactor(track, distance, maxMove);
+				if (cluster->isAssignable(track, ntracks, totalArea)) {
+					distance = cluster->calcDistance(track);
+					rangeFactor = cluster->getRangeFactor(track, distance, maxMove);
 					solutionMatches.push_back(new TrackClusterMatch(track, cluster, distance, rangeFactor));
-				} else {
-					// can't assign (e.g. too much area for merged cluster)
-					ok = false;
 				}
 			}
 		}
 	}
-	return ok;
+	return true;	// resolved
 }
 
 void ImageTracker::assignSolutionMatches() {
