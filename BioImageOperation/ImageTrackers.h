@@ -24,5 +24,5 @@ public:
 	~ImageTrackers();
 	void reset();
 	void close();
-    ImageTracker* get(string id, double fps = 0, double pixelSize = 1, double windowSize = 1, Observer* observer = nullptr);
+    ImageTracker* get(string id, TrackingMethod trackingMethod = TrackingMethod::Any, double fps = 0, double pixelSize = 1, double windowSize = 1, Observer* observer = nullptr);
 };

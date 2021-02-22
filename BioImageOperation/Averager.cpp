@@ -13,9 +13,9 @@
 Averager::Averager() {
 }
 
-void Averager::reset() {
+void Averager::reset(int total) {
 	all = 0;
-	n = 0;
+	setTotal(total);
 }
 
 void Averager::addValue(double value) {

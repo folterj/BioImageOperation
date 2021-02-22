@@ -37,10 +37,12 @@ void OutputStream::clearBuffer() {
 }
 
 void OutputStream::init(string filename, string header) {
-	this->filename = filename;
-	exceptions(ofstream::failbit | ofstream::badbit);
-	if (header != "") {
-		write(header);
+	if (!created) {
+		exceptions(ofstream::failbit | ofstream::badbit);
+		this->filename = filename;
+		if (header != "") {
+			write(header);
+		}
 	}
 }
 

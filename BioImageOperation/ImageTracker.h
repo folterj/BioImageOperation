@@ -10,6 +10,7 @@
 #pragma once
 #include <opencv2/opencv.hpp>
 #include "Observer.h"
+#include "TrackingAlgorithm.h"
 #include "Cluster.h"
 #include "Track.h"
 #include "TrackClusterMatch.h"
@@ -40,7 +41,6 @@ public:
 	vector<Cluster*> clusters;
 	vector<Track*> tracks;
 	vector<TrackClusterMatch*> solutionMatches;
-	vector<vector<TrackClusterMatch*>> trackMatches;
 	vector<PathNode*> pathNodes;
 	vector<PathLink*> pathLinks;
 	int nextTrackLabel = 0;
@@ -62,10 +62,8 @@ public:
 	Mat1d clusterCentroids;
 	Moments clusterMoments;
 
-	Mat_<double> costMatrix;
-	Mat_<bool> validMatrix;
-	Mat_<bool> maskMatrix;
-
+	TrackingMethod trackingMethod;
+	TrackingAlgorithm* trackingAlgorithm;
 	TrackingParams trackingParams;
 	StatData areaStats;
 	StatData distanceStats;
@@ -78,7 +76,7 @@ public:
 	/*
 	 * Main constructor
 	 */
-	ImageTracker(string id, double fps, double pixelSize, double windowSize, Observer* observer);
+	ImageTracker(string id, TrackingMethod trackingMethod, double fps, double pixelSize, double windowSize, Observer* observer);
 
 	/*
 	 * Destructor
@@ -122,20 +120,8 @@ public:
 	 * Create tracks
 	 */
 
-	void matchClusterTracks(bool findOptimalSolutione);
-
-	void initCostMatrix();
-	void minTracksCostMatrix();
-	void minClustersCostMatrix();
-	bool getSolutionCostMatrix();
-	void assignSolutionMatches();
-	void printCostMatrix();
-
-	void unAssignAll();
-	bool removeMatch(vector<TrackClusterMatch*>* trackMatches, TrackClusterMatch* removeMatch);
-	vector<TrackClusterMatch*> assignTracks();
-	double calcMatchScore(vector<TrackClusterMatch*>* trackMatches);
-	vector<TrackClusterMatch*> calcTrackClusterMatches(Track* track, double maxMoveDistance);
+	void matchClusterTracks();
+	TrackClusterMatch* findTrackMatch(int tracki);
 	void pruneTracks();
 
 	/*

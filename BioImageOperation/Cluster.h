@@ -55,7 +55,7 @@ public:
 	void unAssign(Track* track);
 	void unAssign();
 
-	double calcDistance(Track* track);
+	double calcMinDistance(Track* track);
 	double calcAreaDif(Track* track);
 	double calcLengthDif(Track* track);
 	double calcAngleDif(Track* track);

@@ -518,7 +518,9 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::CreateClusters:
 			debugMode = operation->getArgumentBoolean(ArgumentLabel::Debug);
-			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker), sourceFps, pixelSize, windowSize, observer);
+			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker),
+												TrackingMethod::Any,
+												sourceFps, pixelSize, windowSize, observer);
 			output = imageTracker->createClusters(image, operation->getArgumentNumeric(ArgumentLabel::MinArea),
 													operation->getArgumentNumeric(ArgumentLabel::MaxArea),
 													basepath, debugMode);

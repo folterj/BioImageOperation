@@ -18,11 +18,11 @@
 class TrackingStats
 {
 public:
-	Averager trackMatching;
+	Averager trackMatchRate;
+	Averager trackMatchFactor;
 	Averager trackDistance;
 	Averager trackLifetime;
 	Averager pathMatching;
-	int nActiveTracks = 0;
 
 	void reset();
 

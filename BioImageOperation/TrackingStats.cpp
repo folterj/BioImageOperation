@@ -14,9 +14,8 @@ TrackingStats::TrackingStats() {
 }
 
 void TrackingStats::reset() {
-	trackMatching.reset();
+	trackMatchRate.reset();
 	trackDistance.reset();
 	trackLifetime.reset();
 	pathMatching.reset();
-	nActiveTracks = 0;
 }

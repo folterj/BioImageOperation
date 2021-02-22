@@ -63,7 +63,7 @@ bool Cluster::isAssignable(Track* track) {
 }
 
 bool Cluster::isAssignable(int ntotal, double totalArea) {
-	if (ntotal >= Constants::maxMergedBlobs) {
+	if (ntotal > Constants::maxMergedBlobs) {
 		return false;
 	}
 
@@ -77,7 +77,7 @@ bool Cluster::isAssignable(int ntotal, double totalArea) {
 bool Cluster::isAssignable(Track* track, int ntotal, double totalArea) {
 	bool isActive = track->isActive(false);
 
-	if ((ntotal > 1 && !isActive) || ntotal >= Constants::maxMergedBlobs) {
+	if ((ntotal > 1 && !isActive) || ntotal > Constants::maxMergedBlobs) {
 		// for multiple matches: only allow active tracks
 		return false;
 	}
@@ -121,7 +121,7 @@ void Cluster::unAssign() {
 	assignedTracks.clear();
 }
 
-double Cluster::calcDistance(Track* track) {
+double Cluster::calcMinDistance(Track* track) {
 	// project on line between previous and estimated new position
 	double distance, distance1, distance2;
 	double vx1 = track->x;

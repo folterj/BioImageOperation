@@ -28,14 +28,14 @@ void ImageTrackers::close() {
 	}
 }
 
-ImageTracker* ImageTrackers::get(string id, double fps, double pixelSize, double windowSize, Observer* observer) {
+ImageTracker* ImageTrackers::get(string id, TrackingMethod trackingMethod, double fps, double pixelSize, double windowSize, Observer* observer) {
 	for (ImageTracker* tracker : *this) {
 		if (tracker->id == id) {
 			return tracker;
 		}
 	}
 	if (observer) {
-		ImageTracker* newTracker = new ImageTracker(id, fps, pixelSize, windowSize, observer);
+		ImageTracker* newTracker = new ImageTracker(id, trackingMethod, fps, pixelSize, windowSize, observer);
 		push_back(newTracker);
 		return newTracker;
 	}

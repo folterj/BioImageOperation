@@ -11,7 +11,14 @@
 #include "Util.h"
 
 
+TrackClusterMatch::TrackClusterMatch() {
+}
+
 TrackClusterMatch::TrackClusterMatch(Track* track, Cluster* cluster, double distance, double rangeFactor) {
+	set(track, cluster, distance, rangeFactor);
+}
+
+void TrackClusterMatch::set(Track* track, Cluster* cluster, double distance, double rangeFactor) {
 	bool suspectMerged = cluster->isSuspectMerged(track);
 
 	this->track = track;
@@ -36,29 +43,6 @@ TrackClusterMatch::TrackClusterMatch(Track* track, Cluster* cluster, double dist
 	}
 	activeFactor = track->activeFactor();
 	matchFactor = rangeFactor * areaFactor * lengthFactor * activeFactor;
-}
-
-double TrackClusterMatch::calcMatchFactor(Track* track, Cluster* cluster, double distance, double rangeFactor) {
-	bool suspectMerged = cluster->isSuspectMerged(track);
-
-	double areaDif = cluster->calcAreaDif(track);
-	double areaFactor = cluster->calcAreaFactor(track, areaDif);
-	if (suspectMerged) {
-		areaFactor = (areaFactor + 1) / 2;
-	}
-	double lengthDif = cluster->calcLengthDif(track);
-	double lengthFactor = cluster->calcLengthFactor(track, lengthDif);
-	if (suspectMerged) {
-		lengthFactor = (lengthFactor + 1) / 2;
-	}
-	double angleDif = cluster->calcAngleDif(track);
-	double angleFactor = cluster->calcAngleFactor(track, angleDif);
-	if (suspectMerged) {
-		angleFactor = (angleFactor + 1) / 2;
-	}
-	double activeFactor = track->activeFactor();
-	double matchFactor = rangeFactor * areaFactor * lengthFactor * activeFactor;
-	return matchFactor;
 }
 
 bool TrackClusterMatch::isAssignable() {

@@ -21,7 +21,7 @@ public:
 	int n = 0;
 
 	Averager();
-	void reset();
+	void reset(int total = 0);
 	void addValue(double value);
 	void addOne();
 	void addTotal();

@@ -309,6 +309,14 @@ const vector<string> DrawPositions =
 	"BottomRight"
 };
 
+enum class TrackingMethod
+{
+	Any,
+	Greedy,
+	Hungarian
+};
+
+
 class Constants
 {
 public:
