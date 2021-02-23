@@ -6,6 +6,20 @@
 GreedyAlgorithm::GreedyAlgorithm() {
 }
 
+GreedyAlgorithm::~GreedyAlgorithm() {
+	clear();
+}
+
+void GreedyAlgorithm::clear() {
+	for (vector<TrackClusterMatch*> trackMatch : trackMatches) {
+		for (TrackClusterMatch* match : trackMatch) {
+			delete match;
+		}
+		trackMatch.clear();
+	}
+	trackMatches.clear();
+}
+
 vector<TrackClusterMatch*> GreedyAlgorithm::solve() {
 	vector<TrackClusterMatch*> trackMatch;
 
@@ -36,16 +50,6 @@ string GreedyAlgorithm::getDebugInfo() {
 		s += "\n";
 	}
 	return s;
-}
-
-void GreedyAlgorithm::clear() {
-	for (vector<TrackClusterMatch*> trackMatch : trackMatches) {
-		for (TrackClusterMatch* match : trackMatch) {
-			delete match;
-		}
-		trackMatch.clear();
-	}
-	trackMatches.clear();
 }
 
 vector<TrackClusterMatch*> GreedyAlgorithm::calcTrackClusterMatches(Track* track, double maxMove) {

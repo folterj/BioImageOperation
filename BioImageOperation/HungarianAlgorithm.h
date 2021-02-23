@@ -15,16 +15,17 @@ private:
 	double* costMatrix;
 	bool* validMatrix;
 	bool* matchedMatrix;
-	unordered_set<int> matchedClusters, matchedTracks, markedClusters, markedTracks;
+	unordered_set<int> markedClusters, markedTracks;
 	int nc = 0;
 	int nt = 0;
 
 public:
 	HungarianAlgorithm();
 	~HungarianAlgorithm();
+
+	virtual void clear() override;
 	virtual vector<TrackClusterMatch*> solve() override;
 	virtual string getDebugInfo() override;
-	virtual void clear() override;
  
 	void init();
 	bool subtractMinTracks();
@@ -33,6 +34,10 @@ public:
 	bool updateMarked1();
 	void updateMarked2(int markedCluster);
 	void updateMarked3(int markedTrack);
-	bool tryMatch(bool fast);
-	string printMatrix();
+	bool tryMatch();
+	bool listContains(unordered_set<int> list, int i);
+	bool isClusterAvailable(int c);
+	bool isTrackAvailable(int t);
+	string getMatrixView();
+	string getMarkedStats();
 };

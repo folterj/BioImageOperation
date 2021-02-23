@@ -3,6 +3,7 @@
 
 // https://en.wikipedia.org/wiki/Assignment_problem
 // https://cbom.atozmath.com/example/CBOM/Assignment.aspx?he=e&q=HM&ex=4
+// https://en.wikipedia.org/wiki/Hungarian_algorithm
 // (sub-optimal) alternative using discrete clones? https://stackoverflow.com/questions/48108496/hungarian-algorithm-multiple-jobs-per-worker
 // https://github.com/kostasl/FIMTrack
 
@@ -12,41 +13,6 @@ HungarianAlgorithm::HungarianAlgorithm() {
 
 HungarianAlgorithm::~HungarianAlgorithm() {
 	clear();
-}
-
-vector<TrackClusterMatch*> HungarianAlgorithm::solve() {
-	bool ok;
-	bool changed = true;
-	int iterations = 0;
-
-	init();
-
-	subtractMinTracks();
-	ok = tryMatch(true);	// equivalent to greedy algorithm?
-	if (!ok) {
-		subtractMinClusters();
-		ok = tryMatch(true);
-		while (!ok && changed) {
-			if (updateMarked1()) {
-				changed = subtractMinMatrix();
-				ok = tryMatch(true);
-			} else {
-				changed = false;
-			}
-			iterations++;
-			//cout << printCostMatrix() << endl;
-		}
-	}
-
-	if (!ok) {
-		tryMatch(false);
-	}
-
-	return solutionMatches;
-}
-
-string HungarianAlgorithm::getDebugInfo() {
-	return printMatrix();
 }
 
 void HungarianAlgorithm::clear() {
@@ -69,6 +35,37 @@ void HungarianAlgorithm::clear() {
 	solutionMatches.clear();
 }
 
+vector<TrackClusterMatch*> HungarianAlgorithm::solve() {
+	bool ok;
+	bool changed = true;
+	int iterations = 0;
+
+	init();
+
+	subtractMinTracks();
+	ok = tryMatch();					// single pass equivalent to greedy algorithm?
+	cout << getMarkedStats() << endl;
+	if (!ok) {
+		subtractMinClusters();
+		ok = tryMatch();
+		cout << getMarkedStats() << endl;
+		while (!ok && changed) {
+			if (updateMarked1()) {
+				changed = subtractMinMatrix();
+				ok = tryMatch();
+				cout << getMarkedStats() << endl;
+			} else {
+				changed = false;
+			}
+			iterations++;
+			//cout << getMatrixView() << endl;
+		}
+	}
+
+	cout << endl;
+	return solutionMatches;
+}
+
 void HungarianAlgorithm::init() {
 	Track* track;
 	Cluster* cluster;
@@ -84,9 +81,6 @@ void HungarianAlgorithm::init() {
 	validMatrix = new bool[n]();
 	matchedMatrix = new bool[n]();
 
-	matchedClusters.clear();
-	matchedTracks.clear();
-
 	for (int t = 0; t < nt; t++) {
 		track = (*tracks)[t];
 		for (int c = 0; c < nc; c++) {
@@ -99,6 +93,88 @@ void HungarianAlgorithm::init() {
 			costMatrix[ii] = 1 - matchMatrix[ii].matchFactor;
 		}
 	}
+}
+
+bool HungarianAlgorithm::tryMatch() {
+	bool resolved = true;
+	TrackClusterMatch* foundMatch;
+	TrackClusterMatch* match;
+	int maxMatches = 0;
+	int nTracksSolved = 0;
+	int nMatches, ii, foundii;
+	bool hasValidMatch, changed;
+	double totalArea;
+
+	for (TrackClusterMatch* match : solutionMatches) {
+		match->unAssign();
+	}
+	solutionMatches.clear();
+
+	for (int i = 0; i < nc * nt; i++) {
+		matchedMatrix[i] = false;
+	}
+
+	do {
+		changed = false;
+		// find tracks with single cluster
+		for (int t = 0; t < nt; t++) {
+			hasValidMatch = false;
+			nMatches = 0;
+			for (int c = 0; c < nc; c++) {
+				ii = c * nt + t;
+				if (validMatrix[ii]) {
+					hasValidMatch = true;
+					if (costMatrix[ii] == 0) {
+						if (!matchedMatrix[ii]) {
+							match = &matchMatrix[ii];
+							if (match->isAssignable()) {
+								foundMatch = match;
+								foundii = ii;
+								nMatches++;
+							}
+						}
+					}
+				}
+			}
+			if (nMatches == 1) {
+				foundMatch->assign();
+				solutionMatches.push_back(foundMatch);
+				matchedMatrix[foundii] = true;
+				changed = true;
+			}
+		}
+
+		for (int c = 0; c < nc; c++) {
+			nMatches = 0;
+			for (int t = 0; t < nt; t++) {
+				ii = c * nt + t;
+				if (validMatrix[ii]) {
+					if (costMatrix[ii] == 0) {
+						if (!matchedMatrix[ii]) {
+							match = &matchMatrix[ii];
+							if (match->isAssignable()) {
+								foundMatch = match;
+								foundii = ii;
+								nMatches++;
+							}
+						}
+					}
+				}
+			}
+			if (nMatches == 1) {
+				foundMatch->assign();
+				solutionMatches.push_back(foundMatch);
+				matchedMatrix[foundii] = true;
+				changed = true;
+			}
+		}
+	} while (changed);
+
+	resolved = (solutionMatches.size() == nt);
+
+	cout << "Solutions found: " + to_string(solutionMatches.size()) << endl;
+
+	return resolved;
 }
 
 bool HungarianAlgorithm::subtractMinTracks() {
@@ -128,8 +204,6 @@ bool HungarianAlgorithm::subtractMinTracks() {
 					costMatrix[c * nt + t] -= m;
 				}
 			}
-			matchedClusters.insert(mc);
-			matchedMatrix[mc * nt + t] = true;
 			changed = true;
 		}
 	}
@@ -163,8 +237,6 @@ bool HungarianAlgorithm::subtractMinClusters() {
 					costMatrix[ii] -= m;
 				}
 			}
-			matchedTracks.insert(mt);
-			matchedMatrix[c * nt + mt] = true;
 			changed = true;
 		}
 	}
@@ -180,12 +252,10 @@ bool HungarianAlgorithm::subtractMinMatrix() {
 	int ii;
 
 	// get min for each cluster
-	for (int c = 0; c < nc; c++) {
-		if (markedClusters.find(c) != markedClusters.end()) {
-			// found: cluster in marked list
-			for (int t = 0; t < nt; t++) {
-				if (markedTracks.find(t) == markedTracks.end()) {
-					// not found: track not in marked list
+	for (int c = 0; c < nc; c++) {		
+		if (isClusterAvailable(c)) {
+			for (int t = 0; t < nt; t++) {				
+				if (isTrackAvailable(t)) {
 					ii = c * nt + t;
 					if (validMatrix[ii]) {
 						m0 = costMatrix[ii];
@@ -202,9 +272,9 @@ bool HungarianAlgorithm::subtractMinMatrix() {
 	if (mc >= 0 && m != 0) {
 		// subtract minimum
 		for (int c = 0; c < nc; c++) {
-			if (markedClusters.find(c) != markedClusters.end()) {
+			if (isClusterAvailable(c)) {
 				for (int t = 0; t < nt; t++) {
-					if (markedTracks.find(t) == markedTracks.end()) {
+					if (isTrackAvailable(t)) {
 						ii = c * nt + t;
 						if (validMatrix[ii]) {
 							costMatrix[ii] -= m;
@@ -215,9 +285,9 @@ bool HungarianAlgorithm::subtractMinMatrix() {
 		}
 		// add on intersections
 		for (int c = 0; c < nc; c++) {
-			if (markedClusters.find(c) == markedClusters.end()) {
+			if (!isClusterAvailable(c)) {
 				for (int t = 0; t < nt; t++) {
-					if (markedTracks.find(t) != markedTracks.end()) {
+					if (!isTrackAvailable(t)) {
 						ii = c * nt + t;
 						if (validMatrix[ii]) {
 							costMatrix[ii] += m;
@@ -226,23 +296,30 @@ bool HungarianAlgorithm::subtractMinMatrix() {
 				}
 			}
 		}
-		matchedMatrix[mc * nt + mt] = true;
 		changed = true;
 	}
 	return changed;
 }
 
 bool HungarianAlgorithm::updateMarked1() {
-	// mark all rows in which no assigned 0
+	// mark all rows in with no assigned 0
 	bool changed = false;
+	bool unmatched;
 	int ii;
 
 	markedClusters.clear();
 	markedTracks.clear();
 
 	for (int c = 0; c < nc; c++) {
-		if (matchedClusters.find(c) == matchedClusters.end()) {
-			// match not found -> unmatched cluster
+		unmatched = true;
+		for (int t = 0; t < nt; t++) {
+			ii = c * nt + t;
+			if (matchedMatrix[ii]) {
+				unmatched = false;
+				break;
+			}
+		}
+		if (unmatched) {
 			if (markedClusters.insert(c).second) {
 				updateMarked2(c);
 				changed = true;
@@ -254,8 +331,11 @@ bool HungarianAlgorithm::updateMarked1() {
 
 void HungarianAlgorithm::updateMarked2(int markedCluster) {
 	// in marked rows, if any 0 cell occurs in that row, mark that column
+	int ii;
+
 	for (int t = 0; t < nt; t++) {
-		if (costMatrix[markedCluster * nt + t] == 0) {
+		ii = markedCluster * nt + t;
+		if (costMatrix[ii] == 0) {
 			if (markedTracks.insert(t).second) {
 				updateMarked3(t);
 			}
@@ -278,54 +358,19 @@ void HungarianAlgorithm::updateMarked3(int markedTrack) {
 	}
 }
 
-bool HungarianAlgorithm::tryMatch(bool fast) {
-	// * TODO: change into 'opportunistic' matching to find single solution - this effectively also forms the check if valid solution
-	TrackClusterMatch* match;
-	Cluster* cluster;
-	int maxMatches = 0;
-	int nTracksSolved = 0;
-	int nMatchClusters, ii;
-	bool hasValidMatch;
-	double totalArea;
-
-	solutionMatches.clear();
-
-	for (Cluster* cluster : *clusters) {
-		cluster->unAssign();
-	}
-	for (Track* track : *tracks) {
-		track->unAssign();
-	}
-
-	// for each track: one cluster
-	for (int t = 0; t < nt; t++) {
-		hasValidMatch = false;
-		nMatchClusters = 0;
-		for (int c = 0; c < nc; c++) {
-			ii = c * nt + t;
-			if (validMatrix[ii]) {
-				hasValidMatch = true;
-				if (costMatrix[ii] == 0) {
-					// allow to find any match
-					nMatchClusters++;
-					match = &matchMatrix[ii];
-					if (match->isAssignable()) {
-						match->assign();
-						solutionMatches.push_back(match);
-					} else if (fast) {
-						return false;
-					}
-				}
-			}
-		}
-		if ((nMatchClusters > 1 || (hasValidMatch && nMatchClusters == 0)) && fast) {
-			return false;
-		}
-	}
-	return true;
+bool HungarianAlgorithm::listContains(unordered_set<int> list, int i) {
+	return (list.find(i) != list.end());
 }
 
-string HungarianAlgorithm::printMatrix() {
+bool HungarianAlgorithm::isClusterAvailable(int c) {
+	return listContains(markedClusters, c);
+}
+
+bool HungarianAlgorithm::isTrackAvailable(int t) {
+	return !listContains(markedTracks, t);
+}
+
+string HungarianAlgorithm::getMatrixView() {
 	string s, row;
 	int ii;
 
@@ -343,4 +388,66 @@ string HungarianAlgorithm::printMatrix() {
 		s += row + "\n";
 	}
 	return s;
+}
+
+string HungarianAlgorithm::getMarkedStats() {
+	string s;
+	int ii;
+	bool marked;
+	int matchedCells = 0;
+	int zeroCells = 0;
+	int unmatchedCells = 0;
+
+	s += Util::format("# tracks: %d\n", tracks->size());
+	s += Util::format("# clusters: %d\n\n", clusters->size());
+
+	for (int c = 0; c < nc; c++) {
+		for (int t = 0; t < nt; t++) {
+			ii = c * nt + t;
+			if (validMatrix[ii]) {
+				if (costMatrix[ii] == 0) {
+					zeroCells++;
+				}
+				if (matchedMatrix[ii]) {
+					matchedCells++;
+				} else {
+					unmatchedCells++;
+				}
+			}
+		}
+	}
+	s += Util::format("matched cells: %d\n", matchedCells);
+	s += Util::format("unmatched cells: %d\n", unmatchedCells);
+	s += Util::format("zero cells: %d\n\n", zeroCells);
+
+	s += Util::format("marked tracks: %d\n", markedTracks.size());
+	s += Util::format("marked clusters: %d\n", markedClusters.size());
+	s += Util::format("masked tracks: %d\n", markedTracks.size());
+	s += Util::format("masked clusters: %d\n\n", nc - markedClusters.size());
+
+	for (int c = 0; c < nc; c++) {
+		for (int t = 0; t < nt; t++) {
+			ii = c * nt + t;
+			if (validMatrix[ii] && costMatrix[ii] == 0) {
+				// check if covered
+				marked = false;
+				if (!isClusterAvailable(c)) {
+					marked = true;
+				}
+				if (!isTrackAvailable(t)) {
+					marked = true;
+				}
+				if (!marked) {
+					s += Util::format("unmarked 0 at C:%d T:%d\n", c, t);
+				}
+			}
+		}
+	}
+	s += "\n";
+
+	return s;
+}
+
+string HungarianAlgorithm::getDebugInfo() {
+	return getMatrixView();
 }
