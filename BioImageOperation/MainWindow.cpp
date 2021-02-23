@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 	ui.setupUi(this);
 	ui.scriptTextEdit->setFont(font);
-
+	ui.overlayTextEdit->setFont(font);
 	debugWindow.setFont(font);
 
 	ui.actionOpen->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
@@ -75,7 +75,9 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(this, &MainWindow::showText, this, &MainWindow::showTextQt);
 	connect(this, &MainWindow::showImage, this, &MainWindow::showImageQt);
 	connect(this, &MainWindow::showDialog, this, &MainWindow::showDialogQt);
+	connect(this, &MainWindow::showOperations, this, &MainWindow::showOperationsQt);
 
+	operationHighlighter = new QOperationHighlighter(ui.overlayTextEdit->document());
 
 	for (int i = 0; i < Constants::nDisplays; i++) {
 		imageWindows[i].init(this, i + 1);
@@ -310,9 +312,13 @@ void MainWindow::setModeQt(int mode0) {
 		ui.processButton->setText(Util::convertToQString(buttonText));
 		ui.processButton->setEnabled(mode != OperationMode::Abort);
 		ui.abortButton->setEnabled(!controlsEnabled);
-		ui.scriptTextEdit->setReadOnly(!controlsEnabled);
 		ui.actionClear->setEnabled(controlsEnabled);
 		ui.actionOpen->setEnabled(controlsEnabled);
+		if (controlsEnabled) {
+			ui.stackedWidget->setCurrentWidget(ui.scriptTextEdit);
+		} else {
+			ui.stackedWidget->setCurrentWidget(ui.overlayTextEdit);
+		}
 	} catch (exception e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
@@ -436,6 +442,11 @@ void MainWindow::showImageQt(Mat* image, int displayi, string reference) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 	imageQueued[displayi] = false;
+}
+
+void MainWindow::showOperationsQt(ScriptOperations* operations, ScriptOperation* currentOperation) {
+	operationHighlighter->setOperations(operations, currentOperation);
+	ui.overlayTextEdit->setPlainText(ui.scriptTextEdit->toPlainText());
 }
 
 void MainWindow::checkUpdates() {

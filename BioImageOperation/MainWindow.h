@@ -11,6 +11,7 @@
 #include <QMainWindow>
 #include <QSettings>
 #include <QTimer>
+#include "QOperationHighlighter.h"
 #include "ui_MainWindow.h"
 #include <opencv2/opencv.hpp>
 #include "Observer.h"
@@ -37,6 +38,7 @@ private:
 	string defaultProcessText;
 	ScriptProcessing scriptProcessing;
 	QTimer* timer;
+	QOperationHighlighter* operationHighlighter;
 	Clock::time_point time;
 	string filepath;
 	bool fileModified = false;
@@ -79,6 +81,7 @@ signals:
 	void showDialog(string message, int level = (int)MessageLevel::Info);
 	void showText(string text, int displayi, string reference = "");
 	void showImage(Mat* image, int displayi, string reference = "");
+	void showOperations(ScriptOperations* operations, ScriptOperation* currentOperation);
 
 public slots:
 	void setModeQt(int mode);
@@ -87,6 +90,7 @@ public slots:
 	void showDialogQt(string message, int level = (int)MessageLevel::Info);
 	void showTextQt(string text, int displayi, string reference = "");
 	void showImageQt(Mat* image, int displayi, string reference = "");
+	void showOperationsQt(ScriptOperations* operations, ScriptOperation* currentOperation);
 
 protected:
 	void checkUpdates();

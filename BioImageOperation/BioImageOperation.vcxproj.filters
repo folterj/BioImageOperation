@@ -139,6 +139,9 @@
     <ClCompile Include="TrackingAlgorithm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="QOperationHighlighter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -288,6 +291,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="TextWindow.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="QOperationHighlighter.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

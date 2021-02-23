@@ -163,6 +163,9 @@ void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOpe
 		operation = operations->getCurrentOperation();
 		if (operation) {
 			operation->reset();
+			if (!prevOperation0) {
+				observer->showOperations(operations, operation);
+			}
 			operationFinished = processOperation(operation, prevOperation);
 			operation->finish();
 			if (operationFinished) {

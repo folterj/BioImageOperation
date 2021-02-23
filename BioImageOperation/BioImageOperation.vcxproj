@@ -121,6 +121,7 @@
     <ClCompile Include="Argument.cpp" />
     <ClCompile Include="GreedyAlgorithm.cpp" />
     <ClCompile Include="HungarianAlgorithm.cpp" />
+    <ClCompile Include="QOperationHighlighter.cpp" />
     <ClCompile Include="SimpleImageBuffer.cpp" />
     <ClCompile Include="Averager.cpp" />
     <ClCompile Include="BioImageOperation.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="HungarianAlgorithm.h" />
     <ClInclude Include="KeepAlive.h" />
     <ClInclude Include="OutputStreams.h" />
+    <QtMoc Include="QOperationHighlighter.h" />
     <ClInclude Include="ScriptOperation.h" />
     <ClInclude Include="ScriptOperations.h" />
     <ClInclude Include="StatData.h" />

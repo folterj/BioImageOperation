@@ -10,6 +10,7 @@
 #pragma once
 #include <opencv2/opencv.hpp>
 #include "Constants.h"
+#include "ScriptOperations.h"
 
 using namespace std;
 using namespace cv;
@@ -33,4 +34,5 @@ public:
 	virtual void showText(string text, int displayi, string reference = "") = 0;
 	virtual bool checkImageProcess(int displayi) = 0;
 	virtual void showImage(Mat* image, int displayi, string reference = "") = 0;
+	virtual void showOperations(ScriptOperations* operations, ScriptOperation* currentOperation) = 0;
 };

@@ -83,3 +83,6 @@ void TextObserver::showText(string text, int displayi, string reference) {
 
 void TextObserver::showImage(Mat* image, int displayi, string reference) {
 }
+
+void TextObserver::showOperations(ScriptOperations* operations, ScriptOperation* currentOperation) {
+}

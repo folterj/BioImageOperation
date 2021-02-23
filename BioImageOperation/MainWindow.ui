@@ -16,19 +16,38 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QPlainTextEdit" name="scriptTextEdit">
-      <property name="font">
-       <font>
-        <family>Courier</family>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="lineWrapMode">
-       <enum>QPlainTextEdit::NoWrap</enum>
-      </property>
-      <property name="tabStopDistance">
-       <double>16.000000000000000</double>
-      </property>
+     <widget class="QStackedWidget" name="stackedWidget">
+      <widget class="QPlainTextEdit" name="scriptTextEdit">
+       <property name="font">
+        <font>
+         <family>Courier</family>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="lineWrapMode">
+        <enum>QPlainTextEdit::NoWrap</enum>
+       </property>
+       <property name="tabStopDistance">
+        <double>16.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QPlainTextEdit" name="overlayTextEdit">
+       <property name="font">
+        <font>
+         <family>Courier</family>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="lineWrapMode">
+        <enum>QPlainTextEdit::NoWrap</enum>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+       <property name="tabStopDistance">
+        <double>16.000000000000000</double>
+       </property>
+      </widget>
      </widget>
     </item>
     <item>
@@ -85,7 +104,7 @@
      <x>0</x>
      <y>0</y>
      <width>500</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

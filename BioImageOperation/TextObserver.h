@@ -34,4 +34,5 @@ public:
 	virtual void showDialog(string message, int level = (int)MessageLevel::Info) override;
 	virtual void showText(string text, int displayi, string reference = "") override;
 	virtual void showImage(Mat* image, int displayi, string reference = "") override;
+	virtual void showOperations(ScriptOperations* operations, ScriptOperation* currentOperation) override;
 };
