@@ -650,7 +650,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::Benchmark:
-			showText(scriptOperations->getBenchmarking(), Constants::nTextWindows);
+			scriptOperations->updateBenchmarking();
 			break;
 
 			// end of switch

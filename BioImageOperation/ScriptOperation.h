@@ -32,6 +32,7 @@ public:
 	bool positionalMode;
 	string line;
 	string asignee;
+	string extra;
 	int lineStart = 0;
 	int lineEnd = 0;
 	int interval = 1;
@@ -77,7 +78,7 @@ public:
 	void initFrameOutput(FrameType frameType, string basepath, string templatePath, string defaultExtension = "", string start = "", string length = "", double fps = 0, string codecs = "");
 	double getDuration();
 	double getDurationInit();
-	string getBenchmarking(int level);
+	void updateBenchmarking();
 	void close();
 
 private:

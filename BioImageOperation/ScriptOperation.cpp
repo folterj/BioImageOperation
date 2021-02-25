@@ -1176,8 +1176,7 @@ double ScriptOperation::getDurationInit() {
 	return duration;
 }
 
-string ScriptOperation::getBenchmarking(int level) {
-	string s = string(level * 2, ' ') + line;
+void ScriptOperation::updateBenchmarking() {
 	string times;
 	double duration = getDuration();
 	double durationInit = getDurationInit();
@@ -1192,17 +1191,11 @@ string ScriptOperation::getBenchmarking(int level) {
 			times += " ";
 		}
 		times += "us";
-		int i = (int)(80 - s.length() - times.length());
-		if (i < 1) {
-			i = 1;
-		}
-		s += string(i, ' ') + times;
 	}
-	s += "\n";
+	extra = times;
 	if (hasInnerOperations()) {
-		s += innerOperations->getBenchmarking(level + 1);
+		innerOperations->updateBenchmarking();
 	}
-	return s;
 }
 
 void ScriptOperation::close() {

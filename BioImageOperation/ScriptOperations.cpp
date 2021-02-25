@@ -86,12 +86,28 @@ bool ScriptOperations::moveNextOperation() {
 	return (currentOperationi < size());
 }
 
-string ScriptOperations::getBenchmarking(int level) {
-	string s;
+void  ScriptOperations::updateBenchmarking() {
 	for (ScriptOperation* operation : *this) {
-		s += operation->getBenchmarking(level);
+		operation->updateBenchmarking();
 	}
-	return s;
+}
+
+void ScriptOperations::renderText(vector<string>* lines) {
+	string text, line, extra;
+	for (ScriptOperation* operation : *this) {
+		line = (*lines)[operation->lineStart];
+		extra = operation->extra;
+		if (extra != "") {
+			int i = (int)(80 - line.length() - extra.length());
+			if (i < 1) {
+				i = 1;
+			}
+			(*lines)[operation->lineStart] += string(i, ' ') + extra;
+		}
+		if (operation->hasInnerOperations()) {
+			operation->innerOperations->renderText(lines);
+		}
+	}
 }
 
 void ScriptOperations::close() {

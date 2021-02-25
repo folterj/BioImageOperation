@@ -33,7 +33,7 @@ public:
 	bool hasOperations();
 	ScriptOperation* getCurrentOperation();
 	bool moveNextOperation();
-	double getDuration();
-	string getBenchmarking(int level = 0);
+	void updateBenchmarking();
+	void renderText(vector<string>* lines);
 	void close();
 };

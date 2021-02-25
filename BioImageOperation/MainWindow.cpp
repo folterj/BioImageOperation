@@ -445,8 +445,14 @@ void MainWindow::showImageQt(Mat* image, int displayi, string reference) {
 }
 
 void MainWindow::showOperationsQt(ScriptOperations* operations, ScriptOperation* currentOperation) {
+	string text;
 	operationHighlighter->setOperations(operations, currentOperation);
-	ui.overlayTextEdit->setPlainText(ui.scriptTextEdit->toPlainText());
+	vector<string> lines = Util::split(ui.scriptTextEdit->toPlainText().toStdString(), "\n");
+	operations->renderText(&lines);
+	for (string line : lines) {
+		text += line + "\n";
+	}
+	ui.overlayTextEdit->setPlainText(Util::convertToQString(text));
 }
 
 void MainWindow::checkUpdates() {

@@ -4,6 +4,7 @@
 QOperationHighlighter::QOperationHighlighter(QTextDocument* parent)
 	: QSyntaxHighlighter(parent) {
 	highlightFormat.setBackground(Qt::yellow);
+	errorFormat.setUnderlineStyle(QTextCharFormat::UnderlineStyle::WaveUnderline);
 }
 
 QOperationHighlighter::~QOperationHighlighter() {
