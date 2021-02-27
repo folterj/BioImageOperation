@@ -67,7 +67,7 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(ui.scriptTextEdit, &QPlainTextEdit::textChanged, this, &MainWindow::textChanged);
 
 	connect(ui.processButton, &QAbstractButton::clicked, this, &MainWindow::process);
-	connect(ui.abortButton, &QAbstractButton::clicked, &scriptProcessing, &ScriptProcessing::doAbort);
+	connect(ui.abortButton, &QAbstractButton::clicked, &scriptProcessing, &ScriptProcessing::requestAbort);
 
 	connect(this, &MainWindow::setMode, this, &MainWindow::setModeQt);
 	connect(this, &MainWindow::clearStatus, this, &MainWindow::clearStatusQt);
@@ -261,8 +261,8 @@ void MainWindow::process() {
 	scriptProcessing.startProcess(filepath, ui.scriptTextEdit->toPlainText().toStdString());
 }
 
-void MainWindow::pause() {
-	scriptProcessing.doPause();
+void MainWindow::requestPause() {
+	scriptProcessing.requestPause();
 }
 
 void MainWindow::resetProgressTimer() {
@@ -381,6 +381,24 @@ void MainWindow::showStatusQt(int i, int tot, string label) {
 	statusQueued = false;
 }
 
+bool MainWindow::checkOperationsProcess() {
+	bool ok = !operationQueued;
+	operationQueued = true;
+	return ok;
+}
+
+void MainWindow::showOperationsQt(ScriptOperations* operations, ScriptOperation* currentOperation) {
+	string text;
+	operationHighlighter->setOperations(operations, currentOperation);
+	vector<string> lines = Util::split(ui.scriptTextEdit->toPlainText().toStdString(), "\n");
+	operations->renderText(&lines);
+	for (string line : lines) {
+		text += line + "\n";
+	}
+	ui.overlayTextEdit->setPlainText(Util::convertToQString(text));
+	operationQueued = false;
+}
+
 void MainWindow::showDialogQt(string message, int level) {
 	QString title = tr("BIO");
 	try {
@@ -444,17 +462,6 @@ void MainWindow::showImageQt(Mat* image, int displayi, string reference) {
 	imageQueued[displayi] = false;
 }
 
-void MainWindow::showOperationsQt(ScriptOperations* operations, ScriptOperation* currentOperation) {
-	string text;
-	operationHighlighter->setOperations(operations, currentOperation);
-	vector<string> lines = Util::split(ui.scriptTextEdit->toPlainText().toStdString(), "\n");
-	operations->renderText(&lines);
-	for (string line : lines) {
-		text += line + "\n";
-	}
-	ui.overlayTextEdit->setPlainText(Util::convertToQString(text));
-}
-
 void MainWindow::checkUpdates() {
 	string currentVersion, webVersion;
 	try {
@@ -508,7 +515,7 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 	// when main window is closed: ensure to close everything
 	if (askSaveChanges()) {
 		if (askCloseInProgress()) {
-			scriptProcessing.doAbort();
+			scriptProcessing.requestAbort();
 			this_thread::sleep_for(100ms);		// finish async tasks (show image)
 			QApplication::quit();
 			return;

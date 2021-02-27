@@ -32,13 +32,14 @@ void ScriptOperations::reset() {
 void ScriptOperations::extract(string script, int linei0) {
 	ScriptOperation* operation = nullptr;
 	vector<string> lines = Util::split(script, "\n");
-	string line;
+	string original, line;
 	bool skipping = false;
 
 	clear();
 
 	for (int linei = linei0; linei < lines.size(); linei++) {
-		line = Util::trim(lines[linei]);
+		original = lines[linei];
+		line = Util::trim(original);
 		if (Util::startsWith(line, "{")) {
 			// adds inner instructions for last operation
 			if (operation) {
@@ -58,13 +59,25 @@ void ScriptOperations::extract(string script, int linei0) {
 		} else if (!skipping && line != "" && !Util::startsWith(line, "//") && !Util::startsWith(line, "#")) {
 			try {
 				operation = new ScriptOperation();
-				operation->extract(line);
+				operation->extract(original, line);
 				operation->lineStart = linei;
 				operation->lineEnd = linei;
 				push_back(operation);
 			} catch (exception e) {
 				throw invalid_argument(e.what() + string(" in line:\n") + line);
 			}
+		}
+	}
+
+	operationLineMap.clear();
+	createOperationLineList(this);
+}
+
+void ScriptOperations::createOperationLineList(ScriptOperations* operations) {
+	for (ScriptOperation* operation : *operations) {
+		operationLineMap.emplace(operation->lineStart, operation);
+		if (operation->hasInnerOperations()) {
+			createOperationLineList(operation->innerOperations);		// * recursive
 		}
 	}
 }
@@ -79,6 +92,14 @@ ScriptOperation* ScriptOperations::getCurrentOperation() {
 		operation = at(currentOperationi);
 	}
 	return operation;
+}
+
+ScriptOperation* ScriptOperations::getOperation(int linei) {
+	auto item = operationLineMap.find(linei);
+	if (item != operationLineMap.end()) {
+		return item->second;
+	}
+	return nullptr;
 }
 
 bool ScriptOperations::moveNextOperation() {

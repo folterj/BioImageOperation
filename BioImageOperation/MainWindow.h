@@ -44,6 +44,7 @@ private:
 	bool fileModified = false;
 	bool ignoreTextChangeEvent = false;
 	bool statusQueued = false;
+	bool operationQueued = false;
 	bool textQueued[Constants::nTextWindows + 1] = { false, false, false, false, false };
 	bool imageQueued[Constants::nDisplays] = { false, false, false, false };
 	int processCount = 0;
@@ -68,9 +69,10 @@ public:
 
 	void process();
 	void timerElapsed();
-	virtual void pause() override;
+	virtual void requestPause() override;
 	virtual void resetProgressTimer() override;
 	virtual bool checkStatusProcess() override;
+	virtual bool checkOperationsProcess() override;
 	virtual bool checkTextProcess(int displayi) override;
 	virtual bool checkImageProcess(int displayi) override;
 
@@ -87,10 +89,10 @@ public slots:
 	void setModeQt(int mode);
 	void clearStatusQt();
 	void showStatusQt(int i, int tot = 0, string label = "");
+	void showOperationsQt(ScriptOperations* operations, ScriptOperation* currentOperation);
 	void showDialogQt(string message, int level = (int)MessageLevel::Info);
 	void showTextQt(string text, int displayi, string reference = "");
 	void showImageQt(Mat* image, int displayi, string reference = "");
-	void showOperationsQt(ScriptOperations* operations, ScriptOperation* currentOperation);
 
 protected:
 	void checkUpdates();

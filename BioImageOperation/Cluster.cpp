@@ -321,7 +321,7 @@ string Cluster::getCsvHeader(bool outputShapeFeatures, bool outputContour) {
 	string header = "track_label,cluster_label,is_merged"
 		",x,y"
 		",angle"
-		",area,rad,length_major,length_minor";
+		",area,length_major,length_minor,rad";
 	if (outputShapeFeatures) {
 		header += ",size_ratio,ellipsity,circularity,convexity";
 	}
@@ -338,7 +338,7 @@ string Cluster::getCsv(bool outputShapeFeatures, bool outputContour) {
 	csv = Util::replace(getLabels(), ",", " ") + "," + to_string(clusterLabel);
 	csv += format(",%s", isMerged() ? "true" : "false");
 	csv += format(",%f,%f,%f", x * pixelSize, y * pixelSize, angle);
-	csv += format(",%f,%f,%f,%f", area * pixelSize * pixelSize, rad * pixelSize, lengthMajor * pixelSize, lengthMinor * pixelSize);
+	csv += format(",%f,%f,%f,%f", area * pixelSize * pixelSize, lengthMajor * pixelSize, lengthMinor * pixelSize, rad * pixelSize);
 
 	if (outputShapeFeatures || outputContour) {
 		contour = getContour();

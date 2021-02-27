@@ -30,7 +30,7 @@ public:
 	vector<Argument*> arguments;
 	int argumentPos;
 	bool positionalMode;
-	string line;
+	string original, line;
 	string asignee;
 	string extra;
 	int lineStart = 0;
@@ -52,12 +52,11 @@ public:
 	int countElapsedInit = 0;
 
 	ScriptOperation();
-	ScriptOperation(string line);
 	~ScriptOperation();
 	void reset();
 	void initialFinish();
 	void finish();
-	void extract(string line);
+	void extract(string original, string line);
 	void parseArguments();
 	bool hasInnerOperations();
 	ScriptOperation* getNextInnerOperation();

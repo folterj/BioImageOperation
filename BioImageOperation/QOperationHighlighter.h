@@ -10,7 +10,7 @@ class QOperationHighlighter : public QSyntaxHighlighter
 	Q_OBJECT
 
 private:
-	QTextCharFormat highlightFormat, errorFormat;
+	QTextCharFormat highlightFormat, benchmarkFormat, errorFormat;
 	ScriptOperations* operations;
 	ScriptOperation* currentOperation;
 

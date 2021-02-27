@@ -12,7 +12,7 @@
 #include "Util.h"
 
 
-void TextObserver::pause() {
+void TextObserver::requestPause() {
 }
 
 void TextObserver::resetProgressTimer() {
@@ -20,6 +20,10 @@ void TextObserver::resetProgressTimer() {
 }
 
 bool TextObserver::checkStatusProcess() {
+	return true;
+}
+
+bool TextObserver::checkOperationsProcess() {
 	return true;
 }
 
@@ -73,6 +77,9 @@ void TextObserver::showStatus(int i, int tot, string label) {
 	}
 }
 
+void TextObserver::showOperations(ScriptOperations* operations, ScriptOperation* currentOperation) {
+}
+
 void TextObserver::showDialog(string message, int level) {
 	cout << "\n" + MessageLevels[level] + " " + message << endl;
 }
@@ -82,7 +89,4 @@ void TextObserver::showText(string text, int displayi, string reference) {
 }
 
 void TextObserver::showImage(Mat* image, int displayi, string reference) {
-}
-
-void TextObserver::showOperations(ScriptOperations* operations, ScriptOperation* currentOperation) {
 }

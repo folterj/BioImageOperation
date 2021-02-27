@@ -132,8 +132,8 @@ bool ScriptProcessing::startProcess(string filepath, string script) {
 			observer->resetProgressTimer();
 			operationMode = OperationMode::Run;
 			processThread = new std::thread(&ScriptProcessing::processThreadMethod, this);
-		} else {
-			operationMode = OperationMode::Pause;
+		} else {	// operationMode == OperationMode::Run
+			operationMode = OperationMode::RequestPause;
 		}
 		setMode(operationMode);
 	} catch (exception e) {
@@ -145,7 +145,9 @@ bool ScriptProcessing::startProcess(string filepath, string script) {
 }
 
 void ScriptProcessing::processThreadMethod() {
+	KeepAlive::startKeepAlive();
 	processOperations(scriptOperations, nullptr);
+	KeepAlive::stopKeepAlive();
 	if (operationMode != OperationMode::Pause) {
 		this_thread::sleep_for(100ms);		// finish async tasks (show image)
 		doReset();
@@ -157,14 +159,12 @@ void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOpe
 	ScriptOperation* prevOperation = prevOperation0;
 	bool operationFinished;
 
-	KeepAlive::startKeepAlive();
-
-	while (operationMode == OperationMode::Run) {
+	while (operationMode == OperationMode::Run || operationMode == OperationMode::RequestPause) {
 		operation = operations->getCurrentOperation();
 		if (operation) {
 			operation->reset();
 			if (!prevOperation0) {
-				observer->showOperations(operations, operation);
+				showOperations(operations, operation);
 			}
 			operationFinished = processOperation(operation, prevOperation);
 			operation->finish();
@@ -176,8 +176,9 @@ void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOpe
 			break;
 		}
 	}
-
-	KeepAlive::stopKeepAlive();
+	if (operationMode == OperationMode::RequestPause) {
+		setMode(OperationMode::Pause);
+	}
 }
 
 bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperation* prevOperation) {
@@ -646,7 +647,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::Pause:
-			doPause();
+			requestPause();
 			break;
 
 		case ScriptOperationType::Benchmark:
@@ -724,11 +725,11 @@ double ScriptProcessing::getTime(int frame) {
 	return time;
 }
 
-void ScriptProcessing::doPause() {
-	setMode(OperationMode::Pause);
+void ScriptProcessing::requestPause() {
+	setMode(OperationMode::RequestPause);
 }
 
-void ScriptProcessing::doAbort() {
+void ScriptProcessing::requestAbort() {
 	if (operationMode == OperationMode::Pause) {
 		doReset();
 	} else {
@@ -774,4 +775,10 @@ void ScriptProcessing::showImage(Mat* image, int displayi, string reference) {
 
 void ScriptProcessing::showDialog(string message, MessageLevel level) {
 	observer->showDialog(message, (int)level);
+}
+
+void ScriptProcessing::showOperations(ScriptOperations* operations, ScriptOperation* currentOperation) {
+	if (observer->checkOperationsProcess()) {
+		observer->showOperations(operations, currentOperation);
+	}
 }

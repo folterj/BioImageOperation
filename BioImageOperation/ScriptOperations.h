@@ -10,6 +10,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -23,15 +24,19 @@ class ScriptOperation;	// forward declaration
 
 class ScriptOperations : vector<ScriptOperation*>
 {
-public:
+private:
+	map<int, ScriptOperation*> operationLineMap;
 	int currentOperationi = 0;
 
+public:
 	ScriptOperations();
 	~ScriptOperations();
 	void reset();
 	void extract(string script, int linei = 0);
+	void createOperationLineList(ScriptOperations* operations);
 	bool hasOperations();
 	ScriptOperation* getCurrentOperation();
+	ScriptOperation* getOperation(int linei);
 	bool moveNextOperation();
 	void updateBenchmarking();
 	void renderText(vector<string>* lines);

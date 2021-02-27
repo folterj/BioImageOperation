@@ -158,6 +158,7 @@ enum class OperationMode
 {
 	Idle,
 	Run,
+	RequestPause,
 	Pause,
 	Abort
 };

@@ -90,8 +90,8 @@ public:
 	/*
 	 * Abort thread, attempt closing output streams to prevent data loss
 	 */
-	void doPause();
-	void doAbort();
+	void requestPause();
+	void requestAbort();
 	void doReset();
 	void setMode(OperationMode mode);
 	void clearStatus();
@@ -99,4 +99,5 @@ public:
 	void showText(string text, int displayi, string reference = "");
 	void showImage(Mat* image, int displayi, string reference = "");
 	void showDialog(string message, MessageLevel level = MessageLevel::Info);
+	void showOperations(ScriptOperations* operations, ScriptOperation* currentOperation);
 };

@@ -253,7 +253,7 @@ void ImageTracker::matchClusterTracks() {
 				if (track->isMerged && cluster->assignedTracks.size() <= 1) {
 					message = Util::format("Merged cluster split: Track %d", track->label);
 					cout << message << endl;
-					observer->pause();
+					observer->requestPause();
 				}
 			}
 			track->update(cluster, maxArea, maxMove, trackParamsFinalised);

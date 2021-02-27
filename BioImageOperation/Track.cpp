@@ -296,7 +296,7 @@ string Track::getCsvHeader(bool outputShapeFeatures, bool outputContour) {
 	string header = "track_label,cluster_label,is_merged"
 					",x,y,v,a,dist_tot,dist_origin"
 					",angle,v_angle,a_angle"
-					",area,rad,length_major,length_minor";
+					",area,area1,length_major,length_major1,length_minor,length_minor1,rad";
 	if (outputShapeFeatures) {
 		header += ",size_ratio,ellipsity,circularity,convexity";
 	}
@@ -390,7 +390,11 @@ string Track::getCsv(bool outputShapeFeatures, bool outputContour, Cluster* clus
 	csv += format(",%f,%f,%f,%f", x * pixelSize, y * pixelSize, v, a);
 	csv += format(",%f,%f", totdist * pixelSize, centdist * pixelSize);
 	csv += format(",%f,%f,%f", orientation, v_angle, a_angle);
-	csv += format(",%f,%f,%f,%f", area * pixelSize * pixelSize, rad * pixelSize, lengthMajor * pixelSize, lengthMinor * pixelSize);
+	csv += format(",%f,%f,%f,%f,%f,%f,%f",
+					area * pixelSize * pixelSize, meanArea * pixelSize * pixelSize,
+					lengthMajor * pixelSize, meanLengthMajor * pixelSize,
+					lengthMinor * pixelSize, meanLengthMinor * pixelSize,
+					rad * pixelSize);
 
 	if (outputShapeFeatures || outputContour) {
 		if (cluster) {

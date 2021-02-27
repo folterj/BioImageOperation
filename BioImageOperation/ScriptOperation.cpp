@@ -26,10 +26,6 @@
 ScriptOperation::ScriptOperation() {
 }
 
-ScriptOperation::ScriptOperation(string line) {
-	extract(line);
-}
-
 ScriptOperation::~ScriptOperation() {
 	if (innerOperations) {
 		delete innerOperations;
@@ -67,10 +63,11 @@ void ScriptOperation::finish() {
 	countElapsed++;
 }
 
-void ScriptOperation::extract(string line) {
+void ScriptOperation::extract(string original, string line) {
 	string operation, part;
 	int i, i1, i2;
 
+	this->original = original;
 	this->line = line;
 
 	i = (int)line.find(":");

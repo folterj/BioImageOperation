@@ -23,16 +23,17 @@ private:
 	Clock::time_point time;
 
 public:
-	virtual void pause() override;
+	virtual void requestPause() override;
 	virtual void resetProgressTimer() override;
 	virtual bool checkStatusProcess() override;
+	virtual bool checkOperationsProcess() override;
 	virtual bool checkTextProcess(int displayi) override;
 	virtual bool checkImageProcess(int displayi) override;
 	virtual void setMode(int mode) override;
 	virtual void clearStatus() override;
 	virtual void showStatus(int i, int tot = 0, string label = "") override;
+	virtual void showOperations(ScriptOperations* operations, ScriptOperation* currentOperation) override;
 	virtual void showDialog(string message, int level = (int)MessageLevel::Info) override;
 	virtual void showText(string text, int displayi, string reference = "") override;
 	virtual void showImage(Mat* image, int displayi, string reference = "") override;
-	virtual void showOperations(ScriptOperations* operations, ScriptOperation* currentOperation) override;
 };
