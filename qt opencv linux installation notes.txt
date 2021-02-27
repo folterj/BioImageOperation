@@ -1,9 +1,7 @@
 Install library / packages:
 
 Generic:
-apt-get install build-essential
-(cmake)
-(gcc)
+apt-get install build-essential cmake gcc-arm* git unzip pkg-config
 
 
 Qt install:
