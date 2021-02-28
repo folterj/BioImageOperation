@@ -703,7 +703,6 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 	int dcol;
 	int col = 0;
 	int maxi = 0;
-	int minActive = trackingParams.minActive;
 	bool findClusters = (outputShapeFeatures || outputContour);
 	string maincols = Track::getCsvHeader(outputShapeFeatures, outputContour);
 	int nmaincols = (int)Util::split(maincols, ",").size();

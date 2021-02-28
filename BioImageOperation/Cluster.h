@@ -62,7 +62,7 @@ public:
 	double getRangeFactor(Track* track, double distance, double maxMoveDistance);
 	double calcAreaFactor(Track* track, double areaDif);
 	double calcLengthFactor(Track* track, double lengthDif);
-	double calcAngleFactor(Track* track, double angleDif);
+    double calcAngleFactor(double angleDif);
 
 	int getInitialLabel();
 	string getLabels();

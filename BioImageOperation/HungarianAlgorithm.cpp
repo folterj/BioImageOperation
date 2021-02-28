@@ -99,11 +99,8 @@ bool HungarianAlgorithm::tryMatch() {
 	bool resolved = true;
 	TrackClusterMatch* foundMatch;
 	TrackClusterMatch* match;
-	int maxMatches = 0;
-	int nTracksSolved = 0;
 	int nMatches, ii, foundii;
 	bool hasValidMatch, changed;
-	double totalArea;
 
 	for (TrackClusterMatch* match : solutionMatches) {
 		match->unAssign();

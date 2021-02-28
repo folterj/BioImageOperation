@@ -43,7 +43,6 @@ bool VideoSource::init(int apiCode, string basepath, string filepath, string sta
 	string filename = ".";	// dummy value to pass initial while-loop condition
 	bool ok = false;
 	bool canSeek;
-	int lengthi = 0;
 	int nframes0;
     string message;
 

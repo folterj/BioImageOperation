@@ -37,7 +37,7 @@ void TrackClusterMatch::set(Track* track, Cluster* cluster, double distance, dou
 		lengthFactor = (lengthFactor + 1) / 2;
 	}
 	angleDif = cluster->calcAngleDif(track);
-	angleFactor = cluster->calcAngleFactor(track, angleDif);
+    angleFactor = cluster->calcAngleFactor(angleDif);
 	if (suspectMerged) {
 		angleFactor = (angleFactor + 1) / 2;
 	}

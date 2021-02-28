@@ -200,7 +200,7 @@ double Cluster::calcLengthFactor(Track* track, double lengthDif) {
 	return lengthFactor;
 }
 
-double Cluster::calcAngleFactor(Track* track, double angleDif) {
+double Cluster::calcAngleFactor(double angleDif) {
 	double angleFactor = 1;
 	angleFactor = 1 - abs(angleDif) / 360;
 	return angleFactor;

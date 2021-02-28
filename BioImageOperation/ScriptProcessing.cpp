@@ -774,6 +774,7 @@ void ScriptProcessing::showImage(Mat* image, int displayi, string reference) {
 }
 
 void ScriptProcessing::showDialog(string message, MessageLevel level) {
+	cout << "\n" + MessageLevels[(int)level] + " " + message << endl;
 	observer->showDialog(message, (int)level);
 }
 

@@ -95,7 +95,6 @@ bool ImageSeries::getMean(OutputArray dest) {
 	uchar* outData;
 	int pixeli;
 	int npixels = width * height;
-	int m;
 	int n = (int)images.size();
 	double sum, mean;
 

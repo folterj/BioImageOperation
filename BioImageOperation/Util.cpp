@@ -627,9 +627,9 @@ string Util::getUrl(string url) {
 			QByteArray bytes = reply->readAll();
 			QString content = QString::fromUtf8(bytes.data(), bytes.size());
 			QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
-			if (statusCode.isValid()) {
-				int status = statusCode.toInt();
-			}
+            //if (statusCode.isValid()) {
+            //	int status = statusCode.toInt();
+            //}
 			result = content.toStdString();
 		}
 	} catch (...) { }
