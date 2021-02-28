@@ -25,6 +25,7 @@ class ScriptOperation;	// forward declaration
 class ScriptOperations : vector<ScriptOperation*>
 {
 private:
+	string script;
 	map<int, ScriptOperation*> operationLineMap;
 	int currentOperationi = 0;
 
@@ -39,6 +40,7 @@ public:
 	ScriptOperation* getOperation(int linei);
 	bool moveNextOperation();
 	void updateBenchmarking();
-	void renderText(vector<string>* lines);
+	string renderOperations();
+	void renderOperations(vector<string>* lines);
 	void close();
 };

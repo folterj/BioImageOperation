@@ -388,13 +388,8 @@ bool MainWindow::checkOperationsProcess() {
 }
 
 void MainWindow::showOperationsQt(ScriptOperations* operations, ScriptOperation* currentOperation) {
-	string text;
+	string text = operations->renderOperations();
 	operationHighlighter->setOperations(operations, currentOperation);
-	vector<string> lines = Util::split(ui.scriptTextEdit->toPlainText().toStdString(), "\n");
-	operations->renderText(&lines);
-	for (string line : lines) {
-		text += line + "\n";
-	}
 	ui.overlayTextEdit->setPlainText(Util::convertToQString(text));
 	operationQueued = false;
 }

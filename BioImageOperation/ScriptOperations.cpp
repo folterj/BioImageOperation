@@ -31,11 +31,14 @@ void ScriptOperations::reset() {
 
 void ScriptOperations::extract(string script, int linei0) {
 	ScriptOperation* operation = nullptr;
-	vector<string> lines = Util::split(script, "\n");
+	vector<string> lines;
 	string original, line;
 	bool skipping = false;
 
 	clear();
+
+	this->script = script;
+	lines = Util::split(script, "\n");
 
 	for (int linei = linei0; linei < lines.size(); linei++) {
 		original = lines[linei];
@@ -113,7 +116,17 @@ void  ScriptOperations::updateBenchmarking() {
 	}
 }
 
-void ScriptOperations::renderText(vector<string>* lines) {
+string ScriptOperations::renderOperations() {
+	string script1;
+	vector<string> lines = Util::split(script, "\n");
+	renderOperations(&lines);
+	for (string line : lines) {
+		script1 += line + "\n";
+	}
+	return script1;
+}
+
+void ScriptOperations::renderOperations(vector<string>* lines) {
 	string text, line, extra;
 	for (ScriptOperation* operation : *this) {
 		line = (*lines)[operation->lineStart];
@@ -126,7 +139,7 @@ void ScriptOperations::renderText(vector<string>* lines) {
 			(*lines)[operation->lineStart] += string(i, ' ') + extra;
 		}
 		if (operation->hasInnerOperations()) {
-			operation->innerOperations->renderText(lines);
+			operation->innerOperations->renderOperations(lines);		// * recursive
 		}
 	}
 }

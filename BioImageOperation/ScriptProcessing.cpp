@@ -94,7 +94,8 @@ bool ScriptProcessing::startProcessNoGui(string scriptFilename) {
 	TextObserver observer;
 	string script;
 
-	this->observer = &observer;
+	registerObserver(&observer);
+	useGui = false;
 
 	reset();
 	if (!filesystem::exists(scriptFilename)) {
@@ -109,7 +110,7 @@ bool ScriptProcessing::startProcessNoGui(string scriptFilename) {
 
 	try {
 		script = Util::readText(scriptFilename);
-		scriptOperations->extract(script, 0);
+		scriptOperations->extract(script);
 		this->observer->resetProgressTimer();
 		operationMode = OperationMode::Run;
 		processThreadMethod();
@@ -127,12 +128,12 @@ bool ScriptProcessing::startProcess(string filepath, string script) {
 			if (operationMode == OperationMode::Idle) {
                 reset();
                 basepath = Util::extractFilePath(filepath);
-				scriptOperations->extract(script, 0);
+				scriptOperations->extract(script);
 			}
 			observer->resetProgressTimer();
 			operationMode = OperationMode::Run;
 			processThread = new std::thread(&ScriptProcessing::processThreadMethod, this);
-		} else {	// operationMode == OperationMode::Run
+		} else {	// operationMode == Run
 			operationMode = OperationMode::RequestPause;
 		}
 		setMode(operationMode);
@@ -652,6 +653,10 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::Benchmark:
 			scriptOperations->updateBenchmarking();
+			if (!useGui) {
+				output = scriptOperations->renderOperations();
+				showText(output, Constants::nTextWindows);
+			}
 			break;
 
 			// end of switch

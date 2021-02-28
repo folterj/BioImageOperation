@@ -54,7 +54,9 @@ public:
 	double logPower = 0;
 	Palette logPalette = Palette::Grayscale;
 	OperationMode operationMode = OperationMode::Idle;
-	
+	bool useGui = true;
+
+
 	ScriptProcessing();
 	~ScriptProcessing();
 	void registerObserver(Observer* observer);
