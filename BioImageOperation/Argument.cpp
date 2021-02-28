@@ -72,7 +72,7 @@ bool Argument::parseType(ArgumentType argumentType) {
 	case ArgumentType::Fraction:
 		ok = Util::isNumeric(value);
 		if (ok) {
-			x = stof(value);
+			x = Util::toDouble(value);
 			ok = (x >= 0 && x <= 1);
 		}
 		break;
