@@ -148,7 +148,7 @@ bool MainWindow::openDialog() {
 				scriptProcessing.doReset();
 				return true;
 			}
-		} catch (exception e) {
+		} catch (exception& e) {
 			showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 		}
 	}
@@ -165,7 +165,7 @@ bool MainWindow::saveDialog() {
 			filepath = qfilename.toStdString();
 			return save();
 		}
-	} catch (exception e) {
+	} catch (exception& e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 	return false;
@@ -181,7 +181,7 @@ bool MainWindow::save() {
 			output.closeStream();
 			fileModified = false;
 			updateTitle();
-		} catch (exception e) {
+		} catch (exception& e) {
 			showDialog(Util::getExceptionDetail(e));
 			return false;
 		}
@@ -241,7 +241,7 @@ void MainWindow::generateScript(string title, string instruction, string scriptF
 				scriptProcessing.doReset();
 			}
 		}
-		catch (exception e) {
+		catch (exception& e) {
 			showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 		}
 	}
@@ -286,7 +286,7 @@ void MainWindow::timerElapsed() {
 		for (int i = 0; i < Constants::nDisplays; i++) {
 			imageWindows[i].updateFps();
 		}
-	} catch (exception e) {
+	} catch (exception& e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 }
@@ -319,7 +319,7 @@ void MainWindow::setModeQt(int mode0) {
 		} else {
 			ui.stackedWidget->setCurrentWidget(ui.overlayTextEdit);
 		}
-	} catch (exception e) {
+	} catch (exception& e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 }
@@ -328,7 +328,7 @@ void MainWindow::clearStatusQt() {
 	try {
 		ui.statusBar->clearMessage();
 		ui.progressBar->setValue(0);
-	} catch (exception e) {
+	} catch (exception& e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 }
@@ -375,7 +375,7 @@ void MainWindow::showStatusQt(int i, int tot, string label) {
 
 		ui.statusBar->showMessage(Util::convertToQString(s));
 		ui.progressBar->setValue((int)(100 * progress));
-	} catch (exception e) {
+	} catch (exception& e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 	statusQueued = false;
@@ -415,7 +415,7 @@ void MainWindow::showDialogQt(string message, int level) {
 			QMessageBox::information(this, title, Util::convertToQString(message));
 			break;
 		}
-	} catch (exception e) {
+	} catch (exception& e) {
 		cerr << Util::getExceptionDetail(e) << endl;
 	}
 }
@@ -437,7 +437,7 @@ void MainWindow::showTextQt(string text, int displayi, string reference) {
 		} else {
 			textWindows[displayi].showText(text, reference);
 		}
-	} catch (exception e) {
+	} catch (exception& e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 	textQueued[displayi] = false;
@@ -456,7 +456,7 @@ void MainWindow::showImageQt(Mat* image, int displayi, string reference) {
 
 	try {
 		imageWindows[displayi].showImage(image, reference);
-	} catch (exception e) {
+	} catch (exception& e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 	imageQueued[displayi] = false;
@@ -498,7 +498,7 @@ void MainWindow::saveScriptHelp() {
 			outputStream.write(ScriptOperation::getOperationList(true));
 			outputStream.closeStream();
 		}
-	} catch (std::exception e) {
+	} catch (std::exception& e) {
 		showDialog(Util::getExceptionDetail(e));
 	}	
 }

@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 #ifndef _CONSOLE
 		}
 #endif
-	} catch (exception e) {
+	} catch (exception& e) {
 		cerr << e.what() << endl;
 	}
 }

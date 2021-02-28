@@ -72,7 +72,7 @@ void TextObserver::showStatus(int i, int tot, string label) {
 			s += " Left: " + Util::formatTimespan((int)estimateLeft);
 		}
 		cout << s << "\r";
-	} catch (exception e) {
+	} catch (exception& e) {
 		showDialog(Util::getExceptionDetail(e), (int)MessageLevel::Error);
 	}
 }

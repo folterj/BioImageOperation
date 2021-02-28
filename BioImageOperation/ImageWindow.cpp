@@ -101,14 +101,14 @@ void ImageWindow::saveImage() {
 			}
 			Util::saveImage(filename, image);
 		}
-	} catch (cv::Exception e) {
+	} catch (cv::Exception& e) {
 		// opencv exception
 		if (e.err != "") {
 			observer->showDialog(e.err);
 		} else {
 			observer->showDialog(e.msg);
 		}
-	} catch (std::exception e) {
+	} catch (std::exception& e) {
 		observer->showDialog(Util::getExceptionDetail(e));
 	}
 }

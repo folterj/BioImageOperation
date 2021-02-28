@@ -76,7 +76,7 @@ public:
 	static Scalar normColorLightness(Scalar color0, double level = 0.5);
 	static Vec<unsigned char, 3> floatToByteColor(Scalar color);
 
-    static string getExceptionDetail(exception & e, int level = 0);
+    static string getExceptionDetail(exception& e, int level = 0);
 	static Mat loadImage(string filename);
 	static void saveImage(string filename, Mat* image);
 	static bool isValidImage(Mat* image);

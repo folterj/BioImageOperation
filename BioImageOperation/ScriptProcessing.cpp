@@ -113,7 +113,7 @@ bool ScriptProcessing::startProcessNoGui(string scriptFilename) {
 		this->observer->resetProgressTimer();
 		operationMode = OperationMode::Run;
 		processThreadMethod();
-	} catch (exception e) {
+	} catch (exception& e) {
 		showDialog(Util::getExceptionDetail(e), MessageLevel::Error);
 		doReset();
 		return false;
@@ -136,7 +136,7 @@ bool ScriptProcessing::startProcess(string filepath, string script) {
 			operationMode = OperationMode::RequestPause;
 		}
 		setMode(operationMode);
-	} catch (exception e) {
+	} catch (exception& e) {
 		showDialog(Util::getExceptionDetail(e), MessageLevel::Error);
 		doReset();
 		return false;
@@ -676,7 +676,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				operation->imageRef = newImage;
 			}
 		}
-    } catch (cv::Exception & e) {
+    } catch (cv::Exception& e) {
 		errorMsg = e.what();
 		if (Util::contains(errorMsg, "==")) {
 			// adding more user friendly messages:
@@ -693,7 +693,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		errorMsg += " in\n" + operation->line;
 		showDialog(errorMsg, MessageLevel::Error);
 		doReset();
-    } catch (std::exception & e) {
+    } catch (std::exception& e) {
 		errorMsg = Util::getExceptionDetail(e) + " in\n" + operation->line;
 		showDialog(errorMsg, MessageLevel::Error);
 		doReset();

@@ -271,9 +271,18 @@ int Util::parseFrameTime(string s, double fps) {
 
 string Util::readText(string filename) {
 	ostringstream ss;
-	ifstream input(filename);
-	input.exceptions(ifstream::failbit);
-	ss << input.rdbuf();
+	ifstream input;
+	input.exceptions(ofstream::failbit | ofstream::badbit);
+	try {
+		input.open(filename);
+		if (input.is_open()) {
+			ss << input.rdbuf();
+		} else {
+			 throw ios_base::failure("Unable to read file " + filename + "\n" + strerror(errno));
+		}
+	} catch (ios_base::failure e) {
+		throw ios_base::failure("Unable to read file " + filename + "\n" + strerror(errno));
+	}
 	return ss.str();
 }
 
@@ -489,12 +498,12 @@ Vec<unsigned char, 3> Util::floatToByteColor(Scalar color) {
 	return Vec<unsigned char, 3>((unsigned char)(color[0] * 0xFF), (unsigned char)(color[1] * 0xFF), (unsigned char)(color[2] * 0xFF));
 }
 
-string Util::getExceptionDetail(exception & e, int level) {
+string Util::getExceptionDetail(exception& e, int level) {
 	string s = e.what();
 	string inner;
 	try {
 		std::rethrow_if_nested(e);
-	} catch (exception e) {
+	} catch (exception& e) {
 		inner = getExceptionDetail(e, level + 1);		// recursive
 		if (inner != "") {
 			s += " - " + inner;

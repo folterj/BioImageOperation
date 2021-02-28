@@ -63,7 +63,7 @@ void ScriptOperations::extract(string script, int linei0) {
 				operation->lineStart = linei;
 				operation->lineEnd = linei;
 				push_back(operation);
-			} catch (exception e) {
+			} catch (exception& e) {
 				throw invalid_argument(e.what() + string(" in line:\n") + line);
 			}
 		}
