@@ -66,6 +66,8 @@ ScriptProcessing::~ScriptProcessing() {
 
 void ScriptProcessing::reset() {
 	basepath = "";
+	sourceFile = "";
+	sourceFilei = 0;
 	sourceWidth = 0;
 	sourceHeight = 0;
 	sourceFps = 0;
@@ -149,6 +151,9 @@ void ScriptProcessing::processThreadMethod() {
 	KeepAlive::startKeepAlive();
 	processOperations(scriptOperations, nullptr);
 	KeepAlive::stopKeepAlive();
+	if (operationMode == OperationMode::RequestPause) {
+		setMode(OperationMode::Pause);
+	}
 	if (operationMode != OperationMode::Pause) {
 		this_thread::sleep_for(100ms);		// finish async tasks (show image)
 		doReset();
@@ -156,6 +161,7 @@ void ScriptProcessing::processThreadMethod() {
 }
 
 void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOperation* prevOperation0) {
+	bool isRoot = (prevOperation0 == nullptr);
 	ScriptOperation* operation;
 	ScriptOperation* prevOperation = prevOperation0;
 	bool operationFinished;
@@ -172,13 +178,13 @@ void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOpe
 			if (operationFinished) {
 				operations->moveNextOperation();
 			}
+			if (isRoot && operationMode == OperationMode::RequestPause) {
+				break;
+			}
 			prevOperation = operation;
 		} else {
 			break;
 		}
-	}
-	if (operationMode == OperationMode::RequestPause) {
-		setMode(OperationMode::Pause);
 	}
 }
 
@@ -210,7 +216,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 	newImage = &operation->image;						// newImage is pointer to current operation image
 
-	NumericPath outputPath;
+	NumericPath sourcePath, outputPath;
 	ImageTracker* imageTracker;
 	string path, source, output;
 	int width, height;
@@ -255,6 +261,18 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			basepath = operation->getArgument(ArgumentLabel::Path);
 			break;
 
+		case ScriptOperationType::Source:
+			sourcePath.setInputPath(basepath, operation->getArgument(ArgumentLabel::Path));
+			sourceFile = sourcePath.createFilePath(sourceFilei);
+			if (sourceFile != "") {
+				done = false;
+				sourceFilei++;
+			} else {
+				// already past last file (current invalid)
+				return true;
+			}
+			break;
+
 		case ScriptOperationType::CreateImage:
 			width = (int)operation->getArgumentNumeric(ArgumentLabel::Width);
 			height = (int)operation->getArgumentNumeric(ArgumentLabel::Height);
@@ -275,8 +293,12 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::OpenImage:
-			operation->initFrameSource(FrameType::Image, 0, basepath,
-										operation->getArgument(ArgumentLabel::Path),
+			if (sourceFile != "") {
+				source = sourceFile;
+			} else {
+				source = operation->getArgument(ArgumentLabel::Path);
+			}
+			operation->initFrameSource(FrameType::Image, 0, basepath, source,
 										operation->getArgument(ArgumentLabel::Start),
 										operation->getArgument(ArgumentLabel::Length),
 										sourceFps,
@@ -290,12 +312,19 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			sourceWidth = operation->frameSource->getWidth();
 			sourceHeight = operation->frameSource->getHeight();
 			newImageSet = true;
+			if (done) {
+				operation->resetFrameSource();
+			}
 			break;
 
         case ScriptOperationType::OpenVideo:
+			if (sourceFile != "") {
+				source = sourceFile;
+			} else {
+				source = operation->getArgument(ArgumentLabel::Path);
+			}
 			operation->initFrameSource(FrameType::Video,
-										(int)operation->getArgumentNumeric(ArgumentLabel::API), basepath,
-										operation->getArgument(ArgumentLabel::Path),
+										(int)operation->getArgumentNumeric(ArgumentLabel::API), basepath, source,
 										operation->getArgument(ArgumentLabel::Start),
 										operation->getArgument(ArgumentLabel::Length), 0,
 										(int)operation->getArgumentNumeric(ArgumentLabel::Interval),
@@ -306,6 +335,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				done = false;
 			} else {
 				// already past last frame; current image invalid
+				operation->resetFrameSource();
 				return true;
 			}
 			sourceWidth = operation->frameSource->getWidth();
@@ -329,6 +359,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				done = false;
 			} else {
 				// capture failed; current image invalid
+				operation->resetFrameSource();
 				return true;
 			}
 			sourceWidth = operation->frameSource->getWidth();
@@ -594,7 +625,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::SaveClusters:
-			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultDataExtension);
+			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path) + Util::extractFileTitle(sourceFile), Constants::defaultDataExtension);
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->saveClusters(outputPath.createFilePath(frame), frame, getTime(frame),
 										(SaveFormat)operation->getArgument(ArgumentLabel::Format, (int)SaveFormat::ByTime),
@@ -603,7 +634,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::SaveTracks:
-			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultDataExtension);
+			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path) + Util::extractFileTitle(sourceFile), Constants::defaultDataExtension);
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->saveTracks(outputPath.createFilePath(frame), frame, getTime(frame),
 										(SaveFormat)operation->getArgument(ArgumentLabel::Format, (int)SaveFormat::ByTime),
@@ -612,13 +643,13 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::SavePaths:
-			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultDataExtension);
+			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path) + Util::extractFileTitle(sourceFile), Constants::defaultDataExtension);
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->savePaths(outputPath.createFilePath(frame), frame, getTime(frame));
 			break;
 
 		case ScriptOperationType::SaveTrackInfo:
-			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path), Constants::defaultDataExtension);
+			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path) + Util::extractFileTitle(sourceFile), Constants::defaultDataExtension);
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->saveTrackInfo(outputPath.createFilePath(frame), frame, getTime(frame));
 			break;

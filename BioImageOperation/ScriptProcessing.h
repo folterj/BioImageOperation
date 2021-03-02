@@ -45,6 +45,8 @@ public:
 	Mat* dummyImage = new Mat();
 
 	string basepath;
+	string sourceFile;
+	int sourceFilei = 0;
 	int sourceWidth = 0;
 	int sourceHeight = 0;
 	double sourceFps = 0;

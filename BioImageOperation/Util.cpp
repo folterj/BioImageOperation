@@ -52,9 +52,16 @@ string Util::getValueList(vector<string> list) {
 	return s;
 }
 
-bool Util::startsWith(string src, string start) {
-	if (src.length() >= start.length()) {
-		return (src.substr(0, start.length()) == start);
+bool Util::startsWith(string src, string target) {
+	if (src.length() >= target.length()) {
+		return (src.substr(0, target.length()) == target);
+	}
+	return false;
+}
+
+bool Util::endsWith(string src, string target) {
+	if (src.length() >= target.length()) {
+		return (src.substr(src.length() - target.length()) == target);
 	}
 	return false;
 }
@@ -568,7 +575,7 @@ string Util::extractFilePath(string filepath) {
     return filesystem::path(filepath).parent_path().string();
 }
 
-string Util::extractTitle(string filepath) {
+string Util::extractFileTitle(string filepath) {
     return filesystem::path(filepath).stem().string();
 }
 

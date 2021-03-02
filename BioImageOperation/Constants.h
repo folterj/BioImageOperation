@@ -24,6 +24,7 @@ enum class ScriptOperationType
 	Set,
 	SetPath,
 
+	Source,
 	CreateImage,
 	OpenImage,
 	OpenVideo,
@@ -92,6 +93,7 @@ const vector<string> ScriptOperationTypes =
 	"Set",
 	"SetPath",
 
+	"Source",
 	"CreateImage",
 	"OpenImage",
 	"OpenVideo",

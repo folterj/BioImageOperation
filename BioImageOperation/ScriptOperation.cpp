@@ -35,13 +35,19 @@ ScriptOperation::~ScriptOperation() {
 		delete arguments.at(i);
 	}
 
-	if (frameSource) {
-		delete frameSource;
-	}
-
 	if (frameOutput) {
 		delete frameOutput;
 	}
+
+	resetFrameSource();
+}
+
+void ScriptOperation::resetFrameSource() {
+	if (frameSourceInit) {
+		frameSource->close();
+		delete frameSource;
+	}
+	frameSourceInit = false;
 }
 
 void ScriptOperation::reset() {
@@ -347,6 +353,12 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::API, ArgumentLabel::Path, ArgumentLabel::Source, ArgumentLabel::Width, ArgumentLabel::Height, ArgumentLabel::Interval };
 		description = "Open capturing from video (IP) path or camera source";
+		break;
+
+	case ScriptOperationType::Source:
+		requiredArguments = vector<ArgumentLabel>{ ArgumentLabel::Path };
+		optionalArguments = vector<ArgumentLabel>{ };
+		description = "Open sources for individual processing";
 		break;
 
 	case ScriptOperationType::SaveImage:
@@ -1128,7 +1140,7 @@ string ScriptOperation::getOperationListSimple() {
 bool ScriptOperation::initFrameSource(FrameType frameType, int apiCode, string basepath, string templatePath, string start, string length, double fps0, int interval, int total) {
 	bool ok = true;
 
-	if (!frameSource) {
+	if (!frameSourceInit) {
 		switch (frameType) {
 		case FrameType::Image: frameSource = new ImageSource(); break;
 		case FrameType::Video: frameSource = new VideoSource(); break;
@@ -1136,19 +1148,21 @@ bool ScriptOperation::initFrameSource(FrameType frameType, int apiCode, string b
 		}
 		if (frameSource) {
 			ok = frameSource->init(apiCode, basepath, templatePath, start, length, fps0, interval, total);
+			frameSourceInit = true;
 		}
 	}
 	return ok;
 }
 
 void ScriptOperation::initFrameOutput(FrameType frameType, string basepath, string templatePath, string defaultExtension, string start, string length, double fps, string codecs) {
-	if (!frameOutput) {
+	if (!frameOutputInit) {
 		switch (frameType) {
 		case FrameType::Image: frameOutput = new ImageOutput(); break;
 		case FrameType::Video: frameOutput = new VideoOutput(); break;
 		}
 		if (frameOutput) {
 			frameOutput->init(basepath, templatePath, defaultExtension, start, length, fps, codecs);
+			frameOutputInit = true;
 		}
 	}
 }
@@ -1200,11 +1214,11 @@ void ScriptOperation::close() {
 		innerOperations->close();
 	}
 
-	if (frameSource) {
+	if (frameSourceInit) {
 		frameSource->close();
 	}
 
-	if (frameOutput) {
+	if (frameOutputInit) {
 		frameOutput->close();
 	}
 }

@@ -1,4 +1,4 @@
-# Bio Image Operation script operations (v1.7.2 / 2021-02-17)
+# Bio Image Operation script operations (v1.7.2 / 2021-03-02)
 
 
 **Set** (Path, Width, Height, Fps, PixelSize, WindowSize)
@@ -16,6 +16,13 @@ Set parameters
 **SetPath** (**Path**)
 
 Set path for relative file paths (by default path of current script file)
+
+ - Path:	 File path ("path")
+
+
+**Source** (**Path**)
+
+Open sources for individual processing
 
  - Path:	 File path ("path")
 

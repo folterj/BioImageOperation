@@ -35,7 +35,8 @@ public:
 	static bool contains(vector<string> source, string target);
 	static int getListIndex(vector<string> source, string target);
 	static string getValueList(vector<string> list);
-	static bool startsWith(string src, string start);
+	static bool startsWith(string src, string target);
+	static bool endsWith(string src, string target);
 	static vector<string> split(const string s, const string delim, bool removeEmptyEntries=false);
 	static vector<string> split(const string s, const vector<string> delims, bool removeEmptyEntries=false);
 	static string toLower(string s0);
@@ -84,7 +85,7 @@ public:
 
     static vector<string> getImageFilenames(string searchpath);
     static string extractFilePath(string filepath);
-    static string extractTitle(string filepath);
+    static string extractFileTitle(string filepath);
     static string extractFileName(string filepath);
     static string extractFileExtension(string filepath);
     static string combinePath(string basepath, string templatepath);

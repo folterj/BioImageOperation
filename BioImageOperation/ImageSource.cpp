@@ -57,7 +57,7 @@ bool ImageSource::getNextImage(Mat* image) {
 	bool more = false;
 	string filename = sourcePath.createFilePath(filei);
 
-	label = Util::extractFileName(filename);
+	label = Util::extractFileTitle(filename);
 
 	if (filename != "") {
 		*image = Util::loadImage(filename);

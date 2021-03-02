@@ -110,7 +110,7 @@ void MainWindow::setText(string text) {
 
 void MainWindow::updateTitle() {
 	string title = "Bio Image Operation";
-	string fileTitle = Util::extractTitle(filepath);
+	string fileTitle = Util::extractFileTitle(filepath);
 	if (fileTitle != "") {
 		title += " - " + fileTitle;
 	}
@@ -235,8 +235,7 @@ void MainWindow::generateScript(string title, string instruction, string scriptF
 				filepath = qfilename.toStdString();
 				script = Util::replace(script, Constants::filenameTemplate, Util::extractFileName(filepath));
 				fileModified = true;
-				setFilePath(Util::combinePath(Util::extractFilePath(filepath), title + " " + Util::extractTitle(filepath) + "." + Constants::defaultScriptExtension));
-				bioSettings.setValue(DEFAULT_DIR_KEY, QVariant(Util::convertToQString(filepath)));
+				setFilePath(Util::combinePath(Util::extractFilePath(filepath), title + " " + Util::extractFileTitle(filepath) + "." + Constants::defaultScriptExtension));
 				setText(script);
 				scriptProcessing.doReset();
 			}

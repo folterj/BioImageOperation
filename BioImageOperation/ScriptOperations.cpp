@@ -29,37 +29,51 @@ void ScriptOperations::reset() {
 	}
 }
 
-void ScriptOperations::extract(string script, int linei0) {
-	ScriptOperation* operation = nullptr;
+void ScriptOperations::extract(string script) {
 	vector<string> lines;
-	string original, line;
-	bool skipping = false;
-
-	clear();
+	string line;
+	int nopenBrackets = 0;
+	int ncloseBrackets = 0;
 
 	this->script = script;
 	lines = Util::split(script, "\n");
+	for (string line0 : lines) {
+		line = Util::trim(line0);
+		if (Util::endsWith(line, "{")) {
+			nopenBrackets++;
+		}
+		if (Util::startsWith(line, "}")) {
+			ncloseBrackets++;
+		}
+	}
+	if (ncloseBrackets != nopenBrackets) {
+		throw invalid_argument("Mismatched number of open/close brackets { }\n");
+	}
+	extract(lines);
+}
 
-	for (int linei = linei0; linei < lines.size(); linei++) {
+int ScriptOperations::extract(vector<string> lines, int startlinei) {
+	ScriptOperation* operation = nullptr;
+	string original, line;
+	bool bracketOpen, bracketClose;
+
+	clear();
+
+	for (int linei = startlinei; linei < lines.size(); linei++) {
 		original = lines[linei];
 		line = Util::trim(original);
-		if (Util::startsWith(line, "{")) {
-			// adds inner instructions for last operation
-			if (operation) {
-				operation->innerOperations = new ScriptOperations();
-				operation->innerOperations->extract(script, linei + 1);
-				skipping = true;
-			}
-		} else if (Util::startsWith(line, "}")) {
-			if (skipping) {
-				if (operation) {
-					operation->lineEnd = linei;
-				}
-				skipping = false;
-			} else {
-				return;
-			}
-		} else if (!skipping && line != "" && !Util::startsWith(line, "//") && !Util::startsWith(line, "#")) {
+		bracketOpen = Util::endsWith(line, "{");
+		if (bracketOpen) {
+			line = line.substr(0, line.length() - 1);
+		}
+		bracketClose = Util::startsWith(line, "}");
+		if (bracketClose) {
+			line = line.substr(1);
+		}
+
+		if (bracketClose) {
+			return linei;
+		} else if (line != "" && !Util::startsWith(line, "//") && !Util::startsWith(line, "#")) {
 			try {
 				operation = new ScriptOperation();
 				operation->extract(original, line);
@@ -70,10 +84,19 @@ void ScriptOperations::extract(string script, int linei0) {
 				throw invalid_argument(e.what() + string(" in line:\n") + line);
 			}
 		}
+		if (bracketOpen) {
+			// adds inner instructions for last operation
+			if (operation) {
+				operation->innerOperations = new ScriptOperations();
+				linei = operation->innerOperations->extract(lines, linei + 1);
+				operation->lineEnd = linei;
+			}
+		}
 	}
 
 	operationLineMap.clear();
 	createOperationLineList(this);
+	return -1;
 }
 
 void ScriptOperations::createOperationLineList(ScriptOperations* operations) {

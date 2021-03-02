@@ -33,7 +33,8 @@ public:
 	ScriptOperations();
 	~ScriptOperations();
 	void reset();
-	void extract(string script, int linei = 0);
+	void extract(string script);
+	int extract(vector<string> lines, int startlinei = 0);
 	void createOperationLineList(ScriptOperations* operations);
 	bool hasOperations();
 	ScriptOperation* getCurrentOperation();

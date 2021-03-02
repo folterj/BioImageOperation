@@ -41,6 +41,8 @@ public:
 
 	ScriptOperations* innerOperations = nullptr;
 
+	bool frameSourceInit = false;
+	bool frameOutputInit = false;
 	FrameSource* frameSource = nullptr;
 	FrameOutput* frameOutput = nullptr;
 	Mat image;
@@ -53,6 +55,7 @@ public:
 
 	ScriptOperation();
 	~ScriptOperation();
+	void resetFrameSource();
 	void reset();
 	void initialFinish();
 	void finish();

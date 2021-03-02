@@ -119,7 +119,7 @@ bool VideoSource::open() {
 				if (videoNframes < 0) {
 					videoNframes = 0;
 				}
-				label = Util::extractFileName(filename);
+				label = Util::extractFileTitle(filename);
 				sourcei++;
 				videoIsOpen = videoCapture.isOpened();
                 ok = videoIsOpen;
