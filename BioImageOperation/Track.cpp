@@ -68,6 +68,7 @@ void Track::update(Cluster* cluster, double maxArea, double maxMoveDistance, boo
 	} else if (isNew) {
 		newx = cluster->x;
 		newy = cluster->y;
+		angle = cluster->angle;
 		estimateX = newx;
 		estimateY = newy;
 		originX = newx;
@@ -132,12 +133,13 @@ void Track::update(Cluster* cluster, double maxArea, double maxMoveDistance, boo
 		meanLengthMajor = lengthMajor;
 		meanLengthMinor = lengthMinor;
 	} else {
-		points.push_back(Point2d(x, y));
-		angles.push_back(orientation);
 		meanArea = meanArea * 0.9 + area * 0.1;
 		meanLengthMajor = meanLengthMajor * 0.9 + lengthMajor * 0.1;
 		meanLengthMinor = meanLengthMinor * 0.9 + lengthMinor * 0.1;
 	}
+
+	points.push_back(Point2d(x, y));
+	angles.push_back(orientation);
 
 	if (trackParamsFinalised) {
 		lastClusterRad = cluster->rad;
@@ -234,7 +236,7 @@ void Track::drawBox(Mat* image, Scalar color) {
 }
 
 void Track::drawAngle(Mat* image, Scalar color) {
-	double rad2 = meanLengthMinor / 2;
+	double rad2 = meanLengthMajor / 2;
 	if (rad2 == 0) {
 		rad2 = rad;
 	}
@@ -294,7 +296,7 @@ void Track::drawLabel(Mat* image, Scalar color, int drawMode) {
 
 string Track::getCsvHeader(bool outputShapeFeatures, bool outputContour) {
 	string header = "track_label,cluster_label,is_merged"
-					",x,y,v,a,dist_tot,dist_origin"
+					",x,y,v,projection,v_projection,a,dist_tot,dist_origin"
 					",angle,v_angle,a_angle"
 					",area,area1,length_major,length_major1,length_minor,length_minor1,rad";
 	if (outputShapeFeatures) {
@@ -309,15 +311,19 @@ string Track::getCsvHeader(bool outputShapeFeatures, bool outputContour) {
 string Track::getCsv(bool outputShapeFeatures, bool outputContour, Cluster* cluster) {
 	string csv;
 	vector<Point> contour;
-	Point2d lastpoint;
-	double d, lastd, dd, lastangle, centdist;
+	Point2d* point;
+	Point2d* lastPoint;
+	double dist, dx, dy, dx1, dy1, lastDist, ddist, proj, centDist;
+	double dangle, lastAngle, lastDangle, ddangle, radAngle;
 	double v = 0;
 	double v_angle = 0;
 	double a = 0;
 	double a_angle = 0;
+	double vProjection = 0;
+	double projection = 0;
 	int vn = 0;
 	int an = 0;
-	int i = 0;
+	int ii = 0;
 	int n = (int)(round(fps * windowSize));
 
 	csv = format("%d,", label);
@@ -326,70 +332,61 @@ string Track::getCsv(bool outputShapeFeatures, bool outputContour, Cluster* clus
 	}
 	csv += format(",%s", isMerged ? "true" : "false");
 
-	for (auto point = points.rbegin(); point != points.rend(); point++) {
-		if (i > 0) {
-			d = Util::calcDistance(lastpoint, *point);
+	for (int i = points.size() - 1; i >= 0; i--) {
+		// reverse order loop: inverse delta subtractions
+		point = &points[i];
+		angle = angles[i];
+		if (ii > 0) {
+			dx = lastPoint->x - point->x;
+			dy = lastPoint->y - point->y;
+			dist = Util::calcDistance(dx, dy);
+			dangle = Util::calcAngleDif(angle, lastAngle);
+			radAngle = Util::degreesToRadians(angle);
+			dx1 = cos(radAngle);
+			dy1 = sin(radAngle);
+			proj = (dx / dist) * dx1 + (dy / dist) * dy1;
 			if (vn < n) {
-				v += d;
+				v += dist;
+				v_angle += dangle;
+				projection += proj;
+				vProjection += dist * proj;
 				vn++;
 			}
-			if (i > 1) {
-				dd = lastd - d;		// reverse order loop
+			if (ii > 1) {
+				ddist = lastDist - dist;
+				ddangle = lastDangle - dangle;
 				if (an < n) {
-					a += dd;
+					a += ddist;
+					a_angle += ddangle;
 					an++;
 				} else {
 					break;			// completed a and v
 				}
 			}
-			lastd = d;
+			lastDist = dist;
+			lastDangle = dangle;
 		}
-		lastpoint = *point;
-		i++;
+		lastPoint = point;
+		lastAngle = angle;
+		ii++;
 	}
+
 	if (vn != 0) {
-		v = v / vn * pixelSize * fps;
+		v /= vn;
+		v_angle /= vn;
+		projection /= vn;
+		vProjection /= vn;
 	}
 	if (an != 0) {
-		a = a / an * pixelSize * fps * fps;
+		a /= an;
+		a_angle /= an;
 	}
 
-	vn = 0;
-	an = 0;
-	i = 0;
-	for (auto angle = angles.rbegin(); angle != angles.rend(); angle++) {
-		if (i > 0) {
-			d = Util::calcAngleDif(lastangle, *angle);
-			if (vn < n) {
-				v_angle += d;
-				vn++;
-			}
-			if (i > 1) {
-				dd = lastd - d;		// reverse order loop
-				if (an < n) {
-					a_angle += dd;
-					an++;
-				} else {
-					break;			// completed a and v
-				}
-			}
-			lastd = d;
-		}
-		lastangle = *angle;
-		i++;
-	}
-	if (vn != 0) {
-		v_angle = v_angle / vn * fps;
-	}
-	if (an != 0) {
-		a_angle = a_angle / an * fps * fps;
-	}
+	centDist = Util::calcDistance(originX, originY, x, y);
 
-	centdist = Util::calcDistance(originX, originY, x, y);
-
-	csv += format(",%f,%f,%f,%f", x * pixelSize, y * pixelSize, v, a);
-	csv += format(",%f,%f", totdist * pixelSize, centdist * pixelSize);
-	csv += format(",%f,%f,%f", orientation, v_angle, a_angle);
+	csv += format(",%f,%f,%f,%f,%f,%f", x * pixelSize, y * pixelSize, v * pixelSize * fps, projection, vProjection * pixelSize * fps, a * pixelSize * fps * fps);
+	csv += format(",%f,%f", totdist * pixelSize, centDist * pixelSize);
+	csv += format(",%f,%f,%f", orientation, v_angle * fps, a_angle * fps * fps);
 	csv += format(",%f,%f,%f,%f,%f,%f,%f",
 					area * pixelSize * pixelSize, meanArea * pixelSize * pixelSize,
 					lengthMajor * pixelSize, meanLengthMajor * pixelSize,
