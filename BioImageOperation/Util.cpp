@@ -591,6 +591,15 @@ string Util::combinePath(string basepath, string templatepath) {
     return (filesystem::path(basepath) / filesystem::path(templatepath)).string();
 }
 
+string Util::combineFilename(string basename, string name) {
+	string filename = basename + "_";
+	string s = Util::extractFileTitle(name);
+	if (s != "") {
+		filename += s + "_";
+	}
+	return filename;
+}
+
 Size Util::drawText(Mat* image, string text, Point point, HersheyFonts fontFace, double fontScale, Scalar color) {
 	Size size = getTextSize(text, fontFace, fontScale, 1, nullptr);
 	putText(*image, text, point, fontFace, fontScale, color, 1, LineTypes::LINE_AA);

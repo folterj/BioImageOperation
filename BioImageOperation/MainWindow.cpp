@@ -236,6 +236,7 @@ void MainWindow::generateScript(string title, string instruction, string scriptF
 				script = Util::replace(script, Constants::filenameTemplate, Util::extractFileName(filepath));
 				fileModified = true;
 				setFilePath(Util::combinePath(Util::extractFilePath(filepath), title + " " + Util::extractFileTitle(filepath) + "." + Constants::defaultScriptExtension));
+				bioSettings.setValue(DEFAULT_DIR_KEY, QVariant(Util::convertToQString(filepath)));
 				setText(script);
 				scriptProcessing.doReset();
 			}

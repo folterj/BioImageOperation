@@ -625,7 +625,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::SaveClusters:
-			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path) + Util::extractFileTitle(sourceFile), Constants::defaultDataExtension);
+			outputPath.setOutputPath(basepath, Util::combineFilename(operation->getArgument(ArgumentLabel::Path), sourceFile), Constants::defaultDataExtension);
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->saveClusters(outputPath.createFilePath(frame), frame, getTime(frame),
 										(SaveFormat)operation->getArgument(ArgumentLabel::Format, (int)SaveFormat::ByTime),
@@ -634,7 +634,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::SaveTracks:
-			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path) + Util::extractFileTitle(sourceFile), Constants::defaultDataExtension);
+			outputPath.setOutputPath(basepath, Util::combineFilename(operation->getArgument(ArgumentLabel::Path), sourceFile), Constants::defaultDataExtension);
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->saveTracks(outputPath.createFilePath(frame), frame, getTime(frame),
 										(SaveFormat)operation->getArgument(ArgumentLabel::Format, (int)SaveFormat::ByTime),
@@ -643,13 +643,13 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::SavePaths:
-			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path) + Util::extractFileTitle(sourceFile), Constants::defaultDataExtension);
+			outputPath.setOutputPath(basepath, Util::combineFilename(operation->getArgument(ArgumentLabel::Path), sourceFile), Constants::defaultDataExtension);
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->savePaths(outputPath.createFilePath(frame), frame, getTime(frame));
 			break;
 
 		case ScriptOperationType::SaveTrackInfo:
-			outputPath.setOutputPath(basepath, operation->getArgument(ArgumentLabel::Path) + Util::extractFileTitle(sourceFile), Constants::defaultDataExtension);
+			outputPath.setOutputPath(basepath, Util::combineFilename(operation->getArgument(ArgumentLabel::Path), sourceFile), Constants::defaultDataExtension);
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->saveTrackInfo(outputPath.createFilePath(frame), frame, getTime(frame));
 			break;

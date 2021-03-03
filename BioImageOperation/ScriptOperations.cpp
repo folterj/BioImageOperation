@@ -47,7 +47,7 @@ void ScriptOperations::extract(string script) {
 		}
 	}
 	if (ncloseBrackets != nopenBrackets) {
-		throw invalid_argument("Mismatched number of open/close brackets { }\n");
+		throw invalid_argument("Mismatched number of open/close brackets { }");
 	}
 	extract(lines);
 }
