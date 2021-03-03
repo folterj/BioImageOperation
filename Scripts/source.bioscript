@@ -1,0 +1,27 @@
+Source("*.mp4")
+{
+	OpenVideo("*", total=21)
+	{
+		Grayscale()
+		AddSeries()
+	}
+	GetSeriesMedian()
+	StoreImage(background)
+	ClearSeries()
+
+	OpenVideo("*")
+	{
+		GrayScale()
+		DifferenceAbs(background)
+		Threshold()
+
+		CreateClusters()
+		CreateTracks()
+
+		Color()
+		DrawTracks(DrawMode=Point|Circle|Label)
+		ShowImage()
+
+		//SaveTracks("tracking/tracking", Format=Split)
+	}
+}

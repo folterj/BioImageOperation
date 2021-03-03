@@ -68,10 +68,10 @@ BEGIN
         BLOCK "080904b0"
         BEGIN
             VALUE "CompanyName", "Joost de Folter"
-            VALUE "FileDescription", "https://joostdefolter.info"
+            VALUE "FileDescription", "https://github.com/folterj/BioImageOperation"
             VALUE "FileVersion", "1.7.2"
             VALUE "InternalName", "BioImageOperation"
-            VALUE "LegalCopyright", "2021-03-02"
+            VALUE "LegalCopyright", "2021-03-03"
             VALUE "OriginalFilename", "BioImageOperation"
             VALUE "ProductName", "BioImageOperation"
             VALUE "ProductVersion", "1.7.2"

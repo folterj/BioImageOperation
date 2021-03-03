@@ -349,7 +349,6 @@
     <Text Include="CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="CMakeSettings.json" />
     <None Include="templates\template_tracking.bioscript">
       <Filter>Resources</Filter>
     </None>
