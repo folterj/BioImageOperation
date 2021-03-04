@@ -43,7 +43,6 @@ public:
 	double meanLengthMinor = 0;
 	double angle = 0;
 	double orientation = 0;
-	bool orientInvertAngle = false;
 
 	double originX = 0;
 	double originY = 0;

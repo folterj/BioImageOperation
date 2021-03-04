@@ -314,7 +314,7 @@ string Track::getCsv(bool outputShapeFeatures, bool outputContour, Cluster* clus
 	Point2d* point;
 	Point2d* lastPoint;
 	double dist, dx, dy, dx1, dy1, lastDist, ddist, proj, centDist;
-	double dangle, lastAngle, lastDangle, ddangle, radAngle;
+	double angle, dangle, lastAngle, lastDangle, ddangle, radAngle;
 	double v = 0;
 	double v_angle = 0;
 	double a = 0;
@@ -340,11 +340,15 @@ string Track::getCsv(bool outputShapeFeatures, bool outputContour, Cluster* clus
 			dx = lastPoint->x - point->x;
 			dy = lastPoint->y - point->y;
 			dist = Util::calcDistance(dx, dy);
-			dangle = Util::calcAngleDif(angle, lastAngle);
-			radAngle = Util::degreesToRadians(angle);
+			dangle = Util::calcShortAngleDif(angle, lastAngle);
+			radAngle = Util::degreesToRadians(lastAngle);
 			dx1 = cos(radAngle);
 			dy1 = sin(radAngle);
-			proj = (dx / dist) * dx1 + (dy / dist) * dy1;
+			if (dist != 0) {
+				dx /= dist;
+				dy /= dist;
+			}
+			proj = dx * dx1 + dy * dy1;
 			if (vn < n) {
 				v += dist;
 				v_angle += dangle;
