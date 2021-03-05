@@ -87,7 +87,7 @@ public:
 	void drawAngle(Mat* image, Scalar color);
 	void drawTracks(Mat* image, Scalar color, int ntracks = 1);
 	void drawLabel(Mat* image, Scalar color, int drawMode);
-	static string getCsvHeader(bool outputShapeFeatures = false, bool outputContour = false);
-	string getCsv(bool outputShapeFeatures = false, bool outputContour = false, Cluster* cluster = nullptr);
+	static string getCsvHeader(bool outputContour = false);
+	string getCsv(bool outputContour = false, Cluster* cluster = nullptr);
 	string toString();
 };

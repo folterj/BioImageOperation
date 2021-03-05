@@ -637,7 +637,7 @@ string ImageTracker::getInfo() {
 	return info;
 }
 
-void ImageTracker::saveClusters(string filename, int frame, double time, SaveFormat saveFormat, bool outputShapeFeatures, bool outputContour) {
+void ImageTracker::saveClusters(string filename, int frame, double time, SaveFormat saveFormat, bool outputContour) {
 	OutputStream* clusterStream = nullptr;
 	string csv = "";
 	string sfilename;
@@ -645,7 +645,7 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 	int dcol;
 	int col = 0;
 	int maxi = 0;
-	string maincols = Cluster::getCsvHeader(outputShapeFeatures, outputContour);
+	string maincols = Cluster::getCsvHeader(outputContour);
 	int nmaincols = (int)Util::split(maincols, ",").size();
 	string header = "frame,time," + maincols + "\n";
 
@@ -669,7 +669,7 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 							csv += string(',', dcol * nmaincols);
 							col = i;
 						}
-						csv += cluster->getCsv(outputShapeFeatures, outputContour) + ",";
+						csv += cluster->getCsv(outputContour) + ",";
 						col++;
 					}
 				}
@@ -677,11 +677,11 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 			csv += "\n";
 		} else if (saveFormat == SaveFormat::ByTime) {
 			for (Cluster* cluster : clusters) {
-				csv += Util::format("%d,%f,%s\n", frame, time, cluster->getCsv(outputShapeFeatures, outputContour).c_str());
+				csv += Util::format("%d,%f,%s\n", frame, time, cluster->getCsv(outputContour).c_str());
 			}
 		} else if (saveFormat == SaveFormat::Split) {
 			for (Cluster* cluster : clusters) {
-				csv = Util::format("%d,%f,%s\n", frame, time, cluster->getCsv(outputShapeFeatures, outputContour).c_str());
+				csv = Util::format("%d,%f,%s\n", frame, time, cluster->getCsv(outputContour).c_str());
 				sfilename = filepath.createFilePath(cluster->getInitialLabel());
 				clusterStream = clusterStreams.get(sfilename, header);
 				clusterStream->write(csv);
@@ -694,7 +694,7 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 	}
 }
 
-void ImageTracker::saveTracks(string filename, int frame, double time, SaveFormat saveFormat, bool outputShapeFeatures, bool outputContour) {
+void ImageTracker::saveTracks(string filename, int frame, double time, SaveFormat saveFormat, bool outputContour) {
 	OutputStream* trackStream = nullptr;
 	Cluster* cluster = nullptr;
 	string csv = "";
@@ -703,8 +703,7 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 	int dcol;
 	int col = 0;
 	int maxi = 0;
-	bool findClusters = (outputShapeFeatures || outputContour);
-	string maincols = Track::getCsvHeader(outputShapeFeatures, outputContour);
+	string maincols = Track::getCsvHeader(outputContour);
 	int nmaincols = (int)Util::split(maincols, ",").size();
 	string header = "frame,time," + maincols + "\n";
 
@@ -731,10 +730,10 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 								csv += string(',', dcol * nmaincols);
 								col = i;
 							}
-							if (findClusters) {
+							if (outputContour) {
 								cluster = findTrackedCluster(track);
 							}
-							csv += track->getCsv(outputShapeFeatures, outputContour, cluster) + ",";
+							csv += track->getCsv(outputContour, cluster) + ",";
 							col++;
 						}
 					}
@@ -744,19 +743,19 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 		} else if (saveFormat == SaveFormat::ByTime) {
 			for (Track* track : tracks) {
 				if (track->isActive()) {
-					if (findClusters) {
+					if (outputContour) {
 						cluster = findTrackedCluster(track);
 					}
-					csv += Util::format("%d,%f,%s\n", frame, time, track->getCsv(outputShapeFeatures, outputContour, cluster).c_str());
+					csv += Util::format("%d,%f,%s\n", frame, time, track->getCsv(outputContour, cluster).c_str());
 				}
 			}
 		} else if (saveFormat == SaveFormat::Split) {
 			for (Track* track : tracks) {
 				if (track->isActive()) {
-					if (findClusters) {
+					if (outputContour) {
 						cluster = findTrackedCluster(track);
 					}
-					csv = Util::format("%d,%f,%s\n", frame, time, track->getCsv(outputShapeFeatures, outputContour, cluster).c_str());
+					csv = Util::format("%d,%f,%s\n", frame, time, track->getCsv(outputContour, cluster).c_str());
 					sfilename = filepath.createFilePath(track->label);
 					trackStream = trackStreams.get(sfilename, header);
 					trackStream->write(csv);

@@ -317,21 +317,18 @@ void Cluster::drawLabel(Mat* image, Scalar color, int drawMode) {
 	}
 }
 
-string Cluster::getCsvHeader(bool outputShapeFeatures, bool outputContour) {
+string Cluster::getCsvHeader(bool outputContour) {
 	string header = "track_label,cluster_label,is_merged"
 		",x,y"
 		",angle"
 		",area,length_major,length_minor,rad";
-	if (outputShapeFeatures) {
-		header += ",size_ratio,ellipsity,circularity,convexity";
-	}
 	if (outputContour) {
 		header += ",contour";
 	}
 	return header;
 }
 
-string Cluster::getCsv(bool outputShapeFeatures, bool outputContour) {
+string Cluster::getCsv(bool outputContour) {
 	string csv;
 	vector<Point> contour;
     
@@ -340,14 +337,9 @@ string Cluster::getCsv(bool outputShapeFeatures, bool outputContour) {
 	csv += format(",%f,%f,%f", x * pixelSize, y * pixelSize, angle);
 	csv += format(",%f,%f,%f,%f", area * pixelSize * pixelSize, lengthMajor * pixelSize, lengthMinor * pixelSize, rad * pixelSize);
 
-	if (outputShapeFeatures || outputContour) {
-		contour = getContour();
-	}
-	if (outputShapeFeatures) {
-		csv += Util::getShapeFeatures(&contour, area, lengthMajor, lengthMinor);
-	}
 	if (outputContour) {
 		csv += ",";
+		contour = getContour();
 		for (Point point : contour) {
 			if (pixelSize == 1) {
 				csv += Util::format("%d %d ", point.x, point.y);

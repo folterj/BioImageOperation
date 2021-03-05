@@ -629,7 +629,6 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->saveClusters(outputPath.createFilePath(frame), frame, getTime(frame),
 										(SaveFormat)operation->getArgument(ArgumentLabel::Format, (int)SaveFormat::ByTime),
-										operation->getArgumentBoolean(ArgumentLabel::Features),
 										operation->getArgumentBoolean(ArgumentLabel::Contour));
 			break;
 
@@ -638,7 +637,6 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->saveTracks(outputPath.createFilePath(frame), frame, getTime(frame),
 										(SaveFormat)operation->getArgument(ArgumentLabel::Format, (int)SaveFormat::ByTime),
-										operation->getArgumentBoolean(ArgumentLabel::Features),
 										operation->getArgumentBoolean(ArgumentLabel::Contour));
 			break;
 

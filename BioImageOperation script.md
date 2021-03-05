@@ -392,25 +392,23 @@ Draw tracking count on image
  - Tracker:	 Tracker id (string)
 
 
-**SaveClusters** (**Path**, Tracker, Format, Features, Contour)
+**SaveClusters** (**Path**, Tracker, Format, Contour)
 
 Save clusters to CSV file
 
  - Path:	 File path ("path")
  - Tracker:	 Tracker id (string)
  - Format:	 Output format (ByTime, ByLabel, Split)
- - Features:	 Extract features (true / false)
  - Contour:	 Extract contours (true / false)
 
 
-**SaveTracks** (**Path**, Tracker, Format, Features, Contour)
+**SaveTracks** (**Path**, Tracker, Format, Contour)
 
 Save cluster tracking to CSV file
 
  - Path:	 File path ("path")
  - Tracker:	 Tracker id (string)
  - Format:	 Output format (ByTime, ByLabel, Split)
- - Features:	 Extract features (true / false)
  - Contour:	 Extract contours (true / false)
 
 

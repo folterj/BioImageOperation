@@ -84,7 +84,6 @@ enum class ArgumentLabel
 	Display,
 	Position,
 	Format,
-	Features,
 	Contour,
 	Debug
 };
@@ -134,7 +133,6 @@ const vector<string> ArgumentLabels =
 	"Display",
 	"Position",
 	"Format",
-	"Features",
 	"Contour",
 	"Debug"
 };

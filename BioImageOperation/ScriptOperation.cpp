@@ -603,13 +603,13 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 
 	case ScriptOperationType::SaveClusters:
 		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Features, ArgumentLabel::Contour };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Contour };
 		description = "Save clusters to CSV file";
 		break;
 
 	case ScriptOperationType::SaveTracks:
 		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Features, ArgumentLabel::Contour };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::Format, ArgumentLabel::Contour };
 		description = "Save cluster tracking to CSV file";
 		break;
 
@@ -680,7 +680,6 @@ ArgumentType ScriptOperation::getExpectedArgumentType(ArgumentLabel argument) {
 		type = ArgumentType::Display;
 		break;
 
-	case ArgumentLabel::Features:
 	case ArgumentLabel::Contour:
 	case ArgumentLabel::Debug:
 		type = ArgumentType::Bool;
@@ -926,10 +925,6 @@ string ScriptOperation::getArgumentDescription(ArgumentLabel argument) {
 
 	case ArgumentLabel::Position:
 		s = "Draw position";
-		break;
-
-	case ArgumentLabel::Features:
-		s = "Extract features";
 		break;
 
 	case ArgumentLabel::Contour:
