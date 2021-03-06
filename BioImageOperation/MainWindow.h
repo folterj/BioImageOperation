@@ -42,7 +42,6 @@ private:
 	Clock::time_point time;
 	string filepath;
 	bool fileModified = false;
-	bool ignoreTextChangeEvent = false;
 	bool statusQueued = false;
 	bool operationQueued = false;
 	bool textQueued[Constants::nTextWindows + 1] = { false, false, false, false, false };
@@ -53,8 +52,8 @@ private:
 public:
 	MainWindow(QWidget *parent = Q_NULLPTR);
 	void setFilePath(string filepath);
-	void setText(string text);
 	void updateTitle();
+	void setText(string text);
 	void clearInput();
 	bool clearDialog();
 	bool openDialog();

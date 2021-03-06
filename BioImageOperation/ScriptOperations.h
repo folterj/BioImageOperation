@@ -34,7 +34,7 @@ public:
 	~ScriptOperations();
 	void reset();
 	void extract(string script);
-	int extract(vector<string> lines, int startlinei = 0);
+	int extract(vector<string> lines, int startlinei, int startIndentLevel, bool useIndent);
 	void createOperationLineList(ScriptOperations* operations);
 	bool hasOperations();
 	ScriptOperation* getCurrentOperation();

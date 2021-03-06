@@ -102,12 +102,6 @@ void MainWindow::setFilePath(string filepath) {
 	updateTitle();
 }
 
-void MainWindow::setText(string text) {
-	ignoreTextChangeEvent = true;
-	ui.scriptTextEdit->setPlainText(Util::convertToQString(text));
-	ignoreTextChangeEvent = false;
-}
-
 void MainWindow::updateTitle() {
 	string title = "Bio Image Operation";
 	string fileTitle = Util::extractFileTitle(filepath);
@@ -120,8 +114,16 @@ void MainWindow::updateTitle() {
 	setWindowTitle(Util::convertToQString(title));
 }
 
+void MainWindow::setText(string text) {
+	ui.scriptTextEdit->blockSignals(true);
+	ui.scriptTextEdit->setPlainText(Util::convertToQString(text));
+	ui.scriptTextEdit->blockSignals(false);
+}
+
 void MainWindow::clearInput() {
+	ui.scriptTextEdit->blockSignals(true);
 	ui.scriptTextEdit->clear();
+	ui.scriptTextEdit->blockSignals(false);
 	fileModified = false;
 	setFilePath("");
 }
@@ -248,12 +250,32 @@ void MainWindow::generateScript(string title, string instruction, string scriptF
 }
 
 void MainWindow::textChanged() {
-	if (!ignoreTextChangeEvent) {
-		// simplified logic
-		if (fileModified == ui.scriptTextEdit->toPlainText().isEmpty()) {
-			fileModified = !fileModified;
-			updateTitle();
+/*
+	QTextBlock textBlock;
+	string prevLine, nextLine, indentText;
+	int prevIndent, nextIndent, indent;
+
+	textBlock = ui.scriptTextEdit->textCursor().block();
+	if (textBlock.text().isEmpty()) {
+		prevLine = textBlock.previous().text().toStdString();
+		nextLine = textBlock.next().text().toStdString();
+		prevIndent = Util::getIndentLevel(prevLine);
+		nextIndent = Util::getIndentLevel(nextLine);
+
+		if (nextIndent > prevIndent) {
+			indentText = Util::extractIndent(nextLine);
+		} else {
+			indentText = Util::extractIndent(prevLine);
 		}
+		ui.scriptTextEdit->blockSignals(true);
+		ui.scriptTextEdit->insertPlainText(Util::convertToQString(indentText));
+		ui.scriptTextEdit->blockSignals(false);
+	}
+*/
+	// simplified logic
+	if (fileModified == ui.scriptTextEdit->toPlainText().isEmpty()) {
+		fileModified = !fileModified;
+		updateTitle();
 	}
 }
 
@@ -388,9 +410,14 @@ bool MainWindow::checkOperationsProcess() {
 }
 
 void MainWindow::showOperationsQt(ScriptOperations* operations, ScriptOperation* currentOperation) {
+	QPlainTextEdit* textEdit = ui.overlayTextEdit;
 	string text = operations->renderOperations();
 	operationHighlighter->setOperations(operations, currentOperation);
-	ui.overlayTextEdit->setPlainText(Util::convertToQString(text));
+	textEdit->setPlainText(Util::convertToQString(text));
+	QTextCursor cursor(textEdit->document()->findBlockByLineNumber(currentOperation->lineStart));
+	//cursor.setPosition(textEdit->document()->findBlockByLineNumber(currentOperation->lineEnd).position(), QTextCursor::KeepAnchor);	// make selection instead
+	textEdit->setTextCursor(cursor);
+	textEdit->ensureCursorVisible();
 	operationQueued = false;
 }
 

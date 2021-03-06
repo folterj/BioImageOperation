@@ -32,13 +32,18 @@ void ScriptOperations::reset() {
 void ScriptOperations::extract(string script) {
 	vector<string> lines;
 	string line;
+	bool useIndent = false;
 	int nopenBrackets = 0;
 	int ncloseBrackets = 0;
+	int indentLevel = 0;
 
 	this->script = script;
 	lines = Util::split(script, "\n");
 	for (string line0 : lines) {
 		line = Util::trim(line0);
+		if (Util::endsWith(line, ":")) {
+			useIndent = true;
+		}
 		if (Util::endsWith(line, "{")) {
 			nopenBrackets++;
 		}
@@ -46,57 +51,70 @@ void ScriptOperations::extract(string script) {
 			ncloseBrackets++;
 		}
 	}
+	if (!lines.empty()) {
+		line = lines[0];
+		indentLevel = Util::getIndentLevel(line);
+	}
 	if (ncloseBrackets != nopenBrackets) {
 		throw invalid_argument("Mismatched number of open/close brackets { }");
 	}
-	extract(lines);
+	extract(lines, 0, indentLevel, useIndent);
+	operationLineMap.clear();
+	createOperationLineList(this);
 }
 
-int ScriptOperations::extract(vector<string> lines, int startlinei) {
+int ScriptOperations::extract(vector<string> lines, int startlinei, int startIndentLevel, bool useIndent) {
 	ScriptOperation* operation = nullptr;
 	string original, line;
-	bool bracketOpen, bracketClose;
+	bool indentUp, indentDown;
+	int prevIndentLevel = startIndentLevel;
+	int indentLevel;
 
 	clear();
 
 	for (int linei = startlinei; linei < lines.size(); linei++) {
 		original = lines[linei];
+		indentLevel = Util::getIndentLevel(original);
 		line = Util::trim(original);
-		bracketOpen = Util::endsWith(line, "{");
-		if (bracketOpen) {
-			line = line.substr(0, line.length() - 1);
-		}
-		bracketClose = Util::startsWith(line, "}");
-		if (bracketClose) {
-			line = line.substr(1);
-		}
 
-		if (bracketClose) {
-			return linei;
-		} else if (line != "" && !Util::startsWith(line, "//") && !Util::startsWith(line, "#")) {
-			try {
-				operation = new ScriptOperation();
-				operation->extract(original, line);
-				operation->lineStart = linei;
-				operation->lineEnd = linei;
-				push_back(operation);
-			} catch (exception& e) {
-				throw invalid_argument(e.what() + string(" in line:\n") + line);
+		if (line != "" && !Util::startsWith(line, "//") && !Util::startsWith(line, "#")) {
+			indentUp = Util::endsWith(line, "{") || Util::endsWith(line, ":");
+			if (indentUp) {
+				line = line.substr(0, line.length() - 1);
 			}
-		}
-		if (bracketOpen) {
-			// adds inner instructions for last operation
-			if (operation) {
-				operation->innerOperations = new ScriptOperations();
-				linei = operation->innerOperations->extract(lines, linei + 1);
-				operation->lineEnd = linei;
+			indentDown = Util::startsWith(line, "}");
+			if (indentDown) {
+				line = line.substr(1);
 			}
+			if (useIndent && indentLevel < prevIndentLevel) {
+				indentDown = true;
+			}
+
+			if (indentDown) {
+				return linei;
+			} else if (line != "") {
+				try {
+					operation = new ScriptOperation();
+					operation->extract(original, line);
+					operation->lineStart = linei;
+					operation->lineEnd = linei;
+					push_back(operation);
+				} catch (exception& e) {
+					throw invalid_argument(e.what() + string(" in line:\n") + line);
+				}
+			}
+			if (indentUp) {
+				// adds inner instructions for last operation
+				if (operation) {
+					operation->innerOperations = new ScriptOperations();
+					linei = operation->innerOperations->extract(lines, linei + 1, indentLevel, useIndent);
+					operation->lineEnd = linei;
+				}
+			}
+			prevIndentLevel = indentLevel;
 		}
 	}
-
-	operationLineMap.clear();
-	createOperationLineList(this);
-	return -1;
+	return lines.size();
 }
 
 void ScriptOperations::createOperationLineList(ScriptOperations* operations) {

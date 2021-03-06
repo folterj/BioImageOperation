@@ -66,6 +66,32 @@ bool Util::endsWith(string src, string target) {
 	return false;
 }
 
+int Util::getIndentLevel(string line, int indentSize) {
+	int space = 0;
+	for (char c : line) {
+		if (c == ' ') {
+			space++;
+		} else if (c == '\t') {
+			space = ((space / indentSize) + 1) * indentSize;
+		} else {
+			break;
+		}
+	}
+	return space / indentSize;
+}
+
+string Util::extractIndent(string line) {
+	string indentText;
+	for (char c : line) {
+		if (c == ' ' || c == '\t') {
+			indentText += c;
+		} else {
+			break;
+		}
+	}
+	return indentText;
+}
+
 vector<string> Util::split(const string s, const string delim, bool removeEmptyEntries) {
 	vector<string> parts;
 	string part;

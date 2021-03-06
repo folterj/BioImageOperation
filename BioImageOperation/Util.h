@@ -37,6 +37,8 @@ public:
 	static string getValueList(vector<string> list);
 	static bool startsWith(string src, string target);
 	static bool endsWith(string src, string target);
+	static int getIndentLevel(string line, int indentSize = 2);
+	static string extractIndent(string line);
 	static vector<string> split(const string s, const string delim, bool removeEmptyEntries=false);
 	static vector<string> split(const string s, const vector<string> delims, bool removeEmptyEntries=false);
 	static string toLower(string s0);
