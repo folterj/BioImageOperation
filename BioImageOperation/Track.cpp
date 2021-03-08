@@ -309,7 +309,7 @@ string Track::getCsv(bool outputContour, Cluster* cluster) {
 	string csv;
 	vector<Point> contour;
 	Point2d* point;
-	Point2d* lastPoint;
+	Point2d* lastPoint = nullptr;
 	double dist, dx, dy, dx1, dy1, lastDist, ddist, proj, centDist;
 	double angle, dangle, lastAngle, lastDangle, ddangle, radAngle;
 	double v = 0;

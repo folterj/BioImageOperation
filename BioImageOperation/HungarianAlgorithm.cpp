@@ -97,7 +97,7 @@ void HungarianAlgorithm::init() {
 
 bool HungarianAlgorithm::tryMatch() {
 	bool resolved = true;
-	TrackClusterMatch* foundMatch;
+	TrackClusterMatch* foundMatch = nullptr;
 	TrackClusterMatch* match;
 	int nMatches, ii, foundii;
 	bool hasValidMatch, changed;

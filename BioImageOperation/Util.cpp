@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <fstream>
 #include <regex>
+#include <cerrno>
 #ifndef _CONSOLE
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -311,10 +312,10 @@ string Util::readText(string filename) {
 		if (input.is_open()) {
 			ss << input.rdbuf();
 		} else {
-			 throw ios_base::failure("Unable to read file " + filename + "\n" + strerror(errno));
+			 throw ios_base::failure("Unable to read file " + filename + "\n" + getErr());
 		}
 	} catch (ios_base::failure e) {
-		throw ios_base::failure("Unable to read file " + filename + "\n" + strerror(errno));
+		throw ios_base::failure("Unable to read file " + filename + "\n" + getErr());
 	}
 	return ss.str();
 }
@@ -648,6 +649,12 @@ void Util::drawAngle(Mat* image, double x, double y, double rad, double angle, S
 	} else {
 		line(*image, Point(x0, y0), Point(x1, y1), color, 1, LineTypes::LINE_AA);
 	}
+}
+
+string Util::getErr() {
+	char errMsg[1000];
+	strerror_s(errMsg, 1000, errno);
+	return string(errMsg);
 }
 
 #ifndef _CONSOLE

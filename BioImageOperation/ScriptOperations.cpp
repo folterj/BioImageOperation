@@ -68,6 +68,7 @@ int ScriptOperations::extract(vector<string> lines, int startlinei, int startInd
 	string original, line;
 	bool indentUp, indentDown;
 	int prevIndentLevel = startIndentLevel;
+	int nextLineOffset = 0;
 	int indentLevel;
 
 	clear();
@@ -88,10 +89,11 @@ int ScriptOperations::extract(vector<string> lines, int startlinei, int startInd
 			}
 			if (useIndent && indentLevel < prevIndentLevel) {
 				indentDown = true;
+				nextLineOffset = -1;
 			}
 
 			if (indentDown) {
-				return linei;
+				return linei + nextLineOffset;
 			} else if (line != "") {
 				try {
 					operation = new ScriptOperation();

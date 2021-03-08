@@ -8,7 +8,6 @@
  *****************************************************************************/
 
 #include <filesystem>
-#include <cerrno>
 #include "OutputStream.h"
 #include "Util.h"
 #include "Constants.h"
@@ -73,11 +72,11 @@ void OutputStream::writeToFile() {
 			created = true;
 		} else {
 			errorMode = true;
-			throw ios_base::failure("Unable to write to file " + filename + "\n" + strerror(errno));
+			throw ios_base::failure("Unable to write to file " + filename + "\n" + Util::getErr());
 		}
 	} catch (ios_base::failure e) {
 		errorMode = true;
-		throw ios_base::failure("Unable to write to file " + filename + "\n" + strerror(errno));
+		throw ios_base::failure("Unable to write to file " + filename + "\n" + Util::getErr());
 	}
 }
 

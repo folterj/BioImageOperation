@@ -132,6 +132,9 @@
       <AdditionalLibraryDirectories>C:\opencv\build\x64\vc15\bin</AdditionalLibraryDirectories>
       <AdditionalDependencies>opencv_world440d.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y C:\opencv\build\x64\vc15\bin\*.dll $(OutDir)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -151,11 +154,13 @@
       <AdditionalLibraryDirectories>C:\opencv\build\x64\vc15\bin</AdditionalLibraryDirectories>
       <AdditionalDependencies>opencv_world440.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y C:\opencv\build\x64\vc15\bin\*.dll $(OutDir)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AccumBuffer.cpp" />
     <ClCompile Include="Argument.cpp" />
-    <ClCompile Include="AverageBuffer.cpp" />
     <ClCompile Include="Averager.cpp" />
     <ClCompile Include="BioImageOperation.cpp" />
     <ClCompile Include="CaptureSource.cpp" />
@@ -164,6 +169,8 @@
     <ClCompile Include="Constants.cpp" />
     <ClCompile Include="FrameOutput.cpp" />
     <ClCompile Include="FrameSource.cpp" />
+    <ClCompile Include="GreedyAlgorithm.cpp" />
+    <ClCompile Include="HungarianAlgorithm.cpp" />
     <ClCompile Include="ImageItem.cpp" />
     <ClCompile Include="ImageItemList.cpp" />
     <ClCompile Include="ImageOperations.cpp" />
@@ -172,6 +179,7 @@
     <ClCompile Include="ImageSource.cpp" />
     <ClCompile Include="ImageTracker.cpp" />
     <ClCompile Include="ImageTrackers.cpp" />
+    <ClCompile Include="KeepAlive.cpp" />
     <ClCompile Include="NumericPath.cpp" />
     <ClCompile Include="OperationInfo.cpp" />
     <ClCompile Include="OutputStream.cpp" />
@@ -182,10 +190,12 @@
     <ClCompile Include="ScriptOperation.cpp" />
     <ClCompile Include="ScriptOperations.cpp" />
     <ClCompile Include="ScriptProcessing.cpp" />
+    <ClCompile Include="SimpleImageBuffer.cpp" />
     <ClCompile Include="StatData.cpp" />
     <ClCompile Include="TextObserver.cpp" />
     <ClCompile Include="Track.cpp" />
     <ClCompile Include="TrackClusterMatch.cpp" />
+    <ClCompile Include="TrackingAlgorithm.cpp" />
     <ClCompile Include="TrackingParams.cpp" />
     <ClCompile Include="TrackingStats.cpp" />
     <ClCompile Include="Util.cpp" />
@@ -195,7 +205,6 @@
   <ItemGroup>
     <ClInclude Include="AccumBuffer.h" />
     <ClInclude Include="Argument.h" />
-    <ClInclude Include="AverageBuffer.h" />
     <ClInclude Include="Averager.h" />
     <ClInclude Include="CaptureSource.h" />
     <ClInclude Include="Cluster.h" />
@@ -204,6 +213,8 @@
     <ClInclude Include="Constants.h" />
     <ClInclude Include="FrameOutput.h" />
     <ClInclude Include="FrameSource.h" />
+    <ClInclude Include="GreedyAlgorithm.h" />
+    <ClInclude Include="HungarianAlgorithm.h" />
     <ClInclude Include="ImageItem.h" />
     <ClInclude Include="ImageItemList.h" />
     <ClInclude Include="ImageOperations.h" />
@@ -212,6 +223,7 @@
     <ClInclude Include="ImageSource.h" />
     <ClInclude Include="ImageTracker.h" />
     <ClInclude Include="ImageTrackers.h" />
+    <ClInclude Include="KeepAlive.h" />
     <ClInclude Include="NumericPath.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="OperationInfo.h" />
@@ -224,10 +236,12 @@
     <ClInclude Include="ScriptOperation.h" />
     <ClInclude Include="ScriptOperations.h" />
     <ClInclude Include="ScriptProcessing.h" />
+    <ClInclude Include="SimpleImageBuffer.h" />
     <ClInclude Include="StatData.h" />
     <ClInclude Include="TextObserver.h" />
     <ClInclude Include="Track.h" />
     <ClInclude Include="TrackClusterMatch.h" />
+    <ClInclude Include="TrackingAlgorithm.h" />
     <ClInclude Include="TrackingParams.h" />
     <ClInclude Include="TrackingStats.h" />
     <ClInclude Include="Types.h" />

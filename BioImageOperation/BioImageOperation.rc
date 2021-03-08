@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "https://github.com/folterj/BioImageOperation"
             VALUE "FileVersion", "1.7.2"
             VALUE "InternalName", "BioImageOperation"
-            VALUE "LegalCopyright", "2021-03-03"
+            VALUE "LegalCopyright", "2021-03-08"
             VALUE "OriginalFilename", "BioImageOperation"
             VALUE "ProductName", "BioImageOperation"
             VALUE "ProductVersion", "1.7.2"

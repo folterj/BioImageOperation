@@ -96,6 +96,8 @@ public:
 	static Size drawText(Mat* image, string text, Point point, HersheyFonts fontFace, double fontScale, Scalar color);
 	static void drawAngle(Mat* image, double x, double y, double rad, double angle, Scalar color, bool isArrow);
 
+	static string getErr();
+
 #ifndef _CONSOLE
 	static QImage matToQImage(Mat const& src);
 	static string getUrl(string url);
