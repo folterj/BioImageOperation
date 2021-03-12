@@ -652,9 +652,7 @@ void Util::drawAngle(Mat* image, double x, double y, double rad, double angle, S
 }
 
 string Util::getErr() {
-	char errMsg[1000];
-	strerror_s(errMsg, 1000, errno);
-	return string(errMsg);
+	return strerror(errno);
 }
 
 #ifndef _CONSOLE
