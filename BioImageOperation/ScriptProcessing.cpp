@@ -346,8 +346,8 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::OpenCapture:
 			source = operation->getArgument(ArgumentLabel::Path);
-			if (source != "") {
-				source = to_string(operation->getArgumentNumeric());
+			if (source == "") {
+				source = to_string((int)operation->getArgumentNumeric());
 			}
 			operation->initFrameSource(FrameType::Capture,
 										(int)operation->getArgumentNumeric(ArgumentLabel::API),
