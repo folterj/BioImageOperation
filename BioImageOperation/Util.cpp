@@ -290,6 +290,9 @@ int Util::parseFrameTime(string s, double fps) {
 	if (s != "") {
 		if (Util::contains(s, ":")) {
 			// time format
+			if (fps <= 0) {
+				throw invalid_argument("Time value not supported for unknown FPS");
+			}
 			for (string part : split(s, ":")) {
 				totalSeconds *= 60;
 				totalSeconds += stoi(part);

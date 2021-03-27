@@ -299,16 +299,16 @@
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="AboutWindow.ui">
-      <Filter>Form Files</Filter>
+      <Filter>UI Files</Filter>
     </QtUic>
     <QtUic Include="ImageWindow.ui">
-      <Filter>Form Files</Filter>
+      <Filter>UI Files</Filter>
     </QtUic>
     <QtUic Include="MainWindow.ui">
-      <Filter>Form Files</Filter>
+      <Filter>UI Files</Filter>
     </QtUic>
     <QtUic Include="TextWindow.ui">
-      <Filter>Form Files</Filter>
+      <Filter>UI Files</Filter>
     </QtUic>
   </ItemGroup>
   <ItemGroup>
@@ -322,14 +322,14 @@
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
       <ParseFiles>true</ParseFiles>
     </Filter>
-    <Filter Include="Form Files">
-      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
-      <Extensions>ui</Extensions>
-      <ParseFiles>true</ParseFiles>
-    </Filter>
     <Filter Include="Resources">
       <UniqueIdentifier>{0e3ba909-f0c1-4edf-98bb-1bf482dd9af6}</UniqueIdentifier>
       <Extensions>rc;qrc;ico;png;bioscript</Extensions>
+    </Filter>
+    <Filter Include="UI Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+      <ParseFiles>true</ParseFiles>
     </Filter>
   </ItemGroup>
   <ItemGroup>

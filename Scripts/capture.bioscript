@@ -1,4 +1,19 @@
-OpenCapture(0)
+// run for short time to get background image
+OpenCapture(0, length=0:10, total=21, fps=30)
 { 
-   ShowImage()
+	Grayscale()
+	AddSeries()
+}
+GetSeriesMedian()
+StoreImage(background)
+SetBackground()
+
+// normal run
+OpenCapture(0)
+{
+	GrayScale()
+	background = UpdateBackground(weight=0.01)
+	DifferenceAbs(background)
+
+	ShowImage()
 }

@@ -350,9 +350,11 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				source = to_string((int)operation->getArgumentNumeric());
 			}
 			operation->initFrameSource(FrameType::Capture,
-										(int)operation->getArgumentNumeric(ArgumentLabel::API),
-										basepath, source, "", "", 0,
-										(int)operation->getArgumentNumeric(ArgumentLabel::Interval));
+										(int)operation->getArgumentNumeric(ArgumentLabel::API), basepath, source,
+										"", operation->getArgument(ArgumentLabel::Length),
+										operation->getArgumentNumeric(ArgumentLabel::Fps),
+										(int)operation->getArgumentNumeric(ArgumentLabel::Interval),
+										(int)operation->getArgumentNumeric(ArgumentLabel::Total));
 			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage)) {
 				showStatus(operation->frameSource->getCurrentFrame());

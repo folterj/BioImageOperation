@@ -175,7 +175,7 @@ bool VideoSource::getNextImage(Mat* image) {
 	}
 
 	if (frameOk) {
-		if (end != 0 && framei >= end) {
+		if (end > 0 && framei >= end) {
 			// reached desired length
 			videoIsOpen = false;
 		} else if (!videoCapture.retrieve(*image)) {

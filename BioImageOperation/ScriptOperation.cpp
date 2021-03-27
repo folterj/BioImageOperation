@@ -350,8 +350,9 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 		break;
 
 	case ScriptOperationType::OpenCapture:
+		// * TODO: add option to set width/height
 		requiredArguments = vector<ArgumentLabel> { };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::API, ArgumentLabel::Path, ArgumentLabel::Source, ArgumentLabel::Width, ArgumentLabel::Height, ArgumentLabel::Interval };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::API, ArgumentLabel::Path, ArgumentLabel::Source, ArgumentLabel::Fps, ArgumentLabel::Length, ArgumentLabel::Interval, ArgumentLabel::Total };
 		description = "Open capturing from video (IP) path or camera source";
 		break;
 

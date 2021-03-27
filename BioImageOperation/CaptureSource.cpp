@@ -34,7 +34,18 @@ bool CaptureSource::init(int apiCode, string basepath, string filepath, string s
 	this->apiCode = apiCode;
 	this->source = filepath;
 
-	return open();
+	if (open()) {
+		if (fps0 > 0) {
+			videoCapture.set(VideoCaptureProperties::CAP_PROP_FPS, fps0);
+		}
+		fps = videoCapture.get(VideoCaptureProperties::CAP_PROP_FPS);
+		if (fps == 0) {
+			fps = fps0;
+		}
+		calcFrameParams(start, length, fps, interval, total, 0);
+		return true;
+	}
+	return false;
 }
 
 bool CaptureSource::open() {
@@ -88,7 +99,11 @@ bool CaptureSource::getNextImage(Mat* image) {
 	} while ((framei % interval) != 0);
 
 	if (frameOk) {
-		if (!videoCapture.retrieve(*image)) {
+		if (end > 0 && framei >= end) {
+			// reached desired length
+			videoIsOpen = false;
+		} else if (!videoCapture.retrieve(*image)) {
+			// unexpected error
 			videoIsOpen = false;
 		}
 	}
