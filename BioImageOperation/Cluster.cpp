@@ -246,6 +246,9 @@ void Cluster::draw(Mat* image, int drawMode) {
 	if ((drawMode & (int)ClusterDrawMode::Circle) != 0) {
 		drawCircle(image, color);
 	}
+	if ((drawMode & (int)ClusterDrawMode::Ellipse) != 0) {
+		drawEllipse(image, color);
+	}
 	if ((drawMode & (int)ClusterDrawMode::Box) != 0) {
 		drawBox(image, color);
 	}
@@ -266,9 +269,23 @@ void Cluster::drawCircle(Mat* image, Scalar color) {
 	circle(*image, point, (int)ceil(rad), color, 1, LineTypes::LINE_AA);
 }
 
+void Cluster::drawEllipse(Mat* image, Scalar color) {
+	Point point((int)x, (int)y);
+	int rad1 = (int)ceil(lengthMajor / 2);
+	int rad2 = (int)ceil(lengthMinor / 2);
+	if (rad1 == 0) {
+		rad1 = rad;
+	}
+	if (rad2 == 0) {
+		rad2 = rad;
+	}
+	ellipse(*image, point, Size(rad1, rad2), angle, 0, 360, color, 1, LineTypes::LINE_AA);
+}
+
 void Cluster::drawBox(Mat* image, Scalar color) {
-	int rad2 = (int)ceil(rad);
-	Rect rect((int)(x - rad2), (int)(y - rad2), (int)(rad2 * 2), (int)(rad2 * 2));
+	int width = box.width;
+	int height = box.height;
+	Rect rect((int)(x - width / 2), (int)(y - height / 2), width, height);
 	rectangle(*image, rect, color, 1, LineTypes::LINE_AA);
 }
 

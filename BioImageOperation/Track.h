@@ -83,6 +83,7 @@ public:
 	void draw(Mat* image, int drawMode, int ntracks);
 	void drawPoint(Mat* image, Scalar color);
 	void drawCircle(Mat* image, Scalar color);
+	void drawEllipse(Mat* image, Scalar color);
 	void drawBox(Mat* image, Scalar color);
 	void drawAngle(Mat* image, Scalar color);
 	void drawTracks(Mat* image, Scalar color, int ntracks = 1);

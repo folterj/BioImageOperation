@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,7,2
- PRODUCTVERSION 1,7,2
+ FILEVERSION 1,7,3
+ PRODUCTVERSION 1,7,3
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -69,12 +69,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Joost de Folter"
             VALUE "FileDescription", "https://github.com/folterj/BioImageOperation"
-            VALUE "FileVersion", "1.7.2"
+            VALUE "FileVersion", "1.7.3"
             VALUE "InternalName", "BioImageOperation"
-            VALUE "LegalCopyright", "2021-03-27"
+            VALUE "LegalCopyright", "2021-03-29"
             VALUE "OriginalFilename", "BioImageOperation"
             VALUE "ProductName", "BioImageOperation"
-            VALUE "ProductVersion", "1.7.2"
+            VALUE "ProductVersion", "1.7.3"
         END
     END
     BLOCK "VarFileInfo"

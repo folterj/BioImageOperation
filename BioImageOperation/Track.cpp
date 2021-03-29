@@ -192,6 +192,9 @@ void Track::draw(Mat* image, int drawMode, int ntracks) {
 		if ((drawMode & (int)ClusterDrawMode::Circle) != 0) {
 			drawCircle(image, color);
 		}
+		if ((drawMode & (int)ClusterDrawMode::Ellipse) != 0) {
+			drawEllipse(image, color);
+		}
 		if ((drawMode & (int)ClusterDrawMode::Box) != 0) {
 			drawBox(image, color);
 		}
@@ -200,7 +203,7 @@ void Track::draw(Mat* image, int drawMode, int ntracks) {
 		}
 		if ((drawMode & (int)ClusterDrawMode::Tracks) != 0) {
 			if (ntracks == 0) {
-				ntracks = 10;
+				ntracks = (int)fps;
 			}
 			drawTracks(image, color, ntracks);
 		}
@@ -224,6 +227,19 @@ void Track::drawCircle(Mat* image, Scalar color) {
 		rad2 = rad;
 	}
 	circle(*image, point, rad2, color, 1, LineTypes::LINE_AA);
+}
+
+void Track::drawEllipse(Mat* image, Scalar color) {
+	Point point((int)x, (int)y);
+	int rad1 = (int)ceil(meanLengthMajor / 2);
+	int rad2 = (int)ceil(meanLengthMinor / 2);
+	if (rad1 == 0) {
+		rad1 = rad;
+	}
+	if (rad2 == 0) {
+		rad2 = rad;
+	}
+	ellipse(*image, point, Size(rad1, rad2), angle, 0, 360, color, 1, LineTypes::LINE_AA);
 }
 
 void Track::drawBox(Mat* image, Scalar color) {
