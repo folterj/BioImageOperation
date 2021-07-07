@@ -73,6 +73,7 @@ void ImageTracker::deletePaths() {
 }
 
 void ImageTracker::reset() {
+	// TODO: only used as destructor -> remove, and move delete/resets to destructor instead
 	deletePaths();
 	deleteClusters();
 	deleteTracks();
@@ -96,10 +97,11 @@ void ImageTracker::reset() {
 	close();
 }
 
-string ImageTracker::createClusters(Mat* image, double minArea, double maxArea, string basePath, bool clusterDebugMode) {
+string ImageTracker::createClusters(Mat* image, double minArea, double maxArea, int sourceFrames, string basePath, bool clusterDebugMode) {
 	string output;
 	bool clustersOk;
 
+	this->sourceFrames = sourceFrames;
 	this->basePath = basePath;
 	this->clusterDebugMode = clusterDebugMode;
 
@@ -119,10 +121,11 @@ string ImageTracker::createClusters(Mat* image, double minArea, double maxArea, 
 	return output;
 }
 
-string ImageTracker::createTracks(double maxMove, int minActive, int maxInactive, string basePath, bool trackDebugMode) {
+string ImageTracker::createTracks(double maxMove, int minActive, int maxInactive, int sourceFrames, string basePath, bool trackDebugMode) {
 	string output;
 	bool clustersOk = !clusters.empty();
 
+	this->sourceFrames = sourceFrames;
 	this->basePath = basePath;
 	this->trackDebugMode = trackDebugMode;
 
@@ -415,8 +418,9 @@ void ImageTracker::updateClusterParams() {
 		trackingParams.area.n++;
 	}
 
-	if (trackingParams.area.n >= Constants::clusterTrainingCycles &&
-		areaStats.dataSize() >= Constants::trainingDataPoints) {
+	if ((trackingParams.area.n >= Constants::clusterTrainingCycles &&
+		areaStats.dataSize() >= Constants::trainingDataPoints) ||
+		(sourceFrames > 0 && trackingParams.area.n >= 0.1 * sourceFrames)) {
 		areaStats.calcStats();
 		if (clusterDebugMode) {
 			areaStats.saveData(Util::combinePath(basePath, "area_cluster_data.csv"));
@@ -448,8 +452,9 @@ void ImageTracker::updateTrackParams() {
 		trackingParams.maxMove.n++;
 	}
 
-	if (trackingParams.maxMove.n >= Constants::trackTrainingCycles &&
-		distanceStats.dataSize() >= Constants::trainingDataPoints) {
+	if ((trackingParams.maxMove.n >= Constants::trackTrainingCycles &&
+		distanceStats.dataSize() >= Constants::trainingDataPoints) ||
+		(sourceFrames > 0 && trackingParams.maxMove.n >= 0.1 * sourceFrames)) {
 		//distanceStats.removeMaxRange(0.1);	// remove top 10%
 		distanceStats.calcStats();
 		if (trackDebugMode) {

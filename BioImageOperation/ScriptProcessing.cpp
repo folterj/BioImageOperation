@@ -71,6 +71,7 @@ void ScriptProcessing::reset() {
 	sourceWidth = 0;
 	sourceHeight = 0;
 	sourceFps = 0;
+	sourceFrames = 0;
 	sourceFrameNumber = 0;
 	pixelSize = 1;
 	windowSize = 1;
@@ -306,7 +307,8 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 										(int)operation->getArgumentNumeric(ArgumentLabel::Total));
 			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage)) {
-				showStatus(operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames());
+				sourceFrames = operation->frameSource->getTotalFrames();
+				showStatus(operation->frameSource->getCurrentFrame(), sourceFrames);
 				done = false;
 			}
 			sourceWidth = operation->frameSource->getWidth();
@@ -341,6 +343,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			sourceWidth = operation->frameSource->getWidth();
 			sourceHeight = operation->frameSource->getHeight();
 			sourceFps = operation->frameSource->getFps();
+			sourceFrames = operation->frameSource->getTotalFrames();
 			newImageSet = true;
 			break;
 
@@ -366,6 +369,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			}
 			sourceWidth = operation->frameSource->getWidth();
 			sourceHeight = operation->frameSource->getHeight();
+			sourceFrames = 0;
 			newImageSet = true;
 			break;
 
@@ -561,7 +565,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 												sourceFps, pixelSize, windowSize, observer);
 			output = imageTracker->createClusters(image, operation->getArgumentNumeric(ArgumentLabel::MinArea),
 													operation->getArgumentNumeric(ArgumentLabel::MaxArea),
-													basepath, debugMode);
+													sourceFrames, basepath, debugMode);
 			if (debugMode) {
 				showText(output, Constants::nTextWindows);
 			}
@@ -573,7 +577,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			output = imageTracker->createTracks(operation->getArgumentNumeric(ArgumentLabel::MaxMove),
 												(int)operation->getArgumentNumeric(ArgumentLabel::MinActive),
 												(int)operation->getArgumentNumeric(ArgumentLabel::MaxInactive),
-												basepath, debugMode);
+												sourceFrames, basepath, debugMode);
 			if (debugMode) {
 				showText(output, Constants::nTextWindows);
 			}

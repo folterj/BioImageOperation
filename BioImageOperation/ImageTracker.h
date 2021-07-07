@@ -37,6 +37,7 @@ public:
 	Observer* observer;
 	string id = "";
 	string basePath = "";
+	int sourceFrames = 0;
 	vector<vector<Point>> contours;
 	vector<Cluster*> clusters;
 	vector<Track*> tracks;
@@ -99,12 +100,12 @@ public:
 	/*
 	 * Create clusters from image entry point
 	 */
-	string createClusters(Mat* image, double areaMin, double areaMax, string basePath, bool clusterDebugMode);
+	string createClusters(Mat* image, double areaMin, double areaMax, int sourceFrames, string basePath, bool clusterDebugMode);
 
 	/*
 	 * Create tracks entry point
 	 */
-	string createTracks(double maxMove, int minActive, int maxInactive, string basePath, bool trackDebugMode);
+	string createTracks(double maxMove, int minActive, int maxInactive, int sourceFrames, string basePath, bool trackDebugMode);
 
 	/*
 	 * Create paths entry point

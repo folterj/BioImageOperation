@@ -50,6 +50,7 @@ public:
 	int sourceWidth = 0;
 	int sourceHeight = 0;
 	double sourceFps = 0;
+	int sourceFrames = 0;
 	int sourceFrameNumber = 0;
 	double pixelSize = 1;
 	double windowSize = 1;
