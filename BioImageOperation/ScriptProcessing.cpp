@@ -729,6 +729,9 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			if (Util::contains(errorMsg, "channels()")) {
 				errorMsg += " (Incorrect number of image color channels)";
 			}
+			if (Util::contains(errorMsg, "size()")) {
+				errorMsg += " (Image sizes don't match)";
+			}
 		}
 		errorMsg += " in\n" + operation->line;
 		showDialog(errorMsg, MessageLevel::Error);
