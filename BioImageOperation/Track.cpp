@@ -312,7 +312,8 @@ void Track::drawLabel(Mat* image, Scalar color, int drawMode) {
 
 string Track::getCsvHeader(bool outputContour) {
 	string header = "track_label,cluster_label,is_merged"
-					",x,y,v,projection,v_projection,a,dist_tot,dist_origin"
+					",x,y,v,projection,v_projection,a"
+					",dist,dist_tot,dist_origin"
 					",angle,v_angle,a_angle"
 					",area,area1,length_major,length_major1,length_minor,length_minor1,rad";
 	if (outputContour) {
@@ -402,7 +403,7 @@ string Track::getCsv(bool outputContour, Cluster* cluster) {
 	centDist = Util::calcDistance(originX, originY, x, y);
 
 	csv += format(",%f,%f,%f,%f,%f,%f", x * pixelSize, y * pixelSize, v * pixelSize * fps, projection, vProjection * pixelSize * fps, a * pixelSize * fps * fps);
-	csv += format(",%f,%f", totdist * pixelSize, centDist * pixelSize);
+	csv += format(",%f,%f,%f", this->dist * pixelSize, totdist * pixelSize, centDist * pixelSize);
 	csv += format(",%f,%f,%f", orientation, v_angle * fps, a_angle * fps * fps);
 	csv += format(",%f,%f,%f,%f,%f,%f,%f",
 					area * pixelSize * pixelSize, meanArea * pixelSize * pixelSize,

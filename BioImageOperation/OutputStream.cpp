@@ -60,7 +60,15 @@ void OutputStream::write(string output) {
 void OutputStream::writeToFile() {
 	ios_base::openmode openMode = std::ios_base::out;
 	if (created) {
+		// append if already created
 		openMode |= std::ios_base::app;
+	} else {
+		// check/create path
+		filesystem::path path(filename);
+		filesystem::path parent = path.parent_path();
+		if (!filesystem::is_directory(parent)) {
+			filesystem::create_directories(parent);
+		}
 	}
 	try {
 		open(filename, openMode);	// this can throw exception
