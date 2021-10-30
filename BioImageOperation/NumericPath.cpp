@@ -62,7 +62,7 @@ bool NumericPath::setOutputPath(string templatePath) {
 	return ok;
 }
 
-bool NumericPath::setOutputPath(string basepath, string templatePath, string defaultExtension) {
+bool NumericPath::setOutputPath(string basepath, string templatePath, string defaultExtension, bool lookForNum) {
 	int extPos;
 	int numpos;
 	int test;
@@ -82,28 +82,32 @@ bool NumericPath::setOutputPath(string basepath, string templatePath, string def
 	extPos = (int)templatePath.find_last_of(".");
 	if (extPos >= 0) {
 		extension = templatePath.substr(extPos);
-		numpos = extPos - 1;
+		numpos = extPos;
 	} else {
+		// no extension found -> add
 		if (!Util::startsWith(defaultExtension, ".")) {
 			defaultExtension = "." + defaultExtension;
 		}
 		extension = defaultExtension;
-		numpos = (int)(templatePath.length() - 1);
+		numpos = (int)templatePath.length();
 	}
 
-	while (ok) {
-		try {
-			test = stoi(templatePath.substr(numpos, numlen + 1));
-			ok = true;
-		} catch (...) {
-			ok = false;
-		}
-		if (ok) {
-			offset = test;
-			numpos--;
-			numlen++;
-		} else {
-			numpos++;
+	if (lookForNum) {
+		numpos--;
+		while (ok) {
+			try {
+				test = stoi(templatePath.substr(numpos, numlen + 1));
+				ok = true;
+			} catch (...) {
+				ok = false;
+			}
+			if (ok) {
+				offset = test;
+				numpos--;
+				numlen++;
+			} else {
+				numpos++;
+			}
 		}
 	}
 	initialPath = templatePath.substr(0, numpos);

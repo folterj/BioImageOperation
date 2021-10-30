@@ -41,14 +41,16 @@ void ScriptOperations::extract(string script) {
 	lines = Util::split(script, "\n");
 	for (string line0 : lines) {
 		line = Util::trim(line0);
-		if (Util::endsWith(line, ":")) {
-			useIndent = true;
-		}
-		if (Util::endsWith(line, "{")) {
-			nopenBrackets++;
-		}
-		if (Util::startsWith(line, "}")) {
-			ncloseBrackets++;
+		if (line != "" && !Util::startsWith(line, "//") && !Util::startsWith(line, "#")) {
+			if (Util::endsWith(line, ":")) {
+				useIndent = true;
+			}
+			if (Util::endsWith(line, "{")) {
+				nopenBrackets++;
+			}
+			if (Util::startsWith(line, "}")) {
+				ncloseBrackets++;
+			}
 		}
 	}
 	if (!lines.empty()) {

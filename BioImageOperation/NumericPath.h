@@ -38,7 +38,7 @@ public:
 	void resetFilePath();
 	bool setInputPath(string basepath, string templatePath);
 	bool setOutputPath(string templatePath);
-	bool setOutputPath(string basepath, string templatePath, string defaultExtension);
+	bool setOutputPath(string basepath, string templatePath, string defaultExtension, bool lookForNum=false);
 	string createFilePath();
 	string currentFilePath();
 	string createFilePath(int i);

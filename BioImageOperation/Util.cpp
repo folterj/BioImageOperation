@@ -623,9 +623,9 @@ string Util::combinePath(string basepath, string templatepath) {
 
 string Util::combineFilename(string basename, string name) {
 	string filename = basename + "_";
-	string s = Util::extractFileTitle(name);
-	if (s != "") {
-		filename += s + "_";
+	string title = Util::extractFileTitle(name);
+	if (title != "") {
+		filename += replace(title, ".", "_") + "_";
 	}
 	return filename;
 }

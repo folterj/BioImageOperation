@@ -29,7 +29,7 @@ void ImageOutput::init(string basepath, string filepath, string defaultExtension
 	reset();
 	int lengthi;
 
-	if (!outputPath.setOutputPath(basepath, filepath, defaultExtension)) {
+	if (!outputPath.setOutputPath(basepath, filepath, defaultExtension, true)) {
 		throw ios_base::failure("Unable to write to " + Util::extractFilePath(outputPath.initialPath));
 	}
 
