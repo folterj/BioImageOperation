@@ -727,10 +727,13 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				errorMsg += " (Image color channels don't match)";
 			}
 			if (Util::contains(errorMsg, "channels()")) {
-				errorMsg += " (Incorrect number of image color channels)";
+				errorMsg += " (Unexpected number of color channels)";
+			}
+			if (Util::contains(errorMsg, "depth()")) {
+				errorMsg += " (Unexpected image (bit) depth)";
 			}
 			if (Util::contains(errorMsg, "size()")) {
-				errorMsg += " (Image sizes don't match)";
+				errorMsg += " (Unexpected image size)";
 			}
 		}
 		errorMsg += " in\n" + operation->line;
