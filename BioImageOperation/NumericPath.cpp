@@ -56,13 +56,19 @@ bool NumericPath::setInputPath(string basepath, string templatePath) {
 }
 
 bool NumericPath::setOutputPath(string templatePath) {
-	bool ok = setOutputPath("", templatePath, "");
+	string extension = Util::extractFileExtension(templatePath);
+	string title = Util::extractFileTitle(templatePath);
+	string path = Util::extractFilePath(templatePath);
+	if (!Util::endsWith(title, "_")) {
+		templatePath = Util::combinePath(path, title + "_" + extension);
+	}
+	bool ok = setOutputPath("", templatePath);
 	offset = 0;
 	numlen = 1;
 	return ok;
 }
 
-bool NumericPath::setOutputPath(string basepath, string templatePath, string defaultExtension, bool lookForNum) {
+bool NumericPath::setOutputPath(string basepath, string templatePath, string extra, string defaultExtension, bool lookForNum) {
 	int extPos;
 	int numpos;
 	int test;
@@ -70,6 +76,10 @@ bool NumericPath::setOutputPath(string basepath, string templatePath, string def
 
 	if (templatePath == "") {
 		throw invalid_argument("No path specified");
+	}
+
+	if (extra != "") {
+		templatePath = Util::combinePath(Util::extractFilePath(templatePath), Util::replace(Util::extractFileTitle(extra), ".", "_") + "_" + Util::extractFileName(templatePath));
 	}
 
 	templatePath = Util::combinePath(basepath, templatePath);
@@ -83,7 +93,7 @@ bool NumericPath::setOutputPath(string basepath, string templatePath, string def
 	if (extPos >= 0) {
 		extension = templatePath.substr(extPos);
 		numpos = extPos;
-	} else {
+	} else if (defaultExtension != "") {
 		// no extension found -> add
 		if (!Util::startsWith(defaultExtension, ".")) {
 			defaultExtension = "." + defaultExtension;

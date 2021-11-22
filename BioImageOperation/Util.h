@@ -91,7 +91,6 @@ public:
     static string extractFileName(string filepath);
     static string extractFileExtension(string filepath);
     static string combinePath(string basepath, string templatepath);
-	static string combineFilename(string basename, string name);
 
 	static Size drawText(Mat* image, string text, Point point, HersheyFonts fontFace, double fontScale, Scalar color);
 	static void drawAngle(Mat* image, double x, double y, double rad, double angle, Scalar color, bool isArrow);
