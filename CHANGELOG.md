@@ -1,3 +1,7 @@
+#### Version 1.7.4
+* Revised filename generation
+* Small fix for pausing in nested Source loop
+
 #### Version 1.7.3
 * Added raw distance as output
 * Fixed/improved handling numeric paths
