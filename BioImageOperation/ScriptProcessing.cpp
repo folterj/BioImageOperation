@@ -179,7 +179,7 @@ void ScriptProcessing::processOperations(ScriptOperations* operations, ScriptOpe
 			if (operationFinished) {
 				operations->moveNextOperation();
 			}
-			if (isRoot && operationMode == OperationMode::RequestPause) {
+			if (operationMode == OperationMode::RequestPause && (isRoot || operation->hasInnerOperations())) {
 				break;
 			}
 			prevOperation = operation;

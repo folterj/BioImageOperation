@@ -12,7 +12,7 @@
 
 #define PROJECT_NAME "BioImageOperation"
 #define PROJECT_VER  "1.7.4"
-#define PROJECT_DESC "2021-11-22"
+#define PROJECT_DESC "2021-12-14"
 #define PROJECT_URL  "https://github.com/folterj/BioImageOperation"
 
 #endif // INCLUDE_GUARD

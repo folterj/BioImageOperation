@@ -380,5 +380,11 @@ vector<Point> Cluster::getContour() {
 }
 
 string Cluster::toString() {
-	return Util::format("#%d Labels:%s Area:%.0f Radius:%.0f Angle:%.0f X:%.0f Y:%.0f", clusterLabel, getLabels().c_str(), area, rad, angle, x, y);
+	string s = Util::format("#%d", clusterLabel);
+	string labels = getLabels();
+	if (!labels.empty()) {
+		s += " Labels:" + labels;
+	}
+	s += Util::format(" Area:%.0f Radius:%.0f Angle:%.0f X:%.0f Y:%.0f", area, rad, angle, x, y);
+	return s;
 }
