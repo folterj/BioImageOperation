@@ -1,5 +1,5 @@
 #### Version 1.7.4
-* Revised filename generation
+* Revised output filename generation
 * Small fix for pausing in nested Source loop
 
 #### Version 1.7.3
