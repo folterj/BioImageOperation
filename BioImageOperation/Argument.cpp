@@ -130,6 +130,10 @@ bool Argument::parseType(ArgumentType argumentType) {
 		valueEnum = Util::getListIndex(SaveFormats, value);
 		break;
 
+	case ArgumentType::MedianMode:
+		valueEnum = Util::getListIndex(MedianModes, value);
+		break;
+
 	case ArgumentType::Palette:
 		valueEnum = Util::getListIndex(Palettes, value);
 		break;

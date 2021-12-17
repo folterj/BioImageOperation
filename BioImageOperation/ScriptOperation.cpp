@@ -538,7 +538,7 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 
 	case ScriptOperationType::GetSeriesMedian:
 		requiredArguments = vector<ArgumentLabel> { };
-		optionalArguments = vector<ArgumentLabel> { };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::MedianMode };
 		description = "Obtain image median of image series buffer";
 		break;
 
@@ -752,6 +752,10 @@ ArgumentType ScriptOperation::getExpectedArgumentType(ArgumentLabel argument) {
 		type = ArgumentType::Format;
 		break;
 
+	case ArgumentLabel::MedianMode:
+		type = ArgumentType::MedianMode;
+		break;
+
 	case ArgumentLabel::Position:
 		type = ArgumentType::Position;
 		break;
@@ -924,6 +928,10 @@ string ScriptOperation::getArgumentDescription(ArgumentLabel argument) {
 		s = "Output format";
 		break;
 
+	case ArgumentLabel::MedianMode:
+		s = "Median variation mode";
+		break;
+
 	case ArgumentLabel::Position:
 		s = "Draw position";
 		break;
@@ -1003,6 +1011,10 @@ string ScriptOperation::getArgumentTypeDescription(ArgumentType type) {
 
 	case ArgumentType::Format:
 		s = Util::getValueList(SaveFormats);
+		break;
+
+	case ArgumentType::MedianMode:
+		s = Util::getValueList(MedianModes);
 		break;
 
 	case ArgumentType::Position:

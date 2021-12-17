@@ -68,6 +68,7 @@ void ScriptProcessing::reset() {
 	basepath = "";
 	sourceFile = "";
 	sourceFilei = 0;
+	nsourceFiles = 0;
 	sourceWidth = 0;
 	sourceHeight = 0;
 	sourceFps = 0;
@@ -219,7 +220,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 	NumericPath sourcePath, outputPath;
 	ImageTracker* imageTracker;
-	string path, source, output;
+	string path, source, output, label;
 	int width, height;
 	int displayi;
 	double fps, size;
@@ -263,9 +264,12 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::Source:
+			imageTrackers->reset();
+			observer->resetProgressTimer();
 			sourcePath.setInputPath(basepath, operation->getArgument(ArgumentLabel::Path));
 			sourceFile = sourcePath.createFilePath(sourceFilei);
 			if (sourceFile != "") {
+				nsourceFiles = sourcePath.totaln;
 				done = false;
 				sourceFilei++;
 			} else {
@@ -333,7 +337,8 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 										(int)operation->getArgumentNumeric(ArgumentLabel::Total));
 			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage)) {
-				showStatus(operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames(), operation->frameSource->getLabel());
+				label = getSourceLabel() + operation->frameSource->getLabel();
+				showStatus(operation->frameSource->getCurrentFrame(), operation->frameSource->getTotalFrames(), label);
 				done = false;
 			} else {
 				// already past last frame; current image invalid
@@ -540,7 +545,8 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::GetSeriesMedian:
-			newImageSet = imageSeries->getMedian(*newImage);
+			medianMode = (MedianMode)operation->getArgument(ArgumentLabel::MedianMode, (int)MedianMode::Normal);
+			newImageSet = imageSeries->getMedian(*newImage, medianMode);
 			break;
 
 		case ScriptOperationType::GetSeriesMean:
@@ -769,6 +775,14 @@ double ScriptProcessing::getTime(int frame) {
 		time = frame;
 	}
 	return time;
+}
+
+string ScriptProcessing::getSourceLabel() {
+	string label = "";
+	if (nsourceFiles > 0) {
+		label = Util::format("%.0f%% ", (double)(sourceFilei - 1) / nsourceFiles * 100);
+	}
+	return label;
 }
 
 void ScriptProcessing::requestPause() {

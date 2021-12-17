@@ -36,6 +36,7 @@ enum class ArgumentType
 	DrawMode,
 	PathDrawMode,
 	Format,
+	MedianMode,
 	Position,
 };
 
@@ -84,6 +85,7 @@ enum class ArgumentLabel
 	Display,
 	Position,
 	Format,
+	MedianMode,
 	Contour,
 	Debug
 };
@@ -133,6 +135,7 @@ const vector<string> ArgumentLabels =
 	"Display",
 	"Position",
 	"Format",
+	"MedianMode",
 	"Contour",
 	"Debug"
 };

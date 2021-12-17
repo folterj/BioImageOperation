@@ -52,14 +52,16 @@ void ImageSeries::addImage(Mat* image, int bufferSize) {
 	images.push_back(vimage);
 }
 
-bool ImageSeries::getMedian(OutputArray dest) {
+bool ImageSeries::getMedian(OutputArray dest, MedianMode mode) {
 	Mat image;
 	uchar* outData;
 	int pixeli;
 	int npixels = width * height;
-	int m;
-	uchar median;
 	int n = (int)images.size();
+	int m;
+	int maxm = int(round(n * 0.99));
+	int minm = int(round(n * 0.01));
+	uchar median, low, high, dlow, dhigh;
 	vector<uchar> pixelBuffer(n);
 
 	if (n == 0) {
@@ -76,13 +78,28 @@ bool ImageSeries::getMedian(OutputArray dest) {
 				pixelBuffer[i] = images[i][c][pixeli];
 			}
 			m = n / 2;
-			nth_element(pixelBuffer.begin(), pixelBuffer.begin() + m, pixelBuffer.end());
+			sort(pixelBuffer.begin(), pixelBuffer.end());
 			median = pixelBuffer[m];
 			if (n % 2 == 0) {
 				// even number of images: average of 2 middle elements
 				m--;
-				nth_element(pixelBuffer.begin(), pixelBuffer.begin() + m, pixelBuffer.end());
 				median = (median + pixelBuffer[m]) / 2;
+			}
+			if (mode != MedianMode::Normal) {
+				// move towards lighter / darker side of array
+				low = pixelBuffer.front();
+				high = pixelBuffer.back();
+				do {
+					median = pixelBuffer[m];
+					dlow = median - low;
+					dhigh = high - median;
+					if (mode == MedianMode::Light) {
+						m++;
+					} else if (mode == MedianMode::Dark) {
+						m--;
+					}
+				} while (((mode == MedianMode::Light && dlow < 10 * dhigh) || (mode == MedianMode::Dark && dhigh < 10 * dlow)) && m >= minm && m < maxm);
+
 			}
 			outData[pixeli * nchannels + c] = median;
 		}

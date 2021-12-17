@@ -1,4 +1,4 @@
-# Bio Image Operation script operations (v1.7.2 / 2021-03-27)
+# Bio Image Operation script operations (v1.7.5 / 2021-12-17)
 
 
 **Set** (Path, Width, Height, Fps, PixelSize, WindowSize)
@@ -298,10 +298,11 @@ Add image to image series buffer
  - Maximum:	 Maximum number of images to keep (numeric value)
 
 
-**GetSeriesMedian** ()
+**GetSeriesMedian** (MedianMode)
 
 Obtain image median of image series buffer
 
+ - MedianMode:	 Median variation mode (Normal, Light, Dark)
 
 
 **GetSeriesMean** ()
@@ -362,7 +363,7 @@ Draw clusters
 
  - Label:	 Label id (string)
  - Tracker:	 Tracker id (string)
- - DrawMode:	 Draw mode(s) (combine using | character) (None, Point, Circle, Box, Angle, Label, LabelArea, LabelLength, LabelAngle, Track, Tracks, Fill, ClusterDefault, TracksDefault)
+ - DrawMode:	 Draw mode(s) (combine using | character) (None, Point, Circle, Ellipse, Box, Angle, Label, LabelArea, LabelLength, LabelAngle, Track, Tracks, Fill, ClusterDefault, TracksDefault)
 
 
 **DrawTracks** (Label, Tracker, DrawMode)
@@ -371,7 +372,7 @@ Draw tracked clusters
 
  - Label:	 Label id (string)
  - Tracker:	 Tracker id (string)
- - DrawMode:	 Draw mode(s) (combine using | character) (None, Point, Circle, Box, Angle, Label, LabelArea, LabelLength, LabelAngle, Track, Tracks, Fill, ClusterDefault, TracksDefault)
+ - DrawMode:	 Draw mode(s) (combine using | character) (None, Point, Circle, Ellipse, Box, Angle, Label, LabelArea, LabelLength, LabelAngle, Track, Tracks, Fill, ClusterDefault, TracksDefault)
 
 
 **DrawPaths** (Label, Tracker, PathDrawMode, Power, Palette)

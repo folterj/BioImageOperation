@@ -31,6 +31,6 @@ public:
 	ImageSeries();
 	void reset();
 	void addImage(Mat* image, int bufferSize = 0);
-	bool getMedian(OutputArray dest);
+	bool getMedian(OutputArray dest, MedianMode mode);
 	bool getMean(OutputArray dest);
 };

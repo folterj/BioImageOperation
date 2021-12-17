@@ -381,15 +381,15 @@ void MainWindow::showStatusQt(int i, int tot, string label) {
 		totalElapseds = totalElapsed.count();
 		avgFrametime = totalElapseds / (i + 1);
 
+		s = label;
 		if (tot > 0) {
 			progress = (double)i / tot;
-			s += Util::format("%.1f%%", 100 * progress);
 		}
+		s += Util::format(" (#%d)", i);
+		s += Util::format(" %.3fs @%dfps", avgFrametime, processFps);
 		if (progress > 0) {
 			estimateLeft = totalElapseds * (1 / progress - 1);
 		}
-
-		s += Util::format(" %s (#%d) %.3fs @%dfps", label.c_str(), i, avgFrametime, processFps);
 		s += " Elapsed: " + Util::formatTimespan((int)totalElapseds);
 		if (estimateLeft > 0) {
 			s += " Left: " + Util::formatTimespan((int)estimateLeft);

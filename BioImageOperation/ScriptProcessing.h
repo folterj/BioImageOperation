@@ -47,6 +47,7 @@ public:
 	string basepath;
 	string sourceFile;
 	int sourceFilei = 0;
+	int nsourceFiles = 0;
 	int sourceWidth = 0;
 	int sourceHeight = 0;
 	double sourceFps = 0;
@@ -56,6 +57,7 @@ public:
 	double windowSize = 1;
 	double logPower = 0;
 	Palette logPalette = Palette::Grayscale;
+	MedianMode medianMode = MedianMode::Normal;
 	OperationMode operationMode = OperationMode::Idle;
 	bool useGui = true;
 
@@ -91,6 +93,7 @@ public:
 	Mat* getLabelOrCurrentImage(ScriptOperation* operation, Mat* currentImage);
 	OperationMode getMode();
 	double getTime(int frame);
+	string getSourceLabel();
 
 	/*
 	 * Abort thread, attempt closing output streams to prevent data loss

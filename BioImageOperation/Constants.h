@@ -228,6 +228,20 @@ const vector<string> Palettes =
 	"Rainbow"
 };
 
+enum class MedianMode
+{
+	Normal,
+	Light,
+	Dark
+};
+
+const vector<string> MedianModes =
+{
+	"Normal",
+	"Light",
+	"Dark"
+};
+
 enum class ClusterDrawMode : int
 {
 	None = 0,
