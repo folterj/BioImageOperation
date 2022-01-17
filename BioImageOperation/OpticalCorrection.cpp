@@ -11,7 +11,7 @@
 #include "ImageOperations.h"
 
 
-bool OpticalCorrection::calibrate(InputArray calibration_image, int calibrationx, int calibrationy) {
+bool OpticalCorrection::calibrate(InputArray calibration_image, int calibrationx, int calibrationy, bool debug, OutputArray output) {
 	Mat calibration_image2;
 	Size calibration_size = Size(calibrationx, calibrationy);
 	Size size = calibration_image.size();
@@ -27,7 +27,11 @@ bool OpticalCorrection::calibrate(InputArray calibration_image, int calibrationx
 	ImageOperations::convertToGrayScale(calibration_image, calibration_image2);
 	found = findChessboardCorners(calibration_image2, calibration_size, points, chessBoardFlags);
 	if (found) {
-		cornerSubPix(calibration_image2, points, windowSize, Size(-1, -1), TermCriteria(TermCriteria::EPS + TermCriteria::COUNT, 30, 0.0001));
+		cornerSubPix(calibration_image2, points, windowSize, Size(-1, -1), TermCriteria(TermCriteria::EPS | TermCriteria::COUNT, 30, 0.0001));
+		if (debug) {
+			cvtColor(calibration_image, output, cv::COLOR_GRAY2BGR);
+			drawChessboardCorners(output.getMat(), calibration_size, points, found);
+		}
 		points2.push_back(points);
 		mesh3d = calc_points_mesh(points, calibrationx, calibrationy);
 		calibrateCamera(mesh3d, points2, size, cameraMatrix, distCoeffs, rvecs, tvecs);

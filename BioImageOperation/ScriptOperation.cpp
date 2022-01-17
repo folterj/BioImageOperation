@@ -562,7 +562,7 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 
 	case ScriptOperationType::OpticalCalibration:
 		requiredArguments = vector<ArgumentLabel>{ ArgumentLabel::NX, ArgumentLabel::NY };
-		optionalArguments = vector<ArgumentLabel>{ ArgumentLabel::Label };
+		optionalArguments = vector<ArgumentLabel>{ ArgumentLabel::Label, ArgumentLabel::Debug };
 		description = "Calibrate optical correction using consistent internal edges of checkerboard pattern";
 		break;
 

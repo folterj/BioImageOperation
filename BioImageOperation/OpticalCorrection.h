@@ -21,7 +21,7 @@ public:
 	Mat map1, map2;
 	bool calibrated = false;
 
-	bool calibrate(InputArray calibration_image, int calibrationx, int calibrationy);
+	bool calibrate(InputArray calibration_image, int calibrationx, int calibrationy, bool debug=false, OutputArray output=noArray());
 	bool undistort(InputArray source, OutputArray dest);
 	static vector<vector<Point3f>> calc_points_mesh(vector<Point2f> points, int calibrationx, int calibrationy);
 };

@@ -578,8 +578,14 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::OpticalCalibration:
-			if (!opticalCorrection->calibrate(*getLabelOrCurrentImage(operation, image), operation->getArgumentNumeric(ArgumentLabel::NX), operation->getArgumentNumeric(ArgumentLabel::NY))) {
+			debugMode = operation->getArgumentBoolean(ArgumentLabel::Debug);
+			if (!opticalCorrection->calibrate(*getLabelOrCurrentImage(operation, image),
+											operation->getArgumentNumeric(ArgumentLabel::NX),
+											operation->getArgumentNumeric(ArgumentLabel::NY),
+											debugMode, *newImage)) {
 				showDialog("Optical calibration failed based on consistent internal edges", MessageLevel::Error);
+			} else if (debugMode) {
+				newImageSet = true;
 			}
 			break;
 
