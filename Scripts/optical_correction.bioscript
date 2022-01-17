@@ -1,0 +1,9 @@
+OpenImage("checkerboard.png")
+ShowImage()
+OpticalCalibration(NX=10, NY=10)
+
+OpenVideo("test.mp4")
+{
+	OpticalCorrection()
+	SaveVideo("test_corrected.mp4")
+}

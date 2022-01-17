@@ -50,6 +50,22 @@ OpenVideo("ants_in_concrete.mov")
 }
 ```
 
+### Optical correction
+A common issue with close-up views is optical camera distortion.
+This can be corrected by calibrating with an image of a checkerboard pattern. The requirement for the pattern is a minimal of 3 internal edges both horizontal and vertical. The edges also need to be consistent, so in the middle and towards the sides of the image, the number of edges must stay the same and not dissapear off-screen.
+The correction works in 2 steps: 1. calibration and 2. correction
+```javascript
+OpenImage("checkerboard.png")
+ShowImage()
+OpticalCalibration(NX=10, NY=10)
+
+OpenVideo("test.mp4")
+{
+	OpticalCorrection()
+	SaveVideo("test_corrected.mp4")
+}
+```
+
 ### 3.	Background
 This is split into two parts: first defining and/or updating a background image, and second to subtract it from the current image. A static background or dynamic background can be used.
 
