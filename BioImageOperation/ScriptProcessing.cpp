@@ -577,6 +577,19 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			}
 			break;
 
+		case ScriptOperationType::OpticalCalibration:
+			if (!opticalCorrection->calibrate(*getLabelOrCurrentImage(operation, image), operation->getArgumentNumeric(ArgumentLabel::NX), operation->getArgumentNumeric(ArgumentLabel::NY))) {
+				showDialog("Optical calibration failed based on consistent internal edges", MessageLevel::Error);
+			}
+			break;
+
+		case ScriptOperationType::OpticalCorrection:
+			if (!opticalCorrection->undistort(*getLabelOrCurrentImage(operation, image), *newImage)) {
+				showDialog("Optical correction not calibrated", MessageLevel::Error);
+			}
+			newImageSet = true;
+			break;
+
 		case ScriptOperationType::CreateTracks:
 			debugMode = operation->getArgumentBoolean(ArgumentLabel::Debug);
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));

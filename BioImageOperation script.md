@@ -1,4 +1,4 @@
-# Bio Image Operation script operations (v1.7.5 / 2021-12-17)
+# Bio Image Operation script operations (v1.7.5 / 2022-01-17)
 
 
 **Set** (Path, Width, Height, Fps, PixelSize, WindowSize)
@@ -325,6 +325,22 @@ Retrieve the accumulative buffer and convert to image
 
  - Power:	 Exponential power of value range (1E-[power] ... 1) (numeric value)
  - Palette:	 Palette (GrayScale, Heat, Rainbow)
+
+
+**OpticalCalibration** (**NX**, **NY**, Label)
+
+Calibrate optical correction using consistent internal edges of checkerboard pattern
+
+ - NX:	 Number in X axis (numeric value)
+ - NY:	 Number in Y axis (numeric value)
+ - Label:	 Label id (string)
+
+
+**OpticalCorrection** (Label)
+
+Perform optical correction
+
+ - Label:	 Label id (string)
 
 
 **CreateClusters** (Tracker, MinArea, MaxArea, Debug)

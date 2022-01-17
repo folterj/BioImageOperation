@@ -560,6 +560,18 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 		description = "Retrieve the accumulative buffer and convert to image";
 		break;
 
+	case ScriptOperationType::OpticalCalibration:
+		requiredArguments = vector<ArgumentLabel>{ ArgumentLabel::NX, ArgumentLabel::NY };
+		optionalArguments = vector<ArgumentLabel>{ ArgumentLabel::Label };
+		description = "Calibrate optical correction using consistent internal edges of checkerboard pattern";
+		break;
+
+	case ScriptOperationType::OpticalCorrection:
+		requiredArguments = vector<ArgumentLabel>{ };
+		optionalArguments = vector<ArgumentLabel>{ ArgumentLabel::Label };
+		description = "Perform optical correction";
+		break;
+
 	case ScriptOperationType::CreateClusters:
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Tracker, ArgumentLabel::MinArea, ArgumentLabel::MaxArea, ArgumentLabel::Debug };
@@ -698,6 +710,8 @@ ArgumentType ScriptOperation::getExpectedArgumentType(ArgumentLabel argument) {
 	case ArgumentLabel::Height:
 	case ArgumentLabel::X:
 	case ArgumentLabel::Y:
+	case ArgumentLabel::NX:
+	case ArgumentLabel::NY:
 	case ArgumentLabel::Interval:
 	case ArgumentLabel::Total:
 	case ArgumentLabel::MS:
@@ -818,6 +832,14 @@ string ScriptOperation::getArgumentDescription(ArgumentLabel argument) {
 
 	case ArgumentLabel::Y:
 		s = "Y position";
+		break;
+
+	case ArgumentLabel::NX:
+		s = "Number in X axis";
+		break;
+
+	case ArgumentLabel::NY:
+		s = "Number in Y axis";
 		break;
 
 	case ArgumentLabel::Interval:

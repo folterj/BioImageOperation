@@ -7,12 +7,21 @@
  * https://github.com/folterj/BioImageOperation
  *****************************************************************************/
 
-#ifndef INCLUDE_GUARD
-#define INCLUDE_GUARD
+#pragma once
+#include <vector>
+#include <opencv2/opencv.hpp>
 
-#define PROJECT_NAME "BioImageOperation"
-#define PROJECT_VER  "1.7.5"
-#define PROJECT_DESC "2022-01-17"
-#define PROJECT_URL  "https://github.com/folterj/BioImageOperation"
+using namespace std;
+using namespace cv;
 
-#endif // INCLUDE_GUARD
+
+class OpticalCorrection
+{
+public:
+	Mat map1, map2;
+	bool calibrated = false;
+
+	bool calibrate(InputArray calibration_image, int calibrationx, int calibrationy);
+	bool undistort(InputArray source, OutputArray dest);
+	static vector<vector<Point3f>> calc_points_mesh(vector<Point2f> points, int calibrationx, int calibrationy);
+};

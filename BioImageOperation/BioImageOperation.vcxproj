@@ -119,6 +119,7 @@
     <ClCompile Include="AboutWindow.cpp" />
     <ClCompile Include="AccumBuffer.cpp" />
     <ClCompile Include="Argument.cpp" />
+    <ClCompile Include="OpticalCorrection.cpp" />
     <ClCompile Include="GreedyAlgorithm.cpp" />
     <ClCompile Include="HungarianAlgorithm.cpp" />
     <ClCompile Include="QOperationHighlighter.cpp" />
@@ -169,6 +170,7 @@
     <QtUic Include="TextWindow.ui" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="OpticalCorrection.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="GreedyAlgorithm.h" />
     <ClInclude Include="HungarianAlgorithm.h" />

@@ -99,7 +99,6 @@ bool ImageSeries::getMedian(OutputArray dest, MedianMode mode) {
 						m--;
 					}
 				} while (((mode == MedianMode::Light && dlow < 10 * dhigh) || (mode == MedianMode::Dark && dhigh < 10 * dlow)) && m >= minm && m < maxm);
-
 			}
 			outData[pixeli * nchannels + c] = median;
 		}

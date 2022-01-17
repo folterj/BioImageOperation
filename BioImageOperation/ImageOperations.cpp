@@ -143,7 +143,7 @@ void ImageOperations::threshold(InputArray source, OutputArray dest, double thre
 	} else {
 		thresholdType = ThresholdTypes::THRESH_OTSU;
 	}
-	cv::threshold(source, dest, (thresh * 0xFF), 0xFF, thresholdType);
+	cv::threshold(source, dest, thresh * 0xFF, 0xFF, thresholdType);
 	//cv::adaptiveThreshold(source, dest, 0xFF, AdaptiveThresholdTypes::ADAPTIVE_THRESH_MEAN_C, ThresholdTypes::THRESH_BINARY, 199, 3);
 }
 

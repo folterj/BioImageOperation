@@ -67,6 +67,9 @@ enum class ScriptOperationType
 	AddAccum,
 	GetAccum,
 
+	OpticalCalibration,
+	OpticalCorrection,
+
 	CreateClusters,
 	CreateTracks,
 	CreatePaths,
@@ -135,6 +138,9 @@ const vector<string> ScriptOperationTypes =
 	"GetSeriesMean",
 	"AddAccum",
 	"GetAccum",
+
+	"OpticalCalibration",
+	"OpticalCorrection",
 
 	"CreateClusters",
 	"CreateTracks",

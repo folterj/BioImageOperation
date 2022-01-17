@@ -17,10 +17,11 @@
 #include "ScriptOperations.h"
 #include "ScriptOperation.h"
 #include "ImageItemList.h"
-#include "ImageTrackers.h"
 #include "SimpleImageBuffer.h"
 #include "ImageSeries.h"
 #include "AccumBuffer.h"
+#include "OpticalCorrection.h"
+#include "ImageTrackers.h"
 
 
 /*
@@ -41,6 +42,7 @@ public:
 	SimpleImageBuffer* simpleBuffer = new SimpleImageBuffer();
 	ImageSeries* imageSeries = new ImageSeries();
 	AccumBuffer* accumBuffer = new AccumBuffer();
+	OpticalCorrection* opticalCorrection = new OpticalCorrection();
 	ImageTrackers* imageTrackers = new ImageTrackers();
 	Mat* dummyImage = new Mat();
 
