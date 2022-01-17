@@ -1,3 +1,8 @@
+#### Version 1.7.5
+* Improved background/median algorithm with light/dark modification
+* Improved status text in terms of overall progress
+* Added optical correction
+
 #### Version 1.7.4
 * Revised output filename generation
 * Small fix for pausing in nested Source loop
