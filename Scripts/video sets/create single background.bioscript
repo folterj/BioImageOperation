@@ -1,0 +1,9 @@
+OpenVideo("*.mp4", total=201)
+{
+	Grayscale()
+	AddSeries()
+}
+GetSeriesMedian(Light)
+StoreImage(background)
+SaveImage("back.png")
+ShowImage()

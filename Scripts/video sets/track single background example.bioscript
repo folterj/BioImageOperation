@@ -1,0 +1,21 @@
+back = OpenImage("back.png")
+mask = OpenImage("mask.png")
+
+Source("*.avi.mp4")
+{
+	OpenVideo("*.avi.mp4")
+	{
+		Grayscale()
+		DifferenceAbs(back)
+		Mask(mask)
+		Threshold(0.05)
+	
+		CreateClusters(minarea=30,maxarea=4000)
+		CreateTracks(maxmove=20,minactive=200,maxinactive=-1)
+
+		Color()
+		DrawTracks()
+		4:ShowImage()
+		SaveTracks("tracks/tracks",format=split)
+	}
+}

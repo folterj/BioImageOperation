@@ -1,0 +1,29 @@
+mask = OpenImage("mask.png")
+
+Source("*.avi.mp4")
+{
+	ClearSeries()
+	OpenVideo("*.avi.mp4", total=201)
+	{
+		Grayscale()
+		AddSeries()
+	}
+	GetSeriesMedian(Light)
+	StoreImage(back)
+
+	OpenVideo("*.avi.mp4")
+	{
+		Grayscale()
+		DifferenceAbs(back)
+		Mask(mask)
+		Threshold()
+	
+		CreateClusters()
+		CreateTracks()
+
+		Color()
+		DrawTracks()
+		4:ShowImage()
+		ShowTrackInfo()
+	}
+}
