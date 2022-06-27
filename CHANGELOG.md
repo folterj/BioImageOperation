@@ -1,3 +1,6 @@
+#### Version 1.7.6
+* Added debug mode to optical correction
+
 #### Version 1.7.5
 * Improved background/median algorithm with light/dark modification
 * Improved status text in terms of overall progress
