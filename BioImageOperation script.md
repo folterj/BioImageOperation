@@ -1,4 +1,4 @@
-# Bio Image Operation script operations (v1.7.5 / 2022-01-17)
+# Bio Image Operation script operations (v1.7.6 / 2022-06-27)
 
 
 **Set** (Path, Width, Height, Fps, PixelSize, WindowSize)
@@ -327,13 +327,14 @@ Retrieve the accumulative buffer and convert to image
  - Palette:	 Palette (GrayScale, Heat, Rainbow)
 
 
-**OpticalCalibration** (**NX**, **NY**, Label)
+**OpticalCalibration** (**NX**, **NY**, Label, Debug)
 
 Calibrate optical correction using consistent internal edges of checkerboard pattern
 
  - NX:	 Number in X axis (numeric value)
  - NY:	 Number in Y axis (numeric value)
  - Label:	 Label id (string)
+ - Debug:	 Debug mode (true / false)
 
 
 **OpticalCorrection** (Label)
