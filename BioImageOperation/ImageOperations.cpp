@@ -32,7 +32,7 @@ void ImageOperations::scale(InputArray source, OutputArray dest, double width, d
 	int swidth = source.cols();
 	int sheight = source.rows();
 
-	if (width < 1 && height < 1) {
+	if (width <= 1 && height <= 1) {
 		width *= swidth;
 		height *= sheight;
 	}
@@ -51,7 +51,7 @@ void ImageOperations::crop(Mat* source, Mat* dest, double width, double height, 
 	int swidth = source->cols;
 	int sheight = source->rows;
 
-	if (width < 1 && height < 1 && x < 1 && y < 1) {
+	if (x < 1 && y < 1 && width <= 1 && height <= 1) {
 		if (x + width > 1) {
 			width = 1 - x;
 		}
