@@ -47,9 +47,9 @@ void ImageOperations::scale(InputArray source, OutputArray dest, double width, d
 	resize(source, dest, cv::Size((int)width, (int)height));
 }
 
-void ImageOperations::crop(Mat* source, Mat* dest, double width, double height, double x, double y) {
-	int swidth = source->cols;
-	int sheight = source->rows;
+void ImageOperations::crop(const Mat& source, Mat* dest, double width, double height, double x, double y) {
+	int swidth = source.cols;
+	int sheight = source.rows;
 
 	if (x < 1 && y < 1 && width <= 1 && height <= 1) {
 		if (x + width > 1) {
@@ -69,7 +69,7 @@ void ImageOperations::crop(Mat* source, Mat* dest, double width, double height, 
 	if (height == 0) {
 		height = sheight - y;
 	}
-	*dest = (*source)(Rect((int)x, (int)y, (int)width, (int)height));
+	*dest = source(Rect((int)x, (int)y, (int)width, (int)height));
 }
 
 void ImageOperations::mask(InputArray source, InputArray mask, OutputArray dest) {
@@ -77,10 +77,11 @@ void ImageOperations::mask(InputArray source, InputArray mask, OutputArray dest)
 }
 
 void ImageOperations::convertToGrayScale(InputArray source, OutputArray dest) {
-	if (source.channels() > 1) {
-		if (source.channels() == 4) {
+	int channels = source.channels();
+	if (channels > 1) {
+		if (channels == 4) {
 			cvtColor(source, dest, ColorConversionCodes::COLOR_BGRA2GRAY);
-		} else if (source.channels() == 3) {
+		} else if (channels == 3) {
 			cvtColor(source, dest, ColorConversionCodes::COLOR_BGR2GRAY);
 		}
 	} else {
@@ -89,23 +90,46 @@ void ImageOperations::convertToGrayScale(InputArray source, OutputArray dest) {
 }
 
 void ImageOperations::convertToColor(InputArray source, OutputArray dest) {
-	if (source.channels() == 1) {
+	int channels = source.channels();
+	if (channels == 1) {
 		cvtColor(source, dest, ColorConversionCodes::COLOR_GRAY2BGR);
-	} else if (source.channels() == 4) {
+	} else if (channels == 4) {
 		cvtColor(source, dest, ColorConversionCodes::COLOR_BGRA2BGR);
 	} else {
 		source.copyTo(dest);
 	}
 }
 
+
 void ImageOperations::convertToColorAlpha(InputArray source, OutputArray dest) {
-	if (source.channels() == 1) {
+	int channels = source.channels();
+	if (channels == 1) {
 		cvtColor(source, dest, ColorConversionCodes::COLOR_GRAY2BGRA);
-	} else if (source.channels() == 3) {
+	} else if (channels == 3) {
 		cvtColor(source, dest, ColorConversionCodes::COLOR_BGR2BGRA);
 	} else {
 		source.copyTo(dest);
 	}
+}
+
+void ImageOperations::convertToInt(const Mat& source, OutputArray dest) {
+	double alpha = 1;
+	int depth = source.depth();
+	bool isFloat = (depth == CV_16F || depth == CV_32F || depth == CV_64F);
+	if (isFloat) {
+		alpha = 255.0;
+	}
+	source.convertTo(dest, CV_8U, alpha);
+}
+
+void ImageOperations::convertToFloat(const Mat& source, OutputArray dest) {
+	double alpha = 1;
+	int depth = source.depth();
+	bool isFloat = (depth == CV_16F || depth == CV_32F || depth == CV_64F);
+	if (!isFloat) {
+		alpha = 1.0 / 255;
+	}
+	source.convertTo(dest, CV_32F, alpha);
 }
 
 void ImageOperations::getSaturation(InputArray source, Mat* dest) {

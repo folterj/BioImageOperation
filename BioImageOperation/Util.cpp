@@ -22,6 +22,7 @@
 #include <QEventLoop>
 #endif
 #include "Util.h"
+#include "ImageOperations.h"
 
 
 bool Util::contains(string src, string target) {
@@ -574,8 +575,8 @@ Mat Util::loadImage(string filename) {
 	return imread(filename, ImreadModes::IMREAD_UNCHANGED);
 }
 
-void Util::saveImage(string filename, Mat* image) {
-	imwrite(filename, *image);
+void Util::saveImage(string filename, const Mat& image) {
+	imwrite(filename, image);
 }
 
 vector<string> Util::getImageFilenames(string searchpath) {
@@ -650,19 +651,27 @@ string Util::getErr() {
 }
 
 #ifndef _CONSOLE
-QImage Util::matToQImage(Mat const& source0) {
-	Mat source = source0;
+QPixmap Util::matToQPixmap(Mat* source) {
+	QImage qimage;
+	QImage::Format qformat;
+	int depth = source->depth();
+	int channels = source->channels();
+	Mat image;
+	Mat* image1 = source;
 
-	if (source.depth() != CV_8U) {
-		source.convertTo(source, CV_8U);
+	if (depth != CV_8U) {
+		ImageOperations::convertToInt(*image1, image);
+		image1 = &image;
 	}
-	if (source.channels() == 1) {
-		QImage qimage(source.data, source.cols, source.rows, source.step, QImage::Format_Grayscale8);
-		return qimage;
+	if (channels >= 3) {
+		cv::cvtColor(*image1, image, cv::COLOR_BGR2RGB);
+		image1 = &image;
+		qformat = QImage::Format_RGB888;
 	} else {
-		QImage qimage(source.data, source.cols, source.rows, source.step, QImage::Format_RGB888);
-		return qimage.rgbSwapped();
+		qformat = QImage::Format_Grayscale8;
 	}
+	qimage = QImage(image1->data, image1->cols, image1->rows, image1->step, qformat);
+	return QPixmap::fromImage(qimage);
 }
 
 string Util::getUrl(string url) {

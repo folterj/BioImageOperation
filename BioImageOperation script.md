@@ -1,4 +1,4 @@
-# Bio Image Operation script operations (v1.7.6 / 2022-06-27)
+# Bio Image Operation script operations (v1.7.7 / 2022-07-08)
 
 
 **Set** (Path, Width, Height, Fps, PixelSize, WindowSize)
@@ -136,6 +136,20 @@ Convert image to color
 **ColorAlpha** (Label)
 
 Convert image to color with alpha channel
+
+ - Label:	 Label id (string)
+
+
+**Int** (Label)
+
+Convert image to integer type
+
+ - Label:	 Label id (string)
+
+
+**Float** (Label)
+
+Convert image to floating point type
 
  - Label:	 Label id (string)
 

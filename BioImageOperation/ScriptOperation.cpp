@@ -410,6 +410,18 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 		description = "Convert image to color with alpha channel";
 		break;
 
+	case ScriptOperationType::Int:
+		requiredArguments = vector<ArgumentLabel>{ };
+		optionalArguments = vector<ArgumentLabel>{ ArgumentLabel::Label };
+		description = "Convert image to integer type";
+		break;
+
+	case ScriptOperationType::Float:
+		requiredArguments = vector<ArgumentLabel>{ };
+		optionalArguments = vector<ArgumentLabel>{ ArgumentLabel::Label };
+		description = "Convert image to floating point type";
+		break;
+
 	case ScriptOperationType::GetSaturation:
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label };

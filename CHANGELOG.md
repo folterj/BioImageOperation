@@ -1,3 +1,8 @@
+#### Version 1.7.7
+* Added Int / Float image depth type conversions
+* Improved ShowImage() handling of divergent image types
+* Refactored various image operations
+
 #### Version 1.7.6
 * Added debug mode to optical correction
 

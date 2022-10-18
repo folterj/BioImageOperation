@@ -47,7 +47,7 @@ void ImageOutput::init(string basepath, string filepath, string defaultExtension
 
 bool ImageOutput::writeImage(Mat* image) {
 	if (filei >= start && (filei < end || end == 0)) {
-		Util::saveImage(outputPath.createFilePath(filei), image);
+		Util::saveImage(outputPath.createFilePath(filei), *image);
 	}
 	filei++;
 	return true;

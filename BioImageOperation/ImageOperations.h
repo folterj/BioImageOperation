@@ -25,12 +25,14 @@ public:
 	static void convertToGrayScale(InputArray source, OutputArray dest);
 	static void convertToColor(InputArray source, OutputArray dest);
 	static void convertToColorAlpha(InputArray source, OutputArray dest);
+	static void convertToInt(const Mat& source, OutputArray dest);
+	static void convertToFloat(const Mat& source, OutputArray dest);
 	static void getSaturation(InputArray source, Mat* dest);
 	static void getHsValue(InputArray source, Mat* dest);
 	static void getHsLightness(InputArray source, Mat* dest);
 
 	static void scale(InputArray source, OutputArray dest, double width = 0, double height = 0);
-	static void crop(Mat* source, Mat* dest, double width = 0, double height = 0, double x = 0, double y = 0);
+	static void crop(const Mat& source, Mat* dest, double width = 0, double height = 0, double x = 0, double y = 0);
 	static void mask(InputArray source, InputArray mask, OutputArray dest);
 	static void threshold(InputArray source, OutputArray dest, double thresh = 0);
 	static void erode(InputArray source, OutputArray dest, int radius = 0);

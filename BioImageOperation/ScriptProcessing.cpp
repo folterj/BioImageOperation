@@ -427,7 +427,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::Crop:
-			ImageOperations::crop(getLabelOrCurrentImage(operation, image), newImage,
+			ImageOperations::crop(*getLabelOrCurrentImage(operation, image), newImage,
 									operation->getArgumentNumeric(ArgumentLabel::Width),
 									operation->getArgumentNumeric(ArgumentLabel::Height),
 									operation->getArgumentNumeric(ArgumentLabel::X),
@@ -454,6 +454,16 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 
 		case ScriptOperationType::ColorAlpha:
 			ImageOperations::convertToColorAlpha(*getLabelOrCurrentImage(operation, image), *newImage);
+			newImageSet = true;
+			break;
+
+		case ScriptOperationType::Int:
+			ImageOperations::convertToInt(*getLabelOrCurrentImage(operation, image), *newImage);
+			newImageSet = true;
+			break;
+
+		case ScriptOperationType::Float:
+			ImageOperations::convertToFloat(*getLabelOrCurrentImage(operation, image), *newImage);
 			newImageSet = true;
 			break;
 
@@ -755,11 +765,13 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				errorMsg += " (Unexpected number of color channels)";
 			}
 			if (Util::contains(errorMsg, "depth()")) {
-				errorMsg += " (Unexpected image (bit) depth)";
+				errorMsg += " (Unexpected image depth/type)";
 			}
 			if (Util::contains(errorMsg, "size()")) {
 				errorMsg += " (Unexpected image size)";
 			}
+		} else if (Util::contains(errorMsg, "different types")) {
+			errorMsg += " (Image depth/types don't match)";
 		}
 		errorMsg += " in\n" + operation->line;
 		showDialog(errorMsg, MessageLevel::Error);

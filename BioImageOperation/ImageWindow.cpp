@@ -70,7 +70,7 @@ void ImageWindow::showImage(Mat* image, string reference) {
 	this->image = image;
 	this->reference = reference;
 
-	pixmap.setPixmap(QPixmap::fromImage(Util::matToQImage(*image)));
+	pixmap.setPixmap(Util::matToQPixmap(image));
 	pixmap.setTransformationMode(Qt::TransformationMode::SmoothTransformation);
 	if (needResize) {
 		resizeEvent(nullptr);
@@ -99,7 +99,7 @@ void ImageWindow::saveImage() {
 				}
 				filename += extension;
 			}
-			Util::saveImage(filename, image);
+			Util::saveImage(filename, *image);
 		}
 	} catch (cv::Exception& e) {
 		// opencv exception

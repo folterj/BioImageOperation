@@ -13,6 +13,7 @@
 #ifndef _CONSOLE
 #include <QObject>
 #include <QImage>
+#include <QPixmap>
 #endif
 #include <opencv2/opencv.hpp>
 #include "ColorScale.h"
@@ -81,7 +82,7 @@ public:
 
     static string getExceptionDetail(exception& e, int level = 0);
 	static Mat loadImage(string filename);
-	static void saveImage(string filename, Mat* image);
+	static void saveImage(string filename, const Mat& image);
 	static bool isValidImage(Mat* image);
 	static string getCodecString(int codec);
 
@@ -98,7 +99,7 @@ public:
 	static string getErr();
 
 #ifndef _CONSOLE
-	static QImage matToQImage(Mat const& src);
+	static QPixmap matToQPixmap(Mat* source);
 	static string getUrl(string url);
 	static bool openWebLink(string url);
 	static int compareVersions(string version1, string version2);
