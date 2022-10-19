@@ -49,9 +49,10 @@ bool StatData::calcStats() {
 }
 
 void StatData::removeMaxRange(double range) {
-	int n = (int)(data.size() * range);
+	int n;
 
 	if (data.size() > 0) {
+		n = (int)(data.size() * range);
 		std::sort(data.begin(), data.end());
 		for (int i = 0; i < n; i++) {
 			data.pop_back();

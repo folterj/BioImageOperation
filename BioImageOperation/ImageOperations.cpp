@@ -159,16 +159,25 @@ void ImageOperations::getHsLightness(InputArray source, Mat* dest) {
 	*dest = channels[1];	// lightness channel
 }
 
-void ImageOperations::threshold(InputArray source, OutputArray dest, double thresh) {
+double ImageOperations::threshold(InputArray source, OutputArray dest, double thresh) {
 	ThresholdTypes thresholdType;
+	int depth = source.depth();
+	double maxval;
+	bool isFloat = (depth == CV_16F || depth == CV_32F || depth == CV_64F);
 
 	if (thresh > 0) {
 		thresholdType = ThresholdTypes::THRESH_BINARY;
 	} else {
 		thresholdType = ThresholdTypes::THRESH_OTSU;
 	}
-	cv::threshold(source, dest, thresh * 0xFF, 0xFF, thresholdType);
+	if (isFloat) {
+		maxval = 1;
+	} else {
+		maxval = 0xFF;
+	}
+	thresh = cv::threshold(source, dest, thresh * maxval, maxval, thresholdType);
 	//cv::adaptiveThreshold(source, dest, 0xFF, AdaptiveThresholdTypes::ADAPTIVE_THRESH_MEAN_C, ThresholdTypes::THRESH_BINARY, 199, 3);
+	return thresh / maxval;
 }
 
 void ImageOperations::erode(InputArray source, OutputArray dest, int radius) {

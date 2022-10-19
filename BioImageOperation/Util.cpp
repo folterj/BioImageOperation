@@ -252,6 +252,10 @@ string Util::formatThousands(int x) {
 	return s;
 }
 
+int Util::getStringLength(string s) {
+	return s.length() + count(s.begin(), s.end(), '\t');		// Tab counts for 2 spaces; add 1 extra character for each tab
+}
+
 double Util::toDouble(string s) {
 	double d = 0;
 	size_t stodEnd;
@@ -622,9 +626,11 @@ string Util::combinePath(string basepath, string templatepath) {
     return (filesystem::path(basepath) / filesystem::path(templatepath)).string();
 }
 
-Size Util::drawText(Mat* image, string text, Point point, HersheyFonts fontFace, double fontScale, Scalar color) {
-	Size size = getTextSize(text, fontFace, fontScale, 1, nullptr);
-	putText(*image, text, point, fontFace, fontScale, color, 1, LineTypes::LINE_AA);
+Size Util::drawText(Mat* image, string text, Point point, HersheyFonts fontFace, double fontScale0, Scalar color) {
+	double fontScale = fontScale0 * sqrt(image->cols / 1000.0 * image->rows / 1000.0) / 2;
+	int thickness = int(ceil(fontScale));
+	Size size = getTextSize(text, fontFace, fontScale, thickness, nullptr);
+	putText(*image, text, point, fontFace, fontScale, color, thickness, LineTypes::LINE_AA);
 	return size;
 }
 

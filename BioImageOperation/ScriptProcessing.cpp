@@ -223,7 +223,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 	string path, source, output, label;
 	int width, height;
 	int displayi;
-	double fps, size;
+	double fps, size, thresh0, thresh;
 	int frame = sourceFrameNumber;
 
 	int delay;
@@ -483,8 +483,12 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::Threshold:
-			ImageOperations::threshold(*getLabelOrCurrentImage(operation, image), *newImage, operation->getArgumentNumeric());
+			thresh0 = operation->getArgumentNumeric();
+			thresh = ImageOperations::threshold(*getLabelOrCurrentImage(operation, image), *newImage, thresh0);
 			newImageSet = true;
+			if (thresh0 == 0) {
+				showText("Threshold: " + Util::format("%.3f", thresh) + "\n", Constants::nTextWindows);
+			}
 			break;
 
 		case ScriptOperationType::Erode:

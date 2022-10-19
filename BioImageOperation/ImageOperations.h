@@ -34,7 +34,7 @@ public:
 	static void scale(InputArray source, OutputArray dest, double width = 0, double height = 0);
 	static void crop(const Mat& source, Mat* dest, double width = 0, double height = 0, double x = 0, double y = 0);
 	static void mask(InputArray source, InputArray mask, OutputArray dest);
-	static void threshold(InputArray source, OutputArray dest, double thresh = 0);
+	static double threshold(InputArray source, OutputArray dest, double thresh = 0);
 	static void erode(InputArray source, OutputArray dest, int radius = 0);
 	static void dilate(InputArray source, OutputArray dest, int radius = 0);
 	static void difference(InputArray source1, InputArray source2, OutputArray dest, bool abs = false);

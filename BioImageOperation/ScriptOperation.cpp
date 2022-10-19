@@ -1240,10 +1240,8 @@ void ScriptOperation::updateBenchmarking() {
 		times += Util::formatThousands((int)round(duration * 1000000));
 		if (hasInnerOperations()) {
 			times += "]";
-		} else {
-			times += " ";
 		}
-		times += "us";
+		times += " us";
 	}
 	extra = times;
 	if (hasInnerOperations()) {

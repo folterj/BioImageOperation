@@ -72,23 +72,19 @@ vector<TrackClusterMatch*> GreedyAlgorithm::calcTrackClusterMatches(Track* track
 
 vector<TrackClusterMatch*> GreedyAlgorithm::assignTracks() {
 	vector<TrackClusterMatch*> assignedMatches;
-	TrackClusterMatch* match;
-	int i;
 
 	for (vector<TrackClusterMatch*> trackMatch : trackMatches) {
-		i = 0;
-		if (!trackMatch[0]->track->assigned) {
-			while (true) {
-				if (i >= trackMatch.size()) {
-					break;
-				}
-				match = trackMatch[i];
+		Track* track = trackMatch[0]->track;
+		if (!track->assigned) {
+			for (TrackClusterMatch* match : trackMatch) {
 				if (match->isAssignable()) {
 					match->assign();
 					assignedMatches.push_back(match);
 					break;
 				}
-				i++;
+				else {
+					match->isAssignable();
+				}
 			}
 		}
 	}

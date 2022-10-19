@@ -177,7 +177,7 @@ void ScriptOperations::renderOperations(vector<string>* lines) {
 		line = (*lines)[operation->lineStart];
 		extra = operation->extra;
 		if (extra != "") {
-			int i = (int)(80 - line.length() - extra.length());
+			int i = (int)(80 - Util::getStringLength(line) - Util::getStringLength(extra));
 			if (i < 1) {
 				i = 1;
 			}

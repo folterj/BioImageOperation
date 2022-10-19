@@ -305,8 +305,6 @@ void Cluster::drawFill(Mat* image, Scalar color) {
 
 void Cluster::drawLabel(Mat* image, Scalar color, int drawMode) {
 	vector<string> texts;
-	HersheyFonts fontFace = HersheyFonts::FONT_HERSHEY_SIMPLEX;
-	double fontScale = 0.5;
 	Point point((int)(x + rad), (int)(y + rad));
 	Size size;
 	string text;
@@ -329,7 +327,7 @@ void Cluster::drawLabel(Mat* image, Scalar color, int drawMode) {
 	}
 
 	for (string text : texts) {
-		size = Util::drawText(image, text, point, fontFace, fontScale, color);
+		size = Util::drawText(image, text, point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 1, color);
 		point.y += (int)(size.height * 1.5);
 	}
 }

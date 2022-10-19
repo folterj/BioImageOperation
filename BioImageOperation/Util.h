@@ -52,6 +52,7 @@ public:
 	static string format(string format, ...);
 	static string formatTimespan(int seconds);
 	static string formatThousands(int x);
+	static int getStringLength(string s);
 
 	static double toDouble(string s);
 	static bool isNumeric(string s);
