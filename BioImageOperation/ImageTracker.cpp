@@ -725,7 +725,7 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 					maxi = max(track->label, maxi);
 				}
 			}
-			csv += Util::format("{0},{1},", frame, time);
+			csv += Util::format("%d,%f,", frame, time);
 			for (int i = 0; i <= maxi; i++) {
 				for (Track* track : tracks) {
 					if (track->isActive()) {
