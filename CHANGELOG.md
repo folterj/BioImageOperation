@@ -1,3 +1,8 @@
+#### Version 1.7.8
+* Improved threshold showing OTSU value as output
+* Refactor in greedy algorithm
+* Increased annotation font size for hires sources
+
 #### Version 1.7.7
 * Added Int / Float image depth type conversions
 * Improved ShowImage() handling of divergent image types
