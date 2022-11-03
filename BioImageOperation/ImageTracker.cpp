@@ -647,9 +647,9 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 	string csv = "";
 	string sfilename;
 	NumericPath filepath;
-	int dcol;
-	int col = 0;
-	int maxi = 0;
+	int dcolset;
+	int colseti = 0;
+	int maxcluster = 0;
 	string maincols = Cluster::getCsvHeader(outputContour);
 	int nmaincols = (int)Util::split(maincols, ",").size();
 	string header = "frame,time," + maincols + "\n";
@@ -663,19 +663,19 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 	if (clusterParamsFinalised) {
 		if (saveFormat == SaveFormat::ByLabel) {
 			for (Cluster* cluster : clusters) {
-				maxi = max(cluster->getInitialLabel(), maxi);
+				maxcluster = max(cluster->getInitialLabel(), maxcluster);
 			}
 			csv += Util::format("{0},{1},", frame, time);
-			for (int i = 0; i <= maxi; i++) {
+			for (int clusteri = 0; clusteri <= maxcluster; clusteri++) {
 				for (Cluster* cluster : clusters) {
-					if (cluster->getInitialLabel() == i) {
-						dcol = i - col;
-						if (dcol > 0) {
-							csv += string(',', dcol * nmaincols);
-							col = i;
+					if (cluster->getInitialLabel() == clusteri) {
+						dcolset = clusteri - colseti;
+						if (dcolset > 0) {
+							csv += string(dcolset * nmaincols, ',');
+							colseti = clusteri;
 						}
 						csv += cluster->getCsv(outputContour) + ",";
-						col++;
+						colseti++;
 					}
 				}
 			}
@@ -705,11 +705,11 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 	string csv = "";
 	string sfilename;
 	NumericPath filepath;
-	int dcol;
-	int col = 0;
-	int maxi = 0;
 	string maincols = Track::getCsvHeader(outputContour);
 	int nmaincols = (int)Util::split(maincols, ",").size();
+	int maxtrack = 0;
+	int colseti = 0;
+	int dcolset;
 	string header = "frame,time," + maincols + "\n";
 
 	if (saveFormat == SaveFormat::Split) {
@@ -722,24 +722,24 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 		if (saveFormat == SaveFormat::ByLabel) {
 			for (Track* track : tracks) {
 				if (track->isActive()) {
-					maxi = max(track->label, maxi);
+					maxtrack = max(track->label, maxtrack);
 				}
 			}
 			csv += Util::format("%d,%f,", frame, time);
-			for (int i = 0; i <= maxi; i++) {
+			for (int tracki = 0; tracki <= maxtrack; tracki++) {
 				for (Track* track : tracks) {
-					if (track->isActive()) {
-						if (track->label == i) {
-							dcol = i - col;
-							if (dcol > 0) {
-								csv += string(',', dcol * nmaincols);
-								col = i;
+					if (track->label == tracki) {
+						if (track->isActive()) {
+							dcolset = tracki - colseti;
+							if (dcolset > 0) {
+								csv += string(dcolset * nmaincols, ',');
+								colseti = tracki;
 							}
 							if (outputContour) {
 								cluster = findTrackedCluster(track);
 							}
 							csv += track->getCsv(outputContour, cluster) + ",";
-							col++;
+							colseti++;
 						}
 					}
 				}

@@ -1,3 +1,6 @@
+#### Version 1.7.9
+* Fixed bug in cluster and track csv output (ByLabel format)
+
 #### Version 1.7.8
 * Improved threshold showing OTSU value as output
 * Refactor in greedy algorithm
