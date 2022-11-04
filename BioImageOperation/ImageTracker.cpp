@@ -665,7 +665,7 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 			for (Cluster* cluster : clusters) {
 				maxcluster = max(cluster->getInitialLabel(), maxcluster);
 			}
-			csv += Util::format("{0},{1},", frame, time);
+			csv += Util::format("{0},{1}", frame, time);
 			for (int clusteri = 0; clusteri <= maxcluster; clusteri++) {
 				for (Cluster* cluster : clusters) {
 					if (cluster->getInitialLabel() == clusteri) {
@@ -674,7 +674,7 @@ void ImageTracker::saveClusters(string filename, int frame, double time, SaveFor
 							csv += string(dcolset * nmaincols, ',');
 							colseti = clusteri;
 						}
-						csv += cluster->getCsv(outputContour) + ",";
+						csv += "," + cluster->getCsv(outputContour);
 						colseti++;
 					}
 				}
@@ -725,7 +725,7 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 					maxtrack = max(track->label, maxtrack);
 				}
 			}
-			csv += Util::format("%d,%f,", frame, time);
+			csv += Util::format("%d,%f", frame, time);
 			for (int tracki = 0; tracki <= maxtrack; tracki++) {
 				for (Track* track : tracks) {
 					if (track->label == tracki) {
@@ -738,7 +738,7 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 							if (outputContour) {
 								cluster = findTrackedCluster(track);
 							}
-							csv += track->getCsv(outputContour, cluster) + ",";
+							csv += "," + track->getCsv(outputContour, cluster);
 							colseti++;
 						}
 					}
