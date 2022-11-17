@@ -159,13 +159,21 @@ double Cluster::calcAngleDif(Track* track) {
 
 double Cluster::getRangeFactor(Track* track, double distance, double maxMoveDistance) {
 	double rangeFactor = 1;
-	double clusterRad, extraDist;
+	double clusterRad, extraDist, fInactive;
 
 	if (maxMoveDistance != 0) {
 		clusterRad = max(track->lastClusterRad, rad);
 		//extraDist = abs(clusterRad - track->rad) * 2;
 		extraDist = abs(2 * clusterRad - track->rad);
-		rangeFactor = 1 - distance / (maxMoveDistance + extraDist);
+		if (track->inactiveCount == 0) {
+			rangeFactor = 1 - distance / (maxMoveDistance + extraDist);
+		} else {
+			fInactive = track->inactiveCount * 0.1;		// factor emulating slower movement
+			if (fInactive < 1) {
+				fInactive = 1;
+			}
+			rangeFactor = (1 - distance / (maxMoveDistance * fInactive + extraDist)) / fInactive;
+		}
 	}
 	return rangeFactor;
 }

@@ -483,10 +483,11 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::Threshold:
+			debugMode = operation->getArgumentBoolean(ArgumentLabel::Debug);
 			thresh0 = operation->getArgumentNumeric();
 			thresh = ImageOperations::threshold(*getLabelOrCurrentImage(operation, image), *newImage, thresh0);
 			newImageSet = true;
-			if (thresh0 == 0) {
+			if (debugMode) {
 				showText("Threshold: " + Util::format("%.3f", thresh) + "\n", Constants::nTextWindows);
 			}
 			break;

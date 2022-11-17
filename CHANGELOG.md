@@ -1,3 +1,7 @@
+#### Version 1.7.10
+* Tracking: allow larger track movement depending on length being inactive
+* Show (auto) threshold only with debug flag
+
 #### Version 1.7.9
 * Fixed bug in cluster and track csv output (ByLabel format)
 

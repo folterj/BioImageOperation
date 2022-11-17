@@ -460,7 +460,7 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 
 	case ScriptOperationType::Threshold:
 		requiredArguments = vector<ArgumentLabel> { };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Level };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Level, ArgumentLabel::Debug };
 		description = "Convert image to binary using threshold level, or in case not provided using automatic Otsu method";
 		break;
 

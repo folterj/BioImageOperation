@@ -1,4 +1,4 @@
-# Bio Image Operation script operations (v1.7.8 / 2022-10-19)
+# Bio Image Operation script operations (v1.7.10 / 2022-11-17)
 
 
 **Set** (Path, Width, Height, Fps, PixelSize, WindowSize)
@@ -202,12 +202,13 @@ Perform mask on current image
  - Label:	 Label id (string)
 
 
-**Threshold** (Label, Level)
+**Threshold** (Label, Level, Debug)
 
 Convert image to binary using threshold level, or in case not provided using automatic Otsu method
 
  - Label:	 Label id (string)
  - Level:	 Threshold value (numeric value between 0 and 1)
+ - Debug:	 Debug mode (true / false)
 
 
 **Erode** (Label, Radius)
