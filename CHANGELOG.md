@@ -1,3 +1,6 @@
+#### Version 1.7.11
+* Video capture: added setting desired frame width and height parameters
+
 #### Version 1.7.10
 * Tracking: allow larger track movement depending on length being inactive
 * Show (auto) threshold only with debug flag
