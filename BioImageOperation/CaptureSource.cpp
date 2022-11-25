@@ -28,13 +28,20 @@ void CaptureSource::reset() {
 	close();
 }
 
-bool CaptureSource::init(int apiCode, string basepath, string filepath, string start, string length, double fps0, int interval, int total) {
+bool CaptureSource::init(int apiCode, string basepath, string filepath, string start, string length,
+						 double fps0, int interval, int total, int width, int height) {
 	reset();
 
 	this->apiCode = apiCode;
 	this->source = filepath;
 
 	if (open()) {
+		if (width > 0) {
+			videoCapture.set(VideoCaptureProperties::CAP_PROP_FRAME_WIDTH, width);
+		}
+		if (height > 0) {
+			videoCapture.set(VideoCaptureProperties::CAP_PROP_FRAME_HEIGHT, height);
+		}
 		if (fps0 > 0) {
 			videoCapture.set(VideoCaptureProperties::CAP_PROP_FPS, fps0);
 		}

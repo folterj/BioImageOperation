@@ -362,7 +362,9 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 										"", operation->getArgument(ArgumentLabel::Length),
 										operation->getArgumentNumeric(ArgumentLabel::Fps),
 										(int)operation->getArgumentNumeric(ArgumentLabel::Interval),
-										(int)operation->getArgumentNumeric(ArgumentLabel::Total));
+										(int)operation->getArgumentNumeric(ArgumentLabel::Total),
+										(int)operation->getArgumentNumeric(ArgumentLabel::Width),
+										(int)operation->getArgumentNumeric(ArgumentLabel::Height));
 			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage)) {
 				showStatus(operation->frameSource->getCurrentFrame());

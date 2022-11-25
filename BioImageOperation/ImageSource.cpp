@@ -29,7 +29,8 @@ void ImageSource::reset() {
 	height = 0;
 }
 
-bool ImageSource::init(int apiCode, string basepath, string filepath, string start, string length, double fps, int interval, int total) {
+bool ImageSource::init(int apiCode, string basepath, string filepath, string start, string length,
+					   double fps0, int interval, int total, int width, int height) {
 	reset();
 
 	sourcePath.setInputPath(basepath, filepath);

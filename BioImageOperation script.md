@@ -1,4 +1,4 @@
-# Bio Image Operation script operations (v1.7.10 / 2022-11-17)
+# Bio Image Operation script operations (v1.7.11 / 2022-11-25)
 
 
 **Set** (Path, Width, Height, Fps, PixelSize, WindowSize)
@@ -62,7 +62,7 @@ Open video file(s) and process frames, accepts file name pattern (ffmpeg formats
  - Total:	 Total number of frames at regular interval (numeric value)
 
 
-**OpenCapture** (API, Path, Source, Fps, Length, Interval, Total)
+**OpenCapture** (API, Path, Source, Fps, Length, Interval, Total, Width, Height)
 
 Open capturing from video (IP) path or camera source
 
@@ -73,6 +73,8 @@ Open capturing from video (IP) path or camera source
  - Length:	 Length (time reference as (hours:)minutes:seconds, or frame number)
  - Interval:	 Interval in number of frames (numeric value)
  - Total:	 Total number of frames at regular interval (numeric value)
+ - Width:	 Width (numeric value)
+ - Height:	 Height (numeric value)
 
 
 **SaveImage** (**Path**, Label, Start, Length)

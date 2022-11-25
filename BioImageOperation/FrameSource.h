@@ -29,7 +29,8 @@ protected:
 
 public:
 	virtual void reset() = 0;
-	virtual bool init(int apiCode, string basepath, string filepath, string start = "", string length = "", double fps = 1, int interval = 1, int total = 0) = 0;
+	virtual bool init(int apiCode, string basepath, string filepath, string start = "", string length = "",
+					  double fps = 1, int interval = 1, int total = 0, int width = 0, int height = 0) = 0;
 	virtual bool getNextImage(Mat* image) = 0;
 	virtual void close() = 0;
 

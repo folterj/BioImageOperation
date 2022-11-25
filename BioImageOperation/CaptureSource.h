@@ -34,7 +34,8 @@ public:
 	CaptureSource();
 	~CaptureSource();
 	void reset();
-	bool init(int apiCode, string basepath, string filepath, string start = "", string length = "", double fps0 = 1, int interval = 1, int total = 0);
+	bool init(int apiCode, string basepath, string filepath, string start = "", string length = "",
+			  double fps = 1, int interval = 1, int total = 0, int width = 0, int height = 0);
 	bool open();
 	bool getNextImage(Mat* image);
 	void close();

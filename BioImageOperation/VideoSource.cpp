@@ -39,8 +39,9 @@ void VideoSource::reset() {
 	close();
 }
 
-bool VideoSource::init(int apiCode, string basepath, string filepath, string start, string length, double fps, int interval, int total) {
-	string filename = ".";	// dummy value to pass initial while-loop condition
+bool VideoSource::init(int apiCode, string basepath, string filepath, string start, string length,
+					   double fps0, int interval, int total, int width, int height) {
+	string filename;
 	bool ok = false;
 	bool canSeek;
 	int nframes0;
@@ -56,10 +57,10 @@ bool VideoSource::init(int apiCode, string basepath, string filepath, string sta
     }
 
 	nframes = 0;
-    while (filename != "") {
-        filename = sourcePath.createFilePath();
-        if (filename != "") {
-            if (videoCapture.open(filename)) {
+	do {
+		filename = sourcePath.createFilePath();
+		if (filename != "") {
+			if (videoCapture.open(filename)) {
 				nframes0 = (int)videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_COUNT);
 				if (nframes0 > 0) {
 					nframes += nframes0;
@@ -73,15 +74,16 @@ bool VideoSource::init(int apiCode, string basepath, string filepath, string sta
 			} else {
 				message = "Unable to open capture";
 				if (apiCode != 0) {
-                    message += " API code: " + to_string(apiCode);
-                }
+					message += " API code: " + to_string(apiCode);
+				}
 				message += " filename: " + filename;
 				throw ios_base::failure(message);
 
 			}
 			videoCapture.release();
 		}
-	}
+	} while (filename != "");
+
 	sourcePath.resetFilePath();
 
 	calcFrameParams(start, length, fps, interval, total, nframes);
