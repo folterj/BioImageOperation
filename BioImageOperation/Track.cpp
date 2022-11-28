@@ -22,7 +22,7 @@ Track::Track(int label, int minActive, double fps, double pixelSize, double wind
 }
 
 void Track::update(Cluster* cluster, double maxArea, double maxMoveDistance, bool trackParamsFinalised) {
-	double orientationGuess, slowMoveDist;
+	double orientationGuess, slowMoveDist, contributeFactor;
 	double angleDif, angleDifInv;
 	double newx, newy, dx0, dy0, dist0, dangle;
 	int ntracks = (int)cluster->assignedTracks.size();
@@ -132,10 +132,11 @@ void Track::update(Cluster* cluster, double maxArea, double maxMoveDistance, boo
 		meanArea = area;
 		meanLengthMajor = lengthMajor;
 		meanLengthMinor = lengthMinor;
-	} else {
-		meanArea = meanArea * 0.9 + area * 0.1;
-		meanLengthMajor = meanLengthMajor * 0.9 + lengthMajor * 0.1;
-		meanLengthMinor = meanLengthMinor * 0.9 + lengthMinor * 0.1;
+	} else if (!isMerged) {
+		contributeFactor = lastMatchFactor * 0.1;
+		meanArea = meanArea * (1 - contributeFactor) + area * contributeFactor;
+		meanLengthMajor = meanLengthMajor * (1 - contributeFactor) + lengthMajor * contributeFactor;
+		meanLengthMinor = meanLengthMinor * (1 - contributeFactor) + lengthMinor * contributeFactor;
 	}
 
 	points.push_back(Point2d(x, y));
@@ -165,7 +166,8 @@ void Track::unAssign() {
 	assigned = false;
 }
 
-void Track::assign() {
+void Track::assign(double matchFactor) {
+	lastMatchFactor = matchFactor;
 	assigned = true;
 }
 

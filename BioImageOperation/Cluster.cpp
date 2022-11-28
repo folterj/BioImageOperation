@@ -40,7 +40,7 @@ Cluster::Cluster(int clusterLabel, double x, double y, double area, Rect box, Mo
 bool Cluster::isAssignable(Track* track) {
 	int n = (int)assignedTracks.size();
 	double totalArea;
-	bool isActive = track->isActive(false);
+	bool isActive = track->isActive();
 
 	if ((n > 0 && !isActive) || n >= Constants::maxMergedBlobs) {
 		// for multiple matches: only allow active tracks
@@ -75,7 +75,7 @@ bool Cluster::isAssignable(int ntotal, double totalArea) {
 }
 
 bool Cluster::isAssignable(Track* track, int ntotal, double totalArea) {
-	bool isActive = track->isActive(false);
+	bool isActive = track->isActive();
 
 	if ((ntotal > 1 && !isActive) || ntotal > Constants::maxMergedBlobs) {
 		// for multiple matches: only allow active tracks

@@ -43,6 +43,7 @@ public:
 	double meanLengthMinor = 0;
 	double angle = 0;
 	double orientation = 0;
+	double lastMatchFactor = 1;
 
 	double originX = 0;
 	double originY = 0;
@@ -76,7 +77,7 @@ public:
 	double getDistFromOrigin();
 
 	void unAssign();
-	void assign();
+	void assign(double matchFactor = 0);
 	bool isActive(bool needAssigned = false);
 	double activeFactor();
 

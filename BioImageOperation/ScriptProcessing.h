@@ -102,9 +102,8 @@ public:
 	 */
 	void requestPause();
 	void requestAbort();
-	void doReset();
+	void doReset(bool completed=false);
 	void setMode(OperationMode mode);
-	void clearStatus();
 	void showStatus(int i, int tot = 0, string label = "");
 	void showText(string text, int displayi, string reference = "");
 	void showImage(Mat* image, int displayi, string reference = "");

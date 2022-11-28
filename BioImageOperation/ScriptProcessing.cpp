@@ -158,7 +158,7 @@ void ScriptProcessing::processThreadMethod() {
 	}
 	if (operationMode != OperationMode::Pause) {
 		this_thread::sleep_for(100ms);		// finish async tasks (show image)
-		doReset();
+		doReset(operationMode == OperationMode::Run);
 	}
 }
 
@@ -312,13 +312,19 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			sourceFrameNumber = operation->frameSource->getFrameNumber();
 			if (operation->frameSource->getNextImage(newImage)) {
 				sourceFrames = operation->frameSource->getTotalFrames();
-				showStatus(operation->frameSource->getCurrentFrame(), sourceFrames);
+				if (sourceFrames > 1) {
+					showStatus(operation->frameSource->getCurrentFrame(), sourceFrames);
+				}
 				done = false;
 			}
 			sourceWidth = operation->frameSource->getWidth();
 			sourceHeight = operation->frameSource->getHeight();
 			newImageSet = true;
 			if (done) {
+				sourceFrames = operation->frameSource->getTotalFrames();
+				if (sourceFrames > 1) {
+					showStatus(sourceFrames, sourceFrames);
+				}
 				operation->resetFrameSource();
 			}
 			break;
@@ -342,6 +348,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				done = false;
 			} else {
 				// already past last frame; current image invalid
+				showStatus(operation->frameSource->getTotalFrames(), operation->frameSource->getTotalFrames());
 				operation->resetFrameSource();
 				return true;
 			}
@@ -370,6 +377,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				showStatus(operation->frameSource->getCurrentFrame());
 				done = false;
 			} else {
+				showStatus(operation->frameSource->getCurrentFrame(), operation->frameSource->getCurrentFrame());
 				// capture failed; current image invalid
 				operation->resetFrameSource();
 				return true;
@@ -835,22 +843,20 @@ void ScriptProcessing::requestAbort() {
 	}
 }
 
-void ScriptProcessing::doReset() {
+void ScriptProcessing::doReset(bool completed) {
 	imageTrackers->close();
 	scriptOperations->close();
 
 	observer->resetProgressTimer();
 	setMode(OperationMode::Idle);
-	clearStatus();
+	if (!completed) {
+		observer->clearStatus();
+	}
 }
 
 void ScriptProcessing::setMode(OperationMode mode) {
 	operationMode = mode;
 	observer->setMode((int)operationMode);
-}
-
-void ScriptProcessing::clearStatus() {
-	observer->clearStatus();
 }
 
 void ScriptProcessing::showStatus(int i, int tot, string label) {

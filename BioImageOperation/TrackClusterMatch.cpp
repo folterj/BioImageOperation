@@ -51,7 +51,7 @@ bool TrackClusterMatch::isAssignable() {
 
 void TrackClusterMatch::assign() {
 	cluster->assign(track);
-	track->assign();
+	track->assign(matchFactor);
 	assigned = true;
 }
 
