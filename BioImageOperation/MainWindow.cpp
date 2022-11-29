@@ -387,7 +387,9 @@ void MainWindow::showStatusQt(int i, int tot, string label) {
 		if (i < tot) {
 			s = label + Util::format(" (#%d)", i);
 		}
-		s += Util::format(" %.3fs @%dfps", avgFrametime, processFps);
+		if (tot > 1) {
+			s += Util::format(" %.3fs @%dfps", avgFrametime, processFps);
+		}
 		if (progress > 0) {
 			estimateLeft = totalElapseds * (1 / progress - 1);
 		}

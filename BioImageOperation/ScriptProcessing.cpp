@@ -321,10 +321,6 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			sourceHeight = operation->frameSource->getHeight();
 			newImageSet = true;
 			if (done) {
-				sourceFrames = operation->frameSource->getTotalFrames();
-				if (sourceFrames > 1) {
-					showStatus(sourceFrames, sourceFrames);
-				}
 				operation->resetFrameSource();
 			}
 			break;
@@ -348,7 +344,6 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				done = false;
 			} else {
 				// already past last frame; current image invalid
-				showStatus(operation->frameSource->getTotalFrames(), operation->frameSource->getTotalFrames());
 				operation->resetFrameSource();
 				return true;
 			}
@@ -377,7 +372,6 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 				showStatus(operation->frameSource->getCurrentFrame());
 				done = false;
 			} else {
-				showStatus(operation->frameSource->getCurrentFrame(), operation->frameSource->getCurrentFrame());
 				// capture failed; current image invalid
 				operation->resetFrameSource();
 				return true;
@@ -844,14 +838,15 @@ void ScriptProcessing::requestAbort() {
 }
 
 void ScriptProcessing::doReset(bool completed) {
-	imageTrackers->close();
-	scriptOperations->close();
-
-	observer->resetProgressTimer();
-	setMode(OperationMode::Idle);
-	if (!completed) {
+	if (completed) {
+		showStatus(1, 1);
+	} else {
 		observer->clearStatus();
 	}
+	imageTrackers->close();
+	scriptOperations->close();
+	reset();
+	setMode(OperationMode::Idle);
 }
 
 void ScriptProcessing::setMode(OperationMode mode) {
