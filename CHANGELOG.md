@@ -1,3 +1,7 @@
+#### Version 1.7.12
+* Tracking: fine tuned identity charactersistics using match factor
+* Status text: show final run time when completed succesfully
+
 #### Version 1.7.11
 * Video capture: added setting desired frame width and height parameters
 
