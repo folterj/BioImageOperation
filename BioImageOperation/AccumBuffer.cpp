@@ -51,11 +51,11 @@ void AccumBuffer::addImage(Mat* image, AccumMode accumMode) {
 void AccumBuffer::getImage(Mat* dest, float power, Palette palette) {
 	Mat image;
 	float* inData;
-	unsigned char* outData;
+	uchar* outData;
 	int width = bufferImage.cols;
 	int height = bufferImage.rows;
 	float val, scale, colScale;
-	Vec<unsigned char, 3> color;
+	Vec<uchar, 3> color;
 	int pixeli;
 
 	if (power == 0) {
@@ -65,7 +65,7 @@ void AccumBuffer::getImage(Mat* dest, float power, Palette palette) {
 	inData = (float*)bufferImage.data;
 
 	dest->create(height, width, CV_8UC3);
-	outData = (unsigned char*)dest->data;
+	outData = (uchar*)dest->data;
 
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {

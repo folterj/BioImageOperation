@@ -11,16 +11,16 @@
 #include "Util.h"
 
 
-Vec<unsigned char, 3> ColorScale::grayTable[scaleLength];
-Vec<unsigned char, 3> ColorScale::heatTable[scaleLength];
-Vec<unsigned char, 3> ColorScale::rainbowTable[scaleLength];
-Vec<unsigned char, 3> ColorScale::labelTable[labelLength];
+Vec<uchar, 3> ColorScale::grayTable[scaleLength];
+Vec<uchar, 3> ColorScale::heatTable[scaleLength];
+Vec<uchar, 3> ColorScale::rainbowTable[scaleLength];
+Vec<uchar, 3> ColorScale::labelTable[labelLength];
 
 
 void ColorScale::init() {
 	// initialise lookup table
 	double scale;
-	unsigned char gray;
+	uchar gray;
 	double hue = 0;
 	double lightness = 0.5;
 	int i;
@@ -28,8 +28,8 @@ void ColorScale::init() {
 	for (i = 0; i < scaleLength; i++) {
 		scale = (double)i / scaleLength;
 
-		gray = (unsigned char)((1 - scale) * 0xFF);
-		grayTable[i] = Vec<unsigned char, 3>(gray, gray, gray);
+		gray = (uchar)((1 - scale) * 0xFF);
+		grayTable[i] = Vec<uchar, 3>(gray, gray, gray);
 
 		heatTable[i] = Util::floatToByteColor(Util::getHeatScale(scale));
 
@@ -62,24 +62,24 @@ void ColorScale::init() {
 
 }
 
-Vec<unsigned char, 3> ColorScale::getGrayScale(double scale) {
+Vec<uchar, 3> ColorScale::getGrayScale(double scale) {
 	int i = min(max((int)(scale * scaleLength), 0), scaleLength - 1);
 	return grayTable[i];
 }
 
-Vec<unsigned char, 3> ColorScale::getHeatScale(double scale) {
+Vec<uchar, 3> ColorScale::getHeatScale(double scale) {
 	int i = min(max((int)(scale * scaleLength), 0), scaleLength - 1);
 	return heatTable[i];
 }
 
-Vec<unsigned char, 3> ColorScale::getRainbowScale(double scale) {
+Vec<uchar, 3> ColorScale::getRainbowScale(double scale) {
 	int i = min(max((int)(scale * scaleLength), 0), scaleLength - 1);
 	return rainbowTable[i];
 }
 
-Vec<unsigned char, 3> ColorScale::getLabelColor(int label) {
+Vec<uchar, 3> ColorScale::getLabelColor(int label) {
 	if (label < 0) {
-		return Vec<unsigned char, 3>(0x80, 0x80, 0x80);
+		return Vec<uchar, 3>(0x80, 0x80, 0x80);
 	} else {
 		label = label % labelLength;
 		return labelTable[label];

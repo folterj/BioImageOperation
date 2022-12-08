@@ -24,14 +24,14 @@ public:
 	static const int scaleLength = colorLevels * colorLevels * colorLevels;
 	static const int labelLength = 1000;
 
-	static Vec<unsigned char, 3> grayTable[];
-	static Vec<unsigned char, 3> heatTable[];
-	static Vec<unsigned char, 3> rainbowTable[];
-	static Vec<unsigned char, 3> labelTable[];
+	static Vec<uchar, 3> grayTable[];
+	static Vec<uchar, 3> heatTable[];
+	static Vec<uchar, 3> rainbowTable[];
+	static Vec<uchar, 3> labelTable[];
 
 	static void init();
-	static Vec<unsigned char, 3> getGrayScale(double scale);
-	static Vec<unsigned char, 3> getHeatScale(double scale);
-	static Vec<unsigned char, 3> getRainbowScale(double scale);
-	static Vec<unsigned char, 3> getLabelColor(int label);
+	static Vec<uchar, 3> getGrayScale(double scale);
+	static Vec<uchar, 3> getHeatScale(double scale);
+	static Vec<uchar, 3> getRainbowScale(double scale);
+	static Vec<uchar, 3> getLabelColor(int label);
 };

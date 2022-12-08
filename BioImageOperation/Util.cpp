@@ -536,8 +536,8 @@ Scalar Util::normColorLightness(Scalar color, double level) {
 	return Scalar(b, g, r);
 }
 
-Vec<unsigned char, 3> Util::floatToByteColor(Scalar color) {
-	return Vec<unsigned char, 3>((unsigned char)(color[0] * 0xFF), (unsigned char)(color[1] * 0xFF), (unsigned char)(color[2] * 0xFF));
+Vec<uchar, 3> Util::floatToByteColor(Scalar color) {
+	return Vec<uchar, 3>((uchar)(color[0] * 0xFF), (uchar)(color[1] * 0xFF), (uchar)(color[2] * 0xFF));
 }
 
 string Util::getExceptionDetail(exception& e, int level) {
