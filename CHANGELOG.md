@@ -1,3 +1,6 @@
+#### Version 1.7.13
+* Fixed statusbar stats for live capture
+
 #### Version 1.7.12
 * Tracking: fine tuned identity charactersistics using match factor
 * Status text: show final run time when completed succesfully

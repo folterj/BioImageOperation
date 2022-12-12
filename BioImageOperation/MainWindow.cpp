@@ -363,7 +363,7 @@ bool MainWindow::checkStatusProcess() {
 }
 
 void MainWindow::showStatusQt(int i, int tot, string label) {
-	string s = "";
+	string s;
 	double progress = 0;
 	Clock::time_point now;
 	chrono::duration<double> totalElapsed;
@@ -381,17 +381,12 @@ void MainWindow::showStatusQt(int i, int tot, string label) {
 		totalElapseds = totalElapsed.count();
 		avgFrametime = totalElapseds / (i + 1);
 
+		s = label + Util::format(" (#%d) %.3fs @%dfps", i, avgFrametime, processFps);
 		if (tot > 0) {
 			progress = (double)i / tot;
-		}
-		if (i < tot) {
-			s = label + Util::format(" (#%d)", i);
-		}
-		if (tot > 1) {
-			s += Util::format(" %.3fs @%dfps", avgFrametime, processFps);
-		}
-		if (progress > 0) {
-			estimateLeft = totalElapseds * (1 / progress - 1);
+			if (progress > 0) {
+				estimateLeft = totalElapseds * (1 / progress - 1);
+			}
 		}
 		s += " Elapsed: " + Util::formatTimespan((int)totalElapseds);
 		if (estimateLeft > 0) {
