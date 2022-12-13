@@ -1,4 +1,5 @@
 Install library / packages:
+*Note most commands require sudo
 
 Generic:
 apt-get install build-essential cmake gcc-arm* git unzip pkg-config
@@ -8,6 +9,10 @@ Qt install:
 apt-get install qtcreator
 apt-get install qt5-default
 apt-get install qt5-doc qtbase5-examples qtbase5-doc-html
+
+Or for Ubuntu versions >= 22.04 that don't have qt5-default:
+apt-get install qtbase5-dev qt5-qmake
+
 qtchooser -l
 qtchooser -print-env (make sure qt5 is selected)
 
