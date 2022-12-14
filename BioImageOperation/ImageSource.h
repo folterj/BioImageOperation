@@ -33,7 +33,7 @@ public:
 	ImageSource();
 	~ImageSource();
 	void reset();
-	bool init(int apiCode, string basepath, string filepath, string start = "", string length = "",
+	bool init(string basepath, string filepath, int apiCode, string codecs = "", string start = "", string length = "",
 			  double fps = 1, int interval = 1, int total = 0, int width = 0, int height = 0);
 	bool open();
 	bool getNextImage(Mat* image);

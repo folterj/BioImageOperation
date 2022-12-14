@@ -12,6 +12,11 @@ if __name__ == '__main__':
         raise IOError("Unable to open camera")
     #cap.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
     #cap.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
+    fourcc = int(cap.get(cv.CAP_PROP_FOURCC))
+    fourccs = ''.join([chr((int(fourcc) >> 8 * i) & 0xFF) for i in range(4)])
+    print(fourccs)
+    print(cap.get(cv.CAP_PROP_FORMAT))
+    print(cap.get(cv.CAP_PROP_CONVERT_RGB))
 
     max_counter = 100
     counter = 0

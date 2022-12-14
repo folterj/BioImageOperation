@@ -9,6 +9,16 @@ using namespace cv;
 typedef high_resolution_clock Clock;
 
 
+string convertFourCcToString(int fourcc) {
+    string fourccs;
+    for (int i = 0; i < 4; i++) {
+        fourccs += (char)(fourcc & 0xFF);
+        fourcc >>= 8;
+    }
+    return fourccs;
+}
+
+
 int main()
 {
     VideoCapture cap;
@@ -22,7 +32,12 @@ int main()
 
     cap.setExceptionMode(true);
 
-    vector<int> params = { VideoCaptureProperties::CAP_PROP_FRAME_WIDTH, 1920, VideoCaptureProperties::CAP_PROP_FRAME_HEIGHT, 1080 };
+    vector<int> params = {
+        VideoCaptureProperties::CAP_PROP_FRAME_WIDTH, 1920,
+        VideoCaptureProperties::CAP_PROP_FRAME_HEIGHT, 1080,
+        //VideoCaptureProperties::CAP_PROP_FOURCC, VideoWriter::fourcc('H','2','6','4')
+        VideoCaptureProperties::CAP_PROP_FOURCC, VideoWriter::fourcc('M','J','P','G')
+    };
     try {
         if (!cap.open(0, VideoCaptureAPIs::CAP_ANY, params)) {
             cout << "Unable to open camera" << endl;
@@ -34,8 +49,7 @@ int main()
             cout << "Unable to open camera" << endl;
             return -1;
         }
-        //cap.set(VideoCaptureProperties::CAP_PROP_FRAME_WIDTH, 1920);
-        //cap.set(VideoCaptureProperties::CAP_PROP_FRAME_HEIGHT, 1080);
+        //int frameFormat = cap.get(VideoCaptureProperties::CAP_PROP_FORMAT);
 
         t0 = high_resolution_clock::now();
 

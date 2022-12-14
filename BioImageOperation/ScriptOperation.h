@@ -76,7 +76,7 @@ public:
 	static string getOperationList(bool richFormat, string operation="");
 	static string getOperationListSimple();
 
-	bool initFrameSource(FrameType frameType, int apiCode, string basepath, string templatePath, string start = "", string length = "",
+	bool initFrameSource(FrameType frameType, string basepath, string templatePath, int apiCode, string codecs = "", string start = "", string length = "",
 						 double fps0 = 1, int interval = 1, int total = 0, int width=0, int height=0);
 	void initFrameOutput(FrameType frameType, string basepath, string templatePath, string defaultExtension = "", string start = "", string length = "",
 						 double fps = 0, string codecs = "");

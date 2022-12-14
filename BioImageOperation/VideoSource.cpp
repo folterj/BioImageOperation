@@ -39,7 +39,7 @@ void VideoSource::reset() {
 	close();
 }
 
-bool VideoSource::init(int apiCode, string basepath, string filepath, string start, string length,
+bool VideoSource::init(string basepath, string filepath, int apiCode, string codecs, string start, string length,
 					   double fps0, int interval, int total, int width, int height) {
 	string filename;
 	bool ok = false;

@@ -352,7 +352,7 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 	case ScriptOperationType::OpenCapture:
 		// * TODO: add option to set width/height
 		requiredArguments = vector<ArgumentLabel> { };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::API, ArgumentLabel::Path, ArgumentLabel::Source, ArgumentLabel::Fps, ArgumentLabel::Length, ArgumentLabel::Interval, ArgumentLabel::Total, ArgumentLabel::Width, ArgumentLabel::Height };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Path, ArgumentLabel::Source, ArgumentLabel::API, ArgumentLabel::Codec, ArgumentLabel::Fps, ArgumentLabel::Length, ArgumentLabel::Interval, ArgumentLabel::Total, ArgumentLabel::Width, ArgumentLabel::Height };
 		description = "Open capturing from video (IP) path or camera source";
 		break;
 
@@ -1179,7 +1179,7 @@ string ScriptOperation::getOperationListSimple() {
 	return s;
 }
 
-bool ScriptOperation::initFrameSource(FrameType frameType, int apiCode, string basepath, string templatePath, string start, string length,
+bool ScriptOperation::initFrameSource(FrameType frameType, string basepath, string templatePath, int apiCode, string codecs, string start, string length,
 									  double fps0, int interval, int total, int width, int height) {
 	bool ok = true;
 
@@ -1190,7 +1190,7 @@ bool ScriptOperation::initFrameSource(FrameType frameType, int apiCode, string b
 		case FrameType::Capture: frameSource = new CaptureSource(); break;
 		}
 		if (frameSource) {
-			ok = frameSource->init(apiCode, basepath, templatePath, start, length, fps0, interval, total, width, height);
+			ok = frameSource->init(basepath, templatePath, apiCode, codecs, start, length, fps0, interval, total, width, height);
 			frameSourceInit = true;
 		}
 	}

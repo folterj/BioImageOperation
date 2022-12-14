@@ -28,23 +28,37 @@ void CaptureSource::reset() {
 	close();
 }
 
-bool CaptureSource::init(int apiCode, string basepath, string filepath, string start, string length,
+bool CaptureSource::init(string basepath, string filepath, int apiCode, string codecs, string start, string length,
 						 double fps0, int interval, int total, int width, int height) {
+	int codec;
+
 	reset();
 
 	this->apiCode = apiCode;
 	this->source = filepath;
 
+	capParams.clear();
+	if (width > 0) {
+		capParams.push_back(VideoCaptureProperties::CAP_PROP_FRAME_WIDTH);
+		capParams.push_back(width);
+	}
+	if (height > 0) {
+		capParams.push_back(VideoCaptureProperties::CAP_PROP_FRAME_HEIGHT);
+		capParams.push_back(height);
+	}
+	if (fps0 > 0) {
+		capParams.push_back(VideoCaptureProperties::CAP_PROP_FPS);
+		capParams.push_back(fps0);
+	}
+	// * Set codec AFTER width/height
+	if (codecs != "") {
+		Util::toUpper(codecs);
+		codec = VideoWriter::fourcc((char)codecs[0], (char)codecs[1], (char)codecs[2], (char)codecs[3]);
+		capParams.push_back(VideoCaptureProperties::CAP_PROP_FOURCC);
+		capParams.push_back(codec);
+	}
+
 	if (open()) {
-		if (width > 0) {
-			videoCapture.set(VideoCaptureProperties::CAP_PROP_FRAME_WIDTH, width);
-		}
-		if (height > 0) {
-			videoCapture.set(VideoCaptureProperties::CAP_PROP_FRAME_HEIGHT, height);
-		}
-		if (fps0 > 0) {
-			videoCapture.set(VideoCaptureProperties::CAP_PROP_FPS, fps0);
-		}
 		fps = videoCapture.get(VideoCaptureProperties::CAP_PROP_FPS);
 		if (fps == 0) {
 			fps = fps0;
@@ -67,11 +81,11 @@ bool CaptureSource::open() {
 		}
 
 		if (isSourceIndex) {
-			if (videoCapture.open(index, apiCode)) {
+			if (videoCapture.open(index, apiCode, capParams)) {
 				videoIsOpen = videoCapture.isOpened();
 			}
 		} else {
-			if (videoCapture.open(source, apiCode)) {
+			if (videoCapture.open(source, apiCode, capParams)) {
 				videoIsOpen = videoCapture.isOpened();
 			}
 		}

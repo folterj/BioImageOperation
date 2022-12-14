@@ -303,7 +303,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			} else {
 				source = operation->getArgument(ArgumentLabel::Path);
 			}
-			operation->initFrameSource(FrameType::Image, 0, basepath, source,
+			operation->initFrameSource(FrameType::Image, basepath, source, 0, "",
 										operation->getArgument(ArgumentLabel::Start),
 										operation->getArgument(ArgumentLabel::Length),
 										sourceFps,
@@ -331,8 +331,8 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			} else {
 				source = operation->getArgument(ArgumentLabel::Path);
 			}
-			operation->initFrameSource(FrameType::Video,
-										(int)operation->getArgumentNumeric(ArgumentLabel::API), basepath, source,
+			operation->initFrameSource(FrameType::Video, basepath, source,
+										(int)operation->getArgumentNumeric(ArgumentLabel::API), operation->getArgument(ArgumentLabel::Codec),
 										operation->getArgument(ArgumentLabel::Start),
 										operation->getArgument(ArgumentLabel::Length), 0,
 										(int)operation->getArgumentNumeric(ArgumentLabel::Interval),
@@ -359,8 +359,8 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			if (source == "") {
 				source = to_string((int)operation->getArgumentNumeric());
 			}
-			operation->initFrameSource(FrameType::Capture,
-										(int)operation->getArgumentNumeric(ArgumentLabel::API), basepath, source,
+			operation->initFrameSource(FrameType::Capture, basepath, source,
+										(int)operation->getArgumentNumeric(ArgumentLabel::API), operation->getArgument(ArgumentLabel::Codec),
 										"", operation->getArgument(ArgumentLabel::Length),
 										operation->getArgumentNumeric(ArgumentLabel::Fps),
 										(int)operation->getArgumentNumeric(ArgumentLabel::Interval),
