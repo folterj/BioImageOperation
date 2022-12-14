@@ -3,12 +3,15 @@ import time
 
 
 if __name__ == '__main__':
+    params = [cv.CAP_PROP_FRAME_WIDTH, 1920, cv.CAP_PROP_FRAME_HEIGHT, 1080]
     cap = cv.VideoCapture()
-    cap.open(0)
+    if not cap.open(0, cv.CAP_ANY, params):
+        raise IOError("Unable to open camera")
+    print("Camera back end:", cap.getBackendName())
     if not cap.isOpened():
-        raise IOError("Cannot open webcam")
-    cap.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
-    cap.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
+        raise IOError("Unable to open camera")
+    #cap.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
+    #cap.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
 
     max_counter = 100
     counter = 0

@@ -7,7 +7,6 @@ build/
 
 # User-specific files
 *.suo
-*.user
 *.userosscache
 *.sln.docstates
 
