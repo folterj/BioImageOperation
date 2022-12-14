@@ -1,3 +1,7 @@
+#### Version 1.7.14
+* Improved camera capture: added codec parameter
+* OpenCV 4.6.0
+
 #### Version 1.7.13
 * Fixed statusbar stats for live capture
 
