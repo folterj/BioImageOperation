@@ -29,8 +29,6 @@ public:
 	int framei = 0;
 	int width = 0;
 	int height = 0;
-	double fps = 0;
-	int interval = 1;
 
 	CaptureSource();
 	~CaptureSource();

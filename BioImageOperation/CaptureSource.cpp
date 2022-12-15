@@ -29,8 +29,10 @@ void CaptureSource::reset() {
 }
 
 bool CaptureSource::init(string basepath, string filepath, int apiCode, string codecs, string start, string length,
-						 double fps0, int interval, int total, int width, int height) {
+						 double fps, int interval, int total, int width, int height) {
 	int codec;
+	int width0, height0;
+	double fps0;
 
 	reset();
 
@@ -46,9 +48,9 @@ bool CaptureSource::init(string basepath, string filepath, int apiCode, string c
 		capParams.push_back(VideoCaptureProperties::CAP_PROP_FRAME_HEIGHT);
 		capParams.push_back(height);
 	}
-	if (fps0 > 0) {
+	if (fps > 0) {
 		capParams.push_back(VideoCaptureProperties::CAP_PROP_FPS);
-		capParams.push_back(fps0);
+		capParams.push_back(fps);
 	}
 	// * Set codec AFTER width/height
 	if (codecs != "") {
@@ -59,8 +61,16 @@ bool CaptureSource::init(string basepath, string filepath, int apiCode, string c
 	}
 
 	if (open()) {
-		fps = videoCapture.get(VideoCaptureProperties::CAP_PROP_FPS);
-		if (fps == 0) {
+		width0 = videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_WIDTH);
+		if (width0 > 0) {
+			width = width0;
+		}
+		height0 = videoCapture.get(VideoCaptureProperties::CAP_PROP_FRAME_HEIGHT);
+		if (height0 > 0) {
+			height = height0;
+		}
+		fps0 = videoCapture.get(VideoCaptureProperties::CAP_PROP_FPS);
+		if (fps0 > 0) {
 			fps = fps0;
 		}
 		calcFrameParams(start, length, fps, interval, total, 0);
@@ -111,7 +121,7 @@ bool CaptureSource::getNextImage(Mat* image) {
 	bool frameOk = false;
 
 	do {
-		frameOk = videoCapture.grab();
+		frameOk = videoCapture.read(*image);	// need blocking call to respect interval
 		if (!frameOk) {
 			close();
 			break;
@@ -122,9 +132,6 @@ bool CaptureSource::getNextImage(Mat* image) {
 	if (frameOk) {
 		if (end > 0 && framei >= end) {
 			// reached desired length
-			videoIsOpen = false;
-		} else if (!videoCapture.retrieve(*image)) {
-			// unexpected error
 			videoIsOpen = false;
 		}
 	}

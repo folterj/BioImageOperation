@@ -1,5 +1,7 @@
 #### Version 1.7.14
 * Improved camera capture: added codec parameter
+* Camera capture bugs fixed: respect interval and get correct frame size
+* Added msmf library to installer
 * OpenCV 4.6.0
 
 #### Version 1.7.13

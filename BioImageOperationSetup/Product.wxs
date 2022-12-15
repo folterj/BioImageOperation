@@ -46,7 +46,10 @@
 			<Component Id="FfmpegDllComp" Win64="yes">
 				<File Id="FfmpegDll" Name="opencv_videoio_ffmpeg460_64.dll" Source="C:\opencv\build\x64\vc15\bin\opencv_videoio_ffmpeg460_64.dll" />
 			</Component>
-			<Component Id="H264DllComp" Win64="yes">
+      <Component Id="MsmfDllComp" Win64="yes">
+        <File Id="MsmfDll" Name="opencv_videoio_msmf460_64.dll" Source="C:\opencv\build\x64\vc15\bin\opencv_videoio_msmf460_64.dll" />
+      </Component>
+      <Component Id="H264DllComp" Win64="yes">
 				<File Id="H264Dll" Name="openh264-1.8.0-win64.dll" Source="C:\openh264\openh264-1.8.0-win64.dll" />
 			</Component>
       

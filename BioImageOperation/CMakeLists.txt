@@ -99,9 +99,11 @@ if(WIN32)
 	)
 
 	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_world440.dll" ${CMAKE_CURRENT_BINARY_DIR}
-	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_world440d.dll" ${CMAKE_CURRENT_BINARY_DIR}
-	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_videoio_ffmpeg440_64.dll" ${CMAKE_CURRENT_BINARY_DIR}
+	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_world460.dll" ${CMAKE_CURRENT_BINARY_DIR}
+	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_world460d.dll" ${CMAKE_CURRENT_BINARY_DIR}
+	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_videoio_ffmpeg460_64.dll" ${CMAKE_CURRENT_BINARY_DIR}
+	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_videoio_msmf460_64.dll" ${CMAKE_CURRENT_BINARY_DIR}
+	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_videoio_msmf460_64d.dll" ${CMAKE_CURRENT_BINARY_DIR}
 	    COMMENT "Copying OpenCV dlls..."
 	)
 endif()
