@@ -42,10 +42,10 @@ win32 {
     INCLUDEPATH += C:/opencv/build/include
 
     CONFIG(debug,debug|release){
-        LIBS += C:/opencv/build/x64/vc15/lib/opencv_world440d.lib
+        LIBS += C:/opencv/build/x64/vc15/lib/opencv_world460d.lib
     }
 
     CONFIG(release,debug|release){
-        LIBS += C:/opencv/build/x64/vc15/lib/opencv_world440.lib
+        LIBS += C:/opencv/build/x64/vc15/lib/opencv_world460.lib
     }
 }
