@@ -13,9 +13,9 @@
 #include "Util.h"
 
 
-Track::Track(int label, int minActive, double fps, double pixelSize, double windowSize) {
-	this->label = label;
+Track::Track(int minActive, int maxInactive, double fps, double pixelSize, double windowSize) {
 	this->minActive = minActive;
+	this->maxInactive = maxInactive;
 	this->fps = fps;
 	this->pixelSize = pixelSize;
 	this->windowSize = windowSize;
@@ -169,6 +169,25 @@ void Track::unAssign() {
 void Track::assign(double matchFactor) {
 	lastMatchFactor = matchFactor;
 	assigned = true;
+}
+
+bool Track::checkLive(int* newLabel) {
+	bool ok = true;
+	if (probation) {
+		lifeTime++;
+		if (lifeTime >= minActive) {
+			if (activeFactor() > 0.1) {
+				label = (*newLabel)++;
+			} else {
+				ok = false;
+			}
+			probation = false;
+		}
+	}
+	if (maxInactive >= 0 && inactiveCount > maxInactive) {
+		ok = false;
+	}
+	return ok;
 }
 
 bool Track::isActive(bool needAssigned) {

@@ -120,10 +120,9 @@ public:
 	/*
 	 * Create tracks
 	 */
-
+	void checkLiveTracks();
 	void matchClusterTracks();
 	TrackClusterMatch* findTrackMatch(int tracki);
-	void pruneTracks();
 
 	/*
 	 * Create paths

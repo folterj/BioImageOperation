@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="D3B0C179-1F76-406A-B938-7E33C6BF461F" Name="Bio Image Operation" Language="1033" Version="!(bind.FileVersion.BioImageOperationExe)" Manufacturer="Joost de Folter" UpgradeCode="EDE41139-C8E6-4D98-AE85-E669F8CA6D48">
-		<Package InstallerVersion="200" Platform="x64" Compressed="yes" InstallScope="perMachine" Manufacturer="Joost de Folter" Description="http://joostdefolter.info" Comments="http://joostdefolter.info" />
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+	<Package Name="Bio Image Operation" Language="1033" Version="!(bind.FileVersion.BioImageOperationExe)" Manufacturer="Joost de Folter" UpgradeCode="EDE41139-C8E6-4D98-AE85-E669F8CA6D48" InstallerVersion="200" ProductCode="D3B0C179-1F76-406A-B938-7E33C6BF461F">
+		<SummaryInformation Manufacturer="Joost de Folter" Description="http://joostdefolter.info" />
 
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 		<MediaTemplate CompressionLevel="high" EmbedCab="yes" />
@@ -11,74 +10,72 @@
 			<ComponentGroupRef Id="ProductComponents2" />
 			<ComponentGroupRef Id="ProductComponents3" />
 		</Feature>
-	</Product>
+	</Package>
 
 	<Fragment>
-		<Directory Id="TARGETDIR" Name="SourceDir">
-			<Directory Id="ProgramFiles64Folder">
+			<StandardDirectory Id="ProgramFiles64Folder">
 				<Directory Id="INSTALLFOLDER" Name="BioImageOperation">
-          <Directory Id="PlatformsFolder" Name="platforms"/>
-					<Directory Id="StylesFolder" Name="styles"/>
+          <Directory Id="PlatformsFolder" Name="platforms" />
+					<Directory Id="StylesFolder" Name="styles" />
 				</Directory>
-			</Directory>
+			</StandardDirectory>
 
-			<Directory Id="ProgramMenuFolder">
+			<StandardDirectory Id="ProgramMenuFolder">
 				<Directory Id="ApplicationProgramsFolder" Name="BioImageOperation" />
-			</Directory>
-			<Directory Id="DesktopFolder" Name="Desktop" />
-		</Directory>
-	</Fragment>
+			</StandardDirectory>
+			<StandardDirectory Id="DesktopFolder" />
+		</Fragment>
 
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-			<Component Id="MainExecutable" Win64="yes">
-				<File Id="BioImageOperationExe" Name="$(var.BioImageOperation.TargetFileName)" Source="$(var.BioImageOperation.TargetPath)" KeyPath="yes" >
-					<Shortcut Id="StartmenuShortcut" Directory="ApplicationProgramsFolder" Name="BioImageOperation" WorkingDirectory="INSTALLDIR" Advertise="yes" Icon="BioIcon.exe" IconIndex="0">
-						<Icon Id="BioIcon.exe" SourceFile="$(var.BioImageOperation.TargetPath)" />
+			<Component Id="MainExecutable" Bitness="always64">
+				<File Id="BioImageOperationExe" Name="$(var.BioImageOperation.TargetFileName)" Source="$(var.BioImageOperation.TargetPath)" KeyPath="yes">
+					<Shortcut Id="StartmenuShortcut" Directory="ApplicationProgramsFolder" Name="BioImageOperation" WorkingDirectory="INSTALLFOLDER" Advertise="yes" Icon="BioIcon.ico" IconIndex="0">
+						<Icon Id="BioIcon.ico" SourceFile="$(var.BioImageOperation.ProjectDir)\BioImageOperation.ico" />
 					</Shortcut>
-					<Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="BioImageOperation" WorkingDirectory="INSTALLDIR" Advertise="yes" Icon="BioIcon.exe" IconIndex="0" />
+					<Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="BioImageOperation" WorkingDirectory="INSTALLFOLDER" Advertise="yes" Icon="BioIcon.ico" IconIndex="0" />
 				</File>
 			</Component>
       
-			<Component Id="OpencvDllComp" Win64="yes">
-				<File Id="OpencvDll" Name="opencv_world460.dll" Source="C:\opencv\build\x64\vc15\bin\opencv_world460.dll" />
+			<Component Id="OpencvDllComp" Bitness="always64">
+				<File Id="OpencvDll" Name="opencv_world490.dll" Source="C:\opencv\build\x64\vc16\bin\opencv_world490.dll" />
 			</Component>
-			<Component Id="FfmpegDllComp" Win64="yes">
-				<File Id="FfmpegDll" Name="opencv_videoio_ffmpeg460_64.dll" Source="C:\opencv\build\x64\vc15\bin\opencv_videoio_ffmpeg460_64.dll" />
+			<Component Id="FfmpegDllComp" Bitness="always64">
+				<File Id="FfmpegDll" Name="opencv_videoio_ffmpeg490_64.dll" Source="C:\opencv\build\x64\vc16\bin\opencv_videoio_ffmpeg490_64.dll" />
 			</Component>
-      <Component Id="MsmfDllComp" Win64="yes">
-        <File Id="MsmfDll" Name="opencv_videoio_msmf460_64.dll" Source="C:\opencv\build\x64\vc15\bin\opencv_videoio_msmf460_64.dll" />
+      <Component Id="MsmfDllComp" Bitness="always64">
+        <File Id="MsmfDll" Name="opencv_videoio_msmf490_64.dll" Source="C:\opencv\build\x64\vc16\bin\opencv_videoio_msmf490_64.dll" />
       </Component>
-      <Component Id="H264DllComp" Win64="yes">
+      <Component Id="H264DllComp" Bitness="always64">
 				<File Id="H264Dll" Name="openh264-1.8.0-win64.dll" Source="C:\openh264\openh264-1.8.0-win64.dll" />
 			</Component>
       
-      <Component Id="Qt5CoreComp" Win64="yes">
-        <File Id="Qt5Core" Name="Qt5Core.dll" Source="C:\Qt\5.15.2\msvc2019_64\bin\Qt5Core.dll" />
+      <Component Id="QtCoreComp" Bitness="always64">
+        <File Id="QtCore" Name="Qt6Core.dll" Source="C:\Qt\6.6.1\msvc2019_64\bin\Qt6Core.dll" />
       </Component>
-      <Component Id="Qt5WidgetsComp" Win64="yes">
-        <File Id="Qt5Widgets" Name="Qt5Widgets.dll" Source="C:\Qt\5.15.2\msvc2019_64\bin\Qt5Widgets.dll" />
+      <Component Id="QtWidgetsComp" Bitness="always64">
+        <File Id="QtWidgets" Name="Qt6Widgets.dll" Source="C:\Qt\6.6.1\msvc2019_64\bin\Qt6Widgets.dll" />
       </Component>
-      <Component Id="Qt5GuiComp" Win64="yes">
-        <File Id="Qt5Gui" Name="Qt5Gui.dll" Source="C:\Qt\5.15.2\msvc2019_64\bin\Qt5Gui.dll" />
+      <Component Id="QtGuiComp" Bitness="always64">
+        <File Id="QtGui" Name="Qt6Gui.dll" Source="C:\Qt\6.6.1\msvc2019_64\bin\Qt6Gui.dll" />
       </Component>
-      <Component Id="Qt5NetworkComp" Win64="yes">
-        <File Id="Qt5Network" Name="Qt5Network.dll" Source="C:\Qt\5.15.2\msvc2019_64\bin\Qt5Network.dll" />
+      <Component Id="QtNetworkComp" Bitness="always64">
+        <File Id="QtNetwork" Name="Qt6Network.dll" Source="C:\Qt\6.6.1\msvc2019_64\bin\Qt6Network.dll" />
       </Component>
-      <Component Id="Qt5SvgComp" Win64="yes">
-        <File Id="Qt5Svg" Name="Qt5Svg.dll" Source="C:\Qt\5.15.2\msvc2019_64\bin\Qt5Svg.dll" />
+      <Component Id="QtSvgComp" Bitness="always64">
+        <File Id="QtSvg" Name="Qt6Svg.dll" Source="C:\Qt\6.6.1\msvc2019_64\bin\Qt6Svg.dll" />
       </Component>
     </ComponentGroup>
       
     <ComponentGroup Id="ProductComponents2" Directory="PlatformsFolder">
-      <Component Id="Qt5PlatformComp" Win64="yes">
-        <File Id="Qt5Platform" Name="qwindows.dll" Source="C:\Qt\5.15.2\msvc2019_64\plugins\platforms\qwindows.dll" />
+      <Component Id="QtPlatformComp" Bitness="always64">
+        <File Id="QtPlatform" Name="qwindows.dll" Source="C:\Qt\6.6.1\msvc2019_64\plugins\platforms\qwindows.dll" />
       </Component>
     </ComponentGroup>
     
     <ComponentGroup Id="ProductComponents3" Directory="StylesFolder">
-      <Component Id="Qt5StylesComp" Win64="yes">
-        <File Id="Qt5Style" Name="qwindowsvistastyle.dll" Source="C:\Qt\5.15.2\msvc2019_64\plugins\styles\qwindowsvistastyle.dll" />
+      <Component Id="QtStylesComp" Bitness="always64">
+        <File Id="QtStyle" Name="qwindowsvistastyle.dll" Source="C:\Qt\6.6.1\msvc2019_64\plugins\styles\qwindowsvistastyle.dll" />
       </Component>
     </ComponentGroup>
 		<Property Id="ARPPRODUCTICON" Value="BioIcon.exe" />

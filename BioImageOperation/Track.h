@@ -54,13 +54,16 @@ public:
 	double lastClusterRad = 0;
 	double forwardDist = 0;
 
+	bool probation = true;
 	bool isNew = true;
 	bool assigned = true;
 	bool isMerged = false;
 	int activeCount = 0;
 	int inactiveCount = 0;
+	int lifeTime = 0;
 
 	int minActive = 1;
+	int maxInactive = 0;
 	double fps = 0;
 	double pixelSize = 1;
 	double windowSize = 1;
@@ -71,13 +74,14 @@ public:
 	vector<double> angles;
 
 
-	Track(int label, int minActive, double fps, double pixelSize, double windowSize);
+	Track(int minActive, int maxInactive, double fps, double pixelSize, double windowSize);
 	void update(Cluster* cluster, double maxArea, double maxMoveDistance, bool trackParamsFinalised);
 	void updateInactive();
 	double getDistFromOrigin();
 
 	void unAssign();
 	void assign(double matchFactor = 0);
+	bool checkLive(int* newLabel);
 	bool isActive(bool needAssigned = false);
 	double activeFactor();
 

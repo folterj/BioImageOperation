@@ -1,3 +1,9 @@
+#### Version 1.7.15
+* Improved tracking and label assignment using a candidate 'probation' period
+* User Interface: QT 5 -> 6
+* Installer: WIX 3 -> 4
+* OpenCV 4.9.0
+
 #### Version 1.7.14
 * Improved camera capture: added codec parameter
 * Camera capture bugs fixed: respect interval and get correct frame size

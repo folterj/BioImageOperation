@@ -130,6 +130,9 @@ string ImageTracker::createTracks(double maxMove, int minActive, int maxInactive
 	this->trackDebugMode = trackDebugMode;
 
 	if (maxMove != 0 || minActive != 0 || maxInactive != 0) {
+		if (maxMove <= 0) {
+			maxMove = 1;
+		}
 		trackingParams.maxMove.set(0, maxMove);
 		trackingParams.minActive = minActive;
 		trackingParams.maxInactive = maxInactive;
@@ -137,7 +140,7 @@ string ImageTracker::createTracks(double maxMove, int minActive, int maxInactive
 	}
 
 	matchClusterTracks();
-	pruneTracks();
+	checkLiveTracks();
 
 	if (clusterParamsFinalised && !trackParamsFinalised && clustersOk) {
 		updateTrackParams();
@@ -227,12 +230,37 @@ bool ImageTracker::findClusters(Mat* image) {
 	return (!clusters.empty());
 }
 
+void ImageTracker::checkLiveTracks() {
+	Track* track;
+	int i = 0;
+
+	trackingStats.trackLifetime.reset();
+
+	while (i < tracks.size()) {
+		track = tracks[i];
+		if (!track->assigned) {
+			track->updateInactive();
+		}
+		if (!track->checkLive(&nextTrackLabel)) {
+			tracks.erase(tracks.begin() + i);
+			delete track;
+		}
+		else {
+			if (track->isActive()) {
+				trackingStats.trackLifetime.addValue(track->activeCount - 1);		// after update active count already increased
+			}
+			i++;
+		}
+	}
+}
+
 void ImageTracker::matchClusterTracks() {
 	Track* track;
 	TrackClusterMatch* match;
 	int maxArea = (int)trackingParams.area.getMax();
 	double maxMove = trackingParams.maxMove.getMax();
 	int minActive = trackingParams.minActive;
+	int maxInactive = trackingParams.maxInactive;
 	int label;
 	string message;
 
@@ -242,8 +270,7 @@ void ImageTracker::matchClusterTracks() {
 	// assign tracks to unassigned clusters (consider as single unmerged clusters)
 	for (Cluster* cluster : clusters) {
 		if (!cluster->isAssigned() && cluster->area < maxArea) {
-			label = nextTrackLabel++;
-			track = new Track(label, minActive, fps, pixelSize, windowSize);
+			track = new Track(minActive, maxInactive, fps, pixelSize, windowSize);
 			tracks.push_back(track);
 			cluster->assign(track);
 			track->assign();
@@ -294,30 +321,6 @@ TrackClusterMatch* ImageTracker::findTrackMatch(int tracki) {
 		}
 	}
 	return nullptr;
-}
-
-void ImageTracker::pruneTracks() {
-	double maxInactive = trackingParams.maxInactive;
-	Track* track;
-	int i = 0;
-
-	trackingStats.trackLifetime.reset();
-
-	while (i < tracks.size()) {
-		track = tracks[i];
-		if (!track->assigned) {
-			track->updateInactive();
-		}
-		if (maxInactive >= 0 && track->inactiveCount > maxInactive) {
-			tracks.erase(tracks.begin() + i);
-			delete track;
-		} else {
-			if (track->isActive()) {
-				trackingStats.trackLifetime.addValue(track->activeCount - 1);		// after update active count already increased
-			}
-			i++;
-		}
-	}
 }
 
 void ImageTracker::matchPaths() {

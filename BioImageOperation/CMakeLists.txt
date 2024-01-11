@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10)
 
 string (TIMESTAMP NOW "%Y-%m-%d")
 
-project (BioImageOperation VERSION "1.7.14" DESCRIPTION ${NOW} HOMEPAGE_URL "https://github.com/folterj/BioImageOperation")
+project (BioImageOperation VERSION "1.7.15" DESCRIPTION ${NOW} HOMEPAGE_URL "https://github.com/folterj/BioImageOperation")
 
 configure_file (
     "${PROJECT_SOURCE_DIR}/config.h.in"
@@ -30,17 +30,17 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
 endif()
 
 if(WIN32)
-    list(APPEND CMAKE_PREFIX_PATH "C:/Qt/5.15.2/msvc2019_64/lib/cmake" "C:/opencv/build/x64/vc15/lib")
-    set(OpenCV_BIN "C:/opencv/build/x64/vc15/bin")
+    list(APPEND CMAKE_PREFIX_PATH "C:/Qt/6.6.1/msvc2019_64/lib/cmake" "C:/opencv/build/x64/vc16/lib")
+    set(OpenCV_BIN "C:/opencv/build/x64/vc16/bin")
 else()
-    list(APPEND CMAKE_PREFIX_PATH "/usr/lib/qt5/bin" "/usr/lib/x86_64-linux-gnu")
+    list(APPEND CMAKE_PREFIX_PATH "/usr/lib/qt6/bin" "/usr/lib/x86_64-linux-gnu")
     set(OpenCV_BIN "/usr/lib/x86_64-linux-gnu")
 endif()
 
-find_package(Qt5 COMPONENTS Core REQUIRED)
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
-find_package(Qt5 COMPONENTS Gui REQUIRED)
-find_package(Qt5 COMPONENTS Network REQUIRED)
+find_package(Qt6 COMPONENTS Core REQUIRED)
+find_package(Qt6 COMPONENTS Widgets REQUIRED)
+find_package(Qt6 COMPONENTS Gui REQUIRED)
+find_package(Qt6 COMPONENTS Network REQUIRED)
 
 find_package(OpenCV REQUIRED)
 
@@ -61,23 +61,23 @@ add_executable(${PROJECT_NAME}
     ${RESOURCE_FILES}
 )
 
-qt5_add_resources(RESOURCE_FILES ${RESOURCE})
+qt6_add_resources(RESOURCE_FILES ${RESOURCE})
 
 if(NOT WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
     target_link_libraries(${PROJECT_NAME} PRIVATE stdc++fs)
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core)
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Gui)
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Network)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Gui)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Network)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenCV_LIBS})
 
 
 
-get_target_property(_qmake_executable Qt5::qmake IMPORTED_LOCATION)
+get_target_property(_qmake_executable Qt6::qmake IMPORTED_LOCATION)
 get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
 
 find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
@@ -99,11 +99,11 @@ if(WIN32)
 	)
 
 	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_world460.dll" ${CMAKE_CURRENT_BINARY_DIR}
-	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_world460d.dll" ${CMAKE_CURRENT_BINARY_DIR}
-	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_videoio_ffmpeg460_64.dll" ${CMAKE_CURRENT_BINARY_DIR}
-	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_videoio_msmf460_64.dll" ${CMAKE_CURRENT_BINARY_DIR}
-	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_videoio_msmf460_64d.dll" ${CMAKE_CURRENT_BINARY_DIR}
+	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_world490.dll" ${CMAKE_CURRENT_BINARY_DIR}
+	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_world490d.dll" ${CMAKE_CURRENT_BINARY_DIR}
+	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_videoio_ffmpeg490_64.dll" ${CMAKE_CURRENT_BINARY_DIR}
+	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_videoio_msmf490_64.dll" ${CMAKE_CURRENT_BINARY_DIR}
+	    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${OpenCV_BIN}/opencv_videoio_msmf490_64d.dll" ${CMAKE_CURRENT_BINARY_DIR}
 	    COMMENT "Copying OpenCV dlls..."
 	)
 endif()
