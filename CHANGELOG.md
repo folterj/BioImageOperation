@@ -1,5 +1,6 @@
 #### Version 1.7.15
 * Improved tracking and label assignment using a candidate 'probation' period
+* Fixed bug in cluster finding
 * User Interface: QT 5 -> 6
 * Installer: WIX 3 -> 4
 * OpenCV 4.9.0
