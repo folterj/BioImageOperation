@@ -229,10 +229,12 @@ string Cluster::getLabels() {
 	string labels = "";
 
 	for (Track* track : assignedTracks) {
-		if (labels != "") {
-			labels += ",";
+		if (track->label >= 0) {
+			if (labels != "") {
+				labels += ",";
+			}
+			labels += to_string(track->label);
 		}
-		labels += to_string(track->label);
 	}
 	return labels;
 }

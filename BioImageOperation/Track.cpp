@@ -303,7 +303,7 @@ void Track::drawLabel(Mat* image, Scalar color, int drawMode) {
 	Size size;
 	string text;
 
-	if ((drawMode & (int)ClusterDrawMode::Label) != 0) {
+	if ((drawMode & (int)ClusterDrawMode::Label) != 0 && label >= 0) {
 		text = to_string(label);
 		texts.push_back(text);
 	}
@@ -324,8 +324,10 @@ void Track::drawLabel(Mat* image, Scalar color, int drawMode) {
 		if (!isActive()) {
 			text = "(" + text + ")";
 		}
-		size = Util::drawText(image, text, point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 1, color);
-		point.y += (int)(size.height * 1.5);
+		if (text != "") {
+			size = Util::drawText(image, text, point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 1, color);
+			point.y += (int)(size.height * 1.5);
+		}
 	}
 }
 

@@ -141,9 +141,9 @@ string ImageTracker::createTracks(double maxMove, int minActive, int maxInactive
 		}
 	}
 
+	matchClusterTracks();
+	checkLiveTracks();
 	if (clustersOk) {
-		matchClusterTracks();
-		checkLiveTracks();
 		if (clusterParamsFinalised && !trackParamsFinalised) {
 			updateTrackParams();
 		}
@@ -179,7 +179,7 @@ void ImageTracker::findClusters(Mat* image) {
 	int area, minArea, maxArea, totClusterArea;
 	double x, y;
 	Rect box;
-	int minlabel = 1;	// skip initial 'full-image label' returned by connectedComponents
+	int minlabel = 1;	// skip background label returned by connectedComponents
 	int n;
 	bool clusterOk;
 
@@ -287,7 +287,7 @@ void ImageTracker::matchClusterTracks() {
 				if (track->isMerged && cluster->assignedTracks.size() <= 1) {
 					message = Util::format("Merged cluster split: Track %d", track->label);
 					cout << message << endl;
-					observer->requestPause();
+					//observer->requestPause();
 				}
 			}
 			track->update(cluster, maxArea, maxMove, trackParamsFinalised);
@@ -306,7 +306,7 @@ void ImageTracker::matchClusterTracks() {
 		if (track->assigned) {
 			trackingStats.trackMatchRate.addOne();
 		} else {
-			if (trackDebugMode && trackParamsFinalised && !track->isActive()) {
+			if (trackDebugMode && trackParamsFinalised && !track->probation && !track->isActive()) {
 				message = "Failed match:\nTrack " + track->toString();
 				match = findTrackMatch(track->label);
 				if (match) {
@@ -320,7 +320,7 @@ void ImageTracker::matchClusterTracks() {
 
 TrackClusterMatch* ImageTracker::findTrackMatch(int tracki) {
 	for (TrackClusterMatch* match : solutionMatches) {
-		if (match->track->label == tracki) {
+		if (tracki >= 0 && match->track->label == tracki) {
 			return match;
 		}
 	}

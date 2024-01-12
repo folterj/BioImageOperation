@@ -56,7 +56,8 @@
       <AdditionalDependencies>opencv_world490d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y C:\opencv\build\x64\vc16\bin\*.dll $(OutDir)</Command>
+      <Command>xcopy /y C:\opencv\build\x64\vc16\bin\*.dll $(OutDir)
+xcopy /y C:\openh264\*.dll $(OutDir)</Command>
     </PostBuildEvent>
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -68,7 +69,8 @@
       <AdditionalDependencies>opencv_world490.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y C:\opencv\build\x64\vc16\bin\*.dll $(OutDir)</Command>
+      <Command>xcopy /y C:\opencv\build\x64\vc16\bin\*.dll $(OutDir)
+xcopy /y C:\openh264\*.dll $(OutDir)</Command>
     </PostBuildEvent>
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>

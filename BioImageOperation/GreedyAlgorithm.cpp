@@ -43,11 +43,17 @@ vector<TrackClusterMatch*> GreedyAlgorithm::solve() {
 
 string GreedyAlgorithm::getDebugInfo() {
 	string s = "";
+	string smatches;
 	for (vector<TrackClusterMatch*> trackMatch : trackMatches) {
+		smatches = "";
 		for (TrackClusterMatch* match : trackMatch) {
-			s += match->toString() + "\n";
+			if (match->track->label >= 0) {
+				smatches += match->toString() + "\n";
+			}
 		}
-		s += "\n";
+		if (smatches != "") {
+			s += smatches + "\n";
+		}
 	}
 	return s;
 }
