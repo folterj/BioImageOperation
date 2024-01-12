@@ -27,7 +27,7 @@ class PathNode;		// forward declaration
 class Track
 {
 public:
-	int label = 0;
+	int label = -1;
 	int clusterLabel = -1;
 
 	double x = 0;

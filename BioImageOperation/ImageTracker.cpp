@@ -110,7 +110,7 @@ string ImageTracker::createClusters(Mat* image, double minArea, double maxArea, 
 		clusterParamsFinalised = true;
 	}
 
-	clustersOk = findClusters(image);
+	findClusters(image);
 
 	if (!clusters.empty() && !clusterParamsFinalised) {
 		updateClusterParams();
@@ -129,25 +129,29 @@ string ImageTracker::createTracks(double maxMove, int minActive, int maxInactive
 	this->basePath = basePath;
 	this->trackDebugMode = trackDebugMode;
 
-	if (maxMove != 0 || minActive != 0 || maxInactive != 0) {
-		if (maxMove <= 0) {
-			maxMove = 1;
+	if (!trackParamsFinalised) {
+		if (maxMove != 0 || minActive != 0 || maxInactive != 0) {
+			if (maxMove <= 0) {
+				maxMove = 1;
+			}
+			trackingParams.maxMove.set(0, maxMove);
+			trackingParams.minActive = minActive;
+			trackingParams.maxInactive = maxInactive;
+			trackParamsFinalised = true;
 		}
-		trackingParams.maxMove.set(0, maxMove);
-		trackingParams.minActive = minActive;
-		trackingParams.maxInactive = maxInactive;
-		trackParamsFinalised = true;
 	}
 
-	matchClusterTracks();
-	checkLiveTracks();
+	if (clustersOk) {
+		matchClusterTracks();
+		checkLiveTracks();
+		if (clusterParamsFinalised && !trackParamsFinalised) {
+			updateTrackParams();
+		}
+		if (trackDebugMode) {
+			output = getTrackDebugInfo();
+		}
+	}
 
-	if (clusterParamsFinalised && !trackParamsFinalised && clustersOk) {
-		updateTrackParams();
-	}
-	if (trackDebugMode) {
-		output = getTrackDebugInfo();
-	}
 	deleteTrackMatches();
 	return output;
 }
@@ -170,16 +174,24 @@ string ImageTracker::createPaths(double pathDistance, bool pathDebugMode) {
 	return output;
 }
 
-bool ImageTracker::findClusters(Mat* image) {
+void ImageTracker::findClusters(Mat* image) {
 	int totArea = image->rows * image->cols;
-	int area, minArea, maxArea;
+	int area, minArea, maxArea, totClusterArea;
 	double x, y;
 	Rect box;
 	int minlabel = 1;	// skip initial 'full-image label' returned by connectedComponents
 	int n;
 	bool clusterOk;
 
+	deleteClusters();
+
 	n = connectedComponentsWithStats(*image, clusterLabelImage, clusterStats, clusterCentroids);
+
+	totClusterArea = totArea - clusterStats(0, ConnectedComponentsTypes::CC_STAT_AREA);
+	if ((double)totClusterArea / totArea > Constants::maxBinaryPixelsFactor) {
+		clusters.clear();
+		return;
+	}
 
 	if (clusterParamsFinalised) {
 		minArea = (int)trackingParams.area.getMin();
@@ -189,16 +201,9 @@ bool ImageTracker::findClusters(Mat* image) {
 		maxArea = 0;
 	}
 
-	deleteClusters();
 	clusters.reserve(n - 1);
 	for (int label = minlabel; label < n; label++) {
 		area = clusterStats(label, ConnectedComponentsTypes::CC_STAT_AREA);
-
-		if ((double)area / totArea > Constants::maxBinaryPixelsFactor) {
-			clusters.clear();
-			break;
-		}
-
 		if (clusterParamsFinalised) {
 			clusterOk = (area >= minArea && area < maxArea);
 		} else {
@@ -227,7 +232,6 @@ bool ImageTracker::findClusters(Mat* image) {
 			clusters.push_back(new Cluster(label - minlabel, x, y, area, box, &clusterMoments, &clusterRoiImage2, pixelSize));
 		}
 	}
-	return (!clusters.empty());
 }
 
 void ImageTracker::checkLiveTracks() {

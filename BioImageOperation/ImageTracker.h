@@ -115,7 +115,7 @@ public:
 	/*
 	 * Create clusters from image
 	 */
-	bool findClusters(Mat* image);
+	void findClusters(Mat* image);
 
 	/*
 	 * Create tracks

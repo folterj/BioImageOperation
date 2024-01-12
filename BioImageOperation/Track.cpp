@@ -176,7 +176,7 @@ bool Track::checkLive(int* newLabel) {
 	if (probation) {
 		lifeTime++;
 		if (lifeTime >= minActive) {
-			if (activeFactor() > 0.1) {
+			if (activeFactor() > 0.5) {
 				label = (*newLabel)++;
 			} else {
 				ok = false;
