@@ -372,7 +372,7 @@ bool ImageTracker::matchPathElement(Track* track) {
 	if (match) {
 		matchNode->updateUse(pathAge);
 	} else {
-		matchNode = new PathNode(nextTrackLabel++, track);
+		matchNode = new PathNode(nextPathLabel++, track);
 		pathNodes.push_back(matchNode);
 	}
 
