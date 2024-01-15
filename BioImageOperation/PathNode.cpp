@@ -11,8 +11,9 @@
 #include "Util.h"
 
 
-PathNode::PathNode(int label, Track* track) {
+PathNode::PathNode(int label, Track* track, int pathAge) {
 	this->label = label;
+	this->created = pathAge;
 
 	x = track->x;
 	y = track->y;
@@ -21,20 +22,25 @@ PathNode::PathNode(int label, Track* track) {
 void PathNode::updateUse(int pathAge) {
 	usage.push_back(pathAge);
 	accumUsage++;
-	lastUse = 1;
+	lastUse = pathAge;
+	totalUse += pathAge;
 }
 
-double PathNode::getAccumUsage() {
-	return (double)accumUsage / age;
+float PathNode::getAccumUsage(int totalAge) {
+	return (float)accumUsage / totalAge;
 }
 
-double PathNode::getAccumUsage2(int totalAge) {
-	double totalUse = 0;
+float PathNode::getAccumUsage2(int totalAge) {
+	float totalUse = 0;
 
 	for (int use : usage) {
 		totalUse += 1.0 / (totalAge - use);
 	}
 	return totalUse;
+}
+
+float PathNode::getAccumUsage3(int totalAge) {
+	return (float)totalUse / (totalAge + 1);
 }
 
 double PathNode::matchDistance(Track* track, double maxDistance) {
@@ -53,5 +59,5 @@ void PathNode::draw(Mat* image, Scalar color) {
 }
 
 string PathNode::toString() {
-	return Util::format("%d age:%d accumUsage:%d lastUse:%d X:%.0f Y:%.0f", label, age, accumUsage, lastUse, x, y);
+	return Util::format("%d created:%d accumUsage:%d lastUse:%d X:%.0f Y:%.0f", label, created, accumUsage, lastUse, x, y);
 }

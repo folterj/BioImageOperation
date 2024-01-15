@@ -1,3 +1,6 @@
+#### Version 1.7.16
+* Improved accumulated common paths drawing and performance
+
 #### Version 1.7.15
 * Improved tracking and label assignment using a candidate 'probation' period
 * Fixed bug in cluster finding

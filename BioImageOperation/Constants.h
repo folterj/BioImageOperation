@@ -307,6 +307,7 @@ enum class PathDrawMode
 	Age,
 	Usage,
 	Usage2,
+	Usage3,
 	Links,
 	LinksMove
 };
@@ -316,6 +317,7 @@ const vector<string> PathDrawModes =
 	"Age",
 	"Usage",
 	"Usage2",
+	"Usage3",
 	"Links",
 	"LinksMove"
 };

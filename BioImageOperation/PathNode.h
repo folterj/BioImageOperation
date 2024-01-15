@@ -32,14 +32,16 @@ public:
 	double y = 0;
 
 	vector<int> usage;
-	int age = 0;
+	int created = 0;
 	int accumUsage = 1;
 	int lastUse = 1;
+	int totalUse = 0;
 
-	PathNode(int label, Track* track);
+	PathNode(int label, Track* track, int pathAge);
 	void updateUse(int pathAge);
-	double getAccumUsage();
-	double getAccumUsage2(int totalAge);
+	float getAccumUsage(int totalAge);
+	float getAccumUsage2(int totalAge);
+	float getAccumUsage3(int totalAge);
 	double matchDistance(Track* track, double maxDistance);
 	void draw(Mat* image, Scalar color);
 	string toString();

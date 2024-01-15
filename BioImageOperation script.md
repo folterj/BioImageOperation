@@ -1,4 +1,4 @@
-# Bio Image Operation script operations (v1.7.14 / 2022-12-15)
+# Bio Image Operation script operations (v1.7.16 / 2024-01-15)
 
 
 **Set** (Path, Width, Height, Fps, PixelSize, WindowSize)
@@ -416,7 +416,7 @@ Draw common paths
 
  - Label:	 Label id (string)
  - Tracker:	 Tracker id (string)
- - PathDrawMode:	 Path draw mode (Age, Usage, Usage2, Links, LinksMove)
+ - PathDrawMode:	 Path draw mode (Age, Usage, Usage2, Usage3, Links, LinksMove)
  - Power:	 Exponential power of value range (1E-[power] ... 1) (numeric value)
  - Palette:	 Palette (GrayScale, Heat, Rainbow)
 

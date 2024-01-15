@@ -166,7 +166,7 @@ string ImageTracker::createPaths(double pathDistance, bool pathDebugMode) {
 
 	if (trackParamsFinalised) {
 		matchPaths();
-		updatePaths();
+		pathAge++;
 	}
 	if (pathDebugMode) {
 		output = getPathDebugInfo();
@@ -363,16 +363,16 @@ bool ImageTracker::matchPathElement(Track* track) {
 			if (distance >= 0 && (distance < minDistance || first)) {
 				minDistance = distance;
 				matchNode = node;
+				matchNode->updateUse(pathAge);
 				match = true;
 				first = false;
 			}
 		}
 	}
 
-	if (match) {
+	if (!match) {
+		matchNode = new PathNode(nextPathLabel++, track, pathAge);
 		matchNode->updateUse(pathAge);
-	} else {
-		matchNode = new PathNode(nextPathLabel++, track);
 		pathNodes.push_back(matchNode);
 	}
 
@@ -384,14 +384,6 @@ bool ImageTracker::matchPathElement(Track* track) {
 	}
 
 	return match;
-}
-
-void ImageTracker::updatePaths() {
-	for (PathNode* node : pathNodes) {
-		node->age++;
-		node->lastUse++;
-	}
-	pathAge++;
 }
 
 void ImageTracker::addPathLink(PathNode* node1, PathNode* node2) {
@@ -559,12 +551,21 @@ void ImageTracker::drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, floa
 		for (PathNode* node : pathNodes) {
 			switch (drawMode) {
 			case PathDrawMode::Age: scale = (float)(1.0 / node->lastUse); break;	// *** same as 1f / (total - lastuse), with lastuse only assigned to once without need to increment continuously?
-			case PathDrawMode::Usage: scale = (float)node->getAccumUsage(); break;
+			case PathDrawMode::Usage: scale = (float)node->getAccumUsage(pathAge); break;
 			case PathDrawMode::Usage2: scale = (float)node->getAccumUsage2(pathAge); break;
+			case PathDrawMode::Usage3: scale = (float)node->getAccumUsage3(pathAge); break;
 			default: scale = 1; break;
 			}
 			// 	colScale: 0...1
-			colScale = -log10(scale) / power;		// log: 1(E0) ... 1E-[power]
+			if (scale > 0) {
+				if (drawMode == PathDrawMode::Usage3) {
+					colScale = -(log10(scale) - 1) / power;		// log: 1(E0) ... 1E-[power]
+				} else {
+					colScale = -log10(scale) / power;			// log: 1(E0) ... 1E-[power]
+				}
+			} else {
+				colScale = 0;
+			}
 
 			if (colScale < 0) {
 				colScale = 0;
@@ -784,11 +785,11 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 void ImageTracker::savePaths(string filename, int frame, double time) {
 	string s = "";
 
-	pathStream.init(filename, "frame,time,label,age,usage,last use,x,y\n");
+	pathStream.init(filename, "frame,time,label,created,usage,last use, total use,x,y\n");
 
 	if (trackParamsFinalised) {
 		for (PathNode* node : pathNodes) {
-			s += Util::format("%d,%f,%d,%d,%d,%d,%f,%f\n", frame, time, node->label, node->age, node->accumUsage, node->lastUse, node->x, node->y);
+			s += Util::format("%d,%f,%d,%d,%d,%d,%f,%f\n", frame, time, node->label, node->created, node->accumUsage, node->lastUse, node->totalUse, node->x, node->y);
 		}
 		pathStream.write(s);
 	}

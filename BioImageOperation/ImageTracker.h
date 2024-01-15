@@ -129,7 +129,6 @@ public:
 	 */
 	void matchPaths();
 	bool matchPathElement(Track* track);
-	void updatePaths();
 	void addPathLink(PathNode* node1, PathNode* node2);
 
 	/*
