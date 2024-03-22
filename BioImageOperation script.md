@@ -1,4 +1,4 @@
-# Bio Image Operation script operations (v1.7.16 / 2024-01-15)
+# Bio Image Operation script operations (v1.7.17 / 2024-03-22)
 
 
 **Set** (Path, Width, Height, Fps, PixelSize, WindowSize)
@@ -157,6 +157,13 @@ Convert image to floating point type
  - Label:	 Label id (string)
 
 
+**GetHue** (Label)
+
+Extract hue from image (for 8-bit images output scaled to 0 - 180)
+
+ - Label:	 Label id (string)
+
+
 **GetSaturation** (Label)
 
 Extract saturation from image
@@ -212,6 +219,19 @@ Convert image to binary using threshold level, or in case not provided using aut
  - Label:	 Label id (string)
  - Level:	 Threshold value (numeric value between 0 and 1)
  - Debug:	 Debug mode (true / false)
+
+
+**InRangeHsv** (Label, Hmin, Hmax, Smin, Smax, Vmin, Vmax)
+
+Create binary image corresponding to HSV range
+
+ - Label:	 Label id (string)
+ - Hmin:	 Hue minimum (angle between 0 and 360)
+ - Hmax:	 Hue maximum (angle between 0 and 360)
+ - Smin:	 Saturation minimum (numeric value between 0 and 1)
+ - Smax:	 Saturation maximum (numeric value between 0 and 1)
+ - Vmin:	 Value minimum (numeric value between 0 and 1)
+ - Vmax:	 Value maximum (numeric value between 0 and 1)
 
 
 **Erode** (Label, Radius)

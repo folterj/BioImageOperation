@@ -27,14 +27,16 @@ public:
 	static void convertToColorAlpha(InputArray source, OutputArray dest);
 	static void convertToInt(const Mat& source, OutputArray dest);
 	static void convertToFloat(const Mat& source, OutputArray dest);
-	static void getSaturation(InputArray source, Mat* dest);
-	static void getHsValue(InputArray source, Mat* dest);
-	static void getHsLightness(InputArray source, Mat* dest);
+	static void getHue(InputArray source, OutputArray dest);
+	static void getSaturation(InputArray source, OutputArray dest);
+	static void getHsValue(InputArray source, OutputArray dest);
+	static void getHsLightness(InputArray source, OutputArray dest);
 
 	static void scale(InputArray source, OutputArray dest, double width = 0, double height = 0);
 	static void crop(const Mat& source, Mat* dest, double width = 0, double height = 0, double x = 0, double y = 0);
 	static void mask(InputArray source, InputArray mask, OutputArray dest);
 	static double threshold(InputArray source, OutputArray dest, double thresh = 0);
+	static void inrange_hsv(InputArray source, OutputArray dest, double hmin=0, double hmax=360, double smin=0, double smax=1, double vmin=0, double vmax=1);
 	static void erode(InputArray source, OutputArray dest, int radius = 0);
 	static void dilate(InputArray source, OutputArray dest, int radius = 0);
 	static void difference(InputArray source1, InputArray source2, OutputArray dest, bool abs = false);

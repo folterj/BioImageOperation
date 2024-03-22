@@ -44,6 +44,8 @@ public:
 	vector<TrackClusterMatch*> solutionMatches;
 	vector<PathNode*> pathNodes;
 	vector<PathLink*> pathLinks;
+	vector<Point2f> pathPositions;
+	flann::Index position_tree;
 	int nextTrackLabel = 0;
 	int nextPathLabel = 0;
 
@@ -51,6 +53,7 @@ public:
 	bool trackParamsFinalised = false;
 	bool clusterDebugMode = false;
 	bool trackDebugMode = false;
+	bool position_tree_init = false;
 	bool pathDebugMode = false;
 	bool countPositionSet = false;
 	double pathDistance = Constants::minPathDistance;

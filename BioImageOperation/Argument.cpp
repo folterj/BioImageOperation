@@ -77,6 +77,14 @@ bool Argument::parseType(ArgumentType argumentType) {
 		}
 		break;
 
+	case ArgumentType::Angle:
+		ok = Util::isNumeric(value);
+		if (ok) {
+			x = Util::toDouble(value);
+			ok = (x >= 0 && x <= 360);
+		}
+		break;
+
 	case ArgumentType::TimeFrame:
 		if (value.find(":") >= 0) {
 			parts = Util::split(value, ":");

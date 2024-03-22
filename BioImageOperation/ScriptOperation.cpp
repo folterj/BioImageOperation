@@ -422,9 +422,15 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 		description = "Convert image to floating point type";
 		break;
 
-	case ScriptOperationType::GetSaturation:
+	case ScriptOperationType::GetHue:
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label };
+		description = "Extract hue from image (for 8-bit images output scaled to 0 - 180)";
+		break;
+
+	case ScriptOperationType::GetSaturation:
+		requiredArguments = vector<ArgumentLabel>{ };
+		optionalArguments = vector<ArgumentLabel>{ ArgumentLabel::Label };
 		description = "Extract saturation from image";
 		break;
 
@@ -462,6 +468,13 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 		requiredArguments = vector<ArgumentLabel> { };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Level, ArgumentLabel::Debug };
 		description = "Convert image to binary using threshold level, or in case not provided using automatic Otsu method";
+		break;
+
+	case ScriptOperationType::InRangeHsv:
+		requiredArguments = vector<ArgumentLabel>{ };
+		optionalArguments = vector<ArgumentLabel>{ ArgumentLabel::Label,
+			ArgumentLabel::Hmin, ArgumentLabel::Hmax, ArgumentLabel::Smin, ArgumentLabel::Smax, ArgumentLabel::Vmin, ArgumentLabel::Vmax };
+		description = "Create binary image corresponding to HSV range";
 		break;
 
 	case ScriptOperationType::Erode:
@@ -710,9 +723,18 @@ ArgumentType ScriptOperation::getExpectedArgumentType(ArgumentLabel argument) {
 		type = ArgumentType::Bool;
 		break;
 
+	case ArgumentLabel::Hmin:
+	case ArgumentLabel::Hmax:
+		type = ArgumentType::Angle;
+		break;
+
 	case ArgumentLabel::Red:
 	case ArgumentLabel::Green:
 	case ArgumentLabel::Blue:
+	case ArgumentLabel::Smin:
+	case ArgumentLabel::Smax:
+	case ArgumentLabel::Vmin:
+	case ArgumentLabel::Vmax:
 	case ArgumentLabel::Level:
 	case ArgumentLabel::Weight:
 		type = ArgumentType::Fraction;
@@ -820,6 +842,30 @@ string ScriptOperation::getArgumentDescription(ArgumentLabel argument) {
 
 	case ArgumentLabel::Blue:
 		s = "Blue color component";
+		break;
+
+	case ArgumentLabel::Hmin:
+		s = "Hue minimum";
+		break;
+
+	case ArgumentLabel::Hmax:
+		s = "Hue maximum";
+		break;
+
+	case ArgumentLabel::Smin:
+		s = "Saturation minimum";
+		break;
+
+	case ArgumentLabel::Smax:
+		s = "Saturation maximum";
+		break;
+
+	case ArgumentLabel::Vmin:
+		s = "Value minimum";
+		break;
+
+	case ArgumentLabel::Vmax:
+		s = "Value maximum";
 		break;
 
 	case ArgumentLabel::Level:
@@ -1005,6 +1051,10 @@ string ScriptOperation::getArgumentTypeDescription(ArgumentType type) {
 
 	case ArgumentType::Bool:
 		s = "true / false";
+		break;
+
+	case ArgumentType::Angle:
+		s = "angle between 0 and 360";
 		break;
 
 	case ArgumentType::Fraction:

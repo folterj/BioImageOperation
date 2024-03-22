@@ -90,6 +90,7 @@ void ImageTracker::reset() {
 	trackParamsFinalised = false;
 	clusterDebugMode = false;
 	trackDebugMode = false;
+	position_tree_init = false;
 	pathDebugMode = false;
 	countPositionSet = false;
 	countPosition.x = 0;
@@ -330,6 +331,11 @@ TrackClusterMatch* ImageTracker::findTrackMatch(int tracki) {
 void ImageTracker::matchPaths() {
 	trackingStats.pathMatching.reset();
 
+	if (pathPositions.size() > 0) {
+		position_tree.build(Mat(pathPositions).reshape(1), flann::KDTreeIndexParams(), cvflann::FLANN_DIST_EUCLIDEAN);
+		position_tree_init = true;
+	}
+
 	for (Track* track : tracks) {
 		if (track->dist != 0) {
 			if (matchPathElement(track)) {
@@ -343,9 +349,10 @@ void ImageTracker::matchPaths() {
 bool ImageTracker::matchPathElement(Track* track) {
 	PathNode* matchNode = nullptr;
 	double distance;
-	double minDistance = 0;
 	bool match = false;
-	bool first = true;
+	vector<float> query, distances;
+	vector<int> indices;
+	int n;
 
 	// shortcut for performance: first check last node
 	matchNode = track->lastPathNode;
@@ -358,14 +365,15 @@ bool ImageTracker::matchPathElement(Track* track) {
 	}
 
 	if (!match) {
-		for (PathNode* node : pathNodes) {
-			distance = node->matchDistance(track, pathDistance);
-			if (distance >= 0 && (distance < minDistance || first)) {
-				minDistance = distance;
-				matchNode = node;
-				matchNode->updateUse(pathAge);
+		if (position_tree_init) {
+			query.push_back(track->x);
+			query.push_back(track->y);
+			n = position_tree.radiusSearch(query, indices, distances, pathDistance * pathDistance, 1);
+			if (n > 0) {
+				matchNode = pathNodes[indices[0]];
+				//distance = sqrt(distances[0]);
 				match = true;
-				first = false;
+				matchNode->updateUse(pathAge);
 			}
 		}
 	}
@@ -374,6 +382,7 @@ bool ImageTracker::matchPathElement(Track* track) {
 		matchNode = new PathNode(nextPathLabel++, track, pathAge);
 		matchNode->updateUse(pathAge);
 		pathNodes.push_back(matchNode);
+		pathPositions.push_back(Point2f(track->x, track->y));
 	}
 
 	if (track->lastPathNode != matchNode) {
@@ -559,7 +568,7 @@ void ImageTracker::drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, floa
 			// 	colScale: 0...1
 			if (scale > 0) {
 				if (drawMode == PathDrawMode::Usage3) {
-					colScale = -(log10(scale) - 1) / power;		// log: 1(E0) ... 1E-[power]
+					colScale = -(log10(scale) - 2) / power;		// log: 1(E0) ... 1E-[power]
 				} else {
 					colScale = -log10(scale) / power;			// log: 1(E0) ... 1E-[power]
 				}

@@ -11,8 +11,8 @@
 #define INCLUDE_GUARD
 
 #define PROJECT_NAME "BioImageOperation"
-#define PROJECT_VER  "1.7.16"
-#define PROJECT_DESC "2024-01-15"
+#define PROJECT_VER  "1.7.17"
+#define PROJECT_DESC "2024-03-22"
 #define PROJECT_URL  "https://github.com/folterj/BioImageOperation"
 
 #endif // INCLUDE_GUARD

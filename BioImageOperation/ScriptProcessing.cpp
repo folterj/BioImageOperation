@@ -224,6 +224,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 	int width, height;
 	int displayi;
 	double fps, size, thresh0, thresh;
+	double hmin, hmax, smin, smax, vmin, vmax;
 	int frame = sourceFrameNumber;
 
 	int delay;
@@ -471,18 +472,23 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			newImageSet = true;
 			break;
 
+		case ScriptOperationType::GetHue:
+			ImageOperations::getHue(*getLabelOrCurrentImage(operation, image), *newImage);
+			newImageSet = true;
+			break;
+
 		case ScriptOperationType::GetSaturation:
-			ImageOperations::getSaturation(*getLabelOrCurrentImage(operation, image), newImage);
+			ImageOperations::getSaturation(*getLabelOrCurrentImage(operation, image), *newImage);
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::GetHsValue:
-			ImageOperations::getHsValue(*getLabelOrCurrentImage(operation, image), newImage);
+			ImageOperations::getHsValue(*getLabelOrCurrentImage(operation, image), *newImage);
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::GetHsLightness:
-			ImageOperations::getHsLightness(*getLabelOrCurrentImage(operation, image), newImage);
+			ImageOperations::getHsLightness(*getLabelOrCurrentImage(operation, image), *newImage);
 			newImageSet = true;
 			break;
 
@@ -494,6 +500,17 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			if (debugMode) {
 				showText("Threshold: " + Util::format("%.3f", thresh) + "\n", Constants::nTextWindows);
 			}
+			break;
+
+		case ScriptOperationType::InRangeHsv:
+			hmin = operation->getArgumentNumeric(ArgumentLabel::Hmin);
+			hmax = operation->getArgumentNumeric(ArgumentLabel::Hmax);
+			smin = operation->getArgumentNumeric(ArgumentLabel::Smin);
+			smax = operation->getArgumentNumeric(ArgumentLabel::Smax);
+			vmin = operation->getArgumentNumeric(ArgumentLabel::Vmin);
+			vmax = operation->getArgumentNumeric(ArgumentLabel::Vmax);
+			ImageOperations::inrange_hsv(*getLabelOrCurrentImage(operation, image), *newImage, hmin, hmax, smin, smax, vmin, vmax);
+			newImageSet = true;
 			break;
 
 		case ScriptOperationType::Erode:

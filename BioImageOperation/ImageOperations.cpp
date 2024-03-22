@@ -132,31 +132,40 @@ void ImageOperations::convertToFloat(const Mat& source, OutputArray dest) {
 	source.convertTo(dest, CV_32F, alpha);
 }
 
-void ImageOperations::getSaturation(InputArray source, Mat* dest) {
+void ImageOperations::getHue(InputArray source, OutputArray dest) {
 	vector<Mat> channels;
 	Mat hsv;
 
 	cvtColor(source, hsv, ColorConversionCodes::COLOR_BGR2HSV);
 	split(hsv, channels);
-	*dest = channels[1];	// saturation channel
+	channels[0].copyTo(dest);	// hue channel
 }
 
-void ImageOperations::getHsValue(InputArray source, Mat* dest) {
+void ImageOperations::getSaturation(InputArray source, OutputArray dest) {
 	vector<Mat> channels;
 	Mat hsv;
 
 	cvtColor(source, hsv, ColorConversionCodes::COLOR_BGR2HSV);
 	split(hsv, channels);
-	*dest = channels[2];	// value channel
+	channels[1].copyTo(dest);	// saturation channel
 }
 
-void ImageOperations::getHsLightness(InputArray source, Mat* dest) {
+void ImageOperations::getHsValue(InputArray source, OutputArray dest) {
+	vector<Mat> channels;
+	Mat hsv;
+
+	cvtColor(source, hsv, ColorConversionCodes::COLOR_BGR2HSV);
+	split(hsv, channels);
+	channels[2].copyTo(dest);	// value channel
+}
+
+void ImageOperations::getHsLightness(InputArray source, OutputArray dest) {
 	vector<Mat> channels;
 	Mat hsv;
 
 	cvtColor(source, hsv, ColorConversionCodes::COLOR_BGR2HLS);
 	split(hsv, channels);
-	*dest = channels[1];	// lightness channel
+	channels[1].copyTo(dest);	// lightness channel
 }
 
 double ImageOperations::threshold(InputArray source, OutputArray dest, double thresh) {
@@ -178,6 +187,40 @@ double ImageOperations::threshold(InputArray source, OutputArray dest, double th
 	thresh = cv::threshold(source, dest, thresh * maxval, maxval, thresholdType);
 	//cv::adaptiveThreshold(source, dest, 0xFF, AdaptiveThresholdTypes::ADAPTIVE_THRESH_MEAN_C, ThresholdTypes::THRESH_BINARY, 199, 3);
 	return thresh / maxval;
+}
+
+void ImageOperations::inrange_hsv(InputArray source, OutputArray dest, double hmin, double hmax, double smin, double smax, double vmin, double vmax) {
+	Mat hsv;
+	int depth = source.depth();
+	bool isFloat = (depth == CV_16F || depth == CV_32F || depth == CV_64F);
+	double maxval;
+	
+	cvtColor(source, hsv, ColorConversionCodes::COLOR_BGR2HSV);
+
+	if (hmax == 0 && hmax == hmin) {
+		hmax = 360;
+	}
+	if (smax == 0 && smax <= smin) {
+		smax = 1;
+	}
+	if (vmax == 0 && vmax <= vmin) {
+		vmax = 1;
+	}
+
+	hmin /= 360;
+	hmax /= 360;
+	if (!isFloat) {
+		maxval = 0xFF;
+		smin *= maxval;
+		smax *= maxval;
+		vmin *= maxval;
+		vmax *= maxval;
+
+		maxval = 180;
+		hmin *= maxval;
+		hmax *= maxval;
+	}
+	cv::inRange(hsv, Scalar(hmin, smin, vmin), Scalar(hmax, smax, vmax), dest);
 }
 
 void ImageOperations::erode(InputArray source, OutputArray dest, int radius) {

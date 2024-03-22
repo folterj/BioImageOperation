@@ -1,3 +1,7 @@
+#### Version 1.7.17
+* Added more HSV operations including HSV range extraction
+* Fixed bug in split channel operations
+
 #### Version 1.7.16
 * Improved accumulated common paths drawing and performance
 

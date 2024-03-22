@@ -28,8 +28,8 @@ class ScriptOperation
 public:
 	ScriptOperationType operationType = ScriptOperationType::None;
 	vector<Argument*> arguments;
-	int argumentPos;
-	bool positionalMode;
+	int argumentPos = 0;
+	bool positionalMode = false;
 	string original, line;
 	string asignee;
 	string extra;
