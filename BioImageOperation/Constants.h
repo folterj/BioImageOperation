@@ -26,6 +26,7 @@ enum class ScriptOperationType
 
 	Source,
 	CreateImage,
+	VideoInfo,
 	OpenImage,
 	OpenVideo,
 	OpenCapture,
@@ -102,6 +103,7 @@ const vector<string> ScriptOperationTypes =
 
 	"Source",
 	"CreateImage",
+	"VideoInfo",
 	"OpenImage",
 	"OpenVideo",
 	"OpenCapture",

@@ -337,6 +337,12 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 		description = "Create a new image";
 		break;
 
+	case ScriptOperationType::VideoInfo:
+		requiredArguments = vector<ArgumentLabel>{ ArgumentLabel::Path };
+		optionalArguments = vector<ArgumentLabel>{ ArgumentLabel::API, ArgumentLabel::Start, ArgumentLabel::Length, ArgumentLabel::Interval, ArgumentLabel::Total };
+		description = "Open video file(s) and show info (ffmpeg formats supported)";
+		break;
+
 	case ScriptOperationType::OpenImage:
 		requiredArguments = vector<ArgumentLabel> { ArgumentLabel::Path };
 		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Start, ArgumentLabel::Length, ArgumentLabel::Interval, ArgumentLabel::Total };

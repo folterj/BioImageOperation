@@ -298,6 +298,28 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			newImageSet = true;
 			break;
 
+		case ScriptOperationType::VideoInfo:
+			if (sourceFile != "") {
+				source = sourceFile;
+			} else {
+				source = operation->getArgument(ArgumentLabel::Path);
+			}
+			operation->initFrameSource(FrameType::Video, basepath, source,
+				(int)operation->getArgumentNumeric(ArgumentLabel::API), operation->getArgument(ArgumentLabel::Codec),
+				operation->getArgument(ArgumentLabel::Start),
+				operation->getArgument(ArgumentLabel::Length), 0,
+				(int)operation->getArgumentNumeric(ArgumentLabel::Interval),
+				(int)operation->getArgumentNumeric(ArgumentLabel::Total));
+			sourceWidth = operation->frameSource->getWidth();
+			sourceHeight = operation->frameSource->getHeight();
+			sourceFps = operation->frameSource->getFps();
+			sourceFrames = operation->frameSource->getTotalFrames();
+			showText("Source: " + source + "\n" +
+					 "Frames: " + Util::format("%i", sourceFrames) + "\n" +
+					 "@FPS: " + Util::format("%.1f", sourceFps) + "\n" +
+					 "Time: " + Util::formatTimespan(sourceFrames / sourceFps) + "\n", Constants::nTextWindows);
+			break;
+
 		case ScriptOperationType::OpenImage:
 			if (sourceFile != "") {
 				source = sourceFile;
