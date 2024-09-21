@@ -226,6 +226,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 	double fps, size, thresh0, thresh;
 	double hmin, hmax, smin, smax, vmin, vmax;
 	int frame = sourceFrameNumber;
+	int realFrames, interval;
 
 	int delay;
 	bool debugMode;
@@ -282,7 +283,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		case ScriptOperationType::CreateImage:
 			width = (int)operation->getArgumentNumeric(ArgumentLabel::Width);
 			height = (int)operation->getArgumentNumeric(ArgumentLabel::Height);
-			if (width == 0 && height == 0) {
+			if (width <= 0 && height <= 0) {
 				width = sourceWidth;
 				height = sourceHeight;
 			}
@@ -314,10 +315,16 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			sourceHeight = operation->frameSource->getHeight();
 			sourceFps = operation->frameSource->getFps();
 			sourceFrames = operation->frameSource->getTotalFrames();
-			showText("Source: " + source + "\n" +
-					 "Frames: " + Util::format("%i", sourceFrames) + "\n" +
-					 "@FPS: " + Util::format("%.1f", sourceFps) + "\n" +
-					 "Time: " + Util::formatTimespan(sourceFrames / sourceFps) + "\n", Constants::nTextWindows);
+			interval = operation->frameSource->getInterval();
+			realFrames = sourceFrames / interval;
+			output = "Source: " + source + "\n" +
+				"Frames: " + Util::format("%i", realFrames) + "\n" +
+				"@FPS: " + Util::format("%.1f", sourceFps) + "\n" +
+				"Time: " + Util::formatTimespan(realFrames / sourceFps) + "\n";
+			if (interval > 1) {
+				output += "(Interval: " + Util::format("%i", interval) + ")\n";
+			}
+			showText(output, Constants::nTextWindows);
 			break;
 
 		case ScriptOperationType::OpenImage:
@@ -691,12 +698,13 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			break;
 
 		case ScriptOperationType::DrawPaths:
-			logPower = operation->getArgumentNumeric();
+			logPower = operation->getArgumentNumeric(ArgumentLabel::Power);
+			logOffset = operation->getArgumentNumeric(ArgumentLabel::Offset);
 			logPalette = (Palette)operation->getArgument(ArgumentLabel::Palette, (int)Palette::Grayscale);
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->drawPaths(getLabelOrCurrentImage(operation, image), newImage,
-									(PathDrawMode)operation->getArgument(ArgumentLabel::PathDrawMode, (int)PathDrawMode::Age),
-									(float)logPower, logPalette);
+									(PathDrawMode)operation->getArgument(ArgumentLabel::PathDrawMode, (int)PathDrawMode::Time),
+									(float)logPower, (float)logOffset, logPalette);
 			newImageSet = true;
 			break;
 

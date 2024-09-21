@@ -310,22 +310,18 @@ const vector<string> AccumModes =
 
 enum class PathDrawMode
 {
-	Age,
-	Usage,
-	Usage2,
-	Usage3,
-	Links,
-	LinksMove
+	Count,
+	Time,
+	Paths,
+	Direction
 };
 
 const vector<string> PathDrawModes =
 {
-	"Age",
-	"Usage",
-	"Usage2",
-	"Usage3",
-	"Links",
-	"LinksMove"
+	"Count",
+	"Time",
+	"Paths",
+	"Direction"
 };
 
 enum class DrawPosition

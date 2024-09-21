@@ -8,22 +8,28 @@
  *****************************************************************************/
 
 #include "PathLink.h"
+#include "Util.h"
 
 
-PathLink::PathLink() {
+PathLink::PathLink(int label, double x1, double y1, double x2, double y2, int time) {
+	this->label = label;
+	this->x1 = x1;
+	this->y1 = y1;
+	this->x2 = x2;
+	this->y2 = y2;
+	this->created = time;
 }
 
-PathLink::PathLink(PathNode* node1, PathNode* node2) {
-	this->node1 = node1;
-	this->node2 = node2;
-	addMatch(true);
-}
-
-void PathLink::addMatch(bool normalDirection) {
-	if (normalDirection) {
-		nNormal++;
-	} else {
+void PathLink::updateUse(int time, bool reversed) {
+	count++;
+	totalUse += time;
+	if (!used) {
+		used = true;
+	}
+	if (reversed) {
 		nReverse++;
+	} else {
+		nNormal++;
 	}
 }
 
@@ -31,29 +37,33 @@ int PathLink::getMax() {
 	return max(nNormal, nReverse);
 }
 
-double PathLink::getAccumUsage(bool normalDirection, int maxUsage) {
-	if (normalDirection) {
-		return (double)nNormal / maxUsage;
-	} else {
-		return (double)nReverse / maxUsage;
-	}
+double PathLink::getMaxCount(int time) {
+	return (double)getMax() / (time + 1);
 }
 
-void PathLink::draw(Mat* image, Scalar color, int maxUsage, bool animate) {
-	int x1 = (int)node1->x;
-	int y1 = (int)node1->y;
-	int x2 = (int)node2->x;
-	int y2 = (int)node2->y;
+double PathLink::getUsage(int time) {
+	return (double)totalUse / (time + 1);
+}
+
+double PathLink::getDirectionRate() {
+	return (double)(nNormal - nReverse) / getMax();
+}
+
+void PathLink::draw(Mat* image, Scalar color, int max, bool animate, int scale) {
+	int x1 = (int)(this->x1 * scale);
+	int y1 = (int)(this->y1 * scale);
+	int x2 = (int)(this->x2 * scale);
+	int y2 = (int)(this->y2 * scale);
 	Point point;
 	double animPos2;
 
 	if (animate) {
 		if (nNormal >= nReverse) {
 			animPos2 = animPos;
-			animPos += (double)(nNormal - nReverse) / maxUsage;
+			animPos += (double)(nNormal - nReverse) / max;
 		} else {
 			animPos2 = 1 - animPos;
-			animPos += (double)(nReverse - nNormal) / maxUsage;
+			animPos += (double)(nReverse - nNormal) / max;
 		}
 
 		while (animPos >= 1) {
@@ -67,4 +77,8 @@ void PathLink::draw(Mat* image, Scalar color, int maxUsage, bool animate) {
 	} else {
 		line(*image, Point(x1, y1), Point(x2, y2), color, 1, LineTypes::LINE_AA);
 	}
+}
+
+string PathLink::toString() {
+	return Util::format("%d created:%d count:%d totalUse:%d X1:%d Y1:%d X2:%d Y2:%d", label, created, count, totalUse, x1, y1, x2, y2);
 }

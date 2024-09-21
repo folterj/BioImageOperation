@@ -76,6 +76,7 @@ public:
 	static string getShapeFeatures(vector<Point>* contour, double area, double lengthMajor, double lengthMinor);
 
 	static Scalar getHeatScale(double scale);
+	static Scalar getBlueWhiteRedScale(double scale);
 	static Scalar getRainbowScale(double scale);
 	static Scalar hsvToColor(double hue1, double saturation, double value);
 	static Scalar normColorLightness(Scalar color0, double level = 0.5);

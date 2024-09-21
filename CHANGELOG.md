@@ -1,3 +1,10 @@
+#### Version 1.7.19
+* Made common paths output more meaningful, and greatly improved performance
+* Various small bug fixes
+
+#### Version 1.7.18
+* Added VideoInfo command
+
 #### Version 1.7.17
 * Added more HSV operations including HSV range extraction
 * Fixed bug in split channel operations

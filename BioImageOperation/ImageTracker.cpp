@@ -16,6 +16,7 @@
 #include "NumericPath.h"
 #include "ColorScale.h"
 #include "Types.h"
+#include <ImageOperations.h>
 
 
 ImageTracker::ImageTracker(string id, TrackingMethod trackingMethod, double fps, double pixelSize, double windowSize, Observer* observer) {
@@ -59,15 +60,12 @@ void ImageTracker::deleteTrackMatches() {
 }
 
 void ImageTracker::deletePaths() {
+	pathLinkMap.clear();
+
 	for (int i = 0; i < pathLinks.size(); i++) {
 		delete pathLinks[i];
 	}
 	pathLinks.clear();
-
-	for (int i = 0; i < pathNodes.size(); i++) {
-		delete pathNodes[i];
-	}
-	pathNodes.clear();
 
 	nextPathLabel = 0;
 }
@@ -78,8 +76,10 @@ void ImageTracker::reset() {
 	deleteClusters();
 	deleteTracks();
 
-	pathAge = 0;
 	pathDistance = Constants::minPathDistance;
+	pathAge = 0;
+	pathMap.clear();
+	pathMapInit = false;
 
 	trackingParams.reset();
 	areaStats.reset();
@@ -90,7 +90,6 @@ void ImageTracker::reset() {
 	trackParamsFinalised = false;
 	clusterDebugMode = false;
 	trackDebugMode = false;
-	position_tree_init = false;
 	pathDebugMode = false;
 	countPositionSet = false;
 	countPosition.x = 0;
@@ -105,6 +104,8 @@ string ImageTracker::createClusters(Mat* image, double minArea, double maxArea, 
 	this->sourceFrames = sourceFrames;
 	this->basePath = basePath;
 	this->clusterDebugMode = clusterDebugMode;
+	this->imageWidth = image->cols;
+	this->imageHeight = image->rows;
 
 	if (minArea != 0 || maxArea != 0) {
 		trackingParams.area.set(minArea, maxArea);
@@ -159,11 +160,18 @@ string ImageTracker::createTracks(double maxMove, int minActive, int maxInactive
 
 string ImageTracker::createPaths(double pathDistance, bool pathDebugMode) {
 	string output;
+	int width, height;
 	if (pathDistance < Constants::minPathDistance) {
 		pathDistance = Constants::minPathDistance;
 	}
 	this->pathDistance = pathDistance;
 	this->pathDebugMode = pathDebugMode;
+	if (!pathMapInit) {
+		pathMapWidth = int(round(imageWidth / pathDistance));
+		pathMapHeight = int(round(imageHeight / pathDistance));
+		pathMap.resize(pathMapWidth * pathMapHeight, 0);
+		pathMapInit = true;
+	}
 
 	if (trackParamsFinalised) {
 		matchPaths();
@@ -331,11 +339,6 @@ TrackClusterMatch* ImageTracker::findTrackMatch(int tracki) {
 void ImageTracker::matchPaths() {
 	trackingStats.pathMatching.reset();
 
-	if (pathPositions.size() > 0) {
-		position_tree.build(Mat(pathPositions).reshape(1), flann::KDTreeIndexParams(), cvflann::FLANN_DIST_EUCLIDEAN);
-		position_tree_init = true;
-	}
-
 	for (Track* track : tracks) {
 		if (track->dist != 0) {
 			if (matchPathElement(track)) {
@@ -347,69 +350,48 @@ void ImageTracker::matchPaths() {
 }
 
 bool ImageTracker::matchPathElement(Track* track) {
-	PathNode* matchNode = nullptr;
-	double distance;
 	bool match = false;
-	vector<float> query, distances;
-	vector<int> indices;
-	int n;
-
-	// shortcut for performance: first check last node
-	matchNode = track->lastPathNode;
-	if (matchNode) {
-		// check distance from last node
-		distance = matchNode->matchDistance(track, pathDistance / 2);
-		if (distance >= 0) {
-			match = true;
+	int lastx = track->lastPathMapx;
+	int lasty = track->lastPathMapy;
+	int mapx = int(round(track->x / pathDistance));
+	int mapy = int(round(track->y / pathDistance));
+	if (mapx != lastx or mapy != lasty) {
+		int pixeli = mapy * pathMapWidth + mapx;
+		pathMap[pixeli] += pathAge;
+		if (lastx >= 0 && lasty >= 0) {
+			match = matchPathLink(lastx, lasty, mapx, mapy);
 		}
+		track->lastPathMapx = mapx;
+		track->lastPathMapy = mapy;
 	}
-
-	if (!match) {
-		if (position_tree_init) {
-			query.push_back(track->x);
-			query.push_back(track->y);
-			n = position_tree.radiusSearch(query, indices, distances, pathDistance * pathDistance, 1);
-			if (n > 0) {
-				matchNode = pathNodes[indices[0]];
-				//distance = sqrt(distances[0]);
-				match = true;
-				matchNode->updateUse(pathAge);
-			}
-		}
-	}
-
-	if (!match) {
-		matchNode = new PathNode(nextPathLabel++, track, pathAge);
-		matchNode->updateUse(pathAge);
-		pathNodes.push_back(matchNode);
-		pathPositions.push_back(Point2f(track->x, track->y));
-	}
-
-	if (track->lastPathNode != matchNode) {
-		if (track->lastPathNode) {
-			addPathLink(track->lastPathNode, matchNode);
-		}
-		track->lastPathNode = matchNode;
-	}
-
 	return match;
 }
 
-void ImageTracker::addPathLink(PathNode* node1, PathNode* node2) {
-	for (PathLink* link : pathLinks) {
-		if (link->node1 == node1 && link->node2 == node2) {
-			link->addMatch(true);
-			return;
-		}
+bool ImageTracker::matchPathLink(int x1, int y1, int x2, int y2) {
+	bool match = false;
+	string key = Util::format("%d_%d_%d_%d", x1, y1, x2, y2);
+	bool reversed = false;
+	PathLink* link = nullptr;
 
-		if (link->node1 == node2 && link->node2 == node1) {
-			link->addMatch(false);
-			return;
+	if (pathLinkMap.count(key) > 0) {
+		match = true;
+	} else {
+		key = Util::format("%d_%d_%d_%d", x2, y2, x1, y1);
+		if (pathLinkMap.count(key) > 0) {
+			match = true;
+			reversed = true;
 		}
 	}
-
-	// link not in list
-	pathLinks.push_back(new PathLink(node1, node2));
+	if (match) {
+		link = pathLinkMap.at(key);
+		link->updateUse(pathAge, reversed);
+	} else {
+		link = new PathLink(nextPathLabel, x1, y1, x2, y2, pathAge);
+		pathLinkMap[key] = link;
+		pathLinks.push_back(link);
+		nextPathLabel++;
+	}
+	return match;
 }
 
 void ImageTracker::updateClusterParams() {
@@ -491,8 +473,8 @@ string ImageTracker::getTrackDebugInfo() {
 
 string ImageTracker::getPathDebugInfo() {
 	string s = "";
-	for (PathNode* node : pathNodes) {
-		s += node->toString() + "\n";
+	for (PathLink* link : pathLinks) {
+		s += link->toString() + "\n";
 	}
 	return s;
 }
@@ -515,81 +497,41 @@ void ImageTracker::drawTracks(Mat* source, Mat* dest, int drawMode, int ntracks)
 	}
 }
 
-void ImageTracker::drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, float power, Palette palette) {
-	float scale, colScale;
-	int maxUsage = 0;
+void ImageTracker::drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, float power_scale, float power_offset, Palette palette) {
+	float colorScale, colorMagnitude, colorValue;
 	Scalar color;
+	float ln10_factor = 2.303;
 	bool animate;
+	int time = pathAge + 1;
 
 	source->copyTo(*dest);
 
-	if (power == 0) {
-		power = 6;
+	if (power_scale == 0) {
+		power_scale = 6;
 	}
 
-	if (drawMode == PathDrawMode::Links || drawMode == PathDrawMode::LinksMove) {
-		animate = (drawMode == PathDrawMode::LinksMove);
+	if (drawMode == PathDrawMode::Paths || drawMode == PathDrawMode::Direction) {
+		animate = (drawMode == PathDrawMode::Direction);
 		// sort highest last so drawn on top
 		sort(pathLinks.begin(), pathLinks.end(),
-			[](PathLink* a, PathLink* b) { return a->getMax() < b->getMax(); });
+			[](PathLink* a, PathLink* b) { return a->count < b->count; });
 
 		for (PathLink* link : pathLinks) {
-			maxUsage = max(link->getMax(), maxUsage);
-		}
-
-		for (PathLink* link : pathLinks) {
-			scale = (float)link->getMax() / maxUsage;
-			colScale = -log10(scale) / power;		// log: 1(E0) ... 1E-[power]
-
-			if (colScale < 0) {
-				colScale = 0;
-			}
-			if (colScale > 1) {
-				colScale = 1;
-			}
-
-			switch (palette) {
-			case Palette::Heat: color = ColorScale::getHeatScale(colScale); break;
-			case Palette::Rainbow: color = ColorScale::getRainbowScale(colScale); break;
-			default: color = ColorScale::getGrayScale(colScale); break;
-			}
-
-			link->draw(dest, color, maxUsage, animate);
+			colorScale = link->getMaxCount(pathAge);
+			colorMagnitude = min(max(colorScale * pow(10, power_scale), 0.0), 1.0);
+			colorValue = min(max(link->getDirectionRate(), 0.0), 1.0);
+			color = ColorScale::getBlueWhiteRedScale(colorValue) * colorMagnitude;
+			link->draw(dest, color, pathAge, animate, pathDistance);
 		}
 	} else {
-		for (PathNode* node : pathNodes) {
-			switch (drawMode) {
-			case PathDrawMode::Age: scale = (float)(1.0 / node->lastUse); break;	// *** same as 1f / (total - lastuse), with lastuse only assigned to once without need to increment continuously?
-			case PathDrawMode::Usage: scale = (float)node->getAccumUsage(pathAge); break;
-			case PathDrawMode::Usage2: scale = (float)node->getAccumUsage2(pathAge); break;
-			case PathDrawMode::Usage3: scale = (float)node->getAccumUsage3(pathAge); break;
-			default: scale = 1; break;
-			}
-			// 	colScale: 0...1
-			if (scale > 0) {
-				if (drawMode == PathDrawMode::Usage3) {
-					colScale = -(log10(scale) - 2) / power;		// log: 1(E0) ... 1E-[power]
-				} else {
-					colScale = -log10(scale) / power;			// log: 1(E0) ... 1E-[power]
-				}
-			} else {
-				colScale = 0;
-			}
-
-			if (colScale < 0) {
-				colScale = 0;
-			}
-			if (colScale > 1) {
-				colScale = 1;
-			}
-
-			switch (palette) {
-			case Palette::Heat: color = ColorScale::getHeatScale(colScale); break;
-			case Palette::Rainbow: color = ColorScale::getRainbowScale(colScale); break;
-			default: color = ColorScale::getGrayScale(colScale); break;
-			}
-
-			node->draw(dest, color);
+		Mat image0 = Mat(pathMapHeight, pathMapWidth, CV_32F, pathMap.data()) / (pathAge + 1);
+		Mat image;
+		log(image0, image);
+		image = 1 + (image / ln10_factor + power_offset) / power_scale;
+		ImageOperations::convertToInt(image, image);
+		switch (palette) {
+			case Palette::Heat: applyColorMap(image, *dest, COLORMAP_HOT); break;
+			case Palette::Rainbow: applyColorMap(image, *dest, COLORMAP_RAINBOW); break;
 		}
 	}
 }
@@ -650,8 +592,7 @@ string ImageTracker::getInfo() {
 		info += Util::format("Average life time = %.0f\n\n", trackingStats.trackLifetime.getAverage());
 	}
 
-	if (pathNodes.size() != 0 || pathLinks.size() != 0) {
-		info += Util::format("Tot path nodes = %d\n", pathNodes.size());
+	if (pathLinks.size() != 0) {
 		info += Util::format("Tot path links = %d\n", pathLinks.size());
 		info += Util::format("Path match rate = %.3f\n", trackingStats.pathMatching.getAverage());
 	}
@@ -794,11 +735,11 @@ void ImageTracker::saveTracks(string filename, int frame, double time, SaveForma
 void ImageTracker::savePaths(string filename, int frame, double time) {
 	string s = "";
 
-	pathStream.init(filename, "frame,time,label,created,usage,last use, total use,x,y\n");
+	pathStream.init(filename, "frame,time,label,created,count,total use,x1,y1,x2,y2\n");
 
 	if (trackParamsFinalised) {
-		for (PathNode* node : pathNodes) {
-			s += Util::format("%d,%f,%d,%d,%d,%d,%f,%f\n", frame, time, node->label, node->created, node->accumUsage, node->lastUse, node->totalUse, node->x, node->y);
+		for (PathLink* link : pathLinks) {
+			s += Util::format("%d,%f,%d,%d,%d,%d,%d,%d,%d\n", frame, time, link->label, link->created, link->count, link->totalUse, link->x1, link->y1, link->x2, link->y2);
 		}
 		pathStream.write(s);
 	}

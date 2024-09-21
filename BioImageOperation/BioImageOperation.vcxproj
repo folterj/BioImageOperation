@@ -152,7 +152,6 @@ xcopy /y C:\openh264\*.dll $(OutDir)</Command>
     <ClCompile Include="OutputStream.cpp" />
     <ClCompile Include="ParamRange.cpp" />
     <ClCompile Include="PathLink.cpp" />
-    <ClCompile Include="PathNode.cpp" />
     <ClCompile Include="ScriptOperation.cpp" />
     <ClCompile Include="ScriptOperations.cpp" />
     <ClCompile Include="ScriptProcessing.cpp" />
@@ -221,7 +220,6 @@ xcopy /y C:\openh264\*.dll $(OutDir)</Command>
     <ClInclude Include="OutputStream.h" />
     <ClInclude Include="ParamRange.h" />
     <ClInclude Include="PathLink.h" />
-    <ClInclude Include="PathNode.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

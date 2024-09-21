@@ -58,6 +58,7 @@ public:
 	double pixelSize = 1;
 	double windowSize = 1;
 	double logPower = 0;
+	double logOffset = 0;
 	Palette logPalette = Palette::Grayscale;
 	MedianMode medianMode = MedianMode::Normal;
 	OperationMode operationMode = OperationMode::Idle;

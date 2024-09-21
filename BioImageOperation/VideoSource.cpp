@@ -86,6 +86,8 @@ bool VideoSource::init(string basepath, string filepath, int apiCode, string cod
 
 	sourcePath.resetFilePath();
 
+	this->width = width;
+	this->height = height;
 	calcFrameParams(start, length, fps, interval, total, nframes);
 
 	canSeek = (nframes != 0);

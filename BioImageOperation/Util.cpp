@@ -221,17 +221,17 @@ string Util::formatTimespan(int seconds0) {
 	int hours, minutes;
 	int seconds = seconds0;
 	hours = seconds / 3600;
+	seconds %= 3600;
+	minutes = seconds / 60;
 	if (hours > 0) {
 		s += to_string(hours) + ":";
-		seconds %= 3600;
 	}
-	minutes = seconds / 60;
-	if (minutes > 0) {
-		s += Util::format("%02d", minutes) + ":";
-		seconds %= 60;
-	} else {
+	if (hours == 0 && minutes == 0) {
 		s += "0:";
+	} else {
+		s += Util::format("%02d", minutes) + ":";
 	}
+	seconds %= 60;
 	s += Util::format("%02d", seconds);
 	return s;
 }
@@ -480,6 +480,35 @@ Scalar Util::getHeatScale(double scale) {
 		g = 0;
 		b = 1;
 		f = 1 - floatScale;
+		break;
+	}
+	return Scalar(f * b, f * g, f * r);
+}
+
+Scalar Util::getBlueWhiteRedScale(double scale) {
+	double r = 0;
+	double g = 0;
+	double b = 0;
+	double f = 1;
+	double colScale;
+	int intScale;
+	double floatScale;
+
+	colScale = scale * 2;
+	intScale = (int)colScale;
+	floatScale = colScale - intScale;
+	switch (intScale) {
+	case 0:
+		// blue - white
+		r = floatScale;
+		g = floatScale;
+		b = 1;
+		break;
+	case 1:
+		// white - red
+		r = 1;
+		g = 1 - floatScale;
+		b = 1 - floatScale;
 		break;
 	}
 	return Scalar(f * b, f * g, f * r);

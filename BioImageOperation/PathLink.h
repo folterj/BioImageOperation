@@ -9,8 +9,8 @@
 
 #pragma once
 #include <opencv2/opencv.hpp>
-#include "PathNode.h"
 
+using namespace std;
 using namespace cv;
 
 
@@ -21,16 +21,25 @@ using namespace cv;
 class PathLink
 {
 public:
-	PathNode* node1;
-	PathNode* node2;
+	int label = 0;
+
+	double x1, y1;
+	double x2, y2;
+
+	int created = 0;
+	int count = 0;
+	int totalUse = 0;
 	int nNormal = 0;
 	int nReverse = 0;
 	double animPos = 0;
+	bool used = false;
 
-	PathLink();
-	PathLink(PathNode* node1, PathNode* node2);
-	void addMatch(bool normalDirection);
+	PathLink(int label, double x1, double y1, double x2, double y2, int time);
+	void updateUse(int time, bool reversed=false);
 	int getMax();
-	double getAccumUsage(bool normalDirection, int maxUsage);
-	void draw(Mat* image, Scalar color, int maxUsage, bool animate);
+	double getMaxCount(int time);
+	double getUsage(int time);
+	double getDirectionRate();
+	void draw(Mat* image, Scalar color, int max, bool animate, int scale=1);
+	string toString();
 };

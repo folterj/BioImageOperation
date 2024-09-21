@@ -42,6 +42,7 @@ public:
 	virtual string getLabel() = 0;
 	virtual int getCurrentFrame() = 0;
 	virtual int getTotalFrames() = 0;
+	virtual int getInterval();
 
 	void calcFrameParams(string start, string length, double fps, int interval, int total, int nframes);
 };

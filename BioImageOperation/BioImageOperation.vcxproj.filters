@@ -79,9 +79,6 @@
     <ClCompile Include="PathLink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PathNode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ScriptOperation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -217,9 +214,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PathLink.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PathNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ScriptOperation.h">

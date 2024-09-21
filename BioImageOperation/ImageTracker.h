@@ -14,7 +14,6 @@
 #include "Cluster.h"
 #include "Track.h"
 #include "TrackClusterMatch.h"
-#include "PathNode.h"
 #include "PathLink.h"
 #include "TrackingParams.h"
 #include "StatData.h"
@@ -37,15 +36,18 @@ public:
 	Observer* observer;
 	string id = "";
 	string basePath = "";
+	int imageWidth = 0;
+	int imageHeight = 0;
+	int pathMapWidth = 0;
+	int pathMapHeight = 0;
 	int sourceFrames = 0;
 	vector<vector<Point>> contours;
 	vector<Cluster*> clusters;
 	vector<Track*> tracks;
 	vector<TrackClusterMatch*> solutionMatches;
-	vector<PathNode*> pathNodes;
+	vector<float> pathMap;
 	vector<PathLink*> pathLinks;
-	vector<Point2f> pathPositions;
-	flann::Index position_tree;
+	unordered_map<string, PathLink*> pathLinkMap;
 	int nextTrackLabel = 0;
 	int nextPathLabel = 0;
 
@@ -53,11 +55,11 @@ public:
 	bool trackParamsFinalised = false;
 	bool clusterDebugMode = false;
 	bool trackDebugMode = false;
-	bool position_tree_init = false;
 	bool pathDebugMode = false;
 	bool countPositionSet = false;
 	double pathDistance = Constants::minPathDistance;
 	int pathAge = 0;
+	bool pathMapInit = false;
 	Point countPosition;
 	OutputStreams clusterStreams, trackStreams;
 	OutputStream pathStream, trackInfoStream;
@@ -132,7 +134,7 @@ public:
 	 */
 	void matchPaths();
 	bool matchPathElement(Track* track);
-	void addPathLink(PathNode* node1, PathNode* node2);
+	bool matchPathLink(int x1, int y1, int x2, int y2);
 
 	/*
 	 * Update automatic clustering parameters
@@ -156,7 +158,7 @@ public:
 	 */
 	void drawClusters(Mat* source, Mat* dest, int drawMode);
 	void drawTracks(Mat* source, Mat* dest, int drawMode, int ntracks);
-	void drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, float power, Palette palette);
+	void drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, float power_scale, float power_offset, Palette palette);
 	void drawTrackCount(Mat* source, Mat* dest);
 
 	/*

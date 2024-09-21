@@ -17,8 +17,6 @@ using namespace cv;
 
 class Cluster;		// forward declaration
 
-class PathNode;		// forward declaration
-
 
 /*
  * Tracked cluster element
@@ -61,6 +59,8 @@ public:
 	int activeCount = 0;
 	int inactiveCount = 0;
 	int lifeTime = 0;
+	int lastPathMapx = -1;
+	int lastPathMapy = -1;
 
 	int minActive = 1;
 	int maxInactive = 0;
@@ -68,8 +68,6 @@ public:
 	double pixelSize = 1;
 	double windowSize = 1;
 	
-	PathNode* lastPathNode = nullptr;
-
 	vector<Point2d> points;
 	vector<double> angles;
 

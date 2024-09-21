@@ -635,7 +635,7 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 
 	case ScriptOperationType::DrawPaths:
 		requiredArguments = vector<ArgumentLabel> { };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::PathDrawMode, ArgumentLabel::Power, ArgumentLabel::Palette };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::PathDrawMode, ArgumentLabel::Power, ArgumentLabel::Offset, ArgumentLabel::Palette };
 		description = "Draw common paths";
 		break;
 
@@ -756,6 +756,7 @@ ArgumentType ScriptOperation::getExpectedArgumentType(ArgumentLabel argument) {
 	case ArgumentLabel::Total:
 	case ArgumentLabel::MS:
 	case ArgumentLabel::Power:
+	case ArgumentLabel::Offset:
 	case ArgumentLabel::Source:
 	case ArgumentLabel::API:
 	case ArgumentLabel::Fps:
@@ -920,6 +921,10 @@ string ScriptOperation::getArgumentDescription(ArgumentLabel argument) {
 
 	case ArgumentLabel::Power:
 		s = "Exponential power of value range (1E-[power] ... 1)";
+		break;
+
+	case ArgumentLabel::Offset:
+		s = "Exponential offset of value range";
 		break;
 
 	case ArgumentLabel::Source:

@@ -1,4 +1,4 @@
-# Bio Image Operation script operations (v1.7.17 / 2024-03-22)
+# Bio Image Operation script operations (v1.7.19 / 2024-09-21)
 
 
 **Set** (Path, Width, Height, Fps, PixelSize, WindowSize)
@@ -37,6 +37,18 @@ Create a new image
  - Red:	 Red color component (numeric value between 0 and 1)
  - Green:	 Green color component (numeric value between 0 and 1)
  - Blue:	 Blue color component (numeric value between 0 and 1)
+
+
+**VideoInfo** (**Path**, API, Start, Length, Interval, Total)
+
+Open video file(s) and show info (ffmpeg formats supported)
+
+ - Path:	 File path ("path")
+ - API:	 OpenCV API code (See OpenCV API codes) (numeric value)
+ - Start:	 Start (time reference as (hours:)minutes:seconds, or frame number)
+ - Length:	 Length (time reference as (hours:)minutes:seconds, or frame number)
+ - Interval:	 Interval in number of frames (numeric value)
+ - Total:	 Total number of frames at regular interval (numeric value)
 
 
 **OpenImage** (**Path**, Start, Length, Interval, Total)
@@ -430,14 +442,15 @@ Draw tracked clusters
  - DrawMode:	 Draw mode(s) (combine using | character) (None, Point, Circle, Ellipse, Box, Angle, Label, LabelArea, LabelLength, LabelAngle, Track, Tracks, Fill, ClusterDefault, TracksDefault)
 
 
-**DrawPaths** (Label, Tracker, PathDrawMode, Power, Palette)
+**DrawPaths** (Label, Tracker, PathDrawMode, Power, Offset, Palette)
 
 Draw common paths
 
  - Label:	 Label id (string)
  - Tracker:	 Tracker id (string)
- - PathDrawMode:	 Path draw mode (Age, Usage, Usage2, Usage3, Links, LinksMove)
+ - PathDrawMode:	 Path draw mode (Count, Time, Paths, Direction)
  - Power:	 Exponential power of value range (1E-[power] ... 1) (numeric value)
+ - Offset:	 Exponential offset of value range (numeric value)
  - Palette:	 Palette (GrayScale, Heat, Rainbow)
 
 

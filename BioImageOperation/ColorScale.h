@@ -26,12 +26,14 @@ public:
 
 	static Vec<uchar, 3> grayTable[];
 	static Vec<uchar, 3> heatTable[];
+	static Vec<uchar, 3> blueWhiteRedTable[];
 	static Vec<uchar, 3> rainbowTable[];
 	static Vec<uchar, 3> labelTable[];
 
 	static void init();
 	static Vec<uchar, 3> getGrayScale(double scale);
 	static Vec<uchar, 3> getHeatScale(double scale);
+	static Vec<uchar, 3> getBlueWhiteRedScale(double scale);
 	static Vec<uchar, 3> getRainbowScale(double scale);
 	static Vec<uchar, 3> getLabelColor(int label);
 };

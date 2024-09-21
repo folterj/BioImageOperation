@@ -54,3 +54,7 @@ void FrameSource::calcFrameParams(string start, string length, double fps, int i
 		this->interval = 1;
 	}
 }
+
+int FrameSource::getInterval() {
+	return this->interval;
+}

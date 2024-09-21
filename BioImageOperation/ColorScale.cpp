@@ -13,6 +13,7 @@
 
 Vec<uchar, 3> ColorScale::grayTable[scaleLength];
 Vec<uchar, 3> ColorScale::heatTable[scaleLength];
+Vec<uchar, 3> ColorScale::blueWhiteRedTable[scaleLength];
 Vec<uchar, 3> ColorScale::rainbowTable[scaleLength];
 Vec<uchar, 3> ColorScale::labelTable[labelLength];
 
@@ -30,9 +31,8 @@ void ColorScale::init() {
 
 		gray = (uchar)((1 - scale) * 0xFF);
 		grayTable[i] = Vec<uchar, 3>(gray, gray, gray);
-
 		heatTable[i] = Util::floatToByteColor(Util::getHeatScale(scale));
-
+		blueWhiteRedTable[i] = Util::floatToByteColor(Util::getBlueWhiteRedScale(scale));
 		rainbowTable[i] = Util::floatToByteColor(Util::getRainbowScale(scale));
 	}
 
@@ -70,6 +70,11 @@ Vec<uchar, 3> ColorScale::getGrayScale(double scale) {
 Vec<uchar, 3> ColorScale::getHeatScale(double scale) {
 	int i = min(max((int)(scale * scaleLength), 0), scaleLength - 1);
 	return heatTable[i];
+}
+
+Vec<uchar, 3> ColorScale::getBlueWhiteRedScale(double scale) {
+	int i = min(max((int)(scale * scaleLength), 0), scaleLength - 1);
+	return blueWhiteRedTable[i];
 }
 
 Vec<uchar, 3> ColorScale::getRainbowScale(double scale) {
