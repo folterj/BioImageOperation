@@ -66,14 +66,14 @@ public:
 
 	int getInitialLabel();
 	string getLabels();
-	void draw(Mat* image, int drawMode);
+	void draw(Mat* image, int drawMode, double scale = 1);
 	void drawPoint(Mat* image, Scalar color);
-	void drawCircle(Mat* image, Scalar color);
-	void drawEllipse(Mat* image, Scalar color);
-	void drawBox(Mat* image, Scalar color);
-	void drawAngle(Mat* image, Scalar color);
+	void drawCircle(Mat* image, Scalar color, double scale = 1);
+	void drawEllipse(Mat* image, Scalar color, double scale = 1);
+	void drawBox(Mat* image, Scalar color, double scale = 1);
+	void drawAngle(Mat* image, Scalar color, double scale = 1);
 	void drawFill(Mat* image, Scalar color);
-	void drawLabel(Mat* image, Scalar color, int drawMode);
+	void drawLabel(Mat* image, Scalar color, int drawMode, double scale = 1);
 
 	static string getCsvHeader(bool outputContour = false);
 	string getCsv(bool outputContour = false);

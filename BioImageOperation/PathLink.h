@@ -40,6 +40,6 @@ public:
 	double getMaxCount(int time);
 	double getUsage(int time);
 	double getDirectionRate();
-	void draw(Mat* image, Scalar color, int max, bool animate, int scale=1);
+	void draw(Mat* image, Scalar color, int max, bool animate, double scaling = 1, double scale = 1);
 	string toString();
 };

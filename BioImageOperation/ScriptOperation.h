@@ -65,7 +65,7 @@ public:
 	ScriptOperation* getNextInnerOperation();
 	string getArgument(ArgumentLabel label = ArgumentLabel::None);
 	int getArgument(ArgumentLabel label, int defaultArgument);
-	double getArgumentNumeric(ArgumentLabel label = ArgumentLabel::None, bool oneBase = false);
+	double getArgumentNumeric(ArgumentLabel label = ArgumentLabel::None);
 	bool getArgumentBoolean(ArgumentLabel label = ArgumentLabel::None);
 	static OperationInfo getOperationInfo(ScriptOperationType type);
 	static ArgumentType getExpectedArgumentType(ArgumentLabel argument);

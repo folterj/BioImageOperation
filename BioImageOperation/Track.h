@@ -83,14 +83,14 @@ public:
 	bool isActive(bool needAssigned = false);
 	double activeFactor();
 
-	void draw(Mat* image, int drawMode, int ntracks);
+	void draw(Mat* image, int drawMode, int ntracks, double scale = 1);
 	void drawPoint(Mat* image, Scalar color);
-	void drawCircle(Mat* image, Scalar color);
-	void drawEllipse(Mat* image, Scalar color);
-	void drawBox(Mat* image, Scalar color);
-	void drawAngle(Mat* image, Scalar color);
-	void drawTracks(Mat* image, Scalar color, int ntracks = 1);
-	void drawLabel(Mat* image, Scalar color, int drawMode);
+	void drawCircle(Mat* image, Scalar color, double scale = 1);
+	void drawEllipse(Mat* image, Scalar color, double scale = 1);
+	void drawBox(Mat* image, Scalar color, double scale = 1);
+	void drawAngle(Mat* image, Scalar color, double scale = 1);
+	void drawTracks(Mat* image, Scalar color, int ntracks = 1, double scale = 1);
+	void drawLabel(Mat* image, Scalar color, int drawMode, double scale = 1);
 	static string getCsvHeader(bool outputContour = false);
 	string getCsv(bool outputContour = false, Cluster* cluster = nullptr);
 	string toString();

@@ -45,6 +45,7 @@ enum class ArgumentLabel
 {
 	None,
 	Source,
+	Scale,
 	X,
 	Y,
 	NX,
@@ -104,6 +105,7 @@ const vector<string> ArgumentLabels =
 {
 	"None",
 	"Source",
+	"Scale",
 	"X",
 	"Y",
 	"NX",

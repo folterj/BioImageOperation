@@ -257,7 +257,7 @@ int ScriptOperation::getArgument(ArgumentLabel label, int defaultArgument) {
 	return argumentValue;
 }
 
-double ScriptOperation::getArgumentNumeric(ArgumentLabel label, bool oneBase) {
+double ScriptOperation::getArgumentNumeric(ArgumentLabel label) {
 	double x = 0;
 	string arg;
 
@@ -276,7 +276,13 @@ double ScriptOperation::getArgumentNumeric(ArgumentLabel label, bool oneBase) {
 		}
 	}
 
-	if (oneBase) {
+	if (label == ArgumentLabel::Scale) {
+		if (x <= 0) {
+			x = 1;
+		}
+	}
+
+	if (label == ArgumentLabel::Display) {
 		if (x >= 1) {
 			x -= 1;
 		}
@@ -623,25 +629,25 @@ OperationInfo ScriptOperation::getOperationInfo(ScriptOperationType type) {
 
 	case ScriptOperationType::DrawClusters:
 		requiredArguments = vector<ArgumentLabel> { };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::DrawMode };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::DrawMode, ArgumentLabel::Scale };
 		description = "Draw clusters";
 		break;
 
 	case ScriptOperationType::DrawTracks:
 		requiredArguments = vector<ArgumentLabel> { };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::DrawMode };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::DrawMode, ArgumentLabel::Scale };
 		description = "Draw tracked clusters";
 		break;
 
 	case ScriptOperationType::DrawPaths:
 		requiredArguments = vector<ArgumentLabel> { };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::PathDrawMode, ArgumentLabel::Power, ArgumentLabel::Offset, ArgumentLabel::Palette };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::PathDrawMode, ArgumentLabel::Power, ArgumentLabel::Offset, ArgumentLabel::Palette, ArgumentLabel::Scale };
 		description = "Draw common paths";
 		break;
 
 	case ScriptOperationType::DrawTrackCount:
 		requiredArguments = vector<ArgumentLabel> { };
-		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker };
+		optionalArguments = vector<ArgumentLabel> { ArgumentLabel::Label, ArgumentLabel::Tracker, ArgumentLabel::Palette , ArgumentLabel::Scale };
 		description = "Draw tracking count on image";
 		break;
 
@@ -746,6 +752,7 @@ ArgumentType ScriptOperation::getExpectedArgumentType(ArgumentLabel argument) {
 		type = ArgumentType::Fraction;
 		break;
 
+	case ArgumentLabel::Scale:
 	case ArgumentLabel::Width:
 	case ArgumentLabel::Height:
 	case ArgumentLabel::X:

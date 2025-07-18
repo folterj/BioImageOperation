@@ -223,7 +223,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 	string path, source, output, label;
 	int width, height;
 	int displayi;
-	double fps, size, thresh0, thresh;
+	double scale, fps, size, thresh0, thresh;
 	double hmin, hmax, smin, smax, vmin, vmax;
 	int frame = sourceFrameNumber;
 	int realFrames, interval;
@@ -437,7 +437,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			refImage = getLabelOrCurrentImage(operation, image);
 			if (Util::isValidImage(refImage)) {
 				showImage(refImage,
-							(int)operation->getArgumentNumeric(ArgumentLabel::None, true),
+							(int)operation->getArgumentNumeric(ArgumentLabel::Display),
 							"#" + to_string(count));
 			}
 			break;
@@ -685,7 +685,8 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 		case ScriptOperationType::DrawClusters:
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->drawClusters(getLabelOrCurrentImage(operation, image), newImage,
-										operation->getArgument(ArgumentLabel::DrawMode, (int)ClusterDrawMode::ClusterDefault));
+										operation->getArgument(ArgumentLabel::DrawMode, (int)ClusterDrawMode::ClusterDefault),
+										operation->getArgumentNumeric(ArgumentLabel::Scale));
 			newImageSet = true;
 			break;
 
@@ -693,7 +694,7 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->drawTracks(getLabelOrCurrentImage(operation, image), newImage,
 										operation->getArgument(ArgumentLabel::DrawMode, (int)ClusterDrawMode::TracksDefault),
-										(int)sourceFps);
+										(int)sourceFps, operation->getArgumentNumeric(ArgumentLabel::Scale));
 			newImageSet = true;
 			break;
 
@@ -704,20 +705,20 @@ bool ScriptProcessing::processOperation(ScriptOperation* operation, ScriptOperat
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			imageTracker->drawPaths(getLabelOrCurrentImage(operation, image), newImage,
 									(PathDrawMode)operation->getArgument(ArgumentLabel::PathDrawMode, (int)PathDrawMode::Time),
-									(float)logPower, (float)logOffset, logPalette);
+									(float)logPower, (float)logOffset, logPalette, operation->getArgumentNumeric(ArgumentLabel::Scale));
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::DrawTrackCount:
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
-			imageTracker->drawTrackCount(getLabelOrCurrentImage(operation, image), newImage);
+			imageTracker->drawTrackCount(getLabelOrCurrentImage(operation, image), newImage, operation->getArgumentNumeric(ArgumentLabel::Scale));
 			newImageSet = true;
 			break;
 
 		case ScriptOperationType::ShowTrackInfo:
 			imageTracker = imageTrackers->get(operation->getArgument(ArgumentLabel::Tracker));
 			showText(imageTracker->getInfo(),
-					(int)operation->getArgumentNumeric(ArgumentLabel::Display, true),
+					(int)operation->getArgumentNumeric(ArgumentLabel::Display),
 					"#" + to_string(count));
 			break;
 

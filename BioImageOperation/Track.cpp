@@ -202,37 +202,36 @@ double Track::activeFactor() {
 	return factor;
 }
 
-void Track::draw(Mat* image, int drawMode, int ntracks) {
+void Track::draw(Mat* image, int drawMode, int ntracks, double scale) {
 	Scalar color = ColorScale::getLabelColor(label);
-	Scalar labelColor = Scalar(0x80, 0x80, 0x80);
 
 	if (isActive()) {
 		if ((drawMode & (int)ClusterDrawMode::Point) != 0) {
 			drawPoint(image, color);
 		}
 		if ((drawMode & (int)ClusterDrawMode::Circle) != 0) {
-			drawCircle(image, color);
+			drawCircle(image, color, scale);
 		}
 		if ((drawMode & (int)ClusterDrawMode::Ellipse) != 0) {
-			drawEllipse(image, color);
+			drawEllipse(image, color, scale);
 		}
 		if ((drawMode & (int)ClusterDrawMode::Box) != 0) {
-			drawBox(image, color);
+			drawBox(image, color, scale);
 		}
 		if ((drawMode & (int)ClusterDrawMode::Angle) != 0) {
-			drawAngle(image, color);
+			drawAngle(image, color, scale);
 		}
 		if ((drawMode & (int)ClusterDrawMode::Tracks) != 0) {
 			if (ntracks == 0) {
 				ntracks = (int)fps;
 			}
-			drawTracks(image, color, ntracks);
+			drawTracks(image, color, ntracks, scale);
 		}
 		if ((drawMode & (int)ClusterDrawMode::Track) != 0) {
-			drawTracks(image, color, 1);
+			drawTracks(image, color, 1, scale);
 		}
 	}
-	drawLabel(image, labelColor, drawMode);
+	drawLabel(image, color, drawMode, scale);
 }
 
 void Track::drawPoint(Mat* image, Scalar color) {
@@ -241,16 +240,16 @@ void Track::drawPoint(Mat* image, Scalar color) {
 	circle(*image, point, rad2, color, LineTypes::FILLED, LineTypes::LINE_AA);
 }
 
-void Track::drawCircle(Mat* image, Scalar color) {
+void Track::drawCircle(Mat* image, Scalar color, double scale) {
 	Point point((int)x, (int)y);
 	int rad2 = (int)ceil(meanLengthMajor / 2);
 	if (rad2 == 0) {
 		rad2 = rad;
 	}
-	circle(*image, point, rad2, color, 1, LineTypes::LINE_AA);
+	circle(*image, point, rad2, color, (int)scale, LineTypes::LINE_AA);
 }
 
-void Track::drawEllipse(Mat* image, Scalar color) {
+void Track::drawEllipse(Mat* image, Scalar color, double scale) {
 	Point point((int)x, (int)y);
 	int rad1 = (int)ceil(meanLengthMajor / 2);
 	int rad2 = (int)ceil(meanLengthMinor / 2);
@@ -260,27 +259,27 @@ void Track::drawEllipse(Mat* image, Scalar color) {
 	if (rad2 == 0) {
 		rad2 = rad;
 	}
-	ellipse(*image, point, Size(rad1, rad2), angle, 0, 360, color, 1, LineTypes::LINE_AA);
+	ellipse(*image, point, Size(rad1, rad2), angle, 0, 360, color, (int)scale, LineTypes::LINE_AA);
 }
 
-void Track::drawBox(Mat* image, Scalar color) {
+void Track::drawBox(Mat* image, Scalar color, double scale) {
 	int rad2 = (int)ceil(meanLengthMajor / 2);
 	if (rad2 == 0) {
 		rad2 = rad;
 	}
 	Rect rect((int)(x - rad2), (int)(y - rad2), (int)(rad2 * 2), (int)(rad2 * 2));
-	rectangle(*image, rect, color, 1, LineTypes::LINE_AA);
+	rectangle(*image, rect, color, (int)scale, LineTypes::LINE_AA);
 }
 
-void Track::drawAngle(Mat* image, Scalar color) {
+void Track::drawAngle(Mat* image, Scalar color, double scale) {
 	double rad2 = meanLengthMajor / 2;
 	if (rad2 == 0) {
 		rad2 = rad;
 	}
-	Util::drawAngle(image, x, y, rad2, orientation, color, (forwardDist != 0));
+	Util::drawAngle(image, x, y, rad2, orientation, color, (forwardDist != 0), scale);
 }
 
-void Track::drawTracks(Mat* image, Scalar color, int ntracks) {
+void Track::drawTracks(Mat* image, Scalar color, int ntracks, double scale) {
 	Point point0, point1;
 	bool init = false;
 	int n = 0;
@@ -289,7 +288,7 @@ void Track::drawTracks(Mat* image, Scalar color, int ntracks) {
 		point1.x = (int)points[i].x;
 		point1.y = (int)points[i].y;
 		if (init) {
-			line(*image, point0, point1, color, 1, LineTypes::LINE_AA);
+			line(*image, point0, point1, color, (int)scale, LineTypes::LINE_AA);
 		}
 		point0 = point1;
 		init = true;
@@ -297,7 +296,7 @@ void Track::drawTracks(Mat* image, Scalar color, int ntracks) {
 	}
 }
 
-void Track::drawLabel(Mat* image, Scalar color, int drawMode) {
+void Track::drawLabel(Mat* image, Scalar color, int drawMode, double scale) {
 	vector<string> texts;
 	Point point((int)(x + rad), (int)(y + rad));
 	Size size;
@@ -325,7 +324,7 @@ void Track::drawLabel(Mat* image, Scalar color, int drawMode) {
 			text = "(" + text + ")";
 		}
 		if (text != "") {
-			size = Util::drawText(image, text, point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 1, color);
+			size = Util::drawText(image, text, point, HersheyFonts::FONT_HERSHEY_SIMPLEX, color, scale);
 			point.y += (int)(size.height * 1.5);
 		}
 	}

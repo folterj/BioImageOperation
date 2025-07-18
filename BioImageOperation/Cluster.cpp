@@ -239,13 +239,12 @@ string Cluster::getLabels() {
 	return labels;
 }
 
-void Cluster::draw(Mat* image, int drawMode) {
+void Cluster::draw(Mat* image, int drawMode, double scale) {
 	int label = -1;
 	if (hasSingleTrack()) {
 		label = getInitialLabel();
 	}
 	Scalar color = ColorScale::getLabelColor(label);
-	Scalar labelColor = Scalar(0x80, 0x80, 0x80);
 
 	if ((drawMode & (int)ClusterDrawMode::Fill) != 0) {
 		drawFill(image, color);
@@ -254,18 +253,18 @@ void Cluster::draw(Mat* image, int drawMode) {
 		drawPoint(image, color);
 	}
 	if ((drawMode & (int)ClusterDrawMode::Circle) != 0) {
-		drawCircle(image, color);
+		drawCircle(image, color, scale);
 	}
 	if ((drawMode & (int)ClusterDrawMode::Ellipse) != 0) {
-		drawEllipse(image, color);
+		drawEllipse(image, color, scale);
 	}
 	if ((drawMode & (int)ClusterDrawMode::Box) != 0) {
-		drawBox(image, color);
+		drawBox(image, color, scale);
 	}
 	if ((drawMode & (int)ClusterDrawMode::Angle) != 0) {
-		drawAngle(image, color);
+		drawAngle(image, color, scale);
 	}
-	drawLabel(image, labelColor, drawMode);
+	drawLabel(image, color, drawMode, scale);
 }
 
 void Cluster::drawPoint(Mat* image, Scalar color) {
@@ -274,12 +273,12 @@ void Cluster::drawPoint(Mat* image, Scalar color) {
 	circle(*image, point, rad2, color, LineTypes::FILLED, LineTypes::LINE_AA);
 }
 
-void Cluster::drawCircle(Mat* image, Scalar color) {
+void Cluster::drawCircle(Mat* image, Scalar color, double scale) {
 	Point point((int)x, (int)y);
-	circle(*image, point, (int)ceil(rad), color, 1, LineTypes::LINE_AA);
+	circle(*image, point, (int)ceil(rad), color, (int)scale, LineTypes::LINE_AA);
 }
 
-void Cluster::drawEllipse(Mat* image, Scalar color) {
+void Cluster::drawEllipse(Mat* image, Scalar color, double scale) {
 	Point point((int)x, (int)y);
 	int rad1 = (int)ceil(lengthMajor / 2);
 	int rad2 = (int)ceil(lengthMinor / 2);
@@ -289,18 +288,18 @@ void Cluster::drawEllipse(Mat* image, Scalar color) {
 	if (rad2 == 0) {
 		rad2 = rad;
 	}
-	ellipse(*image, point, Size(rad1, rad2), angle, 0, 360, color, 1, LineTypes::LINE_AA);
+	ellipse(*image, point, Size(rad1, rad2), angle, 0, 360, color, (int)scale, LineTypes::LINE_AA);
 }
 
-void Cluster::drawBox(Mat* image, Scalar color) {
+void Cluster::drawBox(Mat* image, Scalar color, double scale) {
 	int width = box.width;
 	int height = box.height;
 	Rect rect((int)(x - width / 2), (int)(y - height / 2), width, height);
 	rectangle(*image, rect, color, 1, LineTypes::LINE_AA);
 }
 
-void Cluster::drawAngle(Mat* image, Scalar color) {
-	Util::drawAngle(image, x, y, rad, angle, color, false);
+void Cluster::drawAngle(Mat* image, Scalar color, double scale) {
+	Util::drawAngle(image, x, y, rad, angle, color, false, scale);
 }
 
 void Cluster::drawFill(Mat* image, Scalar color) {
@@ -313,7 +312,7 @@ void Cluster::drawFill(Mat* image, Scalar color) {
 	}
 }
 
-void Cluster::drawLabel(Mat* image, Scalar color, int drawMode) {
+void Cluster::drawLabel(Mat* image, Scalar color, int drawMode, double scale) {
 	vector<string> texts;
 	Point point((int)(x + rad), (int)(y + rad));
 	Size size;
@@ -337,7 +336,7 @@ void Cluster::drawLabel(Mat* image, Scalar color, int drawMode) {
 	}
 
 	for (string text : texts) {
-		size = Util::drawText(image, text, point, HersheyFonts::FONT_HERSHEY_SIMPLEX, 1, color);
+		size = Util::drawText(image, text, point, HersheyFonts::FONT_HERSHEY_SIMPLEX, color, scale);
 		point.y += (int)(size.height * 1.5);
 	}
 }

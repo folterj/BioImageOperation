@@ -156,10 +156,10 @@ public:
 	/*
 	 * Drawing routines
 	 */
-	void drawClusters(Mat* source, Mat* dest, int drawMode);
-	void drawTracks(Mat* source, Mat* dest, int drawMode, int ntracks);
-	void drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, float power_scale, float power_offset, Palette palette);
-	void drawTrackCount(Mat* source, Mat* dest);
+	void drawClusters(Mat* source, Mat* dest, int drawMode, double scale = 1);
+	void drawTracks(Mat* source, Mat* dest, int drawMode, int ntracks = 1, double scale = 1);
+	void drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, float power_scale, float power_offset, Palette palette, double scale = 1);
+	void drawTrackCount(Mat* source, Mat* dest, double scale = 1);
 
 	/*
 	 * Return tracking information to show in text window

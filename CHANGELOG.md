@@ -1,3 +1,7 @@
+#### Version 1.7.20
+* Added Scale parameter to Draw functions
+* Labels now use matching track id color
+
 #### Version 1.7.19
 * Made common paths output more meaningful, and greatly improved performance
 * Various small bug fixes

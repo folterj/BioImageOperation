@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<iasettings>
+  <projectproperties>
+    <manufacturer>Y</manufacturer>
+    <productname>BioImageOperation</productname>
+    <productversion>1.7.19</productversion>
+    <productcode>{f10cb6fb-3d80-4873-a202-ebcce543e19d}</productcode>
+    <upgradecode>{ac582c71-b2cf-4775-9e3e-0bc068bcb475}</upgradecode>
+    <language>0</language>
+    <languagename>English</languagename>
+  </projectproperties>
+  <summary>
+    <title>BioImageOperation</title>
+    <subject>BioImageOperation</subject>
+    <author>Y</author>
+    <summarycomments>BioImageOperation</summarycomments>
+    <revisioncode>{4d353aa6-1b3d-4c3c-a4e0-f4b7254803ec}</revisioncode>
+    <uacelevation>highestAvailable</uacelevation>
+  </summary>
+  <addremove>
+    <publishername>Y</publishername>
+    <contactname>Y</contactname>
+    <helplink>http://www.mywebsite.com</helplink>
+    <productupdatelink>http://www.mywebsite.com</productupdatelink>
+    <addremovecomments>All Rights Reserved</addremovecomments>
+    <iconfile />
+  </addremove>
+  <codegen>
+    <generateincludefiles>0</generateincludefiles>
+    <generatefeatures>1</generatefeatures>
+    <refreshscript>0</refreshscript>
+  </codegen>
+  <compilervariables>
+    <variables />
+  </compilervariables>
+  <build>
+    <buildtype>0</buildtype>
+    <buildasmsi>False</buildasmsi>
+    <cachesources>1</cachesources>
+  </build>
+  <targetfolders />
+  <files>
+    <filedetails filename="E:\Personal\Projects\Ants\BioImageOperation\x64\Debug\BioImageOperation.exe" targetlocation="$TARGETDIR$" type="1" generatenativeimage="0" registerassembly="0" runinstallerclass="0" createshortcut="1" runprogram="0" installfilecommand="1" VsProjectOutputfile ="1" />
+    <filedetails filename="E:\Personal\Projects\Ants\BioImageOperation\console\x64\Debug\BioImageOperation_console.exe" targetlocation="$TARGETDIR$" type="1" generatenativeimage="0" registerassembly="0" runinstallerclass="0" createshortcut="1" runprogram="0" installfilecommand="1" VsProjectOutputfile ="1" />
+  </files>
+  <dependencies />
+  <registry />
+  <dialogtheme>
+    <themename>Official</themename>
+  </dialogtheme>
+  <authenticode>
+    <sign>0</sign>
+    <mode>0</mode>
+    <certificatefile />
+    <keyfile />
+    <pfxfile />
+    <productinfourl />
+    <authpassword />
+    <timestampurl />
+    <evCertFile />
+    <evKeyContainerName />
+    <signall>0</signall>
+  </authenticode>
+  <compression>
+    <compressiontype>6</compressiontype>
+    <encrypt>0</encrypt>
+    <compressionpassword />
+  </compression>
+  <output>
+    <outputtype>0</outputtype>
+    <location />
+    <filename />
+    <calculatefilehash>0</calculatefilehash>
+    <refreshrevisioncode>1</refreshrevisioncode>
+  </output>
+</iasettings>

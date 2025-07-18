@@ -1,4 +1,4 @@
-# Bio Image Operation script operations (v1.7.19 / 2024-09-21)
+# Bio Image Operation script operations (v1.7.20 / 2025-07-18)
 
 
 **Set** (Path, Width, Height, Fps, PixelSize, WindowSize)
@@ -424,25 +424,27 @@ Create common path usage
  - Debug:	 Debug mode (true / false)
 
 
-**DrawClusters** (Label, Tracker, DrawMode)
+**DrawClusters** (Label, Tracker, DrawMode, Scale)
 
 Draw clusters
 
  - Label:	 Label id (string)
  - Tracker:	 Tracker id (string)
  - DrawMode:	 Draw mode(s) (combine using | character) (None, Point, Circle, Ellipse, Box, Angle, Label, LabelArea, LabelLength, LabelAngle, Track, Tracks, Fill, ClusterDefault, TracksDefault)
+ - Scale:	  (numeric value)
 
 
-**DrawTracks** (Label, Tracker, DrawMode)
+**DrawTracks** (Label, Tracker, DrawMode, Scale)
 
 Draw tracked clusters
 
  - Label:	 Label id (string)
  - Tracker:	 Tracker id (string)
  - DrawMode:	 Draw mode(s) (combine using | character) (None, Point, Circle, Ellipse, Box, Angle, Label, LabelArea, LabelLength, LabelAngle, Track, Tracks, Fill, ClusterDefault, TracksDefault)
+ - Scale:	  (numeric value)
 
 
-**DrawPaths** (Label, Tracker, PathDrawMode, Power, Offset, Palette)
+**DrawPaths** (Label, Tracker, PathDrawMode, Power, Offset, Palette, Scale)
 
 Draw common paths
 
@@ -452,14 +454,17 @@ Draw common paths
  - Power:	 Exponential power of value range (1E-[power] ... 1) (numeric value)
  - Offset:	 Exponential offset of value range (numeric value)
  - Palette:	 Palette (GrayScale, Heat, Rainbow)
+ - Scale:	  (numeric value)
 
 
-**DrawTrackCount** (Label, Tracker)
+**DrawTrackCount** (Label, Tracker, Palette, Scale)
 
 Draw tracking count on image
 
  - Label:	 Label id (string)
  - Tracker:	 Tracker id (string)
+ - Palette:	 Palette (GrayScale, Heat, Rainbow)
+ - Scale:	  (numeric value)
 
 
 **SaveClusters** (**Path**, Tracker, Format, Contour)

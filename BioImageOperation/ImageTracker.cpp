@@ -479,25 +479,25 @@ string ImageTracker::getPathDebugInfo() {
 	return s;
 }
 
-void ImageTracker::drawClusters(Mat* source, Mat* dest, int drawMode) {
+void ImageTracker::drawClusters(Mat* source, Mat* dest, int drawMode, double scale) {
 	source->copyTo(*dest);
 
 	for (Cluster* cluster : clusters) {
-		cluster->draw(dest, drawMode);
+		cluster->draw(dest, drawMode, scale);
 	}
 }
 
-void ImageTracker::drawTracks(Mat* source, Mat* dest, int drawMode, int ntracks) {
+void ImageTracker::drawTracks(Mat* source, Mat* dest, int drawMode, int ntracks, double scale) {
 	source->copyTo(*dest);
 
 	for (Track* track : tracks) {
 		if (track->isActive() || trackDebugMode) {
-			track->draw(dest, drawMode, ntracks);
+			track->draw(dest, drawMode, ntracks, scale);
 		}
 	}
 }
 
-void ImageTracker::drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, float power_scale, float power_offset, Palette palette) {
+void ImageTracker::drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, float power_scale, float power_offset, Palette palette, double scale) {
 	float colorScale, colorMagnitude, colorValue;
 	Scalar color;
 	float ln10_factor = 2.303;
@@ -521,7 +521,7 @@ void ImageTracker::drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, floa
 			colorMagnitude = min(max(colorScale * pow(10, power_scale), 0.0), 1.0);
 			colorValue = min(max(link->getDirectionRate(), 0.0), 1.0);
 			color = ColorScale::getBlueWhiteRedScale(colorValue) * colorMagnitude;
-			link->draw(dest, color, pathAge, animate, pathDistance);
+			link->draw(dest, color, pathAge, animate, pathDistance, scale);
 		}
 	} else {
 		Mat image0 = Mat(pathMapHeight, pathMapWidth, CV_32F, pathMap.data()) / (pathAge + 1);
@@ -536,7 +536,7 @@ void ImageTracker::drawPaths(Mat* source, Mat* dest, PathDrawMode drawMode, floa
 	}
 }
 
-void ImageTracker::drawTrackCount(Mat* source, Mat* dest) {
+void ImageTracker::drawTrackCount(Mat* source, Mat* dest, double scale) {
 	string label;
 	double x = 0;
 	double y = 0;
@@ -572,7 +572,7 @@ void ImageTracker::drawTrackCount(Mat* source, Mat* dest) {
 	if (position.x < 0) position.x = 0;
 	if (position.y < 0) position.y = 0;
 
-	Util::drawText(dest, label, position, HersheyFonts::FONT_HERSHEY_SIMPLEX, 1, color);
+	Util::drawText(dest, label, position, HersheyFonts::FONT_HERSHEY_SIMPLEX, color, scale);
 }
 
 string ImageTracker::getInfo() {
